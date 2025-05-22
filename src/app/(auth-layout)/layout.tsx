@@ -1,7 +1,13 @@
-import React from 'react'
+import React from "react";
 
-export default function AuthLayout() {
+type Props = {
+  children: Readonly<React.ReactNode>;
+};
+
+export default function AuthLayout({ children }: Props) {
   return (
-    <div>AuthLayout</div>
-  )
+    <>
+      <div className="auth-layout">{children}</div>
+    </>
+  );
 }
