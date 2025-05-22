@@ -1,5 +1,6 @@
 import LangSwitcher from "@/components/shared/LangSwitcher";
 import { getDictionary } from "../../dictionaries";
+import DashSidebar from "@/components/layout/DashSidebar";
 
 export default async function RootLayout({
   children,
@@ -13,6 +14,8 @@ export default async function RootLayout({
   return (
     <>
       <div className="dash-layout">
+        <LangSwitcher dict={dict} />
+        <DashSidebar params={{ lang }} />
         {children}
       </div>
     </>
