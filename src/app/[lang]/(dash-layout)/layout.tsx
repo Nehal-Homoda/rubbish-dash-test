@@ -13,7 +13,6 @@ export default async function RootLayout({
   return (
     <>
       <div className="dash-layout">
-        <LangSwitcher dict={dict} />
         {children}
       </div>
     </>
