@@ -3,7 +3,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import Cookies from "js-cookie";
 
-export default function LangSwitcher({ dict }) {
+export default function LangSwitcher({ dict }: { dict:any }) {
   const [isOpen, setIsOpen] = useState(false);
   const pathName = usePathname();
   const router = useRouter();
@@ -19,7 +19,7 @@ export default function LangSwitcher({ dict }) {
   };
   return (
     <>
-      <div className="relative">
+      <div className="relative w-fit mx-40">
         <div>
           <div
             onClick={toggleSwitcher}

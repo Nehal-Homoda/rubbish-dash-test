@@ -34,7 +34,7 @@ export default async function RootLayout({
   const { lang } = await params;
 
   return (
-    <html lang={lang}>
+    <html dir={lang == "ar" ? "rtl" : "ltr"} lang={lang}>
       <head>
         <link
           rel="stylesheet"
