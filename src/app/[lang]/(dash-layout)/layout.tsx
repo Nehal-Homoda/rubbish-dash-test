@@ -1,6 +1,5 @@
-import LangSwitcher from '@/components/shared/LangSwitcher'
+import LangSwitcher from "@/components/shared/LangSwitcher";
 import { getDictionary } from "../../dictionaries";
-
 
 export default async function RootLayout({
   children,
@@ -9,15 +8,15 @@ export default async function RootLayout({
   children: React.ReactNode;
   params: Promise<{ lang: "en" | "ar" }>;
 }>) {
-
   const { lang } = await params;
   const dict = await getDictionary(lang);
+  const dict2 = await getDictionary(lang);
   return (
     <>
       <div className="dash-layout">
-        <LangSwitcher dict={ dict } />
-            {children}
-        </div>
+        <LangSwitcher dict={dict} />
+        {children}
+      </div>
     </>
-  )
+  );
 }
