@@ -10,7 +10,6 @@ export default async function RootLayout({
 }>) {
   const { lang } = await params;
   const dict = await getDictionary(lang);
-  const dict2 = await getDictionary(lang);
   return (
     <>
       <div className="dash-layout">
