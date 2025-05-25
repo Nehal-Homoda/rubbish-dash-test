@@ -19,28 +19,28 @@ export default function LangSwitcher({ dict }: { dict:any }) {
   };
   return (
     <>
-      <div className="relative w-fit mx-40">
+      <div className="relative w-fit">
         <div>
           <div
             onClick={toggleSwitcher}
-            className="text-lg font-semibold text-gray-900 shadow-xs cursor-pointer"
+            className="text-3xl font-semibold text-gray-900 shadow-xs cursor-pointer"
           >
-            <i className="fa-solid fa-globe"></i>
+            <i className="fa-solid fa-globe hover:text-surface transition-all"></i>
           </div>
         </div>
 
         {isOpen ? (
-          <div className="absolute right-0 w-fit rounded-md bg-white shadow-lg">
+          <div className="absolute left-0 w-fit rounded-md bg-white shadow-lg mt-4">
             <div>
               <button
                 onClick={() => switchLang("en")}
-                className="w-full px-4 py-2 text-sm text-gray-700 rounded-md rounded-b-none hover:bg-gray-100 cursor-pointer"
+                className="w-full px-4 py-2 font-bold text-sm text-gray-700 rounded-md rounded-b-none hover:bg-gray-100 cursor-pointer"
               >
                 {dict.english}
               </button>
               <button
                 onClick={() => switchLang("ar")}
-                className="w-full px-4 py-2 text-sm text-gray-700 rounded-md rounded-t-none hover:bg-gray-100 cursor-pointer"
+                className="w-full px-4 py-2 font-bold text-sm text-gray-700 rounded-md rounded-t-none hover:bg-gray-100 cursor-pointer"
               >
                 {dict.arabic}
               </button>
