@@ -1,7 +1,20 @@
 import React from 'react'
+import UIDarkBtn from '../ui/UIDarkBtn'
+import LangSwitcher from '../shared/LangSwitcher'
+import { getDictionary } from '@/app/dictionaries';
 
-export default function DashNavbar() {
+export default async function DashNavbar({lang, dict}) {
   return (
-    <div>DashNavbar</div>
-  )
+    <>
+      <nav className="">
+        <div className="flex justify-between items-center p-6">
+          <div className="title font-bold text-lg">صباح الخير</div>
+          <div className='flex justify-center items-center gap-4'>
+            <UIDarkBtn lang={lang} />
+            <LangSwitcher dict={dict} />
+          </div>
+        </div>
+      </nav>
+    </>
+  );
 }
