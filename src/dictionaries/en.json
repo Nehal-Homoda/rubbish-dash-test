@@ -5,6 +5,8 @@
   "services": "Services",
   "regions": "Regions",
   "users": "Users",
+  "all":"All",
+   "deleted": "Deleted Users",
   "packages": "Packages",
   "rubbush_collectors": "Garbage Collectors",
   "visits": "Visits",
