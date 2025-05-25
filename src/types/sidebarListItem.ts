@@ -1,6 +1,12 @@
-export interface ListItem {
-  icon: string;
+export type DropdownItem = {
   name: string;
   path: string;
-  dropdown?: string[]; 
-}
+  icon?:string;
+};
+
+export type ListItem = {
+  icon: string;
+  name: string;
+  path?: string;
+  dropdown?: DropdownItem[]; 
+};
