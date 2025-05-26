@@ -40,7 +40,7 @@ export default function UIDashCard({
             label="اسم المستخدم"
             type="text"
             iconType="mdi"
-            appendIcon="mdi-account-outline"
+            // appendIcon="mdi-account-outline"
             prependIcon="mdi-account-outline"
             required={true}
             placeholder="ادخل اسمك"
