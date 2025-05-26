@@ -1,7 +1,8 @@
 import { getDictionary } from "../../dictionaries";
 import DashSidebar from "@/components/layout/DashSidebar";
-import UICard from "@/components/ui/UICard";
+import UICard from "@/components/ui/UICardYara";
 import DashNavbar from "@/components/layout/DashNavbar";
+import Input from "@/components/ui/form/TextFieldYara";
 
 export default async function RootLayout({
   children,
@@ -12,6 +13,7 @@ export default async function RootLayout({
 }>) {
   const { lang } = await params;
   const dict = await getDictionary(lang);
+
   return (
     <>
       <div className="dash-layout">
@@ -19,11 +21,10 @@ export default async function RootLayout({
           <DashSidebar dict={dict} />
         </aside>
 
-        <div className="md:ps-[16.9rem] w-[98%] mx-auto">
-          <DashNavbar lang={lang} dict={dict}/>
+        <div className="md:ps-[16.9rem] w-[97%] mx-auto">
+          <DashNavbar lang={lang} dict={dict} />
           {children}
           <UICard title={"الخريطة"}>example</UICard>
-
         </div>
       </div>
     </>
