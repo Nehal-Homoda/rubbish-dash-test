@@ -6,16 +6,22 @@ import skyLight from "@/assets/images/sky-morning.jpg";
 import skyDark from "@/assets/images/sky-night.jpg";
 
 export default function UIDarkBtn({ lang }: { lang: string }) {
-  const [isDark, setIsDark] = useState(false);
+const [isDark, setIsDark] = useState<boolean | null>(null);
+
+    useEffect(() => {
+    const darkModeFromStorage = JSON.parse(localStorage.getItem("dark-mode") || "false");
+    setIsDark(darkModeFromStorage);
+  }, []);
+
+  useEffect(() => {
+      if (isDark === null) return; 
+    const html = document.documentElement;
+    isDark ? html.classList.add("dark") : html.classList.remove("dark");
+    localStorage.setItem('dark-mode',JSON.stringify(isDark));
+  }, [isDark]);
   const toggleTheme = () => {
     setIsDark((prev) => !prev);
   };
-
-  useEffect(() => {
-    const html = document.documentElement;
-    isDark ? html.classList.add("dark") : html.classList.remove("dark");
-  }, [isDark]);
-
   const translateDirection = lang === "ar" ? "-translate-x-8" : "translate-x-8";
 
   return (
@@ -27,7 +33,7 @@ export default function UIDarkBtn({ lang }: { lang: string }) {
             : `url(${skyDark.src})`,
         }}
         onClick={toggleTheme}
-        className={`rounded-full transition-all cursor-pointer bg-no-repeat bg-cover bg-center duration-500 p-1 w-16 h-8 mt-5 `}
+        className={`rounded-full transition-all cursor-pointer bg-no-repeat bg-cover bg-center duration-500 p-1 w-16 h-8 `}
       >
         <div
           style={{
