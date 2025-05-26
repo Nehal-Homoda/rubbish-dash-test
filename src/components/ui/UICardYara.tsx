@@ -11,6 +11,7 @@ export default function UIDashCard({
   children,
   shadowClassName = "shadow-[0_0_0.25rem_0.5625rem_rgb(0,0,0,0.07)]",
 }: UIDashCardProps) {
+  // !inputs will be removed  
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
 
@@ -33,6 +34,7 @@ export default function UIDashCard({
           </div>
         )}
         <div className="mb-7">{children}</div>
+        {/* inputs will be removed */}
         <div className="inputs  flex gap-7">
           <Input
             label="اسم المستخدم"
