@@ -9,7 +9,7 @@ export default async function Home({
   const dict = await getDictionary(lang);
   return (
     <>
-      <div className="home-page">{dict.home}</div>
+      <div className="home-page"></div>
     </>
   );
 }

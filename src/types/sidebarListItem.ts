@@ -1,12 +1,7 @@
-export type DropdownItem = {
-  name: string;
-  path: string;
-  icon?:string;
-};
-
 export type ListItem = {
-  icon: string;
+  icon?: string;
   name: string;
   path?: string;
-  dropdown?: DropdownItem[]; 
+  iconType?: "mdi" | "fa";
+  dropdown?: ListItem[];
 };
