@@ -4,9 +4,9 @@
 
 :root {
   --color-background: 255 255 255;
-  --color-foreground: 56 67 59;
-  /* muted text - icons color */
-  --color-muted: 56 67 59;
+  --color-foreground: 56 67 59; /*text => /65*/
+  /* muted text - icons color
+  --color-muted: 56 67 59; */
 
   /* most used color */
   --color-surface: 0 148 20;
@@ -27,16 +27,15 @@
   --color-surface-light-400: 128 202 138;
   --color-surface-light-500: 153 212 161;
   --color-surface-light-600: 179 223 185;
-  --color-surface-light-700: 204 234 208;
+  --color-surface-light-700: 204 234 208; /*input-border*/
   --color-surface-light-800: 230 244 232;
 
-  /* //TODO inputs-bg 173 170 170  */
 }
 .dark {
   --color-background: 0 0 0;
   --color-foreground: 255 255 255;
   /* muted text - icons color */
-  --color-muted: 56 67 59;
+  /* --color-muted: 56 67 59; */
   /* most used color */
   --color-service: 0 148 20;
   --color-service-100: 0 133 18;
@@ -83,9 +82,14 @@ body {
 [dir="rtl"] .custom-scroll {
   direction: rtl;
 }
-/* .custom-scroll::-webkit-scrollbar {
-  display: none;
-} */
-.card-title {
-  @apply text-foreground text-lg font-semibold capitalize mb-4;
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
 }
