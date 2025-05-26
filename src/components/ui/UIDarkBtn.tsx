@@ -27,7 +27,7 @@ export default function UIDarkBtn({ lang }: { lang: string }) {
             : `url(${skyDark.src})`,
         }}
         onClick={toggleTheme}
-        className={`rounded-full transition-all cursor-pointer bg-no-repeat bg-cover bg-center duration-500 p-1 w-16 h-8 mt-5 `}
+        className={`rounded-full transition-all cursor-pointer bg-no-repeat bg-cover bg-center duration-500 p-1 w-16 h-8 `}
       >
         <div
           style={{

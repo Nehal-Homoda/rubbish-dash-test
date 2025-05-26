@@ -23,14 +23,14 @@ export default function LangSwitcher({ dict }: { dict:any }) {
         <div>
           <div
             onClick={toggleSwitcher}
-            className="text-3xl font-semibold text-gray-900 shadow-xs cursor-pointer"
+            className="text-2xl font-semibold text-gray-900 shadow-xs cursor-pointer"
           >
-            <i className="fa-solid fa-globe hover:text-surface transition-all"></i>
+            <i className="fa-solid fa-globe text-foreground hover:text-surface transition-all"></i>
           </div>
         </div>
 
         {isOpen ? (
-          <div className="absolute left-0 w-fit rounded-md bg-white shadow-lg mt-4">
+          <div className="absolute rtl:left-2 ltr:right-2 w-32 rounded-md bg-white shadow mt-2 z-50">
             <div>
               <button
                 onClick={() => switchLang("en")}

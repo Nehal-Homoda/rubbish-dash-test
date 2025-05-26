@@ -1,4 +1,5 @@
 import { getDictionary } from "@/app/dictionaries";
+import DashCard from "@/components/ui/DashCard";
 
 export default async function Home({
   params,
@@ -9,7 +10,10 @@ export default async function Home({
   const dict = await getDictionary(lang);
   return (
     <>
-      <div className="home-page">{dict.home}</div>
+      <div className="home-page">
+        <DashCard>hi</DashCard>
+      </div>
+      <input type="time" />
     </>
   );
 }

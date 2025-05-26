@@ -1,16 +1,8 @@
-import LangSwitcher from "@/components/shared/LangSwitcher";
 import { getDictionary } from "../../dictionaries";
 import DashSidebar from "@/components/layout/DashSidebar";
-import UIDarkBtn from "@/components/ui/UIDarkBtn";
-import UIDashCard from "@/components/ui/UIDashCard";
+import DashNavbar from "@/components/layout/DashNavbar";
 
-export default async function RootLayout({
-  children,
-  params,
-}: Readonly<{
-  children: React.ReactNode;
-  params: Promise<{ lang: "en" | "ar" }>;
-}>) {
+export default async function RootLayout({children,params,}: Readonly<{children: React.ReactNode;params: Promise<{ lang: "en" | "ar" }>;}>) {
   const { lang } = await params;
   const dict = await getDictionary(lang);
   return (
@@ -21,10 +13,8 @@ export default async function RootLayout({
         </aside>
 
         <div className="flex-1">
+          <DashNavbar dict={dict} lang={lang} />
           {children}
-          <UIDashCard title={"الخريطة"} children={"example"} />
-          {/* * <LangSwitcher dict={dict} /> */}
-          <UIDarkBtn lang={lang} />
         </div>
       </div>
     </>
