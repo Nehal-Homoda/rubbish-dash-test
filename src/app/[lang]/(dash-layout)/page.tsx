@@ -11,6 +11,7 @@ export default async function Home({ params, }: { params: Promise<{ lang: "en" |
       <div className="home-page">
         <CardNada>hi</CardNada>
       </div>
+
     </>
   );
 }

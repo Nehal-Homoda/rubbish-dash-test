@@ -1,9 +1,15 @@
-import React from 'react'
-import UIThemeToggleBtn from "../ui/UIThemeToggleBtn";
-import LangSwitcher from '../shared/LangSwitcher'
-import { getDictionary } from '@/app/dictionaries';
 
-export default async function DashNavbar({lang, dict}:{lang:'ar'|'en',dict:{}}) {
+import React from "react";
+import UIThemeToggleBtn from "@/components/ui/UIThemeToggleBtn";
+import LangSwitcher from "../shared/LangSwitcher";
+
+export default async function DashNavbar({
+  lang,
+  dict,
+}: {
+  lang: "ar" | "en";
+  dict: {};
+}) {
   return (
     <>
       <nav className="">
