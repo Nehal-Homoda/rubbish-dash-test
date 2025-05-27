@@ -2,6 +2,7 @@ import React from "react";
 interface CheckBoxProps {
   text: string;
   checked: boolean;
+  id:string;
   onChange: (checked: boolean) => void;
 }
 export default function CheckBox(props: CheckBoxProps) {
@@ -10,11 +11,13 @@ export default function CheckBox(props: CheckBoxProps) {
   };
   return (
     <>
-      <label className="text-foreground w-fit relative flex items-center gap-2 cursor-pointer">
+      <label htmlFor={props.id} className="text-foreground w-fit relative flex items-center gap-2 cursor-pointer">
         <input
           type="checkbox"
           onChange={handleChange}
           checked={props.checked}
+          id={props.id}
+
           className="  w-5 h-4 opacity-0 peer z-40  absolute"
         />
         <div
@@ -22,7 +25,7 @@ export default function CheckBox(props: CheckBoxProps) {
         >
           {props.checked && (
             <span
-              className={`mdi mdi-check text-surface text-[10px]  leading-none relative `}
+              className={`mdi mdi-check text-surface text-[10px]  leading-none `}
             />
           )}
         </div>
