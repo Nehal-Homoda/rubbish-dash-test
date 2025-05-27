@@ -14,8 +14,13 @@ interface RadionButtonProps {
 export default function RadioButtonWithImg(props: RadionButtonProps) {
   return (
     <>
+   
       <div>
-        <div className="flex items-center border-[1px] border-surface bg-foreground/5 justify-between w-full rounded-xl py-2 px-4">
+        <div
+          className={`flex items-center border-[1px] ${
+            props.value === props.radioValue ? "border-surface" : ""
+          } bg-foreground/5 justify-between w-full rounded-xl py-2 px-4`}
+        >
           <div className="content flex items-center gap-3">
             {props.image && (
               <Image
@@ -32,7 +37,7 @@ export default function RadioButtonWithImg(props: RadionButtonProps) {
             value={props.radioValue}
             checked={props.value === props.radioValue}
             onChange={() => props.onChange(props.radioValue)}
-            className="accent-surface scale-150 border-2 "
+            className="accent-surface scale-150 "
           />
         </div>
         {props.errorMessage && (

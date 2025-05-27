@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useRef, useState } from "react";
 interface FileInputProps {
   errorMessage?: string;
+  title:string;
   onFileChange: (file: File | null) => void;
 }
 export default function FileInput(props: FileInputProps) {
@@ -31,6 +32,7 @@ export default function FileInput(props: FileInputProps) {
   };
   return (
     <>
+        <p className="text-foreground mb-5">{props.title}</p>
       <div>
         <input
           type="file"
@@ -40,7 +42,7 @@ export default function FileInput(props: FileInputProps) {
           onChange={handleFileChange}
         />
         <div
-          className="w-full relative border-2 border-dashed rounded-md flex items-center justify-center py-6 gap-1 cursor-pointer"
+          className=" relative border-2 border-dashed rounded-lg flex items-center justify-center py-10 px-14 w-fit gap-1 cursor-pointer"
           onClick={handleClick}
         >
           {fileType?.startsWith("image/") && imageUrl ? (
@@ -63,7 +65,7 @@ export default function FileInput(props: FileInputProps) {
         </div>
 
         {fileType !== "application/pdf" && fileName && (
-          <p className="text-foreground/70 text-center mt-2">{fileName}</p>
+          <p className="text-foreground/70 mt-2">{fileName}</p>
         )}
         {props.errorMessage && (
           <p className="err-msg text-red-600 text-sm">{props.errorMessage}</p>

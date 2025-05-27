@@ -6,7 +6,7 @@ import cashImg from "@/assets/images/cash-img.jpg";
 import instaPay from "@/assets/images/instapay.png";
 import FileInput from "./form/FileInput";
 import BaseRadioButton from "./form/BaseRadioButton";
-import CheckBoxField from "./form/CheckBoxField";
+import CheckBoxField from "./form/CheckBox";
 
 interface UIDashCardProps {
   title?: string;
@@ -21,8 +21,10 @@ export default function UIDashCard({
   // !inputs will be removed
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
-  const [radioBtn, setRadionBtn] = useState("");
+  const [radioBtnWithImg, setRadionBtnWithImg] = useState("");
+  const [baseRadioBtn, setBaseRadioBtn] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isChecked, setIsChecked] = useState<boolean>(false);
 
   const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
@@ -80,25 +82,37 @@ export default function UIDashCard({
             radioName="payment"
             title="محفظة"
             radioValue="cash"
-            value={radioBtn}
-            onChange={setRadionBtn}
+            value={radioBtnWithImg}
+            onChange={setRadionBtnWithImg}
           />
           <RadioButtonWithImg
             image={instaPay}
             radioName="payment"
             title="انستا باي"
-            value={radioBtn}
+            value={radioBtnWithImg}
             radioValue="instapay"
-            onChange={setRadionBtn}
+            onChange={setRadionBtnWithImg}
           />
         </div>
-        <FileInput onFileChange={handleFile} />
-        <BaseRadioButton text='10:00  -  11:00' radioName="time"/>
-        <CheckBoxField text='السبت' />
-        {/* <p>القيمة المختارة: {radioBtn}</p>
+        <FileInput onFileChange={handleFile}  title="صورة التحويل"/>
+        <BaseRadioButton
+          text="10:00  -  11:00"
+          radioName="time"
+          radioValue="10-11"
+          value={baseRadioBtn}
+          onChange={setBaseRadioBtn}
+        />
+        <CheckBoxField
+          text="السبت"
+          checked={isChecked}
+          onChange={setIsChecked}
+        />
+        <p>القيمة المختارة: {radioBtnWithImg}</p>
         <p>الاسم: {name}</p>
         <p>الرقم السري: {password}</p>
-        <p>فايل: {selectedFile?.name}</p> */}
+        <p>فايل: {selectedFile?.name}</p>
+        <p>{isChecked ? "checked " : "not checked"}</p>
+        <p>{baseRadioBtn}</p>
       </div>
     </>
   );
