@@ -15,14 +15,15 @@ export default function CheckBox(props: CheckBoxProps) {
           type="checkbox"
           onChange={handleChange}
           checked={props.checked}
-          className=" outline-none accent-surface w-5 h-4 opacity-0 peer z-40  absolute"
+          className="  w-5 h-4 opacity-0 peer z-40  absolute"
         />
         <div
           className={`size-4 peer-checked:border-surface flex justify-center items-center  rounded-[4px] border-2 border-foreground/65 ${"border-surface"}`}
         >
           {props.checked && (
-              <span className={`mdi mdi-check text-surface text-[10px]  leading-none relative top-[0.5px] `} />
-          
+            <span
+              className={`mdi mdi-check text-surface text-[10px]  leading-none relative `}
+            />
           )}
         </div>
         {props.text}
