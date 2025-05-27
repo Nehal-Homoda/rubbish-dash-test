@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from "react";
+import React from "react";
 interface CheckBoxProps {
   text: string;
   checked: boolean;
@@ -10,14 +10,23 @@ export default function CheckBox(props: CheckBoxProps) {
   };
   return (
     <>
-      <div className="flex items-center gap-3">
+      <label className="text-foreground w-fit relative flex items-center gap-2 cursor-pointer">
         <input
           type="checkbox"
           onChange={handleChange}
-          className=" outline-none accent-surface scale-110"
+          checked={props.checked}
+          className=" outline-none accent-surface w-5 h-4 opacity-0 peer z-40  absolute"
         />
-        <span className="text-foreground">{props.text}</span>
-      </div>
+        <div
+          className={`size-4 peer-checked:border-surface flex justify-center items-center  rounded-[4px] border-2 border-foreground/65 ${"border-surface"}`}
+        >
+          {props.checked && (
+              <span className={`mdi mdi-check text-surface text-[10px]  leading-none relative top-[0.5px] `} />
+          
+          )}
+        </div>
+        {props.text}
+      </label>
     </>
   );
 }
