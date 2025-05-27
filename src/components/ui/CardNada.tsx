@@ -1,8 +1,8 @@
 "use client";
 import { ReactNode, useEffect, useState } from "react";
 import TextFieldNada from "./form/TextFieldNada";
-import Dropdown from "./form/Dropdown";
 import DatePicker from "./form/DatePicker";
+import MultiCheckbox from "./form/MultiCheckbox";
 
 export default function CardNada({
   children,
@@ -12,19 +12,12 @@ export default function CardNada({
   title?: string;
 }) {
   const [inputValue, setInputValue] = useState("");
-  const [selectedOption, setSelectedOption] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
     console.log(inputValue);
   };
-  const handleDropdownChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedOption(e.target.value);
-  };
 
-  useEffect(() => {
-    console.log(selectedOption);
-  }, [selectedOption]);
   return (
     <>
       <div className="bg-background px-6 py-7 rounded-3xl shadow-lg w-1/2 ms-32">
@@ -49,13 +42,15 @@ export default function CardNada({
             appendIcon={"mdi mdi-account-outline"}
             iconType={"mdi"}
           />
-          <Dropdown
+          <MultiCheckbox
             options={[
               { value: "red", label: "red" },
               { value: "green", label: "green" },
+              { value: "blue", label: "blue" },
+              { value: "yellow", label: "yellow" },
+              { value: "purple", label: "purple" },
+              { value: "black", label: "black" },
             ]}
-            value={selectedOption}
-            handleSelect={handleDropdownChange}
             label={"نوع الخدمة"}
             placeholder={"اختر الخدمة"}
             name={"service"}
