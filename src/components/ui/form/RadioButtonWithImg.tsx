@@ -26,7 +26,7 @@ export default function RadioButtonWithImg(props: RadionButtonProps) {
               <Image
                 src={props.image}
                 alt=""
-                className=" object-cover rounded-full shadow-[0_0_1px_6px_rgb(0,0,0,0.04)] size-10"
+                className="object-cover rounded-full shadow-[0_0_1px_6px_rgb(0,0,0,0.04)] size-10"
               />
             )}
             <span>{props.title}</span>
