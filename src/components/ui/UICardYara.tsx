@@ -94,7 +94,7 @@ export default function UIDashCard({
             onChange={setRadionBtnWithImg}
           />
         </div>
-        <FileInput onFileChange={handleFile}  title="صورة التحويل"/>
+        <FileInput onFileChange={handleFile} title="صورة التحويل" fileUrl="file:///C:/Users/XPRISTO/Downloads/Yara-Asal-Frontend-CV.pdf"/>
         <BaseRadioButton
           text="10:00  -  11:00"
           radioName="time"

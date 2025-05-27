@@ -11,8 +11,7 @@ export default function BaseRadioButton(props: BaseRadioProps) {
     props.onChange(e.target.value);
   };
   return (
-    <>
-      <div className="flex items-center gap-3">
+    <>  <label className="text-foreground flex items-center gap-3 cursor-pointer">
         <input
           type="radio"
           name={props.radioName}
@@ -21,8 +20,7 @@ export default function BaseRadioButton(props: BaseRadioProps) {
           onChange={handleChange}
           className="accent-surface scale-150 "
         />
-        <span className="text-foreground">{props.text}</span>
-      </div>
+      {props.text}</label>
     </>
   );
 }

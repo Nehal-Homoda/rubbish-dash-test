@@ -14,12 +14,12 @@ interface RadionButtonProps {
 export default function RadioButtonWithImg(props: RadionButtonProps) {
   return (
     <>
-   
       <div>
         <div
           className={`flex items-center border-[1px] ${
             props.value === props.radioValue ? "border-surface" : ""
-          } bg-foreground/5 justify-between w-full rounded-xl py-2 px-4`}
+          } bg-foreground/5 justify-between w-full rounded-xl h-16  px-4 cursor-pointer`}
+          onClick={() => props.onChange(props.radioValue)}
         >
           <div className="content flex items-center gap-3">
             {props.image && (
