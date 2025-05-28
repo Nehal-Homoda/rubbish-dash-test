@@ -1,7 +1,6 @@
 "use client";
 import { ReactNode, useEffect, useState } from "react";
 import TextFieldNada from "./form/TextFieldNada";
-import DatePicker from "./form/DatePicker";
 import MultiCheckbox from "./form/MultiCheckbox";
 
 export default function CardNada({
@@ -59,17 +58,7 @@ export default function CardNada({
             appendIcon={"mdi mdi-chevron-down"}
             iconType={"mdi"}
           />
-          <DatePicker
-            value={inputValue}
-            handleChange={handleChange}
-            label={"اليوم"}
-            placeholder={"اختر اليوم"}
-            name={"date"}
-            preIcon={"mdi mdi-calendar-month-outline"}
-            required={true}
-            appendIcon={"mdi mdi-chevron-down"}
-            iconType={"mdi"}
-          />
+ 
           {children}
         </div>
       </div>

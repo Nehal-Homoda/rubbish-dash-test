@@ -40,7 +40,7 @@ export default function TextField(props: InputProps) {
             {props.required && <span className="text-red-600 text-lg">*</span>}
           </label>
           <div className="flex items-center justify-between gap-2">
-            <div className="prepend-icon text-foreground/65 text-xl">
+            <div className="prepend-icon text-foreground/50 text-xl">
               {props.iconType === "mdi" && (
                 <span className={`mdi ${props.prependIcon} `}></span>
               )}
@@ -55,7 +55,7 @@ export default function TextField(props: InputProps) {
               value={props.value}
               onChange={props.onChange}
             />
-            <div className="append-icon text-foreground/65 text-xl">
+            <div className="append-icon text-foreground/50 text-xl">
               {props.iconType === "mdi" && (
                 <>
                   {props.type !== "password" && props.appendIcon && (

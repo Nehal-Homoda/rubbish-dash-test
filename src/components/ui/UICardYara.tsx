@@ -7,16 +7,22 @@ import instaPay from "@/assets/images/instapay.png";
 import FileInput from "./form/FileInput";
 import BaseRadioButton from "./form/BaseRadioButton";
 import CheckBoxField from "./form/CheckBox";
+import DatePicker from "./form/DatePicker";
+import TimePicker from "./form/TimePicker";
 
 interface UIDashCardProps {
   title?: string;
   children: React.ReactNode;
   shadowClassName?: string;
+  lang: "en" | "ar";
+  dict: any;
 }
 export default function UIDashCard({
   title,
   children,
   shadowClassName = "shadow-[0_0_0.25rem_0.5625rem_rgb(0,0,0,0.07)]",
+  lang,
+  dict,
 }: UIDashCardProps) {
   // !inputs will be removed
   const [name, setName] = useState("");
@@ -25,6 +31,8 @@ export default function UIDashCard({
   const [baseRadioBtn, setBaseRadioBtn] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isChecked, setIsChecked] = useState<boolean>(false);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedTime, setSelectedTime] = useState<Date>(new Date());
 
   const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
@@ -36,7 +44,12 @@ export default function UIDashCard({
   const handleFile = (file: File | null) => {
     setSelectedFile(file);
   };
-
+  const handleDateChange = (date: Date) => {
+    setSelectedDate(date);
+  };
+  const handleTimeChange = (time: Date) => {
+    setSelectedTime(time);
+  };
   return (
     <>
       <div
@@ -94,18 +107,37 @@ export default function UIDashCard({
             onChange={setRadionBtnWithImg}
           />
         </div>
-        <FileInput onFileChange={handleFile} title="صورة التحويل" fileUrl="file:///C:/Users/XPRISTO/Downloads/Yara-Asal-Frontend-CV.pdf"/>
+        <FileInput
+          onFileChange={handleFile}
+          title="صورة التحويل"
+          fileUrl="file:///C:/Users/XPRISTO/Downloads/Yara-Asal-Frontend-CV.pdf"
+        />
         <BaseRadioButton
           text="10:00  -  11:00"
           radioName="time"
+          id="1"
           radioValue="10-11"
           value={baseRadioBtn}
           onChange={setBaseRadioBtn}
         />
         <CheckBoxField
           text="السبت"
+          id="1"
           checked={isChecked}
           onChange={setIsChecked}
+        />
+
+        <DatePicker
+          label={dict.start}
+          value={selectedDate}
+          onChange={handleDateChange}
+          lang={lang}
+        />
+        <TimePicker
+          label={dict.from}
+          value={selectedTime}
+          onChange={handleTimeChange}
+          lang={lang}
         />
         <p>القيمة المختارة: {radioBtnWithImg}</p>
         <p>الاسم: {name}</p>
@@ -113,6 +145,16 @@ export default function UIDashCard({
         <p>فايل: {selectedFile?.name}</p>
         <p>{isChecked ? "checked " : "not checked"}</p>
         <p>{baseRadioBtn}</p>
+        <p>
+          {selectedDate
+            ? selectedDate.toLocaleDateString()
+            : "No date selected"}
+        </p>
+        <p>
+          {selectedTime
+            ? selectedTime.toLocaleTimeString()
+            : "No time selected"}
+        </p>
       </div>
     </>
   );

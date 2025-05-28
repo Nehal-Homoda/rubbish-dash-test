@@ -1,87 +1,58 @@
-"use client";
+import React, { useRef } from "react";
+import Flatpickr from "react-flatpickr";
+import "flatpickr/dist/flatpickr.min.css";
+// import  "flatpickr/dist/themes/dark.css";
+import { Arabic } from "flatpickr/dist/l10n/ar.js";
+import { english } from "flatpickr/dist/l10n/default.js";
 
-import { useState } from "react";
-
-type Props = {
-  value: string;
+interface DatePickerFieldProps {
   label: string;
-  placeholder: string;
-  name: string;
-  preIcon?: string;
-  appendIcon?: string;
-  errorMessage?: string;
   required?: boolean;
-  iconType: "mdi" | "fa";
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-};
+  errorMessage?: string;
+  value: Date;
+  onChange: (date: Date) => void;
+  lang: "en" | "ar";
+}
 
-export default function DatePicker({
-  value,
-  label,
-  placeholder,
-  name,
-  preIcon,
-  appendIcon,
-  errorMessage,
-  required,
-  iconType,
-  handleChange,
-}: Props) {
+export default function DatePicker(props: DatePickerFieldProps) {
+  const datePickerRef = useRef<any>(null);
 
-    const [isEditing, setIsEditing] = useState(false);
-    const formattedDate = value
-      ? new Date(value).toLocaleDateString("ar-EG", {
-          day: "2-digit",
-          month: "long",
-          year: "numeric",
-        })
-      : "";
+  const handleIconClick = () => {
+    if (datePickerRef.current) {
+      datePickerRef.current.flatpickr.open();
+    }
+  };
+
   return (
-    <>
-      <div className="relative px-3 py-4 border border-surface-light-700 rounded-2xl mt-4">
-        <div className="label flex items-center gap-1 absolute -top-4 start-4 bg-background w-fit px-3 font-semibold">
-          <label htmlFor={name}>{label}</label>
-          {required && <span className="text-red-600">*</span>}
-        </div>
-
-        <div className="relative">
-          <div className="flex items-center gap-2">
-            {preIcon && iconType === "mdi" && (
-              <span className={`${preIcon} text-2xl text-foreground/45`}></span>
-            )}
-            {preIcon && iconType === "fa" && (
-              <i className={`${preIcon} text-2xl text-foreground/45`}></i>
-            )}
-            <input
-              type={isEditing ? "date" : "text"}
-              name={name}
-              id={name}
-              value={isEditing ? value : formattedDate}
-              placeholder={placeholder}
-              onFocus={() => setIsEditing(true)}
-              onBlur={() => setTimeout(() => setIsEditing(false), 200)}
-              onChange={handleChange}
-              className=" appearance-none outline-none bg-transparent w-full"
-            />
-            <div className="absolute end-0">
-              {appendIcon && iconType === "mdi" && (
-                <span
-                  className={`${appendIcon} text-2xl text-foreground/45`}
-                ></span>
-              )}
-              {appendIcon && iconType === "fa" && (
-                <i className={`${appendIcon} text-2xl text-foreground/45`}></i>
-              )}
-            </div>
-          </div>
-        </div>
+    <div className="border-[1px] mt-9  border-surface-light-600 bg-background relative p-3 rounded-xl">
+      <label
+        htmlFor=""
+        className="absolute bg-background -top-4 capitalize text-base text-foreground px-2"
+      >
+        {props.label}
+        {props.required && <span className="text-red-600 text-lg">*</span>}
+      </label>
+      <div className="w-full datePicker flex items-center">
+        <span
+          className="mdi mdi-calendar-month-outline text-lg text-foreground/50 cursor-pointer"
+          onClick={handleIconClick}
+        ></span>
+        <Flatpickr
+          value={props.value}
+          onChange={(dates: Date[]) => props.onChange(dates[0] || null)}
+          options={{
+            dateFormat: "d F Y",
+            locale: props.lang === "ar" ? Arabic : english,
+          }}
+          ref={datePickerRef}
+          className={`border-none outline-none w-full bg-transparent ps-1 text-sm 
+    dark:flatpickr-dark`}
+        />
+        <span
+          className="mdi mdi-chevron-down text-foreground/50 text-lg cursor-pointer"
+          onClick={handleIconClick}
+        ></span>
       </div>
-
-      {errorMessage && (
-        <div className="err-msg mt-2 text-red-600 font-semibold ps-2">
-          * {errorMessage}
-        </div>
-      )}
-    </>
+    </div>
   );
 }
