@@ -37,7 +37,7 @@ export default function RadioButtonWithImg(props: RadionButtonProps) {
             value={props.radioValue}
             checked={props.value === props.radioValue}
             onChange={() => props.onChange(props.radioValue)}
-            className="accent-surface scale-150 "
+            className="accent-surface scale-150 bg-background "
           />
         </div>
         {props.errorMessage && (
