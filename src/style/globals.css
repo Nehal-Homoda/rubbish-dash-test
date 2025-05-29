@@ -29,7 +29,6 @@
   --color-surface-light-600: 179 223 185;
   --color-surface-light-700: 204 234 208; /*input-border*/
   --color-surface-light-800: 230 244 232;
-
 }
 .dark {
   --color-background: 0 0 0;
@@ -102,5 +101,27 @@ input::-webkit-inner-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
 }
-
-
+::selection {
+  background: rgb(var(--color-surface));
+  color: white;
+}
+.dark .flatpickr-calendar, .dark .flatpickr-time {
+  background: #3f4458;
+  color: white;
+  border: none;
+}
+.dark .flatpickr-time input  .flatpickr-hour-time,.dark .flatpickr-time .flatpickr-am-pm{
+ color:white ; 
+}
+.dark .flatpickr-day,
+.dark span.flatpickr-weekday,
+.dark .flatpickr-months .flatpickr-month,
+.dark .flatpickr-months .flatpickr-prev-month,
+.dark .flatpickr-months .flatpickr-next-month {
+  color: rgb(var(--color-foreground));
+  fill: white;
+}
+.flatpickr-day.selected {
+  border-color: rgb(var(--color-surface)) !important;
+  background: rgb(var(--color-surface)) !important;
+}

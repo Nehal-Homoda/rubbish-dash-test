@@ -3,7 +3,6 @@ import { getDictionary } from "../../dictionaries";
 import DashSidebar from "@/components/layout/DashSidebar";
 import UICard from "@/components/ui/UICardYara";
 import DashNavbar from "@/components/layout/DashNavbar";
-import Input from "@/components/ui/form/TextFieldYara";
 
 export default async function RootLayout({children,params,}: Readonly<{children: React.ReactNode;params: Promise<{ lang: "en" | "ar" }>;}>) {
   // const [isOpen, setIsOpen] = useState(false)
@@ -29,7 +28,8 @@ export default async function RootLayout({children,params,}: Readonly<{children:
             // openSidebar={openSidebar}
           />
           {children}
-          <UICard title={"الخريطة"}>example</UICard>
+          <UICard title={"الخريطة"} lang={lang} dict={dict}>example</UICard>
+
         </div>
       </div>
     </>

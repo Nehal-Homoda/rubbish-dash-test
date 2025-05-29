@@ -265,6 +265,7 @@ export default function CardNada({
           />
 
           <div className="text-white">{children}</div>
+
         </div>
       </div>
     </>
