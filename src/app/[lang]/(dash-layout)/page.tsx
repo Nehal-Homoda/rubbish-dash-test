@@ -9,7 +9,7 @@ export default async function Home({ params, }: { params: Promise<{ lang: "en" |
   return (
     <>
       <div className="home-page">
-        <CardNada>hi</CardNada>
+        <CardNada>content</CardNada>
       </div>
 
     </>

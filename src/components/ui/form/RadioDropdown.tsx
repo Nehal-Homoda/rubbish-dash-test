@@ -1,13 +1,15 @@
 "use client";
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
-import CheckBox from "./CheckBox";
+import BaseRadioButton from "./BaseRadioButton";
 
 type Option = {
   value: string;
   label: string;
 };
+
 type Props = {
+  value: string;
   label: string;
   placeholder: string;
   name: string;
@@ -17,9 +19,11 @@ type Props = {
   errorMessage?: string;
   required?: boolean;
   iconType: "mdi" | "fa";
+  onChange: (value: string) => void;
 };
 
-export default function MultiCheckbox({
+export default function RadioDropdown({
+  value,
   label,
   placeholder,
   name,
@@ -29,16 +33,11 @@ export default function MultiCheckbox({
   errorMessage,
   required,
   iconType,
+  onChange,
 }: Props) {
-  
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
-  const handleCheckboxChange = (value: string, checked: boolean) => {
-    if (checked) {
-      setSelectedOptions((prev) => [...prev, value]);
-    } else {
-      setSelectedOptions((prev) => prev.filter((v) => v !== value));
-    }
-  };
+  const selectedLabel =
+    options.find((option) => option.value === value)?.label || "";
+
   return (
     <>
       <div className="relative p-3 border border-surface-light-700 rounded-2xl mt-6">
@@ -58,17 +57,14 @@ export default function MultiCheckbox({
                   <i className={`${preIcon} text-2xl text-foreground/45`} />
                 )}
 
-                {selectedOptions.length > 0 ? (
+                {selectedLabel ? (
                   <span className="text-foreground line-clamp-1">
-                    {selectedOptions.join(", ")}
+                    {selectedLabel}
                   </span>
                 ) : (
-                  <span className="text-foreground/45">
-                    {placeholder}
-                  </span>
+                  <span className="text-foreground/45">{placeholder}</span>
                 )}
               </div>
-
               {appendIcon && iconType === "mdi" && (
                 <span className={`${appendIcon} text-2xl text-foreground/45`} />
               )}
@@ -77,6 +73,7 @@ export default function MultiCheckbox({
               )}
             </div>
           </Menu.Button>
+
           <Transition
             as={Fragment}
             enter="transition ease-out duration-100"
@@ -88,14 +85,14 @@ export default function MultiCheckbox({
           >
             <Menu.Items className="absolute top-[70px] start-0 z-10 w-full grid grid-cols-2 gap-5 rounded-xl bg-white shadow-[0_0_40px_0_rgb(0,0,0,0.06)] overflow-hidden focus-visible:outline-none pe-8 ps-4 py-6">
               {options.map((option) => (
-                <CheckBox
+                <BaseRadioButton
                   key={option.value}
                   id={option.value}
                   text={option.label}
-                  checked={selectedOptions.includes(option.value)}
-                  onChange={(checked) =>
-                    handleCheckboxChange(option.value, checked)
-                  }
+                  radioName={name}
+                  value={value}
+                  radioValue={option.value}
+                  onChange={onChange}
                 />
               ))}
             </Menu.Items>

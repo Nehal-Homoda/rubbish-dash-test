@@ -23,7 +23,7 @@ export default function LangSwitcher({ dict }: { dict:any }) {
         <div>
           <div
             onClick={toggleSwitcher}
-            className="text-2xl font-semibold text-gray-900 shadow-xs cursor-pointer"
+            className="text-2xl font-semibold shadow-xs cursor-pointer"
           >
             <i className="fa-solid fa-globe text-foreground hover:text-surface transition-all"></i>
           </div>

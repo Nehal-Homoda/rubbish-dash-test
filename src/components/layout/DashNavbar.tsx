@@ -18,6 +18,9 @@ export default async function DashNavbar({
           <div className="flex justify-center items-center gap-4">
             <UIThemeToggleBtn lang={lang} />
             <LangSwitcher dict={dict} />
+            <button className="block md:hidden cursor-pointer">
+              <span className="mdi mdi-menu text-2xl font-semibold text-foreground hover:text-surface transition-all"></span>
+            </button>
           </div>
         </div>
       </nav>
