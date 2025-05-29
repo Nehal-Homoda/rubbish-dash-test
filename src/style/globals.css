@@ -116,3 +116,7 @@ input[type="number"] {
   border-color: rgb(var(--color-surface)) !important;
   background: rgb(var(--color-surface)) !important;
 }
+
+th,td{
+  text-align: center;
+}

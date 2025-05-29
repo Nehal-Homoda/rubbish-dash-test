@@ -9,6 +9,7 @@ import BaseRadioButton from "./form/BaseRadioButton";
 import CheckBoxField from "./form/CheckBox";
 import DatePicker from "./form/DatePicker";
 import TimePicker from "./form/TimePicker";
+import UITable from "./UITable";
 
 interface UIDashCardProps {
   title?: string;
@@ -34,6 +35,13 @@ export default function UIDashCard({
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedTime, setSelectedTime] = useState<Date>(new Date());
 
+  const users = [
+    { المعرف: 1, الاسم: "يارا", المدينة: "طنطا", الحالة: "مفعل" },
+    { المعرف: 2, الاسم: "مي", المدينة: "طنطا", الحالة: "غير مفعل" },
+    { المعرف: 3, الاسم: "مها", المدينة: "طنطا", الحالة: "مقبول" },
+    { المعرف: 4, الاسم: "مروه", المدينة: "طنطا", الحالة: "معلق" },
+  ];
+  const allKeys = Object.keys(users[0]);
   const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
   };
@@ -49,6 +57,21 @@ export default function UIDashCard({
   };
   const handleTimeChange = (time: Date) => {
     setSelectedTime(time);
+  };
+  const handleEdit = (rowData: any) => {
+    console.log("Edit", rowData);
+  };
+
+  const handleDelete = (rowData: any) => {
+    console.log("Delete", rowData);
+  };
+
+  const handleView = (rowData: any) => {
+    console.log("View", rowData);
+  };
+
+  const handleDownload = (rowData: any) => {
+    console.log("Download", rowData);
   };
   return (
     <>
@@ -110,7 +133,7 @@ export default function UIDashCard({
         <FileInput
           onFileChange={handleFile}
           title="صورة التحويل"
-          fileUrl="file:///C:/Users/XPRISTO/Downloads/Yara-Asal-Frontend-CV.pdf"
+          // fileUrl="file:///C:/Users/XPRISTO/Downloads/Yara-Asal-Frontend-CV.pdf"
         />
         <BaseRadioButton
           text="10:00  -  11:00"
@@ -139,7 +162,19 @@ export default function UIDashCard({
           onChange={handleTimeChange}
           lang={lang}
         />
-        <p>القيمة المختارة: {radioBtnWithImg}</p>
+        <UITable
+          values={users}
+          headers={allKeys}
+          lang={lang}
+          dict={dict}
+          loading={false}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onView={handleView}
+          onDownload={handleDownload}
+        />
+
+        {/* <p>القيمة المختارة: {radioBtnWithImg}</p>
         <p>الاسم: {name}</p>
         <p>الرقم السري: {password}</p>
         <p>فايل: {selectedFile?.name}</p>
@@ -154,7 +189,7 @@ export default function UIDashCard({
           {selectedTime
             ? selectedTime.toLocaleTimeString()
             : "No time selected"}
-        </p>
+        </p> */}
       </div>
     </>
   );
