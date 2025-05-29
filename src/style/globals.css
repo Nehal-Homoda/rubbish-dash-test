@@ -59,6 +59,15 @@
   --color-service-light-800: 230 244 232;
 }
 
+@layer components {
+  .base-btn {
+    @apply  h-11 px-4 rounded-xl bg-surface text-white font-medium ;
+  }
+  .cancel-btn {
+    @apply  h-11 px-4 rounded-xl bg-foreground/10 text-surface font-medium ;
+  }
+}
+
 body {
   background-color: rgb(var(--color-background));
   color: rgb(var(--color-foreground));
