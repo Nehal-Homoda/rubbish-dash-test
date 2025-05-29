@@ -1,9 +1,15 @@
 import React from "react";
 interface CheckBoxProps {
-  text: string;
+  text?: string;
   checked: boolean;
   id: string;
   onChange: (checked: boolean) => void;
+  boxSize: string;
+  checkStyle: string;
+  checkBoxBg?: string;
+  checkBoxRoundedValue?: string;
+  border?: string;
+  peerChecked?: string;
 }
 export default function CheckBox(props: CheckBoxProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -20,14 +26,14 @@ export default function CheckBox(props: CheckBoxProps) {
           onChange={handleChange}
           checked={props.checked}
           id={props.id}
-          className="  w-5 h-4 opacity-0 peer z-40  absolute"
+          className="w-5 h-4 opacity-0 peer z-40 right-0 cursor-pointer absolute"
         />
         <div
-          className={`size-4 peer-checked:border-surface flex justify-center items-center  rounded-[4px] border-2 border-foreground/65`}
+          className={`custom-checkbox ${props.boxSize} ${props.checkBoxBg}  flex justify-center items-center ${props.checkBoxRoundedValue} ${props.border} ${props.peerChecked}`}
         >
           {props.checked && (
             <span
-              className={`mdi mdi-check text-surface text-[10px]  leading-none `}
+              className={`mdi mdi-check ${props.checkStyle}  leading-none`}
             />
           )}
         </div>
