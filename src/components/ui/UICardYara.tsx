@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Input from "./form/TextFieldYara";
 import RadioButtonWithImg from "./form/RadioButtonWithImg";
 import cashImg from "@/assets/images/cash-img.jpg";
+import img from "../../assets/images/sky-night.jpg";
 import instaPay from "@/assets/images/instapay.png";
 import FileInput from "./form/FileInput";
 import BaseRadioButton from "./form/BaseRadioButton";
@@ -10,6 +11,7 @@ import CheckBoxField from "./form/CheckBox";
 import DatePicker from "./form/DatePicker";
 import TimePicker from "./form/TimePicker";
 import UITable from "./UITable";
+import Image from "next/image";
 
 interface UIDashCardProps {
   title?: string;
@@ -36,11 +38,53 @@ export default function UIDashCard({
   const [selectedTime, setSelectedTime] = useState<Date>(new Date());
 
   const users = [
-    { المعرف: 1, الاسم: "يارا", المدينة: "طنطا", الحالة: "مفعل" },
-    { المعرف: 2, الاسم: "مي", المدينة: "طنطا", الحالة: "غير مفعل" },
-    { المعرف: 3, الاسم: "مها", المدينة: "طنطا", الحالة: "مقبول" },
-    { المعرف: 4, الاسم: "مروه", المدينة: "طنطا", الحالة: "معلق" },
+    {
+      id: 1,
+      name: "حبيبة احمد",
+      mobile: "01201988345",
+      area: "حي ثان طنطا",
+      subscription: "مشترك/شهرية",
+      renewalDate: "21 مايو 2025",
+      status: "مفعل",
+    },
+    {
+      id: 2,
+      name: "يمنى يوسف",
+      mobile: "01201988345",
+      area: "حي ثالث طنطا",
+      subscription: "مشترك/3شهور",
+      renewalDate: "21 مايو 2025",
+      status: "مفعل",
+    },
+    {
+      id: 3,
+      name: "محمد احمد",
+      mobile: "01201988345",
+      area: "حي اول طنطا",
+      subscription: "غير مشترك",
+      renewalDate: "غير محدد",
+      status: "مفعل",
+    },
+    {
+      id: 4,
+      name: "مريم ابراهيم",
+      mobile: "01201988345",
+      area: "حي ثالث طنطا",
+      subscription: "مشترك/6شهور",
+      renewalDate: "21 مايو 2025",
+      status: "غير مفعل",
+    },
+    {
+      id: 5,
+      name: "هاجر ربيع",
+      mobile: "01201988345",
+      area: "حي اول طنطا",
+      subscription: "غير مشترك",
+      renewalDate: "غير محدد",
+      status: "معلق",
+    },
   ];
+
   const allKeys = Object.keys(users[0]);
   const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
@@ -78,14 +122,30 @@ export default function UIDashCard({
       <div
         className={`rounded-2xl bg-background p-5 w-full ${shadowClassName}`} //handling various shadows
       >
-        {title && (
+        <UITable
+          values={users}
+          headers={allKeys}
+          lang={lang}
+          dict={dict}
+          loading={false}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onView={handleView}
+          onDownload={handleDownload}
+        />
+      </div>
+
+      {/* <div
+        className={`rounded-2xl bg-background p-5 w-full ${shadowClassName}`} //handling various shadows
+      > */}
+      {/* {title && (
           <div className="card-title text-foreground text-lg font-semibold capitalize mb-4">
             {title}
           </div>
         )}
-        <div className="mb-7">{children}</div>
-        {/* inputs will be removed */}
-        <div className="inputs ">
+        <div className="mb-7">{children}</div> */}
+      {/* inputs will be removed */}
+      {/* <div className="inputs ">
           <Input
             label="اسم المستخدم"
             type="text"
@@ -98,6 +158,19 @@ export default function UIDashCard({
             onChange={handleNameChange}
             // errorMessage="error"
           />
+          
+      <CheckBoxField
+        text="السبت"
+        id="1"
+        checked={isChecked}
+        onChange={setIsChecked}
+        boxSize="size-4"
+        border="border-2 border-foreground/65"
+        peerChecked="peer-checked:border-surface"
+        checkStyle="text-surface text-[10px] "
+        checkBoxRoundedValue="rounded-[4px]"
+      />
+
           <Input
             label="الرقم السري"
             type="password"
@@ -143,12 +216,7 @@ export default function UIDashCard({
           value={baseRadioBtn}
           onChange={setBaseRadioBtn}
         />
-        <CheckBoxField
-          text="السبت"
-          id="1"
-          checked={isChecked}
-          onChange={setIsChecked}
-        />
+      
 
         <DatePicker
           label={dict.start}
@@ -161,20 +229,9 @@ export default function UIDashCard({
           value={selectedTime}
           onChange={handleTimeChange}
           lang={lang}
-        />
-        <UITable
-          values={users}
-          headers={allKeys}
-          lang={lang}
-          dict={dict}
-          loading={false}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onView={handleView}
-          onDownload={handleDownload}
-        />
+        /> */}
 
-        {/* <p>القيمة المختارة: {radioBtnWithImg}</p>
+      {/* <p>القيمة المختارة: {radioBtnWithImg}</p>
         <p>الاسم: {name}</p>
         <p>الرقم السري: {password}</p>
         <p>فايل: {selectedFile?.name}</p>
@@ -190,7 +247,7 @@ export default function UIDashCard({
             ? selectedTime.toLocaleTimeString()
             : "No time selected"}
         </p> */}
-      </div>
+      {/* </div> */}
     </>
   );
 }
