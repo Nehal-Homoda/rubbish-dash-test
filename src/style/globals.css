@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -60,13 +62,15 @@
 
 @layer components {
   .base-btn {
-    @apply  h-11 px-4 rounded-xl bg-surface text-white font-medium ;
+    @apply h-11 px-4 rounded-xl bg-surface text-white font-medium;
   }
   .cancel-btn {
-    @apply  h-11 px-4 rounded-xl bg-foreground/10 text-surface font-medium ;
+    @apply h-11 px-4 rounded-xl bg-foreground/10 text-surface font-medium;
   }
 }
-
+html {
+  font-family: "Cairo", sans-serif;
+}
 body {
   background-color: rgb(var(--color-background));
   color: rgb(var(--color-foreground));
@@ -105,13 +109,15 @@ input[type="number"] {
   background: rgb(var(--color-surface));
   color: white;
 }
-.dark .flatpickr-calendar, .dark .flatpickr-time {
+.dark .flatpickr-calendar,
+.dark .flatpickr-time {
   background: #3f4458;
   color: white;
   border: none;
 }
-.dark .flatpickr-time input  .flatpickr-hour-time,.dark .flatpickr-time .flatpickr-am-pm{
- color:white ; 
+.dark .flatpickr-time input .flatpickr-hour-time,
+.dark .flatpickr-time .flatpickr-am-pm {
+  color: white;
 }
 .dark .flatpickr-day,
 .dark span.flatpickr-weekday,
@@ -125,7 +131,12 @@ input[type="number"] {
   border-color: rgb(var(--color-surface)) !important;
   background: rgb(var(--color-surface)) !important;
 }
-
-th,td{
-  text-align: center;
+.table-row {
+  @apply border-b-[1px] border-foreground/10 text-center ;
+}
+.table-headers {
+  @apply text-foreground/65 capitalize font-normal p-4;
+}
+.table-content {
+  @apply text-foreground font-normal  p-4;
 }
