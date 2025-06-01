@@ -1,8 +1,18 @@
-@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap");
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@layer tailwind-base, primereact, tailwind-utilities;
+
+/* IMPORTANT: In "styled" mode you must add the PrimeReact Theme here. Do NOT include in "unstyled" mode */
+@import 'primereact/resources/themes/lara-light-blue/theme.css' layer(primereact);
+
+@layer tailwind-base {
+  @tailwind base;
+}
+
+@layer tailwind-utilities {
+  @tailwind components;
+  @tailwind utilities;
+}
+
 
 :root {
   --color-background: 255 255 255;
@@ -62,10 +72,10 @@
 
 @layer components {
   .base-btn {
-    @apply h-11 px-4 rounded-xl bg-surface text-white font-medium;
+    @apply  h-11 px-4 rounded-xl bg-surface text-white ;
   }
   .cancel-btn {
-    @apply h-11 px-4 rounded-xl bg-foreground/10 text-surface font-medium;
+    @apply  h-11 px-4 rounded-xl bg-surface-light-800 text-surface ;
   }
 }
 html {
