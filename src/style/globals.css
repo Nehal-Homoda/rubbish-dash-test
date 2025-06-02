@@ -141,6 +141,11 @@ input[type="number"] {
   border-color: rgb(var(--color-surface)) !important;
   background: rgb(var(--color-surface)) !important;
 }
+
+th,td{
+  text-align: center;
+}
+
 .table-row {
   @apply border-b-[1px] border-foreground/10 text-center ;
 }

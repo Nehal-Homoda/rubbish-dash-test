@@ -4,9 +4,9 @@ import TextFieldNada from "./form/TextFieldNada";
 import MultiCheckbox from "./form/MultiCheckbox";
 import RadioDropdown from "./form/RadioDropdown";
 import Dropdown from "./form/Dropdown";
-import BaseModal from "./BaseModal";
+import BaseModal from "@/components/ui/BaseModal";
 import AlertModal from "./AlertModal";
-import DataTable from "./DataTable";
+import alert from "@/assets/images/alert.png";
 
 export default function CardNada({
   children,
@@ -18,71 +18,6 @@ export default function CardNada({
   const [inputValue, setInputValue] = useState("");
   const [selectedDay, setSelectedDay] = useState("");
   const [selectedItem, setSelectedItem] = useState("");
-  const [data, setData] = useState<any[]>([
-    {
-      id: 1,
-      name: "وحدات سكنية",
-      service_type: "وحدات سكنية",
-      subscriptions: "25 مشترك",
-      status: true,
-    },
-    {
-      id: 2,
-      name: "شقه",
-
-      service_type: "شقه",
-      subscriptions: "20 مشترك",
-      status: true,
-    },
-    {
-      id: 3,
-      name: "محلات تجارية",
-
-      service_type: "محلات تجارية",
-      subscriptions: "5 مشترك",
-      status: false,
-    },
-    {
-      id: 4,
-      name: "مطاعم",
-
-      service_type: "مطاعم",
-      subscriptions: "2 مشترك",
-      status: true,
-    },
-    {
-      id: 5,
-      name: "وحدات سكنية",
-      service_type: "وحدات سكنية",
-      subscriptions: "25 مشترك",
-      status: true,
-    },
-    {
-      id: 6,
-      name: "شقه",
-
-      service_type: "شقه",
-      subscriptions: "20 مشترك",
-      status: true,
-    },
-    {
-      id: 7,
-      name: "محلات تجارية",
-
-      service_type: "محلات تجارية",
-      subscriptions: "5 مشترك",
-      status: false,
-    },
-    {
-      id: 8,
-      name: "مطاعم",
-
-      service_type: "مطاعم",
-      subscriptions: "2 مشترك",
-      status: true,
-    },
-  ]);
-
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
@@ -106,9 +41,11 @@ export default function CardNada({
 
         <div className="content mt-5">
           <BaseModal
-            title={"اضافة خدمة"}
-            actionBtn={"اضافة"}
+            title={"تعديل خدمة"}
+            actionBtn={"حفظ"}
             action={addService}
+            openBtnLabel={"تعديل خدمة"}
+            style="base-btn"
           >
             <TextFieldNada
               value={inputValue}
@@ -139,26 +76,8 @@ export default function CardNada({
               appendIcon={"mdi mdi-chevron-down"}
               iconType={"mdi"}
             />
-            <RadioDropdown
-              value={selectedDay}
-              onChange={(val: string) => setSelectedDay(val)}
-              label="الوقت"
-              placeholder="اختر الوقت"
-              name="time"
-              required={true}
-              iconType="mdi"
-              preIcon="mdi mdi-account-outline"
-              appendIcon="mdi mdi-chevron-down"
-              options={[
-                { value: "11:00", label: "11:00 م" },
-                { value: "10:00", label: "10:00 ص" },
-                { value: "8:00", label: "8:00 م" },
-                { value: "5:00", label: "5:00 ص" },
-              ]}
-            />
           </BaseModal>
-          <DataTable data={data} rowsPerPage={5} actions={true} />
-          {/* <AlertModal message={"ليس لديك اذن للوصول الى هذه الصفحة"} openBtn={"alert"} />
+          <AlertModal message={"ليس لديك اذن للوصول الى هذه الصفحة"} visibility={true} />
           
           <TextFieldNada
             value={inputValue}
@@ -206,26 +125,6 @@ export default function CardNada({
               { value: "5:00", label: "5:00 ص" },
             ]}
           />
-          <Dropdown
-            value={selectedItem}
-            onChange={(val: string) => {
-              setSelectedItem(val);
-              console.log(selectedItem);
-            }}
-            label="الوقت"
-            placeholder="اختر الوقت"
-            name="time"
-            required={true}
-            iconType="mdi"
-            preIcon="mdi mdi-account-outline"
-            appendIcon="mdi mdi-chevron-down"
-            options={[
-              { value: "11:00", label: "11:00 م" },
-              { value: "10:00", label: "10:00 ص" },
-              { value: "8:00", label: "8:00 م" },
-              { value: "5:00", label: "5:00 ص" },
-            ]}
-          /> */}
           <MultiCheckbox
             options={[
               { value: "السبت", label: "السبت" },
@@ -244,6 +143,9 @@ export default function CardNada({
             iconType={"mdi"}
           />
           <Dropdown
+            style="relative text-foreground p-3 border border-surface-light-700 rounded-2xl mt-6"
+            dropStyle="top-[70px] start-0 z-10 w-full pe-8 ps-4 py-6"
+            iconStyle="flex justify-between items-center w-full text-foreground/45"
             value={selectedItem}
             onChange={(val: string) => {
               setSelectedItem(val);
@@ -265,7 +167,6 @@ export default function CardNada({
           />
 
           <div className="text-white">{children}</div>
-
         </div>
       </div>
     </>
