@@ -14,6 +14,7 @@ import { useLangAndDictionary } from "@/utils/lang";
 import DatePickerTest from "./form/DatePickerTest";
 import TimePickerTest from "./form/TimePickerTest";
 import DatePicker from "./form/DatePicker";
+import TimePicker from "./form/TimePicker";
 
 interface UIDashCardProps {
   title?: string;
@@ -241,6 +242,10 @@ export default function UIDashCard({
         <DatePicker       label={dict.start}
           value={selectedDate}
           onChange={handleDateChange}
+          lang={lang}/>
+          <TimePicker        label={dict.from}
+          value={selectedTime}
+          onChange={handleTimeChange}
           lang={lang}/>
       </div>
     </>
