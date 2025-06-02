@@ -1,232 +1,204 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
 import CheckBox from "./form/CheckBox";
-import Image from "next/image";
-interface RowData {
-  [key: string]: string | number | boolean | null;
+import { Tag } from "primereact/tag";
+import { Button } from "primereact/button";
+interface User {
+  id: number;
+  name: string;
+  mobile: string;
+  area: string;
+  subscription: string;
+  renewalDate: string;
+  status: string;
 }
 
+export default function UserTable() {
+  const users: User[] = [
+    {
+      id: 1,
+      name: "حبيبة احمد",
+      mobile: "01201988345",
+      area: "حي ثان طنطا",
+      subscription: "مشترك/شهرية",
+      renewalDate: "21 مايو 2025",
+      status: "مفعل",
+    },
+    {
+      id: 2,
+      name: "يمنى يوسف",
+      mobile: "01201988345",
+      area: "حي ثالث طنطا",
+      subscription: "مشترك/3شهور",
+      renewalDate: "21 مايو 2025",
+      status: "مفعل",
+    },
+    {
+      id: 3,
+      name: "محمد احمد",
+      mobile: "01201988345",
+      area: "حي اول طنطا",
+      subscription: "غير مشترك",
+      renewalDate: "غير محدد",
+      status: "مفعل",
+    },
+    {
+      id: 4,
+      name: "مريم ابراهيم",
+      mobile: "01201988345",
+      area: "حي ثالث طنطا",
+      subscription: "مشترك/6شهور",
+      renewalDate: "21 مايو 2025",
+      status: "غير مفعل",
+    },
+    {
+      id: 5,
+      name: "هاجر ربيع",
+      mobile: "01201988345",
+      area: "حي اول طنطا",
+      subscription: "غير مشترك",
+      renewalDate: "غير محدد",
+      status: "معلق",
+    },
+  ];
 
-interface TableProps {
-  values: RowData[]; // filter,search
-  headers: string[];
-  lang: "en" | "ar";
-  dict: any;
-  page?: "payments" | "visits" | "الزيارات" | "المدفوعات";
-  pagination?: any;
-  loading: boolean;
-  onDelete?: (rowData: any) => void;
-  onEdit?: (rowData: any) => void;
-  onView?: (rowData: any) => void;
-  onDownload?: (rowData: any) => void;
-}
-export default function UITable(props: TableProps) {
-  const [isChecked, setIsChecked] = useState<boolean>(false);
+  const checkboxTemplate = (rowData: User) => {
+    return (
+      <CheckBox
+        id={`checkbox-${rowData.id}`}
+        boxSize="size-6"
+        checkStyle="text-white"
+        checkBoxBg="bg-foreground/10"
+        peerChecked="peer-checked:bg-surface"
+        checkBoxRoundedValue="rounded-md"
+      />
+    );
+  };
+  const headerCheckbox = () => {
+    return (
+      <CheckBox
+        id="header-checkbox"
+        boxSize="size-6"
+        checkStyle="text-white"
+        checkBoxBg="bg-foreground/10"
+        peerChecked="peer-checked:bg-surface"
+        checkBoxRoundedValue="rounded-md"
+      />
+    );
+  };
+  const getStatusSeverity = (status: string) => {
+    switch (status) {
+      case "مفعل":
+        return "success";
+      case "غير مفعل":
+        return "danger";
+      case "معلق":
+        return "warning";
+      default:
+        return "info";
+    }
+  };
+  const getSubscriptionSeverity = (subscription: string) => {
+    switch (subscription) {
+      case "مشترك/شهرية":
+      case "مشترك/3شهور":
+      case "مشترك/6شهور":
+        return "success";
+      case "غير مشترك":
+        return "danger";
+      default:
+        return "warning";
+    }
+  };
 
-  return (
-    <>
-      <div className="overflow-x-auto">
-        {" "}
-        <table className="xl:table-fixed w-full text-foreground ">
-          <thead>
-            <tr className="table-row ">
-              <th className="table-headers">
-                <div className="flex justify-center">
-                  <CheckBox
-                    checked={isChecked}
-                    onChange={setIsChecked}
-                    id="2"
-                    boxSize="size-6"
-                    checkStyle="text-white "
-                    checkBoxBg="bg-foreground/10"
-                    peerChecked="peer-checked:bg-surface"
-                    checkBoxRoundedValue="rounded-md"
-                  />
-                </div>
-              </th>
+  const handleEdit = (user: User) => {
+    console.log("edit");
+  };
 
-              {props.headers.map((item: string, index: number) => (
-                <th key={index} className="table-headers">
-                  {item}
-                </th>
-              ))}
-              {props.page !== "visits" &&
-                props.page !== "الزيارات" &&
-                props.page !== "payments" &&
-                props.page !== "المدفوعات" && (
-                  <th className="table-headers">Actions</th>
-                )}
+  const handleDelete = (user: User) => {
+    console.log("renove");
+  };
 
-              {(props.page === "payments" || props.page === "المدفوعات") && (
-                <th className="table-headers">payment image</th>
-              )}
-            </tr>
-          </thead>
-          <tbody>
-            {props.loading ? (
-              <tr>
-                <td className="text-center py-4  ">..loading</td>
-              </tr>
-            ) : props.values ? (
-              props.values.map((row: Record<string, any>, rowIndex: number) => (
-                <tr key={rowIndex} className="table-row ">
-                  <td className="table-content">
-                    <div className="flex justify-center">
-                      <CheckBox
-                        checked={isChecked}
-                        onChange={setIsChecked}
-                        id="2"
-                        boxSize="size-6"
-                        checkStyle="text-white "
-                        checkBoxBg="bg-foreground/10"
-                        peerChecked="peer-checked:bg-surface"
-                        checkBoxRoundedValue="rounded-md"
-                      />
-                    </div>
-                  </td>
+  const statusBodyTemplate = (rowData: User) => {
+    return (
+      <Tag
+        value={rowData.status}
+        severity={getStatusSeverity(rowData.status)}
+      />
+    );
+  };
 
-                  {props.headers.map((header: string, index: number) => {
-                    const cell = row[header];
-                    if (header.includes("status")) {
-                      const isActive =
-                        cell === "مفعل" ||
-                        cell === "مقبول" ||
-                        cell === "active" ||
-                        cell === "accepted";
-                      const isNotActive =
-                        cell === "غير مفعل" ||
-                        cell === "مرفوض" ||
-                        cell === "in active" ||
-                        cell === "not accepted";
-
-                      return (
-                        <td key={index} className="table-content  ">
-                          <div className="flex justify-center">
-                            <button
-                              className={` p-1 rounded-md flex  justify-center items-center text-sm ${
-                                isActive
-                                  ? "bg-green-100 text-green-400"
-                                  : isNotActive
-                                  ? "bg-red-100/65 text-red-500/80"
-                                  : "bg-yellow-100 text-yellow-500"
-                              }`}
-                            >
-                              {cell}
-                              <span className="mdi mdi-chevron-down"></span>
-                            </button>
-                          </div>
-                        </td>
-                      );
-                    } else if (header.includes("subscription")) {
-                      const isNotActive =
-                        cell.includes("غير مشترك") ||
-                        cell.includes("not subscribed");
-
-                      const isActive =
-                        !isNotActive &&
-                        (cell.includes("مشترك") || cell.includes("subscribed"));
-
-                      return (
-                        <td key={index} className="table-content">
-                          <span
-                            className={` p-1 rounded-md  text-sm ${
-                              isActive
-                                ? "bg-green-100 text-green-400"
-                                : isNotActive
-                                ? "bg-red-100/65 text-red-500/80"
-                                : "bg-yellow-100 text-yellow-500"
-                            }`}
-                          >
-                            {cell}
-                          </span>
-                        </td>
-                      );
-                    } else if (header.includes("paymentMethod")) {
-                      return (
-                        <td key={index} className="table-content ">
-                          <div className="relative img-container flex justify-center size-10">
-                            <Image
-                              alt="payment method"
-                              src={cell}
-                              fill
-                              className="rounded-full object-cover "
-                            />
-                          </div>
-                        </td>
-                      );
-                    } else if (header.includes("image")) {
-                      return (
-                        <td key={index} className="table-content ">
-                          <div className="relative img-container flex justify-center w-20 h-10">
-                            <Image
-                              alt="image"
-                              src={cell}
-                              fill
-                              className=" object-cover "
-                            />
-                          </div>
-                        </td>
-                      );
-                    }
-                    return (
-                      <td key={index} className="table-content">
-                        {cell}
-                      </td>
-                    );
-                  })}
-
-                  {props.page !== "visits" &&
-                    props.page !== "الزيارات" &&
-                    props.page !== "payments" &&
-                    props.page !== "المدفوعات" && (
-                      <td className=" table-content ">
-                        <div className="flex  items-center justify-center gap-3">
-                          <button
-                            className="text-surface bg-surface-light-800 rounded-md size-8"
-                            onClick={() => props.onEdit && props.onEdit(row)}
-                          >
-                            <i className="fa-regular fa-pen-to-square text-lg"></i>
-                          </button>
-                          <button
-                            className="bg-red-100/65 text-red-500/80 rounded-md size-8"
-                            onClick={() =>
-                              props.onDelete && props.onDelete(row)
-                            }
-                          >
-                            <span className="mdi mdi-delete-outline text-lg"></span>
-                          </button>
-                        </div>
-                      </td>
-                    )}
-
-                  {(props.page === "payments" ||
-                    props.page === "المدفوعات") && (
-                    <td className="flex table-content items-center justify-center  gap-1">
-                      <button
-                        className="text-blue-500 bg-blue-100/50 p-1 rounded-md  text-sm"
-                        onClick={() => props.onView && props.onView(row)}
-                      >
-                        عرض
-                      </button>
-                      <button
-                        className="text-surface bg-surface-light-800 p-1 rounded-md  text-sm"
-                        onClick={() =>
-                          props.onDownload && props.onDownload(row)
-                        }
-                      >
-                        تحميل
-                      </button>
-                    </td>
-                  )}
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td className="text-center py-4 ">لا توجد بيانات</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+  const subscriptionBodyTemplate = (rowData: User) => {
+    return (
+      <Tag
+        value={rowData.subscription}
+        severity={getSubscriptionSeverity(rowData.subscription)}
+      />
+    );
+  };
+  const actionBodyTemplate = (rowData: User) => {
+    return (
+      <div className="flex  items-center justify-center gap-3">
+        <button
+          className="text-surface bg-surface-light-800 rounded-md size-8"
+          onClick={() => handleEdit(rowData)}
+        >
+          <i className="fa-regular fa-pen-to-square text-lg"></i>
+        </button>
+        <button
+          className="bg-red-100/65 text-red-500/80 rounded-md size-8"
+          onClick={() => handleDelete(rowData)}
+        >
+          <span className="mdi mdi-delete-outline text-lg"></span>
+        </button>
       </div>
-    </>
+    );
+  };
+    const paginatorLeft = <Button type="button" icon="pi pi-refresh" text />;
+    const paginatorRight = <Button type="button" icon="pi pi-download" text />;
+  return (
+    <div className="card">
+      <DataTable
+        value={users}
+        removableSort
+        paginator
+        rows={5}
+        rowsPerPageOptions={[5, 10, 25, 50]}
+        paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
+        currentPageReportTemplate="{first} to {last} of {totalRecords}"
+        paginatorLeft={paginatorLeft}
+        paginatorRight={paginatorRight}
+      >
+        <Column
+          header={headerCheckbox}
+          body={checkboxTemplate}
+          style={{ width: "3rem"}}
+        />
+        <Column field="id" header="ID" sortable></Column>
+        <Column field="name" header="الاسم" sortable></Column>
+        <Column field="mobile" header="رقم الموبايل" sortable></Column>
+        <Column field="area" header="المنطقة" sortable></Column>
+        <Column
+          field="subscription"
+          header="الاشتراك"
+          body={subscriptionBodyTemplate}
+          sortable
+        ></Column>
+        <Column field="renewalDate" header="تاريخ التجديد" sortable></Column>
+        <Column
+          field="status"
+          header="الحالة"
+          body={statusBodyTemplate}
+          sortable
+        />
+        <Column
+          field="actions"
+          header="الاجراءات"
+          sortable
+          body={actionBodyTemplate}
+        ></Column>
+      </DataTable>
+    </div>
   );
 }
