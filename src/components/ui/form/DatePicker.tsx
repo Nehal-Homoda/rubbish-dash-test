@@ -1,9 +1,7 @@
-import React, { useRef } from "react";
-import Flatpickr from "react-flatpickr";
-import "flatpickr/dist/flatpickr.min.css";
-// import  "flatpickr/dist/themes/dark.css";
-import { Arabic } from "flatpickr/dist/l10n/ar.js";
-import { english } from "flatpickr/dist/l10n/default.js";
+import React, { useRef, useState } from "react";
+import { Calendar } from "primereact/calendar";
+import { Nullable } from "primereact/ts-helpers";
+import { addLocale } from "primereact/api";
 
 interface DatePickerFieldProps {
   label: string;
@@ -11,48 +9,99 @@ interface DatePickerFieldProps {
   errorMessage?: string;
   value: Date;
   onChange: (date: Date) => void;
-  lang: "en" | "ar";
+  lang?: "en" | "ar";
 }
-
 export default function DatePicker(props: DatePickerFieldProps) {
   const datePickerRef = useRef<any>(null);
 
   const handleIconClick = () => {
     if (datePickerRef.current) {
-      datePickerRef.current.flatpickr.open();
+      datePickerRef.current.show();
     }
   };
+  if (props.lang === "ar") {
+    addLocale("ar", {
+      firstDayOfWeek: 6,
+      dayNames: [
+        "الأحد",
+        "الاثنين",
+        "الثلاثاء",
+        "الأربعاء",
+        "الخميس",
+        "الجمعة",
+        "السبت",
+      ],
+      dayNamesShort: ["أحد", "اثن", "ثلا", "أرب", "خمي", "جمع", "سبت"],
+      dayNamesMin: ["أحد", "اثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة", "سبت"],
+      monthNames: [
+        "يناير",
+        "فبراير",
+        "مارس",
+        "أبريل",
+        "مايو",
+        "يونيو",
+        "يوليو",
+        "أغسطس",
+        "سبتمبر",
+        "أكتوبر",
+        "نوفمبر",
+        "ديسمبر",
+      ],
+      monthNamesShort: [
+        "ينا",
+        "فبر",
+        "مار",
+        "أبر",
+        "ماي",
+        "يون",
+        "يول",
+        "أغس",
+        "سبت",
+        "أكت",
+        "نوف",
+        "ديس",
+      ],
+      today: "اليوم",
+      clear: "مسح",
+    });
+  }
 
   return (
-    <div className="border-[1px] mt-9  border-surface-light-600 bg-background relative p-3 rounded-xl">
-      <label
-        htmlFor=""
-        className="absolute bg-background -top-4 capitalize text-base text-foreground px-2"
-      >
-        {props.label}
-        {props.required && <span className="text-red-600 text-lg">*</span>}
-      </label>
-      <div className="w-full datePicker flex items-center">
-        <span
-          className="mdi mdi-calendar-month-outline text-lg text-foreground/50 cursor-pointer"
-          onClick={handleIconClick}
-        ></span>
-        <Flatpickr
-          value={props.value}
-          onChange={(dates: Date[]) => props.onChange(dates[0] || null)}
-          options={{
-            dateFormat: "d F Y",
-            locale: props.lang === "ar" ? Arabic : english,
-          }}
-          ref={datePickerRef}
-          className={`border-none outline-none w-full bg-transparent ps-1 text-sm 
-    dark:flatpickr-dark`}
-        />
-        <span
-          className="mdi mdi-chevron-down text-foreground/50 text-lg cursor-pointer"
-          onClick={handleIconClick}
-        ></span>
+    <>
+      <div className="border-[1px] mt-9  border-surface-light-600 bg-background relative p-3 rounded-xl">
+        <label
+          htmlFor=""
+          className="absolute bg-background -top-4 capitalize text-base text-foreground px-2"
+        >
+          {props.label}
+          {props.required && <span className="text-red-600 text-lg">*</span>}
+        </label>
+        <div className="w-full datePicker flex items-center">
+          <span
+            className="mdi mdi-calendar-month-outline text-lg text-foreground/50 cursor-pointer"
+            onClick={handleIconClick}
+          ></span>
+          <Calendar
+            value={props.value}
+            ref={datePickerRef}
+            showButtonBar
+            readOnlyInput
+            dateFormat="dd MM yy"
+            onChange={(e) => props.onChange(e.value as Date)}
+            className={`border-none outline-none w-full bg-transparent ps-1 text-sm 
+   ring-0 shadow-none drop-shadow-none`}
+            locale={props.lang === "ar" ? "ar" : "en"}
+          />
+
+          <span
+            className="mdi mdi-chevron-down text-foreground/50 text-lg cursor-pointer"
+            onClick={handleIconClick}
+          ></span>
+        </div>
       </div>
-    </div>
+      {props.errorMessage && (
+        <p className="err-msg text-red-600 text-sm">{props.errorMessage}</p>
+      )}{" "}
+    </>
   );
 }
