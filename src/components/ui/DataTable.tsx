@@ -1,13 +1,23 @@
 "use client";
 import { useEffect, useState, useMemo } from "react";
+import Dropdown from "./form/Dropdown";
 
 type DataTableProps = {
   data: any[];
-    rowsPerPage: number;
-    actions: boolean;
+  rowsPerPage: number;
+  status: boolean;
+  actions: boolean;
+  payment: boolean;
 };
 
-export default function DataTable({ data, rowsPerPage,actions }: DataTableProps) {
+export default function DataTable({
+  data,
+  rowsPerPage,
+  status,
+  actions,
+  payment,
+}: DataTableProps) {
+    const [selectedStatus, setselectedStatus] = useState("active");
   const [columns, setColumns] = useState<string[]>([]);
   const [page, setPage] = useState(1);
 
@@ -25,7 +35,6 @@ export default function DataTable({ data, rowsPerPage,actions }: DataTableProps)
     return data.slice(start, end);
   }, [data, page, rowsPerPage]);
 
-
   return (
     <>
       <table className="w-full text-center">
@@ -36,8 +45,16 @@ export default function DataTable({ data, rowsPerPage,actions }: DataTableProps)
                 {col}
               </th>
             ))}
+            {status && (
+              <th className="border-b px-2 py-5 text-foreground/50">status</th>
+            )}
             {actions && (
               <th className="border-b px-2 py-5 text-foreground/50">actions</th>
+            )}
+            {payment && (
+              <th className="border-b px-2 py-5 text-foreground/50">
+                transform image
+              </th>
             )}
           </tr>
         </thead>
@@ -49,21 +66,72 @@ export default function DataTable({ data, rowsPerPage,actions }: DataTableProps)
                   key={col}
                   className="border-b px-2 py-5 font-medium text-sm"
                 >
-                  {col === "status" ? (
-                    item[col] ? (
-                      <span className="text-green-600 font-bold">مفعل</span>
+                  {col === "subscription" ? (
+                    item[col] == "مشترك" ? (
+                      <span className="text-surface-light-200 bg-surface-light-800/50 px-2 py-1 rounded-lg text-sm">
+                        مشترك
+                      </span>
                     ) : (
-                      <span className="text-red-600 font-bold">غير مفعل</span>
+                      <span className="text-red-600 bg-red-50 px-2 py-1 rounded-lg text-sm">
+                        غير مشترك
+                      </span>
                     )
                   ) : (
                     item[col]
                   )}
                 </td>
               ))}
+              {status && (
+                <td className="border-b px-2 py-5 font-medium text-sm">
+                  <Dropdown
+                    style={`relative w-fit mx-auto ${
+                      selectedStatus == "active"
+                        ? "text-surface-light-200 bg-surface-light-800/50"
+                        : ""
+                    } ${
+                      selectedStatus == "not-active"
+                        ? "text-red-600 bg-red-50"
+                        : ""
+                    } ${
+                      selectedStatus == "pending"
+                        ? "text-yellow-500 bg-yellow-50"
+                        : ""
+                    } px-2 rounded-lg text-sm`}
+                    dropStyle="top-[50px] -start-12 z-10 w-[170px] px-4 py-6"
+                    iconStyle="flex items-center w-fit"
+                    value={selectedStatus}
+                    onChange={(val: string) => {
+                      setselectedStatus(val);
+                    }}
+                    name="status"
+                    iconType="mdi"
+                    appendIcon="mdi mdi-chevron-down"
+                    options={[
+                      { value: "active", label: "مفعل" },
+                      { value: "not-active", label: "غير مفعل" },
+                      { value: "pending", label: "معلق" },
+                    ]}
+                  />
+                </td>
+              )}
               {actions && (
-                <td className="px-2 py-5 border-b space-x-2">
-                  <button className="text-blue-600">تعديل</button>
-                  <button className="text-red-600">حذف</button>
+                <td className="px-2 py-5 border-b flex items-center justify-center gap-2">
+                  <button className="text-surface-light-200 bg-surface-light-800/50 px-2 py-1 rounded-lg">
+                    <span className="mdi mdi-square-edit-outline"></span>
+                  </button>
+                  <button className="text-red-600 bg-red-50 px-2 py-1 rounded-lg">
+                    <span className="mdi mdi-trash-can-outline"></span>
+                  </button>
+                </td>
+              )}
+              {payment && (
+                <td className="px-2 py-5 border-b flex items-center justify-center gap-2">
+                  <button className="text-blue-600 bg-blue-50 px-2 py-1 rounded-lg text-sm font-medium">
+                    View
+                  </button>
+                  <button className="text-surface-light-200 bg-surface-light-800/50 px-2 py-1 rounded-lg text-sm font-medium">
+                    Download
+                  </button>
                 </td>
               )}
             </tr>

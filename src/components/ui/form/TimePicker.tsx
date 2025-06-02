@@ -1,3 +1,4 @@
+"use client"
 import React, { useRef } from "react";
 import Flatpickr from "react-flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
