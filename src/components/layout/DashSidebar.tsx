@@ -5,11 +5,15 @@ import logo from "@/assets/images/logo.png";
 import type { ListItem } from "@/types/sidebarListItem";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
+import { useLangAndDictionary } from "@/utils/lang";
+interface SideBarProps {
+  isOpen: boolean;
+  openSidebar: () => void;
+  lang:'en'|'ar'
+dict: { [key: string]: string };
+}
+export default function DashSidebar(props: SideBarProps) {
 
-type DictionaryType = {
-  [key: string]: string;
-};
-export default function DashSidebar({ dict }: { dict: DictionaryType }) {
   const ListItems: ListItem[] = [
     {
       icon: "mdi-view-dashboard-outline",
@@ -32,10 +36,9 @@ export default function DashSidebar({ dict }: { dict: DictionaryType }) {
     {
       icon: " mdi-account-multiple-outline",
       name: "users",
-      path: "/users",
       iconType: "mdi",
 
-      dropdown: [
+      subLinks: [
         { name: "all", path: "/all" },
         { name: "users", path: "/users2" },
         { name: "deleted", path: "/deleted" },
@@ -101,12 +104,22 @@ export default function DashSidebar({ dict }: { dict: DictionaryType }) {
   const cleanPathname = pathname.replace(langPrefix, "") || "/";
 
   return (
-    <div
-      className={`side-bar md:translate-x-0 z-50 bg-surface text-white fixed top-0 md:flex duration-300 flex-col h-full ${
-        params.lang === "ar" ? " translate-x-full " : " -translate-x-full"
-      }`}
-    >
-      <div className="title uppercase flex items-center justify-start gap-2 ps-9 pt-8 pb-5">
+<div
+  className={`side-bar z-50 bg-surface text-white fixed top-0 md:flex duration-300 flex-col h-full
+  ${
+    props.isOpen
+      ? "flex"
+      : "md:translate-x-0 " + (params.lang === "ar" ? "translate-x-full" : "-translate-x-full")
+  }
+  `}
+>
+
+      <span
+        className="mdi mdi-close text-lg md:hidden py-2 px-3 cursor-pointer"
+        onClick={() => props.openSidebar()}
+      ></span>
+
+      <div className="title uppercase flex items-center justify-start gap-2 ps-9 pt-4 md:pt-9 pb-5">
         <div className="size-7 relative bg-white rounded-full flex justify-center items-center">
           <Image src={logo} alt="Logo" className="size-5 object-contain" />
         </div>
@@ -127,8 +140,9 @@ export default function DashSidebar({ dict }: { dict: DictionaryType }) {
                     }`
                   : ""
               }`}
-              onClick={() => {
-                if (item.dropdown) toggleDropDown(index);
+              onClick={(e) => {
+                if (item.subLinks) e.preventDefault();
+                toggleDropDown(index);
               }}
             >
               <div className="flex items-center">
@@ -139,9 +153,9 @@ export default function DashSidebar({ dict }: { dict: DictionaryType }) {
                   <i className={`fa ${item.icon}  me-2 text-2xl`}></i>
                 ) : null}
 
-                <span>{dict[item.name] || item.name}</span>
+                <span>{props.dict[item.name] || item.name}</span>
               </div>
-              {item.dropdown && (
+              {item.subLinks && (
                 <span
                   className={`mdi mdi-chevron-down transition-all duration-200 ${
                     dropdownIndex === index ? "-rotate-180" : "rotate-0"
@@ -156,7 +170,7 @@ export default function DashSidebar({ dict }: { dict: DictionaryType }) {
                   : "max-h-0 pointer-events-none "
               }`}
             >
-              {item.dropdown?.map((dropKey, index) => (
+              {item.subLinks?.map((dropKey, index) => (
                 <Link
                   href={`${langPrefix}${dropKey.path}`}
                   key={index}
@@ -164,7 +178,7 @@ export default function DashSidebar({ dict }: { dict: DictionaryType }) {
                     ${cleanPathname === dropKey.path ? "bg-white/10 " : ""}
                     `}
                 >
-                  {dict[dropKey.name] || dropKey.name}
+                  {props.dict[dropKey.name] || dropKey.name}
                 </Link>
               ))}
             </div>

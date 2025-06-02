@@ -3,5 +3,5 @@ export type ListItem = {
   name: string;
   path?: string;
   iconType?: "mdi" | "fa";
-  dropdown?: ListItem[];
+  subLinks?: ListItem[];
 };
