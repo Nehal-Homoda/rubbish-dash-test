@@ -1,35 +1,34 @@
-// "use client"
-import { getDictionary } from "../../dictionaries";
+"use client";
 import DashSidebar from "@/components/layout/DashSidebar";
 import UICard from "@/components/ui/UICardYara";
 import DashNavbar from "@/components/layout/DashNavbar";
+import { useState } from "react";
+import { useLangAndDictionary } from "@/utils/lang";
 
-export default async function RootLayout({children,params,}: Readonly<{children: React.ReactNode;params: Promise<{ lang: "en" | "ar" }>;}>) {
-  // const [isOpen, setIsOpen] = useState(false)
-  const { lang } = await params;
-  const dict = await getDictionary(lang);
+type Props = {
+  children: Readonly<React.ReactNode>;
+};
 
-  // function openSidebar() {
-  //   setIsOpen(true)
-  //   console.log(isOpen);
-  // }
+export default function RootLayout({ children }: Props) {
+  const { lang, dict } = useLangAndDictionary();
+
+  const [isOpen, setIsOpen] = useState(false);
+
+  const openSidebar = () => {
+    setIsOpen(true);
+  };
+
   return (
     <>
       <div className="dash-layout">
         <aside>
-          <DashSidebar dict={dict} />
+          <DashSidebar lang={lang} dict={dict} isOpen={isOpen} openSidebar={() => setIsOpen(!isOpen)} />
         </aside>
 
         <div className="md:ps-[16.9rem] w-[97%] mx-auto">
-          <DashNavbar
-            lang={lang}
-            dict={dict}
-            // isOpen={isOpen}
-            // openSidebar={openSidebar}
-          />
+          <DashNavbar isOpen={isOpen} openSidebar={openSidebar} />
           {children}
-          <UICard title={"الخريطة"} lang={lang} dict={dict}>example</UICard>
-
+          <UICard title={"الخريطة"}>example</UICard>
         </div>
       </div>
     </>

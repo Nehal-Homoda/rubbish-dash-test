@@ -6,18 +6,38 @@ import skyLight from "@/assets/images/sky-morning.jpg";
 import skyDark from "@/assets/images/sky-night.jpg";
 
 export default function UIDarkBtn({ lang }: { lang: string }) {
-const [isDark, setIsDark] = useState<boolean | null>(null);
+  const [isDark, setIsDark] = useState<boolean | null>(null);
 
-    useEffect(() => {
-    const darkModeFromStorage = JSON.parse(localStorage.getItem("dark-mode") || "false");
+  useEffect(() => {
+    const darkModeFromStorage = JSON.parse(
+      localStorage.getItem("dark-mode") || "false"
+    );
     setIsDark(darkModeFromStorage);
   }, []);
 
   useEffect(() => {
-      if (isDark === null) return; 
+    if (isDark === null) return;
     const html = document.documentElement;
     isDark ? html.classList.add("dark") : html.classList.remove("dark");
-    localStorage.setItem('dark-mode',JSON.stringify(isDark));
+    localStorage.setItem("dark-mode", JSON.stringify(isDark));
+
+    const existingLink = document.getElementById(
+      "primereact-theme"
+    ) as HTMLLinkElement | null;
+
+    const themeHref = isDark
+      ? "https://unpkg.com/primereact/resources/themes/lara-dark-blue/theme.css"
+      : "https://unpkg.com/primereact/resources/themes/lara-light-blue/theme.css";
+
+    if (existingLink) {
+      existingLink.href = themeHref;
+    } else {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.id = "primereact-theme";
+      link.href = themeHref;
+      document.head.appendChild(link);
+    }
   }, [isDark]);
   const toggleTheme = () => {
     setIsDark((prev) => !prev);

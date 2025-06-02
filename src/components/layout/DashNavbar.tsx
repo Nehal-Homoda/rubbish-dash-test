@@ -1,15 +1,14 @@
-
 import React from "react";
 import UIThemeToggleBtn from "@/components/ui/UIThemeToggleBtn";
 import LangSwitcher from "../shared/LangSwitcher";
+import { useLangAndDictionary } from "@/utils/lang";
+interface NavProps{
+  isOpen:boolean;
+  openSidebar:()=>void;
+}
+export default  function DashNavbar(props:NavProps) {
+  const { lang, dict } = useLangAndDictionary();
 
-export default async function DashNavbar({
-  lang,
-  dict,
-}: {
-  lang: "ar" | "en";
-  dict: {};
-}) {
   return (
     <>
       <nav className="">
@@ -18,7 +17,7 @@ export default async function DashNavbar({
           <div className="flex justify-center items-center gap-4">
             <UIThemeToggleBtn lang={lang} />
             <LangSwitcher dict={dict} />
-            <button className="block md:hidden cursor-pointer">
+            <button onClick={props.openSidebar} className="block md:hidden cursor-pointer">
               <span className="mdi mdi-menu text-2xl font-semibold text-foreground hover:text-surface transition-all"></span>
             </button>
           </div>
