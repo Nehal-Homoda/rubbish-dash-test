@@ -1,5 +1,5 @@
 import { Fragment, useState } from "react";
-import { Listbox, Transition } from "@headlessui/react";
+import { Listbox, ListboxButton, ListboxOption, ListboxOptions, Transition } from "@headlessui/react";
 
 type Option = {
   value: string;
@@ -7,20 +7,26 @@ type Option = {
 };
 
 type Props = {
+  style: string;
+  dropStyle: string;
+  iconStyle: string;
   value: string;
-  label: string;
-  placeholder: string;
+  label?: string;
+  placeholder?: string;
   name: string;
   options: Option[];
   preIcon?: string;
   appendIcon?: string;
   errorMessage?: string;
   required?: boolean;
-  iconType: "mdi" | "fa";
-  onChange: (value: string) => void;
+  iconType?: "mdi" | "fa";
+  onChange?: (value: string) => void;
 };
 
 export default function Dropdown({
+  style,
+  dropStyle,
+  iconStyle,
   value,
   label,
   placeholder,
@@ -37,15 +43,17 @@ export default function Dropdown({
     options.find((option) => option.value === value)?.label || "";
 
   return (
-    <div className="relative p-3 border border-surface-light-700 rounded-2xl mt-6">
-      <div className="label flex items-center gap-1 absolute -top-4 start-4 bg-background w-fit px-3 font-semibold">
-        <label htmlFor={name}>{label}</label>
-        {required && <span className="text-red-600">*</span>}
-      </div>
+    <div className={style}>
+      {label && (
+        <div className="label flex items-center gap-1 absolute -top-4 start-4 bg-background w-fit px-3 font-semibold">
+          <label htmlFor={name}>{label}</label>
+          {required && <span className="text-red-600">*</span>}
+        </div>
+      )}
 
       <Listbox value={value} onChange={onChange}>
-        <Listbox.Button className="w-full text-start flex items-center justify-between gap-2 bg-transparent outline-none">
-          <div className="flex justify-between items-center w-full">
+        <ListboxButton className="w-full text-start flex items-center justify-between gap-2 bg-transparent outline-none">
+          <div className={iconStyle}>
             <div className="flex items-center gap-2">
               {preIcon && iconType === "mdi" && (
                 <span className={`${preIcon} text-2xl text-foreground/45`} />
@@ -55,7 +63,7 @@ export default function Dropdown({
               )}
 
               {selectedLabel ? (
-                <span className="text-foreground line-clamp-1">
+                <span className="line-clamp-1">
                   {selectedLabel}
                 </span>
               ) : (
@@ -63,13 +71,13 @@ export default function Dropdown({
               )}
             </div>
             {appendIcon && iconType === "mdi" && (
-              <span className={`${appendIcon} text-2xl text-foreground/45`} />
+              <span className={`${appendIcon} text-2xl`} />
             )}
             {appendIcon && iconType === "fa" && (
-              <i className={`${appendIcon} text-2xl text-foreground/45`} />
+              <i className={`${appendIcon} text-2xl`} />
             )}
           </div>
-        </Listbox.Button>
+        </ListboxButton>
         <Transition
           as={Fragment}
           enter="transition ease-out duration-100"
@@ -79,17 +87,19 @@ export default function Dropdown({
           leaveFrom="opacity-100 translate-y-0"
           leaveTo="opacity-0 translate-y-2"
         >
-          <Listbox.Options className="absolute top-[70px] start-0 z-10 w-full rounded-xl bg-white shadow-[0_0_40px_0_rgb(0,0,0,0.06)] overflow-hidden focus-visible:outline-none pe-8 ps-4 py-6">
+          <ListboxOptions
+            className={`absolute ${dropStyle} rounded-xl bg-white shadow-[0_0_40px_0_rgb(0,0,0,0.06)] overflow-hidden focus-visible:outline-none`}
+          >
             {options.map((option) => (
-              <Listbox.Option
+              <ListboxOption
                 key={option.value}
                 value={option.value}
                 className="cursor-pointer text-foreground font-semibold text-lg w-full mb-1 px-2 py-1 rounded-lg hover:bg-surface-light-100 hover:text-white transition-all"
               >
                 {option.label}
-              </Listbox.Option>
+              </ListboxOption>
             ))}
-          </Listbox.Options>
+          </ListboxOptions>
         </Transition>
       </Listbox>
       {errorMessage && (

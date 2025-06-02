@@ -1,106 +1,82 @@
-import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react";
-import { Fragment, ReactNode, useState } from "react";
+import React, { ReactNode, useState } from "react";
+import { Button } from "primereact/button";
+import { Dialog } from "primereact/dialog";
 
 type Props = {
-  title: string;
-  actionBtn: string;
-  children: ReactNode;
-  action: any
+  title?: string;
+  openBtnLabel?: string;
+  openBtnIcon?: string;
+  iconType?: string;
+  actionBtn?: string;
+  children?: ReactNode;
+  action?: any;
+  style?: string;
 };
+
+
 export default function BaseModal(props: Props) {
-  let [isOpen, setIsOpen] = useState(false);
-
-  function closeModal() {
-    setIsOpen(false);
-  }
-
-  function openModal() {
-    setIsOpen(true);
-  }
+  const [visible, setVisible] = useState<boolean>(false);
 
   function handleAction() {
     props.action();
-    closeModal(); 
+    setVisible(false);
   }
 
-  return (
-    <>
-      <div className="flex items-center justify-end mb-8">
-        <button type="button" onClick={openModal} className="base-btn w-28">
-          {props.title}
-        </button>
+  const headerElement = (
+    <div className="relative">
+      <div className="absolute w-16 h-1 -top-3 left-1/2 -translate-x-1/2 bg-foreground/10 rounded-md"></div>
+      <div className="text-center">
+        <span className="font-semibold white-space-nowrap">{props.title}</span>
       </div>
+    </div>
+  );
 
-      <Transition appear show={isOpen} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={closeModal}>
-          <TransitionChild
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <div className="fixed inset-0 bg-black/25" />
-          </TransitionChild>
+  const footerContent = (
+    <div className="flex justify-center items-center gap-3">
+      <Button
+        label={props.actionBtn}
+        onClick={() => {
+          handleAction();
+        }}
+        className="base-btn w-40"
+      />
+      <Button
+        label="الغاء"
+        onClick={() => {
+          setVisible(false);
+        }}
+        className="cancel-btn w-20"
+      />
+    </div>
+  );
 
-          <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center p-4 text-center">
-              <TransitionChild
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 scale-95"
-                enterTo="opacity-100 scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 scale-100"
-                leaveTo="opacity-0 scale-95"
-              >
-                <DialogPanel className="w-full max-w-xl transform overflow-hidden rounded-2xl bg-white p-6 text-center align-middle shadow-xl transition-all">
-                  <div className="w-16 h-1 mx-auto bg-foreground/10 rounded-md mb-6"></div>
-                  <div className="flex justify-center items-center mb-14 ">
-                    {props.title ? (
-                      <DialogTitle
-                        as="h3"
-                        className="text-lg font-bold leading-6 text-foreground"
-                      >
-                        {props.title}
-                      </DialogTitle>
-                    ) : (
-                      ""
-                    )}
-                    <button
-                      type="button"
-                      className="absolute end-10"
-                      onClick={closeModal}
-                    >
-                      <span className="mdi mdi-close"></span>
-                    </button>
-                  </div>
-                  <div className="mt-2">{props.children}</div>
-
-                  <div className="flex justify-center items-center gap-4 mt-8">
-                    <button
-                      type="button"
-                      className="base-btn w-48"
-                      onClick={handleAction}
-                    >
-                      {props.actionBtn}
-                    </button>
-                    <button
-                      type="button"
-                      className="cancel-btn w-28"
-                      onClick={closeModal}
-                    >
-                      الغاء
-                    </button>
-                  </div>
-                </DialogPanel>
-              </TransitionChild>
-            </div>
-          </div>
-        </Dialog>
-      </Transition>
-    </>
+  return (
+    <div className="card flex justify-content-center">
+      <button onClick={() => setVisible(true)} className={props.style}>
+        {props.openBtnIcon ? (
+          props.iconType === "mdi" ? (
+            <span className={props.openBtnIcon}></span>
+          ) : (
+            <i className={props.openBtnIcon}></i>
+          )
+        ) : (
+          props.openBtnLabel
+        )}
+      </button>
+      <Dialog
+        visible={visible}
+        modal
+        header={headerElement}
+        footer={footerContent}
+        style={{ width: "40vw" }}
+        breakpoints={{ "960px": "75vw", "641px": "100vw" }}
+        onHide={() => {
+          if (!visible) return;
+          setVisible(false);
+        }}
+      >
+        <div className="mt-10">{props.children}</div>
+      </Dialog>
+    </div>
   );
 }
