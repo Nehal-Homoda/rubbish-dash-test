@@ -8,25 +8,25 @@ import instaPay from "@/assets/images/instapay.png";
 import FileInput from "./form/FileInput";
 import BaseRadioButton from "./form/BaseRadioButton";
 import CheckBoxField from "./form/CheckBox";
-import DatePicker from "./form/DatePicker";
-import TimePicker from "./form/TimePicker";
-import UITable from "./UITable";
 import Image from "next/image";
+import UITable from "./UITable";
+import { useLangAndDictionary } from "@/utils/lang";
+import DatePickerTest from "./form/DatePickerTest";
+import TimePickerTest from "./form/TimePickerTest";
+import DatePicker from "./form/DatePicker";
 
 interface UIDashCardProps {
   title?: string;
   children: React.ReactNode;
   shadowClassName?: string;
-  lang: "en" | "ar";
-  dict: any;
 }
 export default function UIDashCard({
   title,
   children,
   shadowClassName = "shadow-[0_0_0.25rem_0.5625rem_rgb(0,0,0,0.07)]",
-  lang,
-  dict,
 }: UIDashCardProps) {
+  const { lang, dict } = useLangAndDictionary();
+
   // !inputs will be removed
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
@@ -122,7 +122,7 @@ export default function UIDashCard({
       <div
         className={`rounded-2xl bg-background p-5 w-full ${shadowClassName}`} //handling various shadows
       >
-        <UITable
+        {/* <UITable
           values={users}
           headers={allKeys}
           lang={lang}
@@ -132,20 +132,29 @@ export default function UIDashCard({
           onDelete={handleDelete}
           onView={handleView}
           onDownload={handleDownload}
+        /> */}
+        <UITable />
+        <BaseRadioButton
+          text="10:00  -  11:00"
+          radioName="time"
+          id="1"
+          radioValue="10-11"
+          value={baseRadioBtn}
+          onChange={setBaseRadioBtn}
         />
       </div>
 
-      {/* <div
+      <div
         className={`rounded-2xl bg-background p-5 w-full ${shadowClassName}`} //handling various shadows
-      > */}
-      {/* {title && (
+      >
+        {title && (
           <div className="card-title text-foreground text-lg font-semibold capitalize mb-4">
             {title}
           </div>
         )}
-        <div className="mb-7">{children}</div> */}
-      {/* inputs will be removed */}
-      {/* <div className="inputs ">
+        <div className="mb-7">{children}</div>
+        {/* inputs will be removed */}
+        <div className="inputs ">
           <Input
             label="اسم المستخدم"
             type="text"
@@ -158,18 +167,18 @@ export default function UIDashCard({
             onChange={handleNameChange}
             // errorMessage="error"
           />
-          
-      <CheckBoxField
-        text="السبت"
-        id="1"
-        checked={isChecked}
-        onChange={setIsChecked}
-        boxSize="size-4"
-        border="border-2 border-foreground/65"
-        peerChecked="peer-checked:border-surface"
-        checkStyle="text-surface text-[10px] "
-        checkBoxRoundedValue="rounded-[4px]"
-      />
+
+          <CheckBoxField
+            text="السبت"
+            id="1"
+            checked={isChecked}
+            onChange={setIsChecked}
+            boxSize="size-4"
+            border="border-2 border-foreground/65"
+            peerChecked="peer-checked:border-surface"
+            checkStyle="text-surface text-[10px] "
+            checkBoxRoundedValue="rounded-[4px]"
+          />
 
           <Input
             label="الرقم السري"
@@ -216,38 +225,24 @@ export default function UIDashCard({
           value={baseRadioBtn}
           onChange={setBaseRadioBtn}
         />
-      
 
-        <DatePicker
+        <DatePickerTest
           label={dict.start}
           value={selectedDate}
           onChange={handleDateChange}
           lang={lang}
         />
-        <TimePicker
+        <TimePickerTest
           label={dict.from}
           value={selectedTime}
           onChange={handleTimeChange}
           lang={lang}
-        /> */}
-
-      {/* <p>القيمة المختارة: {radioBtnWithImg}</p>
-        <p>الاسم: {name}</p>
-        <p>الرقم السري: {password}</p>
-        <p>فايل: {selectedFile?.name}</p>
-        <p>{isChecked ? "checked " : "not checked"}</p>
-        <p>{baseRadioBtn}</p>
-        <p>
-          {selectedDate
-            ? selectedDate.toLocaleDateString()
-            : "No date selected"}
-        </p>
-        <p>
-          {selectedTime
-            ? selectedTime.toLocaleTimeString()
-            : "No time selected"}
-        </p> */}
-      {/* </div> */}
+        />
+        <DatePicker       label={dict.start}
+          value={selectedDate}
+          onChange={handleDateChange}
+          lang={lang}/>
+      </div>
     </>
   );
 }
