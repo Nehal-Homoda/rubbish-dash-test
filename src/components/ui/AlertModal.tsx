@@ -6,7 +6,7 @@ import alert from "@/assets/images/alert.png";
 
 type Props = {
   message: string;
-  visibility: boolean;
+  show: boolean;
 };
 
 
@@ -26,7 +26,7 @@ export default function BaseModal(props: Props) {
   );
 
   useEffect(() => {
-    setVisible(props.visibility)
+    setVisible(props.show)
   }, [])
   
 
