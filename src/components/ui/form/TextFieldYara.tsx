@@ -4,10 +4,12 @@ interface InputProps {
   label: string;
   type: "text" | "password" | "email" | "number" | "tel";
   placeholder: string;
-  prependIcon: string;
+  prependIcon?: string;
   appendIcon?: string;
   closedEye?: string;
   openedEye?: string;
+  name:string
+  id:string
   value: string;
   iconType: "mdi" | "fa";
   required: boolean;
@@ -21,35 +23,35 @@ export default function TextField(props: InputProps) {
     setshowPassword((prev) => !prev);
     inputType === "password" ? setInputType("text") : setInputType("password");
   };
-  if (props.type === "password" && (!props.closedEye || !props.openedEye)) {
-    console.error(
-      "For password input type, both 'closedEye' and 'openedEye' icons must be provided."
-    );
-  }
 
-  //!inputs are used in UICardYara
+  //!inputs are used in UICardYara for test
   return (
     <>
       <div>
         <div className="border-[1px] border-surface-light-600 bg-background relative p-3 rounded-xl">
           <label
-            htmlFor=""
+            htmlFor={props.id}
             className="absolute bg-background -top-4 capitalize text-base text-foreground px-2"
           >
-            {props.label}{" "}
+            {props.label}
             {props.required && <span className="text-red-600 text-lg">*</span>}
           </label>
           <div className="flex items-center justify-between gap-2">
             <div className="prepend-icon text-foreground/50 text-xl">
-              {props.iconType === "mdi" && (
-                <span className={`mdi ${props.prependIcon} `}></span>
-              )}
-              {props.iconType === "fa" && (
-                <i className={`fa ${props.prependIcon} `}></i>
+              {props.prependIcon && (
+                <>
+                  {props.iconType === "mdi" && (
+                    <span className={` ${props.prependIcon} `}></span>
+                  )}
+                  {props.iconType === "fa" && (
+                    <i className={` ${props.prependIcon} `}></i>
+                  )}
+                </>
               )}
             </div>
             <input
               type={inputType}
+              id={props.id}
               className="w-full bg-background border-none outline-none text-sm placeholder:text-foreground/65"
               placeholder={props.placeholder}
               value={props.value}
@@ -59,14 +61,14 @@ export default function TextField(props: InputProps) {
               {props.iconType === "mdi" && (
                 <>
                   {props.type !== "password" && props.appendIcon && (
-                    <span className={`mdi ${props.appendIcon}`}></span>
+                    <span className={`${props.appendIcon}`}></span>
                   )}
 
                   {props.type === "password" &&
                     props.closedEye &&
                     props.openedEye && (
                       <span
-                        className={`mdi ${
+                        className={` ${
                           showPassword ? props.openedEye : props.closedEye
                         }  cursor-pointer`}
                         onClick={handleShowPassword}
@@ -77,14 +79,14 @@ export default function TextField(props: InputProps) {
               {props.iconType === "fa" && (
                 <>
                   {props.type !== "password" && props.appendIcon && (
-                    <i className={`fa ${props.appendIcon}`}></i>
+                    <i className={`${props.appendIcon}`}></i>
                   )}
 
                   {props.type === "password" &&
                     props.closedEye &&
                     props.openedEye && (
                       <i
-                        className={`fa ${
+                        className={`${
                           showPassword ? props.openedEye : props.closedEye
                         }  cursor-pointer`}
                         onClick={handleShowPassword}

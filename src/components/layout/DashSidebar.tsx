@@ -5,32 +5,31 @@ import logo from "@/assets/images/logo.png";
 import type { ListItem } from "@/types/sidebarListItem";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
-import { useLangAndDictionary } from "@/utils/lang";
+import Routes from "@/core/manager/route.manager";
 interface SideBarProps {
   isOpen: boolean;
   openSidebar: () => void;
-  lang:'en'|'ar'
-dict: { [key: string]: string };
+  lang: "en" | "ar";
+  dict: { [key: string]: string };
 }
 export default function DashSidebar(props: SideBarProps) {
-
   const ListItems: ListItem[] = [
     {
       icon: "mdi-view-dashboard-outline",
       name: "home",
-      path: "/",
+      path: Routes.home,
       iconType: "mdi",
     },
     {
       icon: "mdi-layers-triple-outline",
       name: "services",
-      path: "/services",
+      path: Routes.services,
       iconType: "mdi",
     },
     {
       icon: "mdi-image-marker-outline",
       name: "regions",
-      path: "/regions",
+      path: Routes.regions,
       iconType: "mdi",
     },
     {
@@ -39,7 +38,7 @@ export default function DashSidebar(props: SideBarProps) {
       iconType: "mdi",
 
       subLinks: [
-        { name: "all", path: "/all" },
+        { name: "all", path: Routes.users },
         { name: "users", path: "/users2" },
         { name: "deleted", path: "/deleted" },
       ],
@@ -47,50 +46,56 @@ export default function DashSidebar(props: SideBarProps) {
     {
       icon: "mdi-format-list-checkbox",
       name: "packages",
-      path: "/packages",
+      path: Routes.packages,
       iconType: "mdi",
     },
     {
       icon: "mdi-dolly",
       name: "rubbush_collectors",
+      path: Routes.rubbushCollectors,
+
       iconType: "mdi",
     },
     {
       icon: "mdi-truck-outline",
       name: "visits",
-      path: "/visits",
+      path: Routes.visits,
       iconType: "mdi",
     },
     {
       icon: "mdi-wallet-bifold-outline",
       name: "payments",
-      path: "/payments",
+      path: Routes.payments,
       iconType: "mdi",
     },
     {
       icon: "mdi-bell-outline",
       name: "notifications",
-      path: "/notification",
+      path: Routes.notifications,
       iconType: "mdi",
     },
     {
       icon: "mdi-calendar-text-outline",
       name: "instructions",
-      path: "/instructions",
-
+      path: Routes.instructions,
       iconType: "mdi",
     },
     {
       icon: "mdi-book-outline",
       name: "signs",
-      path: "/signs",
+      path: Routes.signs,
       iconType: "mdi",
     },
-    { icon: "mdi-headset", name: "support", path: "/support", iconType: "mdi" },
+    {
+      icon: "mdi-headset",
+      name: "support",
+      path: Routes.support,
+      iconType: "mdi",
+    },
     {
       icon: "mdi-cog-outline",
       name: "settings",
-      path: "/settings",
+      path: Routes.settings,
       iconType: "mdi",
     },
   ];
@@ -104,16 +109,16 @@ export default function DashSidebar(props: SideBarProps) {
   const cleanPathname = pathname.replace(langPrefix, "") || "/";
 
   return (
-<div
-  className={`side-bar z-50 bg-surface text-white fixed top-0 md:flex duration-300 flex-col h-full
+    <div
+      className={`side-bar z-50 bg-surface text-white/85 fixed top-0 md:flex duration-300 flex-col h-full
   ${
     props.isOpen
       ? "flex"
-      : "md:translate-x-0 " + (params.lang === "ar" ? "translate-x-full" : "-translate-x-full")
+      : "md:translate-x-0 " +
+        (params.lang === "ar" ? "translate-x-full" : "-translate-x-full")
   }
   `}
->
-
+    >
       <span
         className="mdi mdi-close text-lg md:hidden py-2 px-3 cursor-pointer"
         onClick={() => props.openSidebar()}
@@ -131,7 +136,7 @@ export default function DashSidebar(props: SideBarProps) {
           <div key={index}>
             <Link
               href={`${langPrefix}${item.path}`}
-              className={`relative flex items-center justify-between capitalize cursor-pointer text-lg hover:bg-white/10 rounded-2xl mb-2 w-56 h-12 transition-all px-4 ${
+              className={`relative flex items-center justify-between capitalize cursor-pointer text-lg hover:bg-white/10 rounded-2xl mb-2 w-60 h-12 transition-all px-4 ${
                 cleanPathname === item.path
                   ? `bg-white/10 before:content-[''] before:absolute before:bg-white before:h-[85%] before:w-[6px] before:rounded-md ${
                       params.lang === "en"
@@ -175,7 +180,7 @@ export default function DashSidebar(props: SideBarProps) {
                   href={`${langPrefix}${dropKey.path}`}
                   key={index}
                   className={`cursor-pointer hover:bg-white/10 py-2 px-3 rounded-xl 
-                    ${cleanPathname === dropKey.path ? "bg-white/10 " : ""}
+                    ${cleanPathname === dropKey.path ? "text-white " : ""}
                     `}
                 >
                   {props.dict[dropKey.name] || dropKey.name}

@@ -1,9 +1,6 @@
 
 @layer tailwind-base, primereact, tailwind-utilities;
 
-/* IMPORTANT: In "styled" mode you must add the PrimeReact Theme here. Do NOT include in "unstyled" mode */
-/* @import 'primereact/resources/themes/lara-light-blue/theme.css' layer(primereact); */
-
 @layer tailwind-base {
   @tailwind base;
 }
@@ -19,8 +16,8 @@
   --color-foreground: 56 67 59; /*text => /65*/
   /* muted text - icons color
   --color-muted: 56 67 59; */
-
   /* most used color */
+  --text-color:#ffffff;
   --color-surface: 0 148 20;
   --color-surface-100: 0 133 18;
   --color-surface-200: 0 118 16;
@@ -118,34 +115,10 @@ input[type="number"] {
 ::selection {
   background: rgb(var(--color-surface));
   color: white;
-}
-.dark .flatpickr-calendar,
-.dark .flatpickr-time {
-  background: #3f4458;
-  color: white;
-  border: none;
-}
-.dark .flatpickr-time input .flatpickr-hour-time,
-.dark .flatpickr-time .flatpickr-am-pm {
-  color: white;
-}
-.dark .flatpickr-day,
-.dark span.flatpickr-weekday,
-.dark .flatpickr-months .flatpickr-month,
-.dark .flatpickr-months .flatpickr-prev-month,
-.dark .flatpickr-months .flatpickr-next-month {
-  color: rgb(var(--color-foreground));
-  fill: white;
-}
-.flatpickr-day.selected {
-  border-color: rgb(var(--color-surface)) !important;
-  background: rgb(var(--color-surface)) !important;
-}
+} 
 
-th,td{
-  text-align: center;
-}
 
+/*
 .table-row {
   @apply border-b-[1px] border-foreground/10 text-center ;
 }
@@ -154,4 +127,4 @@ th,td{
 }
 .table-content {
   @apply text-foreground font-normal  p-4;
-}
+} */
