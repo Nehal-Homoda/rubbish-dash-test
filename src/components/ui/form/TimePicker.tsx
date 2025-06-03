@@ -18,8 +18,6 @@ export default function TimePicker(props: TimePickerFieldProps) {
     }
   };
 
-
-
   return (
     <>
       <div className="border-[1px] mt-9 border-surface-light-600 bg-background relative p-3 rounded-xl">
@@ -42,7 +40,8 @@ export default function TimePicker(props: TimePickerFieldProps) {
             timeOnly
             readOnlyInput
             hourFormat="12"
-            className="border-none outline-none ring-0 drop-shadow-none w-full bg-transparent ps-1 text-sm"
+                   className={`w-full  ps-1 `}
+            inputStyle={{ boxShadow: "none", border:"none",backgroundColor:"transparent" , padding:"0",fontSize:"14px"}}
           />
         </div>
       </div>
