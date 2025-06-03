@@ -25,10 +25,10 @@ export default function RootLayout({ children }: Props) {
           <DashSidebar lang={lang} dict={dict} isOpen={isOpen} openSidebar={() => setIsOpen(!isOpen)} />
         </aside>
 
-        <div className="md:ps-[16.9rem] w-[97%] mx-auto">
+        <div className="md:ps-[293px] w-[97%] mx-auto">
           <DashNavbar isOpen={isOpen} openSidebar={openSidebar} />
           {children}
-          <UICard title={"الخريطة"}>example</UICard>
+          {/* <UICard title={"الخريطة"}>example</UICard> */}
         </div>
       </div>
     </>
