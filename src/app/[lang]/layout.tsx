@@ -47,6 +47,12 @@ export default async function RootLayout({
           rel="stylesheet"
           href="https://cdn.materialdesignicons.com/7.4.47/css/materialdesignicons.min.css"
         />
+        <link
+          rel="stylesheet"
+          id="primereact-theme"
+          href="https://unpkg.com/primereact/resources/themes/lara-light-blue/theme.css"
+        />
+        
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <StoreProvider>{children}</StoreProvider>

@@ -84,13 +84,26 @@ export default function DatePicker(props: DatePickerFieldProps) {
           <Calendar
             value={props.value}
             ref={datePickerRef}
-            showButtonBar
             readOnlyInput
             dateFormat="dd MM yy"
             onChange={(e) => props.onChange(e.value as Date)}
-            className={`border-none outline-none w-full bg-transparent ps-1 text-sm 
-   ring-0 shadow-none drop-shadow-none`}
-            locale={props.lang === "ar" ? "ar" : "en"}
+            className={`w-full  ps-1 `}
+            inputStyle={{ boxShadow: "none", border:"none",backgroundColor:"transparent" , padding:"0",fontSize:"14px"}}
+            locale={props.lang}
+            nextIcon={
+              props.lang === "ar" ? (
+                <span className="mdi mdi-chevron-left text-2xl"></span>
+              ) : (
+                <span className="mdi mdi-chevron-right text-2xl"></span>
+              )
+            }
+            prevIcon={
+              props.lang === "ar" ? (
+                <span className="mdi mdi-chevron-right text-2xl"></span>
+              ) : (
+                <span className="mdi mdi-chevron-left text-2xl"></span>
+              )
+            }
           />
 
           <span

@@ -4,40 +4,49 @@ interface CheckBoxProps {
   checked: boolean;
   id: string;
   onChange: (checked: boolean) => void;
-  boxSize: string;
-  checkStyle: string;
+  boxSize?: string;
+  checkStyle?: string;
   checkBoxBg?: string;
   checkBoxRoundedValue?: string;
   border?: string;
   peerChecked?: string;
 }
-export default function CheckBox(props: CheckBoxProps) {
+export default function CheckBox({
+  text,
+  checked,
+  id,
+  onChange,
+  boxSize = "size-4",
+  checkStyle = "text-surface text-[10px] ",
+  checkBoxBg="bg-transparent",
+  checkBoxRoundedValue = "rounded-[4px]",
+  border = "border-2 border-foreground/65",
+  peerChecked = "peer-checked:border-surface",
+}: CheckBoxProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    props.onChange(e.target.checked);
+    onChange(e.target.checked);
   };
   return (
     <>
       <label
-        htmlFor={props.id}
+        htmlFor={id}
         className="text-foreground w-fit relative flex items-center gap-2 cursor-pointer"
       >
         <input
           type="checkbox"
           onChange={handleChange}
-          checked={props.checked}
-          id={props.id}
+          checked={checked}
+          id={id}
           className="w-5 h-4 opacity-0 peer z-40 right-0 cursor-pointer absolute"
         />
         <div
-          className={`custom-checkbox ${props.boxSize} ${props.checkBoxBg}  flex justify-center items-center ${props.checkBoxRoundedValue} ${props.border} ${props.peerChecked}`}
+          className={`custom-checkbox ${boxSize} ${checkBoxBg}  flex justify-center items-center ${checkBoxRoundedValue} ${border} ${peerChecked}`}
         >
-          {props.checked && (
-            <span
-              className={`mdi mdi-check ${props.checkStyle}  leading-none`}
-            />
+          {checked && (
+            <span className={`mdi mdi-check ${checkStyle}  leading-none`} />
           )}
         </div>
-        {props.text}
+        {text}
       </label>
     </>
   );

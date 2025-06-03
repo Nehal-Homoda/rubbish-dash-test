@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
+"use client";
+import React from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import CheckBox from "./form/CheckBox";
+import CheckBox from "../ui/form/CheckBox";
 import { Tag } from "primereact/tag";
 import { Button } from "primereact/button";
+import BaseModal from './../ui/BaseModal';
 interface User {
   id: number;
   name: string;
@@ -14,7 +16,7 @@ interface User {
   status: string;
 }
 
-export default function UserTable() {
+export default function UsersDataTable() {
   const users: User[] = [
     {
       id: 1,
@@ -72,6 +74,7 @@ export default function UserTable() {
         checkBoxBg="bg-foreground/10"
         peerChecked="peer-checked:bg-surface"
         checkBoxRoundedValue="rounded-md"
+        border="border-transparent"
       />
     );
   };
@@ -84,6 +87,7 @@ export default function UserTable() {
         checkBoxBg="bg-foreground/10"
         peerChecked="peer-checked:bg-surface"
         checkBoxRoundedValue="rounded-md"
+        border="border-transparent"
       />
     );
   };
@@ -112,14 +116,6 @@ export default function UserTable() {
     }
   };
 
-  const handleEdit = (user: User) => {
-    console.log("edit");
-  };
-
-  const handleDelete = (user: User) => {
-    console.log("renove");
-  };
-
   const statusBodyTemplate = (rowData: User) => {
     return (
       <Tag
@@ -137,26 +133,38 @@ export default function UserTable() {
       />
     );
   };
-  const actionBodyTemplate = (rowData: User) => {
+  const actionsBodyTemplate = () => {
     return (
-      <div className="flex  items-center justify-center gap-3">
-        <button
-          className="text-surface bg-surface-light-800 rounded-md size-8"
-          onClick={() => handleEdit(rowData)}
+      <div className="flex items-center justify-center gap-3">
+        <BaseModal
+          title={"تعديل عنصر"}
+          actionBtn={"حفظ"}
+          openBtnIcon={"fa-regular fa-pen-to-square text-lg"}
+          iconType="mdi"
+          style="text-surface-light-200 bg-surface-light-800/50 px-2 py-1 rounded-lg"
         >
-          <i className="fa-regular fa-pen-to-square text-lg"></i>
-        </button>
-        <button
-          className="bg-red-100/65 text-red-500/80 rounded-md size-8"
-          onClick={() => handleDelete(rowData)}
+          <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis,
+            vero!
+          </p>
+        </BaseModal>
+        <BaseModal
+          title={"حذف عنصر"}
+          actionBtn={"تأكيد"}
+          iconType="mdi"
+          openBtnIcon={"mdi mdi-delete-outline text-lg"}
+          style="text-red-600 bg-red-50 px-2 py-1 rounded-lg"
         >
-          <span className="mdi mdi-delete-outline text-lg"></span>
-        </button>
+          <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis,
+            vero!
+          </p>
+        </BaseModal>
       </div>
     );
   };
-    const paginatorLeft = <Button type="button" icon="pi pi-refresh" text />;
-    const paginatorRight = <Button type="button" icon="pi pi-download" text />;
+  const paginatorLeft = <Button type="button" icon="pi pi-refresh" text />;
+  const paginatorRight = <Button type="button" icon="pi pi-download" text />;
   return (
     <div className="card">
       <DataTable
@@ -171,32 +179,65 @@ export default function UserTable() {
         paginatorRight={paginatorRight}
       >
         <Column
-          header={headerCheckbox}
+          header={headerCheckbox()}
           body={checkboxTemplate}
-          style={{ width: "3rem"}}
+          style={{ textAlign: "center" }}
+          headerStyle={{ textAlign: "center" }}
         />
-        <Column field="id" header="ID" sortable></Column>
-        <Column field="name" header="الاسم" sortable></Column>
-        <Column field="mobile" header="رقم الموبايل" sortable></Column>
-        <Column field="area" header="المنطقة" sortable></Column>
+        <Column
+          field="id"
+          header="ID"
+          sortable
+          style={{ textAlign: "center" }}
+          headerStyle={{ textAlign: "center" }}
+        ></Column>
+        <Column
+          field="name"
+          header="اسم المستخدم"
+          sortable
+          style={{ textAlign: "center" }}
+          headerStyle={{ textAlign: "center" }}
+        ></Column>
+        <Column
+          field="mobile"
+          header="رقم الموبايل"
+          style={{ textAlign: "center" }}
+          headerStyle={{ textAlign: "center" }}
+        ></Column>
+        <Column
+          field="area"
+          header="المنطقة"
+          style={{ textAlign: "center" }}
+          headerStyle={{ textAlign: "center" }}
+        ></Column>
         <Column
           field="subscription"
           header="الاشتراك"
           body={subscriptionBodyTemplate}
-          sortable
+          style={{ textAlign: "center" }}
+          headerStyle={{ textAlign: "center" }}
         ></Column>
-        <Column field="renewalDate" header="تاريخ التجديد" sortable></Column>
+        <Column
+          field="renewalDate"
+          header="ميعاد التجديد"
+          sortable
+          style={{ textAlign: "center" }}
+          headerStyle={{ textAlign: "center" }}
+        ></Column>
         <Column
           field="status"
           header="الحالة"
           body={statusBodyTemplate}
-          sortable
+          style={{ textAlign: "center" }}
+          headerStyle={{ textAlign: "center" }}
         />
         <Column
           field="actions"
           header="الاجراءات"
           sortable
-          body={actionBodyTemplate}
+          body={actionsBodyTemplate}
+          style={{ textAlign: "center" }}
+          headerStyle={{ textAlign: "center" }}
         ></Column>
       </DataTable>
     </div>
