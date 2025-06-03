@@ -3,10 +3,9 @@ import { ReactNode, useState } from "react";
 import TextFieldNada from "./form/TextFieldNada";
 import MultiCheckbox from "./form/MultiCheckbox";
 import RadioDropdown from "./form/RadioDropdown";
-import Dropdown from "./form/Dropdown";
 import BaseModal from "@/components/ui/BaseModal";
 import AlertModal from "./AlertModal";
-import alert from "@/assets/images/alert.png";
+import BaseDropdown from "./form/Dropdown";
 
 export default function CardNada({
   children,
@@ -18,6 +17,7 @@ export default function CardNada({
   const [inputValue, setInputValue] = useState("");
   const [selectedDay, setSelectedDay] = useState("");
   const [selectedItem, setSelectedItem] = useState("");
+  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
@@ -53,39 +53,25 @@ export default function CardNada({
               label={"اسم المستخدم"}
               placeholder={"ادخل اسم المستخدم"}
               name={"user-name"}
-              preIcon={"mdi mdi-account-outline"}
+              prependIcon={"mdi mdi-account-outline"}
               type={"password"}
               required={true}
               appendIcon={"mdi mdi-account-outline"}
               iconType={"mdi"}
             />
-            <MultiCheckbox
-              options={[
-                { value: "السبت", label: "السبت" },
-                { value: "الاحد", label: "الاحد" },
-                { value: "الاثنين", label: "الاثنين" },
-                { value: "الثلاثاء", label: "الثلاثاء" },
-                { value: "الاربعاء", label: "الاربعاء" },
-                { value: "الخميس", label: "الخميس" },
-              ]}
-              label={"اليوم"}
-              placeholder={"اختر اليوم"}
-              name={"day"}
-              preIcon={"mdi mdi-account-outline"}
-              required={true}
-              appendIcon={"mdi mdi-chevron-down"}
-              iconType={"mdi"}
-            />
           </BaseModal>
-          <AlertModal message={"ليس لديك اذن للوصول الى هذه الصفحة"} visibility={true} />
-          
+          <AlertModal
+            message={"ليس لديك اذن للوصول الى هذه الصفحة"}
+            show={false}
+          />
+
           <TextFieldNada
             value={inputValue}
             handleChange={handleChange}
             label={"اسم المستخدم"}
             placeholder={"ادخل اسم المستخدم"}
             name={"user-name"}
-            preIcon={"mdi mdi-account-outline"}
+            prependIcon={"mdi mdi-account-outline"}
             type={"password"}
             required={true}
             appendIcon={"mdi mdi-account-outline"}
@@ -100,12 +86,16 @@ export default function CardNada({
               { value: "الاربعاء", label: "الاربعاء" },
               { value: "الخميس", label: "الخميس" },
             ]}
+            handleChange={(value) => {
+              setSelectedOptions(value);
+              console.log(selectedOptions);
+            }}
+            value={selectedOptions}
             label={"اليوم"}
             placeholder={"اختر اليوم"}
             name={"day"}
-            preIcon={"mdi mdi-account-outline"}
+            prependIcon={"mdi mdi-account-outline"}
             required={true}
-            appendIcon={"mdi mdi-chevron-down"}
             iconType={"mdi"}
           />
           <RadioDropdown
@@ -116,8 +106,7 @@ export default function CardNada({
             name="time"
             required={true}
             iconType="mdi"
-            preIcon="mdi mdi-account-outline"
-            appendIcon="mdi mdi-chevron-down"
+            prependIcon="mdi mdi-account-outline"
             options={[
               { value: "11:00", label: "11:00 م" },
               { value: "10:00", label: "10:00 ص" },
@@ -125,30 +114,12 @@ export default function CardNada({
               { value: "5:00", label: "5:00 ص" },
             ]}
           />
-          <MultiCheckbox
-            options={[
-              { value: "السبت", label: "السبت" },
-              { value: "الاحد", label: "الاحد" },
-              { value: "الاثنين", label: "الاثنين" },
-              { value: "الثلاثاء", label: "الثلاثاء" },
-              { value: "الاربعاء", label: "الاربعاء" },
-              { value: "الخميس", label: "الخميس" },
-            ]}
-            label={"اليوم"}
-            placeholder={"اختر اليوم"}
-            name={"day"}
-            preIcon={"mdi mdi-account-outline"}
-            required={true}
-            appendIcon={"mdi mdi-chevron-down"}
-            iconType={"mdi"}
-          />
-          <Dropdown
-            style="relative text-foreground p-3 border border-surface-light-700 rounded-2xl mt-6"
-            dropStyle="top-[70px] start-0 z-10 w-full pe-8 ps-4 py-6"
-            iconStyle="flex justify-between items-center w-full text-foreground/45"
+
+          <BaseDropdown
+            style="relative text-foreground px-3 py-1.5 border border-surface-light-700 rounded-2xl mt-6"
             value={selectedItem}
-            onChange={(val: string) => {
-              setSelectedItem(val);
+            onChange={({ value }: { value: string }) => {
+              setSelectedItem(value);
               console.log(selectedItem);
             }}
             label="الوقت"
@@ -156,8 +127,7 @@ export default function CardNada({
             name="time"
             required={true}
             iconType="mdi"
-            preIcon="mdi mdi-account-outline"
-            appendIcon="mdi mdi-chevron-down"
+            prependIcon="mdi mdi-account-outline"
             options={[
               { value: "11:00", label: "11:00 م" },
               { value: "10:00", label: "10:00 ص" },
