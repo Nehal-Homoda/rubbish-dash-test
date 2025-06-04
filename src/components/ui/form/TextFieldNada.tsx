@@ -27,9 +27,9 @@ export default function TextFieldNada({
   appendIcon,
   eyeOpen,
   eyeClosed,
-  errorMessage,
-  required,
-  iconType,
+  errorMessage="",
+  required=true,
+  iconType="mdi",
   handleChange,
 }: Props) {
     
@@ -125,7 +125,7 @@ export default function TextFieldNada({
 
       {errorMessage && (
         <div className="err-msg mt-2 text-red-600 font-semibold ps-2">
-          * {errorMessage}
+           {errorMessage}
         </div>
       )}
     </>
