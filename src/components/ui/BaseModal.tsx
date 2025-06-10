@@ -45,7 +45,7 @@ export default function BaseModal(props: Props) {
         onClick={() => {
           setVisible(false);
         }}
-        className="cancel-btn w-20"
+        className="btn-secondary w-20"
       />
     </div>
   );

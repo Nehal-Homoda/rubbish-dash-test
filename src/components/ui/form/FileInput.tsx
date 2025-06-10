@@ -65,7 +65,7 @@ export default function FileInput({
         className={`relative  ${
           state === "add"
             ? "border-2 border-dashed rounded-lg "
-            : " rounded-2xl shadow-xl"
+            : " rounded-2xl shadow-[0_0_0.5625rem_0.4375rem_rgb(0,0,0,0.07)]"
         } w-fit`}
       >
         <input
@@ -86,8 +86,9 @@ export default function FileInput({
               src={imageUrl}
               fill
               alt={fileName}
-              className="object-contain"
-              sizes="(max-width: 320px) 100vw, 320px"
+              className={`object-cover ${
+                state === "add" ? "" : "rounded-2xl"
+              } `}
             />
           ) : fileType === "application/pdf" && fileName ? (
             <p className="text-foreground/50 text-sm text-center">{fileName}</p>
