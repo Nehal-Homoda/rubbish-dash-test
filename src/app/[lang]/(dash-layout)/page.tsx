@@ -1,11 +1,11 @@
-"use client"
+"use client";
 import ChartDemo from "@/components/ui/UIChart";
-import UIDashCard from "@/components/ui/UICardYara";
+import UIDashCard from "@/components/ui/UIDashCard";
 import { useState } from "react";
 import { useLangAndDictionary } from "@/utils/lang";
 
 export default function Home() {
-  const [activeBtn, setActiveBtn] = useState<'month'|'year'>("month");
+  const [activeBtn, setActiveBtn] = useState<"month" | "year">("month");
   const [chartData, setChartData] = useState<number[]>([8, 6, 10, 4]);
   const [chartLabels, setChartLabels] = useState<string[]>([
     "شقق",
@@ -13,9 +13,8 @@ export default function Home() {
     "مطاعم",
     "محلات تجارية",
   ]);
-  const {lang,dict} = useLangAndDictionary()
+  const { lang, dict } = useLangAndDictionary();
 
-  
   return (
     <>
       <div className="home-page">
