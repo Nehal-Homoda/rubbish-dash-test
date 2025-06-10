@@ -141,7 +141,7 @@ export default function UsersDataTable() {
           actionBtn={"حفظ"}
           openBtnIcon={"fa-regular fa-pen-to-square text-lg"}
           iconType="mdi"
-          style="text-surface-light-200 bg-surface-light-800/50 px-2 py-1 rounded-lg"
+          style="text-surface bg-surface-light-800/50 px-2 py-1 rounded-lg"
         >
           <p>
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis,
