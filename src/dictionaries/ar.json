@@ -79,6 +79,7 @@
   "your_note": "ملاحظتك",
   "active": "مفعل",
   "not_active": "غير مفعل",
+  "pending": "معلق",
   "subscribers": "المشتركين",
   "not_subscribers": "غير المشتركين",
   "subscriber": "مشترك",
@@ -97,5 +98,11 @@
   "from": "من",
   "to": "الى",
   "start": "بدء من",
-  "end": "انتهاء في"
+  "end": "انتهاء في",
+  "shops": "محلات تجارية",
+  "apartments": "شقق",
+  "units": "وحدات سكنية",
+  "restaurants": "مطاعم",
+  "month_stats": "احصائيات الشهر",
+  "year_stats": "احصائيات السنة"
 }

@@ -1,5 +1,4 @@
-import { Fragment, useState } from "react";
-import { Listbox, ListboxButton, ListboxOption, ListboxOptions, Transition } from "@headlessui/react";
+import { Dropdown } from "primereact/dropdown";
 
 type Option = {
   value: string;
@@ -8,39 +7,32 @@ type Option = {
 
 type Props = {
   style: string;
-  dropStyle: string;
-  iconStyle: string;
+
   value: string;
   label?: string;
   placeholder?: string;
   name: string;
   options: Option[];
-  preIcon?: string;
-  appendIcon?: string;
+  prependIcon?: string;
   errorMessage?: string;
   required?: boolean;
   iconType?: "mdi" | "fa";
   onChange?: (value: string) => void;
 };
 
-export default function Dropdown({
+export default function BaseDropdown({
   style,
-  dropStyle,
-  iconStyle,
   value,
   label,
   placeholder,
   name,
   options,
-  preIcon,
-  appendIcon,
+  prependIcon,
   errorMessage,
   required,
   iconType,
   onChange,
 }: Props) {
-  const selectedLabel =
-    options.find((option) => option.value === value)?.label || "";
 
   return (
     <div className={style}>
@@ -51,57 +43,35 @@ export default function Dropdown({
         </div>
       )}
 
-      <Listbox value={value} onChange={onChange}>
-        <ListboxButton className="w-full text-start flex items-center justify-between gap-2 bg-transparent outline-none">
-          <div className={iconStyle}>
-            <div className="flex items-center gap-2">
-              {preIcon && iconType === "mdi" && (
-                <span className={`${preIcon} text-2xl text-foreground/45`} />
-              )}
-              {preIcon && iconType === "fa" && (
-                <i className={`${preIcon} text-2xl text-foreground/45`} />
-              )}
-
-              {selectedLabel ? (
-                <span className="line-clamp-1">
-                  {selectedLabel}
-                </span>
-              ) : (
-                <span className="text-foreground/45">{placeholder}</span>
-              )}
-            </div>
-            {appendIcon && iconType === "mdi" && (
-              <span className={`${appendIcon} text-2xl`} />
+      <div className="card flex justify-content-center items-center">
+        {prependIcon && (
+          <>
+            {iconType === "mdi" && (
+              <span className={`${prependIcon} text-2xl text-foreground/45`} />
             )}
-            {appendIcon && iconType === "fa" && (
-              <i className={`${appendIcon} text-2xl`} />
+            {iconType === "fa" && (
+              <i className={`${prependIcon} text-2xl text-foreground/45`} />
             )}
-          </div>
-        </ListboxButton>
-        <Transition
-          as={Fragment}
-          enter="transition ease-out duration-100"
-          enterFrom="opacity-0 translate-y-2"
-          enterTo="opacity-100 translate-y-0"
-          leave="transition ease-in duration-75"
-          leaveFrom="opacity-100 translate-y-0"
-          leaveTo="opacity-0 translate-y-2"
-        >
-          <ListboxOptions
-            className={`absolute ${dropStyle} rounded-xl bg-white shadow-[0_0_40px_0_rgb(0,0,0,0.06)] overflow-hidden focus-visible:outline-none`}
-          >
-            {options.map((option) => (
-              <ListboxOption
-                key={option.value}
-                value={option.value}
-                className="cursor-pointer text-foreground font-semibold text-lg w-full mb-1 px-2 py-1 rounded-lg hover:bg-surface-light-100 hover:text-white transition-all"
-              >
-                {option.label}
-              </ListboxOption>
-            ))}
-          </ListboxOptions>
-        </Transition>
-      </Listbox>
+          </>
+        )}
+        <Dropdown
+          value={value}
+          onChange={onChange}
+          options={options}
+          optionLabel="label"
+          placeholder={placeholder}
+          className="w-full md:w-14rem shadow-none border-none"
+          pt={{
+            panel: {
+              className: "mt-3 p-2",
+            },
+            item: {
+              className:
+                "hover:bg-surface hover:text-white rounded-lg p-2 bg-transparent font-semibold ",
+            },
+          }}
+        />
+      </div>
       {errorMessage && (
         <div className="err-msg mt-2 text-red-600 font-semibold ps-2">
           * {errorMessage}

@@ -11,7 +11,9 @@ export default function regions() {
     <>
       <div>
         <UIDashCard shadow="shadow-xl">
+
           <RegionsDataTable lang={lang} dict={dict} />
+
         </UIDashCard>
       </div>
     </>

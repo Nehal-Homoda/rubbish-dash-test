@@ -79,6 +79,7 @@
   "your_note": "Your Note",
   "active": "Active",
   "not_active": "Inactive",
+  "pending": "Pending",
   "subscribers": "Subscribers",
   "not_subscribers": "Non-Subscribers",
   "subscriber": "Subscriber",
@@ -97,5 +98,11 @@
   "from": "From",
   "to": "To",
   "start": "Start from",
-  "end": "End "
+  "end": "End ",
+  "shops": "Shops",
+  "apartments": "Apartments",
+  "units": "Residenial units",
+  "restaurants": "Restaurants",
+  "month_stats": "Monthly statistics",
+  "year_stats": "Yearly statistics"
 }
