@@ -1,14 +1,15 @@
 "use client";
 import React, { useState } from "react";
-import { DataTable } from "primereact/datatable";
+import { DataTable, DataTableFilterMeta } from "primereact/datatable";
 import { Column } from "primereact/column";
-import CheckBox from "../ui/form/CheckBox";
 import { Tag } from "primereact/tag";
-import { Button } from "primereact/button";
 import BaseModal from "../ui/BaseModal";
 import TextField from "../ui/form/TextFieldNada";
 import TimePicker from "../ui/form/TimePicker";
-import FileInput from './../ui/form/FileInput';
+import { InputText } from "primereact/inputtext";
+import { IconField } from "primereact/iconfield";
+import { InputIcon } from "primereact/inputicon";
+import { FilterMatchMode } from "primereact/api";
 interface Regions {
   id: number;
   areaName: string;
@@ -24,23 +25,34 @@ export default function RegionsDataTable({
   dict = {},
 }: RgionTableProps) {
   const [regionNameArabic, setRegionNameArabic] = useState<any>();
+  const [selectedRegions, setSelectedRegions] = useState<any>(null);
+  const [filters, setFilters] = useState<DataTableFilterMeta>({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    id: { value: null, matchMode: FilterMatchMode.EQUALS },
+    areaName: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    status: { value: null, matchMode: FilterMatchMode.EQUALS },
+    subscriptionsNumber: { value: null, matchMode: FilterMatchMode.EQUALS },
+  });
+  const [globalFilterValue, setGlobalFilterValue] = useState<string>("");
+  const [regionNameEnglish, setRegionNameEnglish] = useState<any>();
+  const [TimeFrom, setTimeFrom] = useState<Date>(new Date());
+  const [TimeTo, setTimeTo] = useState<Date>(new Date());
+
   const handleRegionNameArabicChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     setRegionNameArabic(e.target.value);
   };
-  const [regionNameEnglish, setRegionNameEnglish] = useState<any>();
+
   const handleRegionNameEnglishChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     setRegionNameEnglish(e.target.value);
   };
-  const [TimeFrom, setTimeFrom] = useState<Date>(new Date());
 
   const handleTimeFromChange = (time: Date) => {
     setTimeFrom(time);
   };
-  const [TimeTo, setTimeTo] = useState<Date>(new Date());
 
   const handleTimeToChange = (time: Date) => {
     setTimeTo(time);
@@ -57,7 +69,6 @@ export default function RegionsDataTable({
       id: 2,
       areaName: "حي ثالث طنطا",
       subscriptionsNumber: "15 مشترك",
-
       status: "معلق",
     },
     {
@@ -68,32 +79,6 @@ export default function RegionsDataTable({
     },
   ];
 
-  const checkboxTemplate = (rowData: Regions) => {
-    return (
-      <CheckBox
-        id={`checkbox-${rowData.id}`}
-        boxSize="size-6"
-        checkStyle="text-white"
-        checkBoxBg="bg-foreground/10"
-        peerChecked="peer-checked:bg-surface"
-        checkBoxRoundedValue="rounded-md"
-        border="border-transparent"
-      />
-    );
-  };
-  const headerCheckbox = () => {
-    return (
-      <CheckBox
-        id="header-checkbox"
-        boxSize="size-6"
-        checkStyle="text-white"
-        checkBoxBg="bg-foreground/10"
-        peerChecked="peer-checked:bg-surface"
-        checkBoxRoundedValue="rounded-md"
-        border="border-transparent"
-      />
-    );
-  };
   const getStatusSeverity = (status: string) => {
     switch (status) {
       case "مفعل":
@@ -119,11 +104,11 @@ export default function RegionsDataTable({
     return (
       <div className="flex items-center justify-center gap-3">
         <BaseModal
-          title={"تعديل منطقة"}
-          actionBtn={"حفظ"}
-          openBtnIcon={"fa-regular fa-pen-to-square text-lg"}
+          title={dict.edit_region}
+          actionBtn={dict.save}
+          openBtnIcon={"fa-regular fa-pen-to-square text-lg "}
           iconType="mdi"
-          style="text-surface bg-surface-light-800/50 px-2 py-1 rounded-lg"
+          style=" bg-surface-light-800/50 text-surface rounded-lg px-2 py-1"
           action={() => {
             console.log("Save clicked");
           }}
@@ -139,7 +124,7 @@ export default function RegionsDataTable({
                 "Enter the region name in Arabic"
               }
               type="text"
-              preIcon="mdi mdi-map-marker-outline"
+              prependIcon="mdi mdi-map-marker-outline"
               iconType="mdi"
             />
             <TextField
@@ -152,7 +137,7 @@ export default function RegionsDataTable({
                 "Enter the region name in English"
               }
               type="text"
-              preIcon="mdi mdi-map-marker-outline"
+              prependIcon="mdi mdi-map-marker-outline"
               iconType="mdi"
             />
             <div className="flex items-center gap-3">
@@ -174,8 +159,8 @@ export default function RegionsDataTable({
           title={"حذف عنصر"}
           actionBtn={"تأكيد"}
           iconType="mdi"
-          openBtnIcon={"mdi mdi-delete-outline text-lg"}
-          style="text-red-600 bg-red-50 px-2 py-1 rounded-lg"
+          openBtnIcon={"mdi mdi-delete-outline text-lg "}
+          style="text-red-600 bg-red-50 rounded-lg px-2 py-1"
         >
           <p>
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis,
@@ -186,66 +171,177 @@ export default function RegionsDataTable({
     );
   };
 
-  const paginatorLeft = <Button type="button" icon="pi pi-refresh" text />;
-  const paginatorRight = <Button type="button" icon="pi pi-download" text />;
+  const renderHeader = () => {
+    return (
+      <div className="flex justify-between items-center">
+        <IconField iconPosition={`${lang === "en" ? "left" : "right"}`}>
+          <InputIcon className="pi pi-search" />
+          <InputText
+            value={globalFilterValue}
+            onChange={onGlobalFilterChange}
+            placeholder={dict.search}
+            style={{
+              color: "rgb(var(--color-foreground))",
+              opacity: 0.6,
+            }}
+          />
+        </IconField>
+        <div className="flex items-center gap-3">
+          <button className="btn-secondary">
+            <i className="fa-solid fa-download "></i>
+          </button>
+          <BaseModal
+            openBtnLabel={dict.add_region}
+            style="base-btn"
+            title={dict.add_region}
+            actionBtn={dict.add}
+          >
+            <div className="flex flex-col gap-12">
+              <TextField
+                handleChange={handleRegionNameArabicChange}
+                value={regionNameArabic}
+                label={dict.region_name_arabic || "Region Name (Arabic)"}
+                name="region_name_arabic"
+                placeholder={
+                  dict.region_name_arabic_placeholder ||
+                  "Enter the region name in Arabic"
+                }
+                type="text"
+                prependIcon="mdi mdi-map-marker-outline"
+                iconType="mdi"
+              />
+              <TextField
+                handleChange={handleRegionNameEnglishChange}
+                value={regionNameEnglish}
+                label={dict.region_name_english || "Region Name (English)"}
+                name="region_name_english"
+                placeholder={
+                  dict.region_name_english_placeholder ||
+                  "Enter the region name in English"
+                }
+                type="text"
+                prependIcon="mdi mdi-map-marker-outline"
+                iconType="mdi"
+              />
+              <div className="flex items-center gap-3">
+                <TimePicker
+                  label={dict.from || "From"}
+                  value={TimeFrom}
+                  onChange={handleTimeFromChange}
+                />
+                <TimePicker
+                  label={dict.to || "To"}
+                  value={TimeTo}
+                  onChange={handleTimeToChange}
+                />
+                <span className="mdi mdi-plus bg-surface px-[7px] py-1 rounded-md text-white hover:bg-surface-light-100 transition-all duration-300 cursor-pointer"></span>
+              </div>
+            </div>
+          </BaseModal>
+        </div>
+      </div>
+    );
+  };
+  const onGlobalFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    let _filters = { ...filters };
+
+    // @ts-ignore
+    _filters["global"].value = value;
+
+    setFilters(_filters);
+    setGlobalFilterValue(value);
+  };
+  const header = renderHeader();
+
   return (
     <div className="card">
       <DataTable
         value={regions}
+        header={header}
         removableSort
         paginator
         rows={5}
+        filters={filters}
         rowsPerPageOptions={[5, 10, 25, 50]}
-        paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
-        currentPageReportTemplate="{first} to {last} of {totalRecords}"
-        paginatorLeft={paginatorLeft}
-        paginatorRight={paginatorRight}
+        selection={selectedRegions!}
+        onSelectionChange={(e) => setSelectedRegions(e.value)}
+        dataKey="id"
+        emptyMessage="No regions found."
       >
-        <Column
-          header={headerCheckbox()}
-          body={checkboxTemplate}
+        
+        <Column 
+        
+          selectionMode="multiple"
           style={{ textAlign: "center" }}
-          headerStyle={{ textAlign: "center" }}
+          headerStyle={{
+            textAlign: "center",
+          }}
         />
         <Column
           field="id"
           header="ID"
           sortable
           style={{ textAlign: "center" }}
-          headerStyle={{ textAlign: "center" }}
+          headerStyle={{
+            textAlign: "center",
+            color: "rgb(var(--color-foreground))",
+            opacity: 0.5,
+            fontWeight: 500,
+          
+          }}
         ></Column>
         <Column
           field="areaName"
           header="اسم المنطقة"
           style={{ textAlign: "center" }}
-          headerStyle={{ textAlign: "center" }}
+          headerStyle={{
+            textAlign: "center",
+            color: "rgb(var(--color-foreground))",
+            opacity: 0.5,
+            fontWeight: 500,
+            
+          }}
         />
         <Column
           field="subscriptionsNumber"
           header="عدد الاشتراكات"
           sortable
-          style={{ textAlign: "center" }}
+          style={{
+            textAlign: "center",
+          }}
+          headerStyle={{
+            textAlign: "center",
+            color: "rgb(var(--color-foreground))",
+            opacity: 0.5,
+            fontWeight: 500,
+          }}
         />
         <Column
           field="status"
           header="الحالة"
           body={statusBodyTemplate}
           style={{ textAlign: "center" }}
-          headerStyle={{ textAlign: "center" }}
+          headerStyle={{
+            textAlign: "center",
+            color: "rgb(var(--color-foreground))",
+            opacity: 0.5,
+            fontWeight: 500,
+          }}
         />
         <Column
           field="actions"
           header="الإجراءات"
-          body={actionsBodyTemplate()}
+          body={actionsBodyTemplate}
           style={{ textAlign: "center" }}
-          headerStyle={{ textAlign: "center" }}
+          headerStyle={{
+            textAlign: "center",
+            color: "rgb(var(--color-foreground))",
+            opacity: 0.5,
+            fontWeight: 500,
+          }}
         />
       </DataTable>
-      {/* <TimePicker
-            label={dict.to}
-            value={TimeTo}
-            onChange={handleTimeToChange}
-          /> */}
     </div>
   );
 }
