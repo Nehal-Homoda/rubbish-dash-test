@@ -1,31 +1,41 @@
-const BASE_URL = "";
+import Cookies from "js-cookie";
 
-const headers = (): HeadersInit => {
-  const token = localStorage ? localStorage.getItem("token") : null;
-  return {
-    Accept: "application/json",
-    Authorization: `Bearer ${token}`,
-  };
+export const APP_API_HEADERS = (): HeadersInit => {
+    const token = Cookies.get("token") || null;
+    // console.log("token get ===> ", token);
+
+    return {
+        Accept: "application/json",
+        // "Client-Type": "web",
+        // 'Content-Type': "multipart/form-data",
+        // "Content-Type": "application/json",
+        ...(token && { Authorization: `${token}` }),
+    };
 };
 
-export const apiCall = {
-  get: (path: string) => {
-    return fetch(`${BASE_URL}${path}`, {
-      method: "GET",
-      headers: {
-        ...headers(),
-      },
-    });
-  },
+export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
-  post: (endpoint: string, init?: RequestInit) => {
-    return fetch(`${BASE_URL}${endpoint}`, {
-      method: "POST",
-      headers: {
-        ...headers(),
-        ...init?.headers,
-      },
-      body: init?.body,
-    });
-  },
+export const apiCall = {
+    get: async (endpoint: string, init?: RequestInit) => {
+        return fetch(BASE_URL + decodeURIComponent(endpoint), {
+            method: "GET",
+            body: init?.body,
+            ...init,
+            headers: {
+                ...APP_API_HEADERS(),
+                ...init?.headers,
+            },
+        });
+    },
+    post: async (endpoint: string, init?: RequestInit) => {
+        return fetch(BASE_URL + decodeURIComponent(endpoint), {
+            method: "POST",
+            body: init?.body,
+            ...init,
+            headers: {
+                ...APP_API_HEADERS(),
+                ...init?.headers,
+            },
+        });
+    },
 };

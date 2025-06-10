@@ -1,44 +1,57 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { AuthResponse, User } from "@/types/auth.interface";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import Cookies from "js-cookie";
 
 interface InitialState {
-  loading: boolean;
-  userData: null;
-  userToken: null | string;
-  error: null | string;
+    user: null | User;
+    token: null | string;
+    isLoggedIn: boolean;
 }
 
 const initialState: InitialState = {
-  loading: false,
-  userData: null,
-  userToken: null,
-  error: null,
+    user: null,
+    token: null,
+    isLoggedIn: false,
 };
 
-
-
 export const authSlice = createSlice({
-  name: "auth",
-  initialState,
-  reducers: {
-    // register: (state, action) => {
-    //   state.userData = action.payload.user || null;
-    //   state.userToken = action.payload.token || null;
-    //   state.error = action.payload.error || null;
-    // },
-    // login: (state, action) => {
-    //   state.userData = action.payload.user || null;
-    //   state.userToken = action.payload.token || null;
-    //   state.error = action.payload.error || null;
-    // },
-    // // Logout reducer
-    // logout: (state) => {
-    //   state.userData = null;
-    //   state.userToken = null;
-    //   state.error = null;
-    //   localStorage.removeItem("userToken");
-    // },
-  },
+    name: "auth",
+    initialState,
+    reducers: {
+        login: (state, action: PayloadAction<AuthResponse>) => {
+            state.user = action.payload.data.admin || null;
+            state.token = action.payload.data.token || null;
+            state.isLoggedIn = true;
+            Cookies.set("user", JSON.stringify(state.user));
+            Cookies.set("token", JSON.stringify(state.token));
+        },
+        logout: (state) => {
+            state.user = null;
+            state.token = null;
+            Cookies.remove("user");
+            Cookies.remove("token");
+            state.isLoggedIn = false;
+        },
+        enter: (state) => {
+            try {
+                const storedUser = Cookies.get("user");
+                const storedToken = Cookies.get("token");
+                if (storedUser && storedToken) {
+                    state.user = JSON.parse(storedUser);
+                    state.token = JSON.parse(storedToken);
+                    state.isLoggedIn = true;
+                }
+            } catch (error: any) {
+                state.user = null;
+                state.token = null;
+                Cookies.remove("user");
+                Cookies.remove("token");
+                state.isLoggedIn = false;
+                console.log("Enter error ", error.message);
+            }
+        },
+    },
 });
 
-// export const { register, login, logout } = authSlice.actions;
+export const { login, logout, enter } = authSlice.actions;
 export default authSlice.reducer;
