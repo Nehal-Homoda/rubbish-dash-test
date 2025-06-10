@@ -1,8 +1,10 @@
+
 "use client";
 import ChartDemo from "@/components/ui/UIChart";
 import UIDashCard from "@/components/ui/UIDashCard";
 import { useState } from "react";
 import { useLangAndDictionary } from "@/utils/lang";
+
 
 export default function Home() {
   const [activeBtn, setActiveBtn] = useState<"month" | "year">("month");
@@ -18,6 +20,7 @@ export default function Home() {
   return (
     <>
       <div className="home-page">
+
         <div className="w-1/2">
           <UIDashCard>
             <div className="flex items-center gap-4 mb-10">

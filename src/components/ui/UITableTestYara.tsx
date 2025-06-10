@@ -7,7 +7,7 @@ interface RowData {
 
 
 interface TableProps {
-  values: RowData[]; // filter,search
+  values: RowData[]; 
   headers: string[];
   lang: "en" | "ar";
   dict: any;

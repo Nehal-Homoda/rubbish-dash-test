@@ -86,7 +86,7 @@ export default function ServicesDataTable() {
           actionBtn={dict.save || "حفظ"}
           openBtnIcon={"mdi mdi-square-edit-outline"}
           iconType="mdi"
-          style="text-surface-light-200 bg-surface-light-800/50 px-2 py-1 rounded-lg"
+          style="text-surface bg-surface-light-800/50 px-2 py-1 rounded-lg"
         >
           <div className="mt-10 mb-9">
           <FileInput state="edit" />

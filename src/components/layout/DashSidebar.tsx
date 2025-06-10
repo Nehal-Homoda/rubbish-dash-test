@@ -40,7 +40,7 @@ export default function DashSidebar(props: SideBarProps) {
       subLinks: [
         { name: "all", path: Routes.users },
         { name: "users", path: "/users2" },
-        { name: "deleted", path: "/deleted" },
+        { name: "deleted", path: Routes.deletedUsers },
       ],
     },
     {
@@ -193,3 +193,11 @@ export default function DashSidebar(props: SideBarProps) {
     </div>
   );
 }
+// const handleFile = (file: File | null) => {
+//   setSelectedFile(file);
+// };
+// <FileInput
+//   onFileChange={handleFile}
+//   title="صورة التحويل"
+//   // fileUrl="file:///C:/Users/XPRISTO/Downloads/Yara-Asal-Frontend-CV.pdf"
+// />;
