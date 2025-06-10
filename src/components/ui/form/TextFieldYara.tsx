@@ -12,7 +12,7 @@ interface InputProps {
   id:string
   value: string;
   iconType: "mdi" | "fa";
-  required: boolean;
+  required?: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   errorMessage?: string;
 }

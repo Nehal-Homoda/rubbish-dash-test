@@ -6,7 +6,6 @@ import { useState, useEffect } from "react";
 interface FileInputProps {
   errorMessage?: string;
   title?: string;
-  onFileChange: (file: File | null) => void;
   fileUrl?: string;
   state: "edit" | "add" | "addToTable";
 }
@@ -14,7 +13,6 @@ interface FileInputProps {
 export default function FileInput({
   errorMessage,
   title,
-  onFileChange,
   fileUrl,
   state = "add",
 }: FileInputProps) {
@@ -40,7 +38,6 @@ export default function FileInput({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
-    onFileChange(file);
     if (file) {
       setFileType(file.type);
       setFileName(file.name);
