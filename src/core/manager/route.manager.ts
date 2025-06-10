@@ -3,6 +3,7 @@ const ROUTES = {
   services: "/services",
   regions: "/regions",
   users: "/users",
+  deletedUsers: "/deleted-users",
   packages: "/packages",
   rubbushCollectors: "/rubbush-collectors",
   visits: "/visits",
