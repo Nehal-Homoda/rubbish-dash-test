@@ -1,4 +1,5 @@
 import UsersDataTable from "@/components/data-tables/UsersDataTable";
+import UsersDataTableCopy from "@/components/data-tables/UsersDataTableCopy";
 import UIDashCard from "@/components/ui/UIDashCard";
 import React from "react";
 
@@ -7,7 +8,8 @@ export default function users() {
     <>
       {" "}
       <UIDashCard shadow="shadow-xl">
-        <UsersDataTable />
+        {/* <UsersDataTable /> */}
+        <UsersDataTableCopy />
       </UIDashCard>
     </>
   );
