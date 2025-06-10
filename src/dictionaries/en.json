@@ -1,13 +1,13 @@
 {
-  "welcome":"Good morning",
+  "welcome": "Good morning",
   "arabic": "Arabic",
   "english": "English",
   "home": "Home",
   "services": "Services",
   "regions": "Regions",
   "users": "Users",
-  "all":"All",
-   "deleted": "Deleted Users",
+  "all": "All",
+  "deleted": "Deleted Users",
   "packages": "Packages",
   "rubbush_collectors": "Garbage Collectors",
   "visits": "Visits",
@@ -94,5 +94,11 @@
   "from": "From",
   "to": "To",
   "start": "Start from",
-  "end": "End "
+  "end": "End ",
+  "shops": "Shops",
+  "apartments": "Apartments",
+  "units": "Residenial units",
+  "restaurants": "Restaurants",
+  "month_stats": "Monthly statistics",
+  "year_stats": "Yearly statistics"
 }

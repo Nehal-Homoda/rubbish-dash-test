@@ -1,6 +1,6 @@
 import ServicesDataTable from "@/components/data-tables/ServicesDataTable";
+import UIDashCard from "@/components/ui/UICardYara";
 import React from "react";
-import { UIDashCard } from '@/components/ui/UICardYara';
 
 export default function services() {
   return (
