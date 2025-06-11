@@ -1,21 +1,20 @@
+@import "primeicons/primeicons.css";
 
-@import 'primeicons/primeicons.css';
-        
 @layer tailwind-base, primereact, tailwind-utilities;
 
-        
 @layer tailwind-base {
-  @tailwind base;
+    @tailwind base;
 }
 
 @layer tailwind-utilities {
-  @tailwind components;
-  @tailwind utilities;
+    @tailwind components;
+    @tailwind utilities;
 }
+
 :root {
-  --color-background: 255 255 255;
-  --color-foreground: 56 67 59; /*text => /65*/
-  /* muted text - icons color
+    --color-background: 255 255 255;
+    --color-foreground: 56 67 59; /*text => /65*/
+    /* muted text - icons color
   --color-muted: 56 67 59; */
   /* most used color */
   --text-color:#ffffff;
@@ -31,15 +30,15 @@
   --color-surface-800: 0 30 4;
   --color-surface-900: 0 15 2;
 
-  --color-surface-light: 26 159 44;
-  --color-surface-light-100: 51 169 67;
-  --color-surface-light-200: 77 180 91;
-  --color-surface-light-300: 102 191 114;
-  --color-surface-light-400: 128 202 138;
-  --color-surface-light-500: 153 212 161;
-  --color-surface-light-600: 179 223 185;
-  --color-surface-light-700: 204 234 208; /*input-border*/
-  --color-surface-light-800: 230 244 232;
+    --color-surface-light: 26 159 44;
+    --color-surface-light-100: 51 169 67;
+    --color-surface-light-200: 77 180 91;
+    --color-surface-light-300: 102 191 114;
+    --color-surface-light-400: 128 202 138;
+    --color-surface-light-500: 153 212 161;
+    --color-surface-light-600: 179 223 185;
+    --color-surface-light-700: 204 234 208; /*input-border*/
+    --color-surface-light-800: 230 244 232;
 }
 .dark {
   --color-background: 0 0 0;
@@ -60,15 +59,15 @@
   --color-service-800: 0 30 4;
   --color-service-900: 0 15 2;
 
-  --color-service-light: 26 159 44;
-  --color-service-light-100: 51 169 67;
-  --color-service-light-200: 77 180 91;
-  --color-service-light-300: 102 191 114;
-  --color-service-light-400: 128 202 138;
-  --color-service-light-500: 153 212 161;
-  --color-service-light-600: 179 223 185;
-  --color-service-light-700: 204 234 208;
-  --color-service-light-800: 230 244 232;
+    --color-service-light: 26 159 44;
+    --color-service-light-100: 51 169 67;
+    --color-service-light-200: 77 180 91;
+    --color-service-light-300: 102 191 114;
+    --color-service-light-400: 128 202 138;
+    --color-service-light-500: 153 212 161;
+    --color-service-light-600: 179 223 185;
+    --color-service-light-700: 204 234 208;
+    --color-service-light-800: 230 244 232;
 }
 
 @layer components {
@@ -80,48 +79,61 @@
   }
 }
 html {
-  font-family: "Cairo", sans-serif;
+    font-family: "Cairo", sans-serif;
 }
 body {
-  background-color: rgb(var(--color-background));
-  color: rgb(var(--color-foreground));
+    background-color: rgb(var(--color-background));
+    color: rgb(var(--color-foreground));
 }
 .custom-scroll::-webkit-scrollbar {
-  width: 6px;
+    width: 6px;
 }
 
 .custom-scroll::-webkit-scrollbar-track {
-  background: transparent;
+    background: transparent;
 }
 
 .custom-scroll::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
 }
 
 .custom-scroll:hover::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.4);
+    background-color: rgba(255, 255, 255, 0.4);
 }
 [dir="rtl"] .custom-scroll {
-  direction: rtl;
+    direction: rtl;
 }
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 /* Firefox */
 input[type="number"] {
-  -moz-appearance: textfield;
+    -moz-appearance: textfield;
 }
 ::selection {
-  background: rgb(var(--color-surface));
-  color: white;
-} 
+    background: rgb(var(--color-surface));
+    color: white;
+}
+.p-dropdown-label {
+    color: #009414;
+  }
+  .p-icon  {
+  color: #009414;
 
+}
 
+.p-dropdown-item .p-highlight{
+  color: #009414;
+
+}
+.p-dropdown-item-label{
+  color: black;
+}
 /*
 .table-row {
   @apply border-b-[1px] border-foreground/10 text-center ;
