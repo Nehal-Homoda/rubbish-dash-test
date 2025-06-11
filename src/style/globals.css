@@ -1,6 +1,9 @@
 
+@import 'primeicons/primeicons.css';
+        
 @layer tailwind-base, primereact, tailwind-utilities;
 
+        
 @layer tailwind-base {
   @tailwind base;
 }
@@ -72,7 +75,7 @@
     @apply h-11 px-4 rounded-xl bg-surface text-white ;
   }
   .btn-secondary {
-    @apply h-11 px-4 rounded-xl bg-surface-light-800/50 text-surface ;
+    @apply  h-11 px-4 rounded-xl bg-surface-light-800/50 text-surface ;
   }
 }
 html {
