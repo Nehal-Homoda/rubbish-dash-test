@@ -9,7 +9,7 @@ export interface ResponseError {
 }
 
 export interface ResponseData<T> {
-    data: T[];
+    data: T;
     success: boolean;
     meta: {
         message: null | string;
