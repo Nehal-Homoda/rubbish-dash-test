@@ -1,11 +1,12 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import CheckBox from "../ui/form/CheckBox";
 import { Tag } from "primereact/tag";
 import { Button } from "primereact/button";
 import BaseModal from './../ui/BaseModal';
+import { ListBox } from "primereact/listbox";
 interface User {
   id: number;
   name: string;
@@ -17,53 +18,59 @@ interface User {
 }
 
 export default function UsersDataTable() {
-  const users: User[] = [
-    {
-      id: 1,
-      name: "حبيبة احمد",
-      mobile: "01201988345",
-      area: "حي ثان طنطا",
-      subscription: "مشترك/شهرية",
-      renewalDate: "21 مايو 2025",
-      status: "مفعل",
-    },
-    {
-      id: 2,
-      name: "يمنى يوسف",
-      mobile: "01201988345",
-      area: "حي ثالث طنطا",
-      subscription: "مشترك/3شهور",
-      renewalDate: "21 مايو 2025",
-      status: "مفعل",
-    },
-    {
-      id: 3,
-      name: "محمد احمد",
-      mobile: "01201988345",
-      area: "حي اول طنطا",
-      subscription: "غير مشترك",
-      renewalDate: "غير محدد",
-      status: "مفعل",
-    },
-    {
-      id: 4,
-      name: "مريم ابراهيم",
-      mobile: "01201988345",
-      area: "حي ثالث طنطا",
-      subscription: "مشترك/6شهور",
-      renewalDate: "21 مايو 2025",
-      status: "غير مفعل",
-    },
-    {
-      id: 5,
-      name: "هاجر ربيع",
-      mobile: "01201988345",
-      area: "حي اول طنطا",
-      subscription: "غير مشترك",
-      renewalDate: "غير محدد",
-      status: "معلق",
-    },
-  ];
+  // const users: User[] = [
+  //   {
+  //     id: 1,
+  //     name: "حبيبة احمد",
+  //     mobile: "01201988345",
+  //     area: "حي ثان طنطا",
+  //     subscription: "مشترك/شهرية",
+  //     renewalDate: "21 مايو 2025",
+  //     status: "مفعل",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "يمنى يوسف",
+  //     mobile: "01201988345",
+  //     area: "حي ثالث طنطا",
+  //     subscription: "مشترك/3شهور",
+  //     renewalDate: "21 مايو 2025",
+  //     status: "مفعل",
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "محمد احمد",
+  //     mobile: "01201988345",
+  //     area: "حي اول طنطا",
+  //     subscription: "غير مشترك",
+  //     renewalDate: "غير محدد",
+  //     status: "مفعل",
+  //   },
+  //   {
+  //     id: 4,
+  //     name: "مريم ابراهيم",
+  //     mobile: "01201988345",
+  //     area: "حي ثالث طنطا",
+  //     subscription: "مشترك/6شهور",
+  //     renewalDate: "21 مايو 2025",
+  //     status: "غير مفعل",
+  //   },
+  //   {
+  //     id: 5,
+  //     name: "هاجر ربيع",
+  //     mobile: "01201988345",
+  //     area: "حي اول طنطا",
+  //     subscription: "غير مشترك",
+  //     renewalDate: "غير محدد",
+  //     status: "معلق",
+  //   },
+  // ];
+
+
+  const [users, setUsers] = useState<User[]>([])
+
+
+
 
   const checkboxTemplate = (rowData: User) => {
     return (
@@ -163,10 +170,76 @@ export default function UsersDataTable() {
       </div>
     );
   };
+
+
+  const [selectedUser, setSelectedUser] = useState(null)
+
+
   const paginatorLeft = <Button type="button" icon="pi pi-refresh" text />;
   const paginatorRight = <Button type="button" icon="pi pi-download" text />;
+
+
+
+  useEffect(() => {
+
+
+    setUsers(
+      [
+
+        {
+          id: 1,
+          name: "حبيبة احمد",
+          mobile: "01201988345",
+          area: "حي ثان طنطا",
+          subscription: "مشترك/شهرية",
+          renewalDate: "21 مايو 2025",
+          status: "مفعل",
+        },
+        {
+          id: 2,
+          name: "يمنى يوسف",
+          mobile: "01201988345",
+          area: "حي ثالث طنطا",
+          subscription: "مشترك/3شهور",
+          renewalDate: "21 مايو 2025",
+          status: "مفعل",
+        },
+        {
+          id: 3,
+          name: "محمد احمد",
+          mobile: "01201988345",
+          area: "حي اول طنطا",
+          subscription: "غير مشترك",
+          renewalDate: "غير محدد",
+          status: "مفعل",
+        },
+        {
+          id: 4,
+          name: "مريم ابراهيم",
+          mobile: "01201988345",
+          area: "حي ثالث طنطا",
+          subscription: "مشترك/6شهور",
+          renewalDate: "21 مايو 2025",
+          status: "غير مفعل",
+        },
+        {
+          id: 5,
+          name: "هاجر ربيع",
+          mobile: "01201988345",
+          area: "حي اول طنطا",
+          subscription: "غير مشترك",
+          renewalDate: "غير محدد",
+          status: "معلق",
+        },
+
+
+      ])
+  }, [])
   return (
     <div className="card">
+
+      <ListBox filter value={selectedUser} onChange={(e) => setSelectedUser(e.value)} options={users} optionLabel="name" className="w-full md:w-14rem" />
+
       <DataTable
         value={users}
         removableSort
