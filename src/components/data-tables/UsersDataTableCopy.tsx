@@ -19,6 +19,7 @@ import CheckBox from "../ui/form/CheckBox";
 
 import users from '@/app/[lang]/(dash-layout)/users/page';
 import BaseModal from '../ui/BaseModal';
+import { color } from 'chart.js/helpers';
 // import { CustomerService } from './service/CustomerService';
 
 // The rule argument should be a string in the format "custom_[field]".
@@ -29,22 +30,44 @@ FilterService.register('custom_activity', (value, filters) => {
     if (from === null && to !== null) return value <= to;
     return from <= value && value <= to;
 });
+interface Location {
+    id: number,
+    name: string
 
+
+
+}
 export default function CustomFilterDemo() {
     const [customers, setCustomers] = useState(null);
     const [filters, setFilters] = useState({
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        'country.name': { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        representative: { value: null, matchMode: FilterMatchMode.IN },
-        // For using custom filters, you must set FilterMatchMode.CUSTOM to matchMode.
-        activity: { value: null, matchMode: FilterMatchMode.CUSTOM },
+        area: { value: null, matchMode: FilterMatchMode.EQUALS },
         status: { value: null, matchMode: FilterMatchMode.EQUALS },
-        verified: { value: null, matchMode: FilterMatchMode.EQUALS }
+        subscription: { value: null, matchMode: FilterMatchMode.EQUALS },
     });
     const [globalFilterValue, setGlobalFilterValue] = useState('');
 
-
+    const [location, setLocation] = useState<Location | null>(null)
+    const [status, setStatus] = useState(null)
+    const [subscribe, setSubscribe] = useState(null)
+    const [filtered, setFiltered] = useState<User[]>([])
+    const areas = [
+        { id: 1, name: "حي اول طنطا" },
+        { id: 2, name: "حي ثان طنطا" },
+        { id: 3, name: "حي ثالث طنطا" },
+    ]
+    const statusList = [
+        { id: 1, name: 'مفعل' },
+        { id: 2, name: 'غير مفعل' },
+        { id: 3, name: 'معلق' },
+    ]
+    const subscriptionList = [
+        { id: 1, name: 'مشترك/شهرية' },
+        { id: 2, name: 'مشترك/3شهور' },
+        { id: 3, name: 'غير مشترك' },
+        { id: 4, name: 'مشترك/6شهور' },
+    ]
 
     useEffect(() => {
         setUsers(
@@ -102,50 +125,122 @@ export default function CustomFilterDemo() {
 
 
 
-    const onGlobalFilterChange = (e) => {
-        const value = e.target.value;
-        let _filters = { ...filters };
 
-        _filters['global'].value = value;
 
-        setFilters(_filters);
-        setGlobalFilterValue(value);
-    };
 
     const renderHeader = () => {
         return (
-            <div className='grid grid-cols-12 items-center gap-32'>
-                <div className="flex justify-content-end col-span-5">
+            <div className='grid grid-cols-12 items-center lg:gap-28'>
+                <div className="flex justify-content-end lg:col-span-5 col-span-12">
                     <IconField className='w-full' iconPosition="left">
                         <InputIcon className="pi pi-search" />
                         <InputText className='w-full' value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Keyword Search" />
                     </IconField>
                 </div>
-                <div className='col-span-7 flex  gap-10 '>
+                <div className='lg:col-span-7 col-span-12 flex flex-shrink-0 flex-grow-0  lg:gap-5 '>
 
 
-                    <div className='bg-[#0094140D] py-2  text-center rounded-xl w-[13%]'>
-                        <span>المنطقه</span>
-                    </div>
-                    <div className='bg-[#0094140D] py-2 text-center rounded-xl w-[13%]'>
-                        <span>الاشتراك</span>
-                    </div>
-                    <div className='bg-[#0094140D] py-2 text-center rounded-xl w-[13%]'>
-                        <span>الحالة</span>
-                    </div>
 
-                    <div className='bg-[#0094140D] py-2 text-center rounded-xl w-[10%]'>
-                            <i className='pi pi-download'></i>
+
+                    <div className='bg-[#0094140D]  text-center rounded-xl text-[#009414]'>
+                        <Dropdown value={location} onChange={(e) => handleChangeArea(e)} options={areas} optionLabel="name"
+                            placeholder="المنطقة" className="w-full md:w-14rem border-0 bg-transparent font-bold " />
                     </div>
 
 
-                    <div className='bg-[#009414] py-2 px-3 rounded-xl text-white'>
+
+
+
+                    <div className='bg-[#0094140D]  text-center rounded-xl '>
+                        <Dropdown value={status} onChange={(e) => handleChangeStatus(e)} options={statusList} optionLabel="name"
+                            placeholder="الحالة" className="w-full md:w-14rem border-0 bg-transparent font-bold " />
+                    </div>
+
+
+                    <div className='bg-[#0094140D]  text-center rounded-xl '>
+                        <Dropdown value={subscribe} onChange={(e) => handleChangeSubscribe(e)} options={subscriptionList} optionLabel="name"
+                            placeholder="الاشتراك" className="w-full md:w-14rem border-0 bg-transparent font-bold " />
+                    </div>
+
+
+
+                    <div className='bg-[#0094140D] py-2 text-center rounded-xl px-5 flex items-center justify-content-center '>
+                        <i className='pi pi-download text-[#009414]'></i>
+                    </div>
+
+
+                    <div className='bg-[#009414] py-2 px-3 rounded-xl text-center  text-white min-w-36'>
                         <button>اضافة مستخدم</button>
                     </div>
                 </div>
 
             </div>
         );
+    };
+
+    const handleChangeArea = (e: any) => {
+        console.log(e.target.value)
+        const value = e.target.value;
+        setLocation(value)
+        // const filteredAreas = users.filter((userItem) => {
+        //     return userItem.area == e.target.value.name
+        // })
+
+        // setFiltered(filteredAreas)
+        let _filters = { ...filters };
+        console.log(_filters)
+
+        _filters['area'].value = value.name;
+        console.log(_filters['area'].value)
+        console.log(_filters)
+
+        setFilters(_filters);
+    }
+    const handleChangeStatus = (e: any) => {
+        console.log(e.target.value)
+        const value = e.target.value;
+        setStatus(value)
+        // const filteredAreas = users.filter((userItem) => {
+        //     return userItem.area == e.target.value.name
+        // })
+
+        // setFiltered(filteredAreas)
+        let _filters = { ...filters };
+        console.log(_filters)
+
+        _filters['status'].value = value.name;
+        console.log(_filters['status'].value)
+        console.log(_filters)
+
+        setFilters(_filters);
+    }
+    const handleChangeSubscribe = (e: any) => {
+        console.log(e.target.value)
+        const value = e.target.value;
+        setStatus(value)
+        // const filteredAreas = users.filter((userItem) => {
+        //     return userItem.area == e.target.value.name
+        // })
+
+        // setFiltered(filteredAreas)
+        let _filters = { ...filters };
+        console.log(_filters)
+
+        _filters['subscription'].value = value.name;
+        console.log(_filters['subscription'].value)
+        console.log(_filters)
+
+        setFilters(_filters);
+    }
+
+    const onGlobalFilterChange = (e) => {
+        const value = e.target.value;
+        let _filters = { ...filters };
+
+        _filters['global'].value = value;
+        setFilters(_filters);
+        console.log(_filters)
+        setGlobalFilterValue(value);
     };
 
 
@@ -224,6 +319,7 @@ export default function CustomFilterDemo() {
             />
         );
     };
+
 
 
 
@@ -314,10 +410,15 @@ export default function CustomFilterDemo() {
     const [users, setUsers] = useState<User[]>([])
 
 
+
+
+
+
+
     return (
         <div className="card">
             <DataTable value={users} paginator rows={10} dataKey="id" filters={filters} filterDisplay="row"
-                globalFilterFields={['name', 'country.name', 'representative.name', 'status']} header={header} emptyMessage="No users found.">
+                globalFilterFields={['name', 'global', 'area']} header={header} emptyMessage="No users found.">
                 <Column header={headerCheckbox()}
                     body={checkboxTemplate}
                     style={{ textAlign: "center" }}
@@ -328,6 +429,7 @@ export default function CustomFilterDemo() {
                     style={{ textAlign: "center" }}
                     headerStyle={{ textAlign: "center" }} />
                 <Column field="name"
+
                     header="اسم المستخدم"
                     sortable
                     style={{ textAlign: "center" }}
@@ -341,7 +443,7 @@ export default function CustomFilterDemo() {
                     header="المنطقة"
                     style={{ textAlign: "center" }}
                     headerStyle={{ textAlign: "center" }} dataType="boolean" />
-                <Column field="subscription"
+                <Column field="subscribe"
                     header="الاشتراك"
                     body={subscriptionBodyTemplate}
                     style={{ textAlign: "center" }}
@@ -381,3 +483,6 @@ export default function CustomFilterDemo() {
         </div>
     );
 }
+
+
+
