@@ -24,6 +24,20 @@ export default function ServicesDataTable() {
   const [filters, setFilters] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
+  const [formDate, setFormData] = useState({
+    name1: '',
+    name2: '',
+    state: '',
+  })
+   const inputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('changed')
+    console.log('changed name ', e.target.name)
+    console.log('changed value ', e.target.value)
+          setFormData((prev) => ({
+              ...prev,
+              [e.target.name]: e.target.value,
+          }));
+      };
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [data, setData] = useState<any[]>([
     {
@@ -32,24 +46,24 @@ export default function ServicesDataTable() {
       status: "مفعل",
       subscription: "10 مشترك",
     },
-    {
-      id: 2,
-      name: "شقه",
-      status: "غير مفعل",
-      subscription: "10 مشترك",
-    },
-    {
-      id: 3,
-      name: "محلات تجارية",
-      status: "معلق",
-      subscription: "3 مشترك",
-    },
-    {
-      id: 4,
-      name: "مطاعم",
-      status: "مفعل",
-      subscription: "3 مشترك",
-    },
+    // {
+    //   id: 2,
+    //   name: "شقه",
+    //   status: "غير مفعل",
+    //   subscription: "10 مشترك",
+    // },
+    // {
+    //   id: 3,
+    //   name: "محلات تجارية",
+    //   status: "معلق",
+    //   subscription: "3 مشترك",
+    // },
+    // {
+    //   id: 4,
+    //   name: "مطاعم",
+    //   status: "مفعل",
+    //   subscription: "3 مشترك",
+    // },
   ]);
   const options = [
     {
@@ -107,34 +121,30 @@ export default function ServicesDataTable() {
             <FileInput state="edit" />
           </div>
           <TextFieldNada
-            value={arabicName}
+            value={formDate.name1}
             label={"اسم الخدمة (عربي)"}
             prependIcon={"mdi mdi-layers-triple-outline"}
             iconType="mdi"
             placeholder={dict.service_name || "اسم الخدمة"}
-            name="service-name"
+            name="name1"
             type="text"
             required={true}
-            handleChange={(e) => {
-              setArabicName(e.target.value);
-            }}
+            handleChange={inputChangeHandler}
           />
           <div className="my-9">
             <TextFieldNada
-              value={englishName}
+              value={formDate.name2}
               label={"اسم الخدمة (انجليزي)"}
               prependIcon={"mdi mdi-layers-triple-outline"}
               iconType="mdi"
               placeholder={dict.service_name || "اسم الخدمة"}
-              name="service-name"
+              name="name2"
               type="text"
               required={true}
-              handleChange={(e) => {
-                setEnglishName(e.target.value);
-              }}
+              handleChange={inputChangeHandler}
             />
           </div>
-          <BaseDropdown
+          {/* <BaseDropdown
             style="relative text-foreground px-3 py-1.5 border border-surface-light-700 rounded-2xl mt-6"
             value={status}
             onChange={({ value }: { value: string }) => {
@@ -151,7 +161,7 @@ export default function ServicesDataTable() {
               { value: "not-active", label: `غير مفعل` },
               { value: "pending", label: "معلق" },
             ]}
-          />
+          /> */}
         </BaseModal>
         <BaseModal
           title={"حذف عنصر"}
