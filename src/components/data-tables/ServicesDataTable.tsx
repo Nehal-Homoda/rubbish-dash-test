@@ -13,6 +13,7 @@ import BaseDropdown from "../ui/form/Dropdown";
 import FileInput from "../ui/form/FileInput";
 import { FilterMatchMode } from "primereact/api";
 import { Dropdown } from "primereact/dropdown";
+import TableStatusDropdown from "../ui/TableStatusDropdown";
 
 export default function ServicesDataTable() {
   const [selectedProducts, setSelectedProducts] = useState(null);
@@ -20,10 +21,23 @@ export default function ServicesDataTable() {
   const [arabicName, setArabicName] = useState("");
   const [englishName, setEnglishName] = useState("");
   const [status, setStatus] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState("");
   const [filters, setFilters] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
+  const [formDate, setFormData] = useState({
+    name1: '',
+    name2: '',
+    state: '',
+  })
+   const inputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('changed')
+    console.log('changed name ', e.target.name)
+    console.log('changed value ', e.target.value)
+          setFormData((prev) => ({
+              ...prev,
+              [e.target.name]: e.target.value,
+          }));
+      };
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [data, setData] = useState<any[]>([
     {
@@ -32,48 +46,49 @@ export default function ServicesDataTable() {
       status: "مفعل",
       subscription: "10 مشترك",
     },
-    {
-      id: 2,
-      name: "شقه",
-      status: "غير مفعل",
-      subscription: "10 مشترك",
-    },
-    {
-      id: 3,
-      name: "محلات تجارية",
-      status: "معلق",
-      subscription: "3 مشترك",
-    },
-    {
-      id: 4,
-      name: "مطاعم",
-      status: "مفعل",
-      subscription: "3 مشترك",
-    },
+    // {
+    //   id: 2,
+    //   name: "شقه",
+    //   status: "غير مفعل",
+    //   subscription: "10 مشترك",
+    // },
+    // {
+    //   id: 3,
+    //   name: "محلات تجارية",
+    //   status: "معلق",
+    //   subscription: "3 مشترك",
+    // },
+    // {
+    //   id: 4,
+    //   name: "مطاعم",
+    //   status: "مفعل",
+    //   subscription: "3 مشترك",
+    // },
   ]);
-  
+  const options = [
+    {
+      label: "مفعل",
+      value: "مفعل",
+      style: "text-green-700 bg-green-100 rounded-md text-sm w-fit p-1",
+      icon: "fa-solid fa-chevron-down",
+    },
+    {
+      label: "غير مفعل",
+      value: "غير مفعل",
+      style: "text-red-500/80 bg-red-100/65 rounded-md text-sm w-fit p-1",
+      icon: "fa-solid fa-chevron-down",
+    },
+    {
+      label: "معلق",
+      value: "معلق",
+      style: "text-yellow-500 bg-yellow-100 rounded-md text-sm w-fit p-1",
+      icon: "fa-solid fa-chevron-down",
+    },
+  ];
   const { lang, dict } = useLangAndDictionary();
 
-  const statusBodyTemplate = (data) => {
-    return (
-        <Tag value={data.status} severity={getSeverity(data)} className="w-fit">
-          <i className="fa-solid fa-chevron-down ms-2"></i>
-        </Tag>
-    )};
-  const getSeverity = (data) => {
-    switch (data.status) {
-      case "مفعل":
-        return "success";
-
-      case "معلق":
-        return "warning";
-
-      case "غير مفعل":
-        return "danger";
-
-      default:
-        return null;
-    }
+  const statusBodyTemplate = () => {
+    return <TableStatusDropdown items={options} />;
   };
 
   const imageBodyTemplate = (data) => {
@@ -106,34 +121,30 @@ export default function ServicesDataTable() {
             <FileInput state="edit" />
           </div>
           <TextFieldNada
-            value={arabicName}
+            value={formDate.name1}
             label={"اسم الخدمة (عربي)"}
             prependIcon={"mdi mdi-layers-triple-outline"}
             iconType="mdi"
             placeholder={dict.service_name || "اسم الخدمة"}
-            name="service-name"
+            name="name1"
             type="text"
             required={true}
-            handleChange={(e) => {
-              setArabicName(e.target.value);
-            }}
+            handleChange={inputChangeHandler}
           />
           <div className="my-9">
             <TextFieldNada
-              value={englishName}
+              value={formDate.name2}
               label={"اسم الخدمة (انجليزي)"}
               prependIcon={"mdi mdi-layers-triple-outline"}
               iconType="mdi"
               placeholder={dict.service_name || "اسم الخدمة"}
-              name="service-name"
+              name="name2"
               type="text"
               required={true}
-              handleChange={(e) => {
-                setEnglishName(e.target.value);
-              }}
+              handleChange={inputChangeHandler}
             />
           </div>
-          <BaseDropdown
+          {/* <BaseDropdown
             style="relative text-foreground px-3 py-1.5 border border-surface-light-700 rounded-2xl mt-6"
             value={status}
             onChange={({ value }: { value: string }) => {
@@ -150,7 +161,7 @@ export default function ServicesDataTable() {
               { value: "not-active", label: `غير مفعل` },
               { value: "pending", label: "معلق" },
             ]}
-          />
+          /> */}
         </BaseModal>
         <BaseModal
           title={"حذف عنصر"}
@@ -177,12 +188,12 @@ export default function ServicesDataTable() {
     setFilters(_filters);
     setGlobalFilterValue(value);
   };
-  
+
   const renderHeader = () => {
     return (
       <div className="flex justify-between relative ">
-        <IconField>
-          <i className="fa-solid fa-magnifying-glass text-gray-500 absolute top-1/2 -translate-y-1/2 start-3"></i>
+        <IconField iconPosition="right">
+          {/* <i className="fa-solid fa-magnifying-glass text-gray-500 absolute top-1/2 -translate-y-1/2 start-3"></i> */}
           <InputText
             className="focus:shadow-none bg-surface-light-800/50"
             style={{ outline: "none", border: "none", boxShadow: "none" }}
@@ -192,24 +203,6 @@ export default function ServicesDataTable() {
           />
         </IconField>
         <div className="flex items-center gap-3">
-          <div className="card flex justify-content-center items-center">
-            <Dropdown
-              pt={{
-                root: "px-0 flex justify-center items-center btn-secondary border-none shadow-none w-fit text-surface",
-                trigger: "text-surface",
-                input: "text-surface pe-0",
-              }}
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.value)}
-              options={[
-                { label: "مفعل", value: "مفعل" },
-                { label: "غير مفعل", value: "غير مفعل" },
-                { label: "معلق", value: "معلق" },
-              ]}
-              optionLabel="label"
-              placeholder="الحالة"
-            />
-          </div>
           <button className="btn-secondary text-xl">
             <span className="mdi mdi-tray-arrow-down"></span>
           </button>
@@ -405,7 +398,6 @@ export default function ServicesDataTable() {
             header="الاجراءات"
             body={actionsBodyTemplate}
           ></Column>
-          
         </DataTable>
       </div>
     </>
