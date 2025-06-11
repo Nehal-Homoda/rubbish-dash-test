@@ -1,11 +1,13 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import CheckBox from "../ui/form/CheckBox";
 import { Tag } from "primereact/tag";
 import { Button } from "primereact/button";
 import BaseModal from "../ui/BaseModal";
+import { getPackagesService } from "@/services/packagesOffersService";
+import { PackageOffer } from "@/types/packagesOffer.interface";
 interface Packages {
   id: number;
   name: string;
@@ -17,53 +19,33 @@ interface Packages {
 }
 
 export default function PackagesDataTable() {
-  const packages: Packages[] = [
-    {
-      id: 1,
-      name: "شهرية",
-      serviceType: "محلات",
-      unitPrice: "100 جنيه",
-      duration: "24 يوم",
-      subscriptionsNumber: "20 مشترك",
-      status: "مفعل",
-    },
-    {
-      id: 2,
-      name: "شهرية",
-      serviceType: "محلات",
-      unitPrice: "100 جنيه",
-      duration: "24 يوم",
-      subscriptionsNumber: "20 مشترك",
-      status: "غير مفعل",
-    },
-    {
-      id: 3,
-      name: "شهرية",
-      serviceType: "محلات",
-      unitPrice: "100 جنيه",
-      duration: "24 يوم",
-      subscriptionsNumber: "20 مشترك",
-      status: "مفعل",
-    },
-    {
-      id: 4,
-      name: "شهرية",
-      serviceType: "محلات",
-      unitPrice: "100 جنيه",
-      duration: "24 يوم",
-      subscriptionsNumber: "20 مشترك",
-      status: "غير مفعل",
-    },
-    {
-      id: 5,
-      name: "شهرية",
-      serviceType: "محلات",
-      unitPrice: "100 جنيه",
-      duration: "24 يوم",
-      subscriptionsNumber: "20 مشترك",
-      status: "مفعل",
-    },
-  ];
+  const [packagesOffer, setPackagesOffer] = useState<PackageOffer[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchPackages = async () => {
+
+    setLoading(true)
+    getPackagesService()
+    .then((response) => {
+      
+      setPackagesOffer(response.data);
+      console.log(response.data)
+    })
+    .catch((error) => {
+      
+      console.log('fetch packages error ', error.message)
+    })
+    .finally(() => {
+
+      setLoading(false)
+    })
+
+  }
+ 
+  useEffect(() => {
+getPackagesService();
+
+  }, [])
 
   const checkboxTemplate = (rowData: Packages) => {
     return (
@@ -148,7 +130,7 @@ export default function PackagesDataTable() {
   return (
     <div className="card">
       <DataTable
-        value={packages}
+        value={packagesOffer}
         removableSort
         paginator
         rows={5}
