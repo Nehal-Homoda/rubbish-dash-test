@@ -48,7 +48,7 @@ export default function TextFieldNada({
         </div>
 
         <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 w-full">
             {prependIcon && (
               <>
                 {iconType === "mdi" && (
