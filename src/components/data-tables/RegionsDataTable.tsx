@@ -10,6 +10,8 @@ import { InputText } from "primereact/inputtext";
 import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
 import { FilterMatchMode } from "primereact/api";
+import downloadIcon from "../../assets/images/icons/download-icon.png";
+import Image from "next/image";
 interface Regions {
   id: number;
   areaName: string;
@@ -21,8 +23,8 @@ interface RgionTableProps {
   dict?: { [key: string]: string };
 }
 interface TimeRange {
-  from: Date | null;
-  to: Date | null;
+  from: Date;
+  to: Date;
 }
 
 export default function RegionsDataTable({
@@ -40,8 +42,6 @@ export default function RegionsDataTable({
   });
   const [globalFilterValue, setGlobalFilterValue] = useState<string>("");
   const [regionNameEnglish, setRegionNameEnglish] = useState<string>("");
-  const [TimeFrom, setTimeFrom] = useState<Date>(new Date());
-  const [TimeTo, setTimeTo] = useState<Date>(new Date());
   const [timeRanges, setTimeRanges] = useState<TimeRange[]>([
     { from: null, to: null },
   ]);
@@ -57,17 +57,23 @@ export default function RegionsDataTable({
     setRegionNameEnglish(e.target.value);
   };
 
-  const handleTimeFromChange = (time: Date) => {
-    setTimeFrom(time);
+  const handleTimeChange = (
+    index: number,
+    field: "from" | "to",
+    value: Date
+  ) => {
+    const updated = [...timeRanges];
+    updated[index][field] = value;
+    setTimeRanges(updated);
   };
 
-  const handleTimeToChange = (time: Date) => {
-    setTimeTo(time);
-  };
   const handleAddTime = () => {
     setTimeRanges([...timeRanges, { from: null, to: null }]);
   };
-  
+  const handleRemoveTime = () => {
+    setTimeRanges((prev) => prev.slice(0, -1));
+  };
+
   const regions: Regions[] = [
     {
       id: 1,
@@ -147,21 +153,35 @@ export default function RegionsDataTable({
               prependIcon="mdi mdi-map-marker-outline"
               iconType="mdi"
             />
-            <div className="flex items-center gap-3">
-              <TimePicker
-                label={dict.from || "From"}
-                value={TimeFrom}
-                onChange={handleTimeFromChange}
-              />
-              <TimePicker
-                label={dict.to || "To"}
-                value={TimeTo}
-                onChange={handleTimeToChange}
-              />
-              <span
-                onClick={handleAddTime}
-                className="mdi mdi-plus bg-surface px-[7px] py-1 rounded-md text-white hover:bg-surface-light-100 transition-all duration-300 cursor-pointer"
-              ></span>
+            <div className="flex flex-col items-center gap-6">
+              {timeRanges.map((range, index) => (
+                <div key={index} className="flex gap-3 items-center">
+                  <TimePicker
+                    label={dict.from || "From"}
+                    value={range.from}
+                    onChange={(val) => handleTimeChange(index, "from", val)}
+                  />
+                  <TimePicker
+                    label={dict.to || "To"}
+                    value={range.to}
+                    onChange={(val) => handleTimeChange(index, "to", val)}
+                  />
+                  {index === 0 && (
+                    <button
+                      onClick={handleAddTime}
+                      disabled={timeRanges.length > 2}
+                      className="mdi mdi-plus outline-none border-none bg-surface px-[7px] py-1 rounded-md text-white hover:bg-surface-light-100 transition-all duration-300 cursor-pointer  disabled:bg-gray-400/50 disabled:text-white disabled:cursor-not-allowed"
+                    ></button>
+                  )}
+                  {index > 0 && (
+                    <button
+                      onClick={handleRemoveTime}
+                      className="mdi mdi-close outline-none border-none bg-rose-500 
+ px-[7px] py-1 rounded-md text-white hover:opacity-85 transition-all duration-300 cursor-pointer"
+                    ></button>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         </BaseModal>
@@ -197,8 +217,8 @@ export default function RegionsDataTable({
           />
         </IconField>
         <div className="flex items-center gap-3">
-          <button className="btn-secondary">
-            <i className="fa-solid fa-download "></i>
+          <button className="btn-secondary  ">
+            <Image src={downloadIcon} alt="download" width={20} height={20}/>
           </button>
           <BaseModal
             openBtnLabel={dict.add_region}
@@ -233,19 +253,36 @@ export default function RegionsDataTable({
                 prependIcon="mdi mdi-map-marker-outline"
                 iconType="mdi"
               />
-              <div className="flex items-center gap-3">
-                <TimePicker
-                  label={dict.from || "From"}
-                  value={TimeFrom}
-                  onChange={handleTimeFromChange}
-                />
-                <TimePicker
-                  label={dict.to || "To"}
-                  value={TimeTo}
-                  onChange={handleTimeToChange}
-                />
-                <span className="mdi mdi-plus bg-surface px-[7px] py-1 rounded-md text-white hover:bg-surface-light-100 transition-all duration-300 cursor-pointer"></span>
-              </div>
+              <div className="flex flex-col items-center gap-6">
+              {timeRanges.map((range, index) => (
+                <div key={index} className="flex gap-3 items-center">
+                  <TimePicker
+                    label={dict.from || "From"}
+                    value={range.from}
+                    onChange={(val) => handleTimeChange(index, "from", val)}
+                  />
+                  <TimePicker
+                    label={dict.to || "To"}
+                    value={range.to}
+                    onChange={(val) => handleTimeChange(index, "to", val)}
+                  />
+                  {index === 0 && (
+                    <button
+                      onClick={handleAddTime}
+                      disabled={timeRanges.length > 2}
+                      className="mdi mdi-plus outline-none border-none bg-surface px-[7px] py-1 rounded-md text-white hover:bg-surface-light-100 transition-all duration-300 cursor-pointer  disabled:bg-gray-400/50 disabled:text-white disabled:cursor-not-allowed"
+                    ></button>
+                  )}
+                  {index > 0 && (
+                    <button
+                      onClick={handleRemoveTime}
+                      className="mdi mdi-close outline-none border-none bg-rose-500 
+ px-[7px] py-1 rounded-md text-white hover:opacity-85 transition-all duration-300 cursor-pointer"
+                    ></button>
+                  )}
+                </div>
+              ))}
+            </div>
             </div>
           </BaseModal>
         </div>
@@ -273,7 +310,6 @@ export default function RegionsDataTable({
         paginator
         rows={5}
         filters={filters}
-        rowsPerPageOptions={[5, 10, 25, 50]}
         selection={selectedRegions!}
         onSelectionChange={(e) => setSelectedRegions(e.value)}
         dataKey="id"
