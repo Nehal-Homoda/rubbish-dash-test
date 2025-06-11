@@ -137,13 +137,13 @@ export default function CustomFilterDemo() {
                         <InputText className='w-full' value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Keyword Search" />
                     </IconField>
                 </div>
-                <div className='lg:col-span-7 col-span-12 flex flex-shrink-0 flex-grow-0  lg:gap-5 '>
+                <div className='lg:col-span-7 col-span-12 flex justify-end gap-5  '>
 
 
 
 
                     <div className='bg-[#0094140D]  text-center rounded-xl text-[#009414]'>
-                        <Dropdown value={location} onChange={(e) => handleChangeArea(e)} options={areas} optionLabel="name"
+                        <Dropdown value={location} onChange={(e) => handleFilterChange(e, 'area')} options={areas} optionLabel="name"
                             placeholder="المنطقة" className="w-full md:w-14rem border-0 bg-transparent font-bold " />
                     </div>
 
@@ -152,25 +152,25 @@ export default function CustomFilterDemo() {
 
 
                     <div className='bg-[#0094140D]  text-center rounded-xl '>
-                        <Dropdown value={status} onChange={(e) => handleChangeStatus(e)} options={statusList} optionLabel="name"
+                        <Dropdown value={status} onChange={(e) => handleFilterChange(e, 'status')} options={statusList} optionLabel="name"
                             placeholder="الحالة" className="w-full md:w-14rem border-0 bg-transparent font-bold " />
                     </div>
 
 
                     <div className='bg-[#0094140D]  text-center rounded-xl '>
-                        <Dropdown value={subscribe} onChange={(e) => handleChangeSubscribe(e)} options={subscriptionList} optionLabel="name"
+                        <Dropdown value={subscribe} onChange={(e) => handleFilterChange(e, 'subscription')} options={subscriptionList} optionLabel="name"
                             placeholder="الاشتراك" className="w-full md:w-14rem border-0 bg-transparent font-bold " />
                     </div>
 
 
 
-                    <div className='bg-[#0094140D] py-2 text-center rounded-xl px-5 flex items-center justify-content-center '>
+                    <div className='bg-[#0094140D] cursor-pointer   py-2 text-center rounded-xl px-5 flex items-center justify-content-center '>
                         <i className='pi pi-download text-[#009414]'></i>
                     </div>
 
 
-                    <div className='bg-[#009414] py-2 px-3 rounded-xl text-center  text-white min-w-36'>
-                        <button>اضافة مستخدم</button>
+                    <div className='bg-[#009414] py-2 rounded-xl text-center  text-white min-w-36'>
+                        <button className='w-full h-full'>اضافة مستخدم</button>
                     </div>
                 </div>
 
@@ -178,7 +178,9 @@ export default function CustomFilterDemo() {
         );
     };
 
-    const handleChangeArea = (e: any) => {
+
+
+    const handleFilterChange = (e: any, name: string) => {
         console.log(e.target.value)
         const value = e.target.value;
         setLocation(value)
@@ -190,48 +192,13 @@ export default function CustomFilterDemo() {
         let _filters = { ...filters };
         console.log(_filters)
 
-        _filters['area'].value = value.name;
-        console.log(_filters['area'].value)
+        _filters[name].value = value.name;
+        console.log(_filters[name].value)
         console.log(_filters)
 
         setFilters(_filters);
     }
-    const handleChangeStatus = (e: any) => {
-        console.log(e.target.value)
-        const value = e.target.value;
-        setStatus(value)
-        // const filteredAreas = users.filter((userItem) => {
-        //     return userItem.area == e.target.value.name
-        // })
 
-        // setFiltered(filteredAreas)
-        let _filters = { ...filters };
-        console.log(_filters)
-
-        _filters['status'].value = value.name;
-        console.log(_filters['status'].value)
-        console.log(_filters)
-
-        setFilters(_filters);
-    }
-    const handleChangeSubscribe = (e: any) => {
-        console.log(e.target.value)
-        const value = e.target.value;
-        setStatus(value)
-        // const filteredAreas = users.filter((userItem) => {
-        //     return userItem.area == e.target.value.name
-        // })
-
-        // setFiltered(filteredAreas)
-        let _filters = { ...filters };
-        console.log(_filters)
-
-        _filters['subscription'].value = value.name;
-        console.log(_filters['subscription'].value)
-        console.log(_filters)
-
-        setFilters(_filters);
-    }
 
     const onGlobalFilterChange = (e) => {
         const value = e.target.value;
@@ -242,6 +209,64 @@ export default function CustomFilterDemo() {
         console.log(_filters)
         setGlobalFilterValue(value);
     };
+    // const handleChangeArea = (e: any) => {
+    //     console.log(e.target.value)
+    //     const value = e.target.value;
+    //     setLocation(value)
+    //     // const filteredAreas = users.filter((userItem) => {
+    //     //     return userItem.area == e.target.value.name
+    //     // })
+
+    //     // setFiltered(filteredAreas)
+    //     let _filters = { ...filters };
+    //     console.log(_filters)
+
+    //     _filters['area'].value = value.name;
+    //     console.log(_filters['area'].value)
+    //     console.log(_filters)
+
+    //     setFilters(_filters);
+    // }
+
+
+    // const handleChangeStatus = (e: any) => {
+    //     console.log(e.target.value)
+    //     const value = e.target.value;
+    //     setStatus(value)
+    //     // const filteredAreas = users.filter((userItem) => {
+    //     //     return userItem.area == e.target.value.name
+    //     // })
+
+    //     // setFiltered(filteredAreas)
+    //     let _filters = { ...filters };
+    //     console.log(_filters)
+
+    //     _filters['status'].value = value.name;
+    //     console.log(_filters['status'].value)
+    //     console.log(_filters)
+
+    //     setFilters(_filters);
+    // }
+    // const handleChangeSubscribe = (e: any) => {
+    //     console.log(e.target.value)
+    //     const value = e.target.value;
+    //     setStatus(value)
+    //     // const filteredAreas = users.filter((userItem) => {
+    //     //     return userItem.area == e.target.value.name
+    //     // })
+
+    //     // setFiltered(filteredAreas)
+    //     let _filters = { ...filters };
+    //     console.log(_filters)
+
+    //     _filters['subscription'].value = value.name;
+    //     console.log(_filters['subscription'].value)
+    //     console.log(_filters)
+
+    //     setFilters(_filters);
+    // }
+
+
 
 
 
@@ -298,7 +323,7 @@ export default function CustomFilterDemo() {
             <CheckBox
                 id={`checkbox-${rowData.id}`}
                 boxSize="size-6"
-                checkStyle="text-white"
+                checkStyle="text-white "
                 checkBoxBg="bg-foreground/10"
                 peerChecked="peer-checked:bg-surface"
                 checkBoxRoundedValue="rounded-md"

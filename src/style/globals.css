@@ -123,6 +123,14 @@ input[type="number"] {
   color: #009414;
 
 }
+
+.p-dropdown-item .p-highlight{
+  color: #009414;
+
+}
+.p-dropdown-item-label{
+  color: black;
+}
 /*
 .table-row {
   @apply border-b-[1px] border-foreground/10 text-center ;
