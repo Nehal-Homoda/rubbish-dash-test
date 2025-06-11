@@ -39,19 +39,21 @@ export default function BaseModal(props: Props) {
           handleAction();
         }}
         className="base-btn w-40"
+        style={{ border: "none" }}
       />
       <Button
         label="الغاء"
         onClick={() => {
           setVisible(false);
         }}
-        className="cancel-btn w-20"
+        className="btn-secondary w-20"
+        style={{ border: "none" }}
       />
     </div>
   );
 
   return (
-    <div className="card flex justify-content-center">
+    <>
       <button onClick={() => setVisible(true)} className={props.style}>
         {props.openBtnIcon ? (
           props.iconType === "mdi" ? (
@@ -77,6 +79,6 @@ export default function BaseModal(props: Props) {
       >
         <div className="mt-10">{props.children}</div>
       </Dialog>
-    </div>
+    </>
   );
 }
