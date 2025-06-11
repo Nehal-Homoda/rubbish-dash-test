@@ -7,3 +7,13 @@ export interface ResponseError {
     };
     success: boolean;
 }
+
+export interface ResponseData<T> {
+    data: T[];
+    success: boolean;
+    meta: {
+        message: null | string;
+    };
+}
+
+

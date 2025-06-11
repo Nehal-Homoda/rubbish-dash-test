@@ -72,7 +72,7 @@
 
 @layer components {
   .base-btn {
-    @apply  h-11 px-4 rounded-xl bg-surface text-white ;
+    @apply h-11 px-4 rounded-xl bg-surface text-white ;
   }
   .btn-secondary {
     @apply  h-11 px-4 rounded-xl bg-surface-light-800/50 text-surface ;

@@ -156,13 +156,7 @@ export const responseErrorServiceHandler = async (
 ) => {
     const contentType = response.headers.get("content-type");
 
-    console.log(contentType);
-
-    if (
-        !contentType ||
-        !contentType.includes("application/json") ||
-        !contentType.includes("application/problem+json")
-    ) {
+    if (!contentType?.includes("json")) {
         console.log("not json");
         throw new Error(`Failed to ${serviceMessage}!`);
     }
