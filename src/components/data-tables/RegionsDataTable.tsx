@@ -20,11 +20,16 @@ interface RgionTableProps {
   lang?: "en" | "ar";
   dict?: { [key: string]: string };
 }
+interface TimeRange {
+  from: Date | null;
+  to: Date | null;
+}
+
 export default function RegionsDataTable({
   lang = "en",
   dict = {},
 }: RgionTableProps) {
-  const [regionNameArabic, setRegionNameArabic] = useState<any>();
+  const [regionNameArabic, setRegionNameArabic] = useState<string>("");
   const [selectedRegions, setSelectedRegions] = useState<any>(null);
   const [filters, setFilters] = useState<DataTableFilterMeta>({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -34,10 +39,12 @@ export default function RegionsDataTable({
     subscriptionsNumber: { value: null, matchMode: FilterMatchMode.EQUALS },
   });
   const [globalFilterValue, setGlobalFilterValue] = useState<string>("");
-  const [regionNameEnglish, setRegionNameEnglish] = useState<any>();
+  const [regionNameEnglish, setRegionNameEnglish] = useState<string>("");
   const [TimeFrom, setTimeFrom] = useState<Date>(new Date());
   const [TimeTo, setTimeTo] = useState<Date>(new Date());
-
+  const [timeRanges, setTimeRanges] = useState<TimeRange[]>([
+    { from: null, to: null },
+  ]);
   const handleRegionNameArabicChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -57,7 +64,10 @@ export default function RegionsDataTable({
   const handleTimeToChange = (time: Date) => {
     setTimeTo(time);
   };
-
+  const handleAddTime = () => {
+    setTimeRanges([...timeRanges, { from: null, to: null }]);
+  };
+  
   const regions: Regions[] = [
     {
       id: 1,
@@ -104,14 +114,11 @@ export default function RegionsDataTable({
     return (
       <div className="flex items-center justify-center gap-3">
         <BaseModal
-          title={dict.edit_region}
-          actionBtn={dict.save}
+          title={dict.edit_region || "Edit Region"}
+          actionBtn={dict.save || "Save"}
           openBtnIcon={"fa-regular fa-pen-to-square text-lg "}
           iconType="mdi"
           style=" bg-surface-light-800/50 text-surface rounded-lg px-2 py-1"
-          action={() => {
-            console.log("Save clicked");
-          }}
         >
           <div className="flex flex-col gap-12">
             <TextField
@@ -151,7 +158,10 @@ export default function RegionsDataTable({
                 value={TimeTo}
                 onChange={handleTimeToChange}
               />
-              <span className="mdi mdi-plus bg-surface px-[7px] py-1 rounded-md text-white hover:bg-surface-light-100 transition-all duration-300 cursor-pointer"></span>
+              <span
+                onClick={handleAddTime}
+                className="mdi mdi-plus bg-surface px-[7px] py-1 rounded-md text-white hover:bg-surface-light-100 transition-all duration-300 cursor-pointer"
+              ></span>
             </div>
           </div>
         </BaseModal>
@@ -269,38 +279,32 @@ export default function RegionsDataTable({
         dataKey="id"
         emptyMessage="No regions found."
       >
-        
-        <Column 
-        
+        <Column
           selectionMode="multiple"
           style={{ textAlign: "center" }}
-          headerStyle={{
-            textAlign: "center",
-          }}
+          align={"center"}
         />
         <Column
           field="id"
           header="ID"
           sortable
           style={{ textAlign: "center" }}
+          align={"center"}
           headerStyle={{
-            textAlign: "center",
             color: "rgb(var(--color-foreground))",
             opacity: 0.5,
             fontWeight: 500,
-          
           }}
         ></Column>
         <Column
           field="areaName"
           header="اسم المنطقة"
           style={{ textAlign: "center" }}
+          align={"center"}
           headerStyle={{
-            textAlign: "center",
             color: "rgb(var(--color-foreground))",
             opacity: 0.5,
             fontWeight: 500,
-            
           }}
         />
         <Column
@@ -310,8 +314,8 @@ export default function RegionsDataTable({
           style={{
             textAlign: "center",
           }}
+          align={"center"}
           headerStyle={{
-            textAlign: "center",
             color: "rgb(var(--color-foreground))",
             opacity: 0.5,
             fontWeight: 500,
@@ -322,8 +326,8 @@ export default function RegionsDataTable({
           header="الحالة"
           body={statusBodyTemplate}
           style={{ textAlign: "center" }}
+          align={"center"}
           headerStyle={{
-            textAlign: "center",
             color: "rgb(var(--color-foreground))",
             opacity: 0.5,
             fontWeight: 500,
@@ -334,8 +338,8 @@ export default function RegionsDataTable({
           header="الإجراءات"
           body={actionsBodyTemplate}
           style={{ textAlign: "center" }}
+          align={"center"}
           headerStyle={{
-            textAlign: "center",
             color: "rgb(var(--color-foreground))",
             opacity: 0.5,
             fontWeight: 500,
