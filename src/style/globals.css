@@ -132,17 +132,6 @@ input[type="number"] {
 .p-dropdown-item-label {
   color: black;
 }
-.p-datatable .p-datatable-tbody > tr {
-  pointer-events: none;
-}
-
-.p-datatable .p-datatable-tbody > tr > td.p-selection-column,
-.p-datatable .p-datatable-tbody > tr button,
-.p-datatable .p-datatable-tbody > tr a,
-.p-datatable .p-datatable-tbody > tr .p-element,
-.p-datatable .p-datatable-tbody > tr .custom-checkbox {
-  pointer-events: auto;
-}
 
 .region-table .p-dropdown .p-dropdown-clear-icon {
   right: 10px;

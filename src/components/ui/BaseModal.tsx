@@ -63,14 +63,9 @@ export default function BaseModal(props: Props) {
 
     return (
         <>
-        <div ref={parentRef} onClick={(e) => e.stopPropagation()}>
+        <div ref={parentRef} >
 
-            <button 
-             onClick={(e) => {
-            e.stopPropagation();
-            setVisible(true);
-          }} 
-           className={props.style}>
+            <button onClick={() => setVisible(true)} className={props.style}>
                 {props.openBtnIcon ? (
                     props.iconType === "mdi" ? (
                         <span className={props.openBtnIcon}></span>
@@ -85,7 +80,6 @@ export default function BaseModal(props: Props) {
                 visible={visible}
                 ref={modalRef}
                 modal
-                  onClick={(e) => e.stopPropagation()} 
                 header={headerElement}
                 footer={footerContent}
                 style={{ width: "40vw" }}
