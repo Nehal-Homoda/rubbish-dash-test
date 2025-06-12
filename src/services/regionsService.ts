@@ -1,7 +1,7 @@
 import { responseErrorServiceHandler } from "@/utils/shared";
 import { apiCall } from "./apiCall";
 import { ResponseData } from "@/types/shared";
-import type { Regions } from "@/types/regions.interface";
+import type { Region } from "@/types/regions.interface";
 
 export const getRegionsService = async (query?: string) => {
   try {
@@ -9,7 +9,7 @@ export const getRegionsService = async (query?: string) => {
     if (!response.ok) {
       await responseErrorServiceHandler(response, "districts");
     }
-    const data = (await response.json()) as ResponseData<Regions[]>;
+    const data = (await response.json()) as ResponseData<Region[]>;
     console.log("response data =>>>>", data);
     return data;
   } catch (error: any) {
