@@ -17,7 +17,6 @@ import { Tag } from 'primereact/tag';
 import { TriStateCheckbox } from 'primereact/tristatecheckbox';
 import CheckBox from "../ui/form/CheckBox";
 
-import users from '@/app/[lang]/(dash-layout)/users/page';
 import BaseModal from '../ui/BaseModal';
 import { color } from 'chart.js/helpers';
 import { Paginator } from 'primereact/paginator';
@@ -56,6 +55,14 @@ export default function CustomFilterDemo() {
     const [status, setStatus] = useState(null)
     const [subscribe, setSubscribe] = useState(null)
     const [filtered, setFiltered] = useState<User[]>([])
+
+    const [first, setFirst] = useState(1);
+    const [rows, setRows] = useState(5);
+    const [page, setPage] = useState(1);
+    const [isLoggedin, setIsLoggedIn] = useState(false)
+
+    const [users, setUsers] = useState<User[]>([])
+
     const areas = [
         { id: 1, name: "حي اول طنطا" },
         { id: 2, name: "حي ثان طنطا" },
@@ -73,9 +80,7 @@ export default function CustomFilterDemo() {
         { id: 4, name: 'مشترك/6شهور' },
     ]
 
-    const [first, setFirst] = useState(1);
-    const [rows, setRows] = useState(5);
-    const [page, setPage] = useState(1);
+
 
 
     const onPageChange = (event) => {
@@ -83,10 +88,8 @@ export default function CustomFilterDemo() {
         setFirst(event.first);
         setRows(event.rows);
         setPage(event.page)
-        console.log(event.page)
         fetchUserList()
     };
-    const [isLoggedin, setIsLoggedIn] = useState(false)
 
     useEffect(() => {
         const form = {
@@ -219,12 +222,12 @@ export default function CustomFilterDemo() {
     const fetchUserList = () => {
         userListService(page).then((response) => {
             console.log(response)
-            setUsers(response)
+            setUsers(response.data)
         })
     }
 
     useEffect(() => {
-        if(isLoggedin){
+        if (isLoggedin) {
 
             fetchUserList()
         }
@@ -539,7 +542,7 @@ export default function CustomFilterDemo() {
     }
 
     const header = renderHeader();
-    const [users, setUsers] = useState<User[]>([])
+    
 
 
 
@@ -607,7 +610,7 @@ export default function CustomFilterDemo() {
 
 
             <div className="card">
-                <Paginator first={first} rows={rows} totalRecords={120} rowsPerPageOptions={[10, 20, 30]} onPageChange={onPageChange} />
+                <Paginator first={first} rows={rows} totalRecords={users.length} rowsPerPageOptions={[10, 20, 30]} onPageChange={onPageChange} />
             </div>
 
 

@@ -7,13 +7,14 @@ let token="Bearer 160|9eiDkr7DC2EryTIiZbQbO5CoJoxE7X88IPHqcNGs7f3d3254"
 
 export const userListService = async (pageNumber: number) => {
     try {
-        const response = await apiCall.post(
+
+        const response = await apiCall.get(
             `/admins/users?page=${pageNumber}`,
             {
                 headers: {
                     Authorization:
                         `Bearer ${token}`,
-                    // "Content-Type": "application/json",
+                    "Content-Type": "application/json",
                 },
             }
         );
