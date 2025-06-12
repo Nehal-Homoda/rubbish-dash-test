@@ -40,7 +40,7 @@
   --color-surface-light-700: 204 234 208; /*input-border*/
   --color-surface-light-800: 230 244 232;
 }
-.dark {
+[data-theme="dark"] {
   --color-background: 0 0 0;
   --color-foreground: 255 255 255;
   /* muted text - icons color */
@@ -133,11 +133,17 @@ input[type="number"] {
   color: black;
 }
 
-.region-table .p-dropdown .p-dropdown-clear-icon {
+html[dir="rtl"] .region-table .p-dropdown .p-dropdown-clear-icon {
   right: 10px;
+  left: auto;
   top: 55%;
 }
 
+html[dir="ltr"] .region-table .p-dropdown .p-dropdown-clear-icon {
+  left: 10px;
+  right: auto;
+  top: 55%;
+}
 /*
 .table-row {
   @apply border-b-[1px] border-foreground/10 text-center ;
