@@ -23,16 +23,17 @@ import { Paginator } from 'primereact/paginator';
 import { userListService } from '@/services/sharedService';
 import { Password } from 'primereact/password';
 import { loginService } from '@/services/authServices';
+import { useRouter } from 'next/navigation';
 // import { CustomerService } from './service/CustomerService';
 
 // The rule argument should be a string in the format "custom_[field]".
-FilterService.register('custom_activity', (value, filters) => {
-    const [from, to] = filters ?? [null, null];
-    if (from === null && to === null) return true;
-    if (from !== null && to === null) return from <= value;
-    if (from === null && to !== null) return value <= to;
-    return from <= value && value <= to;
-});
+// FilterService.register('custom_activity', (value, filters) => {
+//     const [from, to] = filters ?? [null, null];
+//     if (from === null && to === null) return true;
+//     if (from !== null && to === null) return from <= value;
+//     if (from === null && to !== null) return value <= to;
+//     return from <= value && value <= to;
+// });
 interface Location {
     id: number,
     name: string
@@ -41,7 +42,7 @@ interface Location {
 
 }
 export default function CustomFilterDemo() {
-    const [customers, setCustomers] = useState(null);
+    // const [customers, setCustomers] = useState(null);
     const [filters, setFilters] = useState({
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
@@ -54,12 +55,13 @@ export default function CustomFilterDemo() {
     const [location, setLocation] = useState<Location | null>(null)
     const [status, setStatus] = useState(null)
     const [subscribe, setSubscribe] = useState(null)
-    const [filtered, setFiltered] = useState<User[]>([])
+    // const [filtered, setFiltered] = useState<User[]>([])
 
     const [first, setFirst] = useState(1);
     const [rows, setRows] = useState(5);
     const [page, setPage] = useState(1);
     const [isLoggedin, setIsLoggedIn] = useState(false)
+    const router=useRouter()
 
     const [users, setUsers] = useState<User[]>([])
 
@@ -84,10 +86,10 @@ export default function CustomFilterDemo() {
 
 
     const onPageChange = (event) => {
-        event.page += 1
+        // event.page += 1
         setFirst(event.first);
         setRows(event.rows);
-        setPage(event.page)
+        setPage(event.page+1)
         fetchUserList()
     };
 
@@ -276,7 +278,7 @@ export default function CustomFilterDemo() {
 
 
                         <div className='bg-[#009414] py-2 rounded-xl text-center  text-white min-w-36 '>
-                            <button className='w-full h-full'>اضافة مستخدم</button>
+                            <button onClick={handleAddUser} className='w-full h-full'>اضافة مستخدم</button>
                         </div>
 
                     </div>
@@ -307,6 +309,10 @@ export default function CustomFilterDemo() {
         console.log(_filters)
 
         setFilters(_filters);
+    }
+
+    const handleAddUser=()=>{
+        router.push(`/users/add-user`)
     }
 
 
@@ -423,9 +429,9 @@ export default function CustomFilterDemo() {
     // };
 
 
-    const verifiedRowFilterTemplate = (options) => {
-        return <TriStateCheckbox value={options.value} onChange={(e) => options.filterApplyCallback(e.value)} />;
-    };
+    // const verifiedRowFilterTemplate = (options) => {
+    //     return <TriStateCheckbox value={options.value} onChange={(e) => options.filterApplyCallback(e.value)} />;
+    // };
 
 
     const checkboxTemplate = (rowData: User) => {
@@ -610,7 +616,7 @@ export default function CustomFilterDemo() {
 
 
             <div className="card">
-                <Paginator first={first} rows={rows} totalRecords={users.length} rowsPerPageOptions={[10, 20, 30]} onPageChange={onPageChange} />
+                <Paginator first={first} rows={rows} totalRecords={users.length} rowsPerPageOptions={[5, 10, 15]} onPageChange={onPageChange} />
             </div>
 
 
