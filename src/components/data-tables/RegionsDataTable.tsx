@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import { DataTable, DataTableFilterMeta } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Tag } from "primereact/tag";
 import BaseModal from "../ui/BaseModal";
 import TextField from "../ui/form/TextFieldNada";
 import TimePicker from "../ui/form/TimePicker";
@@ -13,9 +12,9 @@ import { FilterMatchMode } from "primereact/api";
 import downloadIcon from "@/assets/images/icons/download-icon.png";
 import Image from "next/image";
 import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
-import { getRegionsService } from "@/services/regionsServices";
-import { getPackagesService } from "@/services/packagesOffersService";
+import { getRegionsService } from "@/services/regionsService";
 import type { Region } from "@/types/regions.interface";
+import TableStatusDropdown from "../ui/TableStatusDropdown";
 interface RegionsTableProps {
   lang?: "en" | "ar";
   dict?: { [key: string]: string };
@@ -23,7 +22,6 @@ interface RegionsTableProps {
 interface regionNames {
   id: number;
   name: string;
-  label: string;
 }
 interface TimeRange {
   from: Date | null;
@@ -75,9 +73,9 @@ export default function RegionsDataTable({
   //   },
   // ];
   const regionNames: regionNames[] = [
-    { id: 1, name: "حي اول طنطا", label: "حي اول طنطا" },
-    { id: 2, name: "حي ثان طنطا", label: "حي ثان طنطا" },
-    { id: 3, name: "حي ثالث طنطا", label: "حي ثالث طنطا" },
+    { id: 1, name: "الحى 1" },
+    { id: 2, name: "الحى 2"},
+    { id: 3, name: "الحى 3"},
   ];
   const handleNameArChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRegionForm({ ...regionForm, nameAr: e.target.value });
@@ -111,24 +109,16 @@ export default function RegionsDataTable({
     });
   };
 
-  const getStatusSeverity = (status: string) => {
-    switch (status) {
-      case "مفعل":
-        return "success";
-      case "غير مفعل":
-        return "danger";
-      case "معلق":
-        return "warning";
-      default:
-        return "info";
-    }
+  const handleStatusChange = (newStatus: string, id: number) => {
+console.log('hi');
+
   };
 
-  const statusBodyTemplate = (rowData: any) => {
+  const statusBodyTemplate = (data: any) => {
     return (
-      <Tag
-        value={rowData.status}
-        severity={getStatusSeverity(rowData.status)}
+      <TableStatusDropdown
+        currentStatus={data.is_active}
+        onStatusChange={(newStatus) => handleStatusChange(newStatus, data.id)}
       />
     );
   };
@@ -241,14 +231,14 @@ export default function RegionsDataTable({
                 name_ar: { value: e.value, matchMode: FilterMatchMode.EQUALS },
               });
             }}
-            optionLabel="label"
+            optionLabel="name"
             optionValue="name"
             placeholder={dict.region}
             className="btn-secondary px-0 border-0 "
             showClear
           />
 
-          <div className="btn-secondary flex-shrink-0 flex justify-center items-center">
+          <div className="btn-secondary flex-shrink-0 flex justify-center items-center cursor-pointer" >
             <Image src={downloadIcon} alt="download" width={20} height={20} />
           </div>
           <BaseModal
@@ -332,15 +322,7 @@ export default function RegionsDataTable({
     setFilters(_filters);
     setGlobalFilterValue(value);
   };
-  useEffect(() => {
-    getPackagesService()
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
-        console.error("Error while fetching regions:", err.message);
-      });
-  }, []);
+
   useEffect(() => {
     // setRegions(mockRegions); // dummy data (for test)
 
@@ -378,14 +360,12 @@ export default function RegionsDataTable({
       >
         <Column
           selectionMode="multiple"
-          style={{ textAlign: "center" }}
           align={"center"}
         />
         <Column
           field="id"
           header="ID"
           sortable
-          style={{ textAlign: "center" }}
           align={"center"}
           headerStyle={{
             color: "rgb(var(--color-foreground))",
@@ -395,8 +375,7 @@ export default function RegionsDataTable({
         ></Column>
         <Column
           field={lang === "en" ? "name_en" : "name_ar"}
-          header="اسم المنطقة"
-          style={{ textAlign: "center" }}
+          header={dict.region_name}
           align={"center"}
           headerStyle={{
             color: "rgb(var(--color-foreground))",
@@ -406,7 +385,7 @@ export default function RegionsDataTable({
         />
         <Column
           field="no_of_subscriptions"
-          header="عدد الاشتراكات"
+          header={dict.subscribe_number}
           sortable
           style={{
             textAlign: "center",
@@ -419,10 +398,8 @@ export default function RegionsDataTable({
           }}
         />
         <Column
-          field="status"
-          header="الحالة"
+          header={dict.status}
           body={statusBodyTemplate}
-          style={{ textAlign: "center" }}
           align={"center"}
           headerStyle={{
             color: "rgb(var(--color-foreground))",
@@ -432,9 +409,8 @@ export default function RegionsDataTable({
         />
         <Column
           field="actions"
-          header="الإجراءات"
+          header={dict.actions || "Actions"}
           body={actionsBodyTemplate}
-          style={{ textAlign: "center" }}
           align={"center"}
           headerStyle={{
             color: "rgb(var(--color-foreground))",
