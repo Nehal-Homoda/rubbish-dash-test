@@ -130,48 +130,51 @@ export default function CustomFilterDemo() {
 
     const renderHeader = () => {
         return (
-            <div className='grid grid-cols-12 items-center lg:gap-28'>
-                <div className="flex justify-content-end lg:col-span-5 col-span-12">
+            <div className='grid grid-cols-12 items-center  gap-5 data-table-header' >
+                <div className="flex lg:justify-content-end lg:col-span-5 col-span-12">
                     <IconField className='w-full' iconPosition="left">
                         <InputIcon className="pi pi-search" />
                         <InputText className='w-full' value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Keyword Search" />
                     </IconField>
                 </div>
-                <div className='lg:col-span-7 col-span-12 flex justify-end gap-5  '>
+                <div className='lg:col-span-7 col-span-12  overflow-x-auto '>
+
+                    <div className='flex gap-4 lg:justify-end min-w-max '>
+
+                        <div className='bg-[#0094140D]  text-center rounded-xl text-[#009414]'>
+                            <Dropdown value={location} onChange={(e) => handleFilterChange(e, 'area')} options={areas} optionLabel="name"
+                                placeholder="المنطقة" className="w-full md:w-14rem border-0 bg-transparent font-bold " />
+                        </div>
 
 
 
 
-                    <div className='bg-[#0094140D]  text-center rounded-xl text-[#009414]'>
-                        <Dropdown value={location} onChange={(e) => handleFilterChange(e, 'area')} options={areas} optionLabel="name"
-                            placeholder="المنطقة" className="w-full md:w-14rem border-0 bg-transparent font-bold " />
+
+                        <div className='bg-[#0094140D]  text-center rounded-xl '>
+                            <Dropdown value={status} onChange={(e) => handleFilterChange(e, 'status')} options={statusList} optionLabel="name"
+                                placeholder="الحالة" className="w-full md:w-14rem border-0 bg-transparent font-bold " />
+                        </div>
+
+
+                        <div className='bg-[#0094140D]  text-center rounded-xl '>
+                            <Dropdown value={subscribe} onChange={(e) => handleFilterChange(e, 'subscription')} options={subscriptionList} optionLabel="name"
+                                placeholder="الاشتراك" className="w-full md:w-14rem border-0 bg-transparent font-bold " />
+                        </div>
+
+
+
+                        <div className='bg-[#0094140D] cursor-pointer   py-2 text-center rounded-xl px-5 flex items-center justify-content-center '>
+                            <i className='pi pi-download text-[#009414]'></i>
+                        </div>
+
+
+                        <div className='bg-[#009414] py-2 rounded-xl text-center  text-white min-w-36 '>
+                            <button className='w-full h-full'>اضافة مستخدم</button>
+                        </div>
+
                     </div>
 
 
-
-
-
-                    <div className='bg-[#0094140D]  text-center rounded-xl '>
-                        <Dropdown value={status} onChange={(e) => handleFilterChange(e, 'status')} options={statusList} optionLabel="name"
-                            placeholder="الحالة" className="w-full md:w-14rem border-0 bg-transparent font-bold " />
-                    </div>
-
-
-                    <div className='bg-[#0094140D]  text-center rounded-xl '>
-                        <Dropdown value={subscribe} onChange={(e) => handleFilterChange(e, 'subscription')} options={subscriptionList} optionLabel="name"
-                            placeholder="الاشتراك" className="w-full md:w-14rem border-0 bg-transparent font-bold " />
-                    </div>
-
-
-
-                    <div className='bg-[#0094140D] cursor-pointer   py-2 text-center rounded-xl px-5 flex items-center justify-content-center '>
-                        <i className='pi pi-download text-[#009414]'></i>
-                    </div>
-
-
-                    <div className='bg-[#009414] py-2 rounded-xl text-center  text-white min-w-36'>
-                        <button className='w-full h-full'>اضافة مستخدم</button>
-                    </div>
                 </div>
 
             </div>
@@ -442,7 +445,7 @@ export default function CustomFilterDemo() {
 
     return (
         <div className="card">
-            <DataTable value={users} paginator rows={10} dataKey="id" filters={filters} filterDisplay="row"
+            <DataTable scrollable value={users} paginator rows={10} dataKey="id" filters={filters} filterDisplay="row"
                 globalFilterFields={['name', 'global', 'area']} header={header} emptyMessage="No users found.">
                 <Column header={headerCheckbox()}
                     body={checkboxTemplate}
