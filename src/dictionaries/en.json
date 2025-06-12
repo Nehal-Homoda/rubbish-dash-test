@@ -70,6 +70,7 @@
   "discount": "Discount",
   "day": "Day",
   "time": "Time",
+  "enterTime": "Enter time",
   "status": "Status",
   "text": "Text",
   "rank": "Rank",
@@ -91,6 +92,7 @@
   "edit": "Edit",
   "done": "Done",
   "delete": "Delete",
+  "deleteItem": "Delete Item",
   "cancel": "Cancel",
   "search": "Search",
   "select": "Select",
@@ -104,5 +106,8 @@
   "units": "Residenial units",
   "restaurants": "Restaurants",
   "month_stats": "Monthly statistics",
-  "year_stats": "Yearly statistics"
+  "year_stats": "Yearly statistics",
+  "regions_Empty_table_msg":"No regions found.",
+  "confirm": "Confirm"
+
 }

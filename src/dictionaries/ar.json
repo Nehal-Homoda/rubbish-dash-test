@@ -70,6 +70,7 @@
   "discount": "نسبة الخصم",
   "day": "اليوم",
   "time": "الوقت",
+  "enterTime": "ادخل الوقت",
   "status": "الحالة",
   "text": "النص",
   "rank": "ترتيب",
@@ -91,6 +92,7 @@
   "edit": "تعديل",
   "done": "تم",
   "delete": "حذف",
+  "deleteItem": "حذف عنصر",
   "cancel": "الغاء",
   "search": "بحث",
   "select": "اختر",
@@ -104,5 +106,7 @@
   "units": "وحدات سكنية",
   "restaurants": "مطاعم",
   "month_stats": "احصائيات الشهر",
-  "year_stats": "احصائيات السنة"
+  "year_stats": "احصائيات السنة",
+  "regions_Empty_table_msg": "لم يتم العثور على أي مناطق.",
+"confirm": "تأكيد"
 }
