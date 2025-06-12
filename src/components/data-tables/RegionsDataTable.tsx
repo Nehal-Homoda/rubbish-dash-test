@@ -21,7 +21,8 @@ interface RegionsTableProps {
 }
 interface regionNames {
   id: number;
-  name: string;
+  name_ar: string;
+  name_en: string;
 }
 interface TimeRange {
   from: Date | null;
@@ -52,31 +53,12 @@ export default function RegionsDataTable({
   });
   const [globalFilterValue, setGlobalFilterValue] = useState<string>("");
 
-  // const mockRegions = [
-  //   {
-  //     id: 1,
-  //     areaName: "حي ثان طنطا",
-  //     subscriptionsNumber: "25 مشترك",
-  //     status: "مفعل",
-  //   },
-  //   {
-  //     id: 2,
-  //     areaName: "حي ثالث طنطا",
-  //     subscriptionsNumber: "15 مشترك",
-  //     status: "معلق",
-  //   },
-  //   {
-  //     id: 3,
-  //     areaName: "حي اول طنطا",
-  //     subscriptionsNumber: "10 مشترك",
-  //     status: "غير مفعل",
-  //   },
-  // ];
   const regionNames: regionNames[] = [
-    { id: 1, name: "الحى 1" },
-    { id: 2, name: "الحى 2"},
-    { id: 3, name: "الحى 3"},
+    { id: 1, name_ar: "الحى 1", name_en: "District 1" },
+    { id: 2, name_ar: "الحى 2", name_en: "District 2" },
+    { id: 3, name_ar: "الحى 3", name_en: "District 3" },
   ];
+
   const handleNameArChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRegionForm({ ...regionForm, nameAr: e.target.value });
   };
@@ -110,8 +92,7 @@ export default function RegionsDataTable({
   };
 
   const handleStatusChange = (newStatus: string, id: number) => {
-console.log('hi');
-
+    console.log("hi");
   };
 
   const statusBodyTemplate = (data: any) => {
@@ -223,22 +204,46 @@ console.log('hi');
         </IconField>
         <div className="flex items-center gap-3 overflow-x-auto ">
           <Dropdown
-            value={filters.name_ar.value}
+            value={
+              lang === "ar" ? filters.name_ar.value : filters.name_en.value
+            }
             options={regionNames}
-            onChange={(e: DropdownChangeEvent) => {
-              setFilters({
+            onChange={async (e: DropdownChangeEvent) => {
+              const updatedFilters = {
                 ...filters,
-                name_ar: { value: e.value, matchMode: FilterMatchMode.EQUALS },
-              });
+                name_ar: {
+                  value: lang === "ar" ? e.value : null,
+                  matchMode: FilterMatchMode.EQUALS,
+                },
+                name_en: {
+                  value: lang === "en" ? e.value : null,
+                  matchMode: FilterMatchMode.EQUALS,
+                },
+              };
+              setFilters(updatedFilters);
+
+              try {
+                const queryParam = lang === "ar" ? "name_ar" : "name_en";
+                const query = e.value
+                  ? `?${queryParam}=${encodeURIComponent(e.value)}`
+                  : "";
+
+                const response = await getRegionsService(query);
+                setRegions(response.data);
+              } catch (error) {
+                console.error("Error while filtering regions:", error);
+              }
             }}
-            optionLabel="name"
-            optionValue="name"
+            optionLabel={lang === "ar" ? "name_ar" : "name_en"}
+            optionValue={lang === "ar" ? "name_ar" : "name_en"}
             placeholder={dict.region}
-            className="btn-secondary px-0 border-0 "
+            className={`btn-secondary  border-0 ${
+              lang === "ar" ? "p-0" : "pe-0"
+            } `}
             showClear
           />
 
-          <div className="btn-secondary flex-shrink-0 flex justify-center items-center cursor-pointer" >
+          <div className="btn-secondary flex-shrink-0 flex justify-center items-center cursor-pointer">
             <Image src={downloadIcon} alt="download" width={20} height={20} />
           </div>
           <BaseModal
@@ -312,7 +317,9 @@ console.log('hi');
       </div>
     );
   };
-  const onGlobalFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onGlobalFilterChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const value = e.target.value;
     let _filters = { ...filters };
 
@@ -321,11 +328,16 @@ console.log('hi');
 
     setFilters(_filters);
     setGlobalFilterValue(value);
+
+    try {
+      const query = value ? `?search=${encodeURIComponent(value)}` : "";
+      const response = await getRegionsService(query);
+      setRegions(response.data);
+    } catch (error) {
+      console.error("Error while searching regions:", error);
+    }
   };
-
   useEffect(() => {
-    // setRegions(mockRegions); // dummy data (for test)
-
     getRegionsService()
       .then((res) => {
         console.log(res);
@@ -358,10 +370,7 @@ console.log('hi');
         dataKey="id"
         emptyMessage={dict.regions_Empty_table_msg}
       >
-        <Column
-          selectionMode="multiple"
-          align={"center"}
-        />
+        <Column selectionMode="multiple" align={"center"} />
         <Column
           field="id"
           header="ID"
