@@ -356,7 +356,7 @@ export default function RegionsDataTable({
   const header = renderHeader();
 
   return (
-    <div className="card">
+    <div className="card region-table">
       <DataTable
         value={regions}
         header={header}

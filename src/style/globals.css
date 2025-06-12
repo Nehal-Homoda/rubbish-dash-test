@@ -144,7 +144,7 @@ input[type="number"] {
   pointer-events: auto;
 }
 
-.p-dropdown .p-dropdown-clear-icon {
+.region-table .p-dropdown .p-dropdown-clear-icon {
   right: 10px;
   top: 55%;
 }
