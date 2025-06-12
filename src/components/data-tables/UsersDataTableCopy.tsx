@@ -20,6 +20,10 @@ import CheckBox from "../ui/form/CheckBox";
 import users from '@/app/[lang]/(dash-layout)/users/page';
 import BaseModal from '../ui/BaseModal';
 import { color } from 'chart.js/helpers';
+import { Paginator } from 'primereact/paginator';
+import { userListService } from '@/services/sharedService';
+import { Password } from 'primereact/password';
+import { loginService } from '@/services/authServices';
 // import { CustomerService } from './service/CustomerService';
 
 // The rule argument should be a string in the format "custom_[field]".
@@ -69,62 +73,162 @@ export default function CustomFilterDemo() {
         { id: 4, name: 'مشترك/6شهور' },
     ]
 
+    const [first, setFirst] = useState(1);
+    const [rows, setRows] = useState(5);
+    const [page, setPage] = useState(1);
+
+
+    const onPageChange = (event) => {
+        event.page += 1
+        setFirst(event.first);
+        setRows(event.rows);
+        setPage(event.page)
+        console.log(event.page)
+        fetchUserList()
+    };
+    const [isLoggedin, setIsLoggedIn] = useState(false)
+
     useEffect(() => {
-        setUsers(
-            [
+        const form = {
+            email: "test@example.com",
+            password: "password"
+        }
+        const fd = new FormData()
+        fd.append('email', "test@example.com")
+        fd.append('password', "password")
+        loginService(fd).then((response) => {
+            setIsLoggedIn(true)
+        })
+        // setUsers(
+        //     [
 
-                {
-                    id: 1,
-                    name: "حبيبة احمد",
-                    mobile: "01201988345",
-                    area: "حي ثان طنطا",
-                    subscription: "مشترك/شهرية",
-                    renewalDate: "21 مايو 2025",
-                    status: "مفعل",
-                },
-                {
-                    id: 2,
-                    name: "يمنى يوسف",
-                    mobile: "01201988345",
-                    area: "حي ثالث طنطا",
-                    subscription: "مشترك/3شهور",
-                    renewalDate: "21 مايو 2025",
-                    status: "مفعل",
-                },
-                {
-                    id: 3,
-                    name: "محمد احمد",
-                    mobile: "01201988345",
-                    area: "حي اول طنطا",
-                    subscription: "غير مشترك",
-                    renewalDate: "غير محدد",
-                    status: "مفعل",
-                },
-                {
-                    id: 4,
-                    name: "مريم ابراهيم",
-                    mobile: "01201988345",
-                    area: "حي ثالث طنطا",
-                    subscription: "مشترك/6شهور",
-                    renewalDate: "21 مايو 2025",
-                    status: "غير مفعل",
-                },
-                {
-                    id: 5,
-                    name: "هاجر ربيع",
-                    mobile: "01201988345",
-                    area: "حي اول طنطا",
-                    subscription: "غير مشترك",
-                    renewalDate: "غير محدد",
-                    status: "معلق",
-                },
+        //         {
+        //             id: 1,
+        //             name: "حبيبة احمد",
+        //             mobile: "01201988345",
+        //             area: "حي ثان طنطا",
+        //             subscription: "مشترك/شهرية",
+        //             renewalDate: "21 مايو 2025",
+        //             status: "مفعل",
+        //         },
+        //         {
+        //             id: 2,
+        //             name: "يمنى يوسف",
+        //             mobile: "01201988345",
+        //             area: "حي ثالث طنطا",
+        //             subscription: "مشترك/3شهور",
+        //             renewalDate: "21 مايو 2025",
+        //             status: "مفعل",
+        //         },
+        //         {
+        //             id: 3,
+        //             name: "محمد احمد",
+        //             mobile: "01201988345",
+        //             area: "حي اول طنطا",
+        //             subscription: "غير مشترك",
+        //             renewalDate: "غير محدد",
+        //             status: "مفعل",
+        //         },
+        //         {
+        //             id: 4,
+        //             name: "مريم ابراهيم",
+        //             mobile: "01201988345",
+        //             area: "حي ثالث طنطا",
+        //             subscription: "مشترك/6شهور",
+        //             renewalDate: "21 مايو 2025",
+        //             status: "غير مفعل",
+        //         },
+        //         {
+        //             id: 5,
+        //             name: "هاجر ربيع",
+        //             mobile: "01201988345",
+        //             area: "حي اول طنطا",
+        //             subscription: "غير مشترك",
+        //             renewalDate: "غير محدد",
+        //             status: "معلق",
+        //         },
+        //         {
+        //             id: 5,
+        //             name: "هاجر ربيع",
+        //             mobile: "01201988345",
+        //             area: "حي اول طنطا",
+        //             subscription: "غير مشترك",
+        //             renewalDate: "غير محدد",
+        //             status: "معلق",
+        //         },
+        //         {
+        //             id: 5,
+        //             name: "هاجر ربيع",
+        //             mobile: "01201988345",
+        //             area: "حي اول طنطا",
+        //             subscription: "غير مشترك",
+        //             renewalDate: "غير محدد",
+        //             status: "معلق",
+        //         },
+        //         {
+        //             id: 5,
+        //             name: "هاجر ربيع",
+        //             mobile: "01201988345",
+        //             area: "حي اول طنطا",
+        //             subscription: "غير مشترك",
+        //             renewalDate: "غير محدد",
+        //             status: "معلق",
+        //         },
+        //         {
+        //             id: 5,
+        //             name: "هاجر ربيع",
+        //             mobile: "01201988345",
+        //             area: "حي اول طنطا",
+        //             subscription: "غير مشترك",
+        //             renewalDate: "غير محدد",
+        //             status: "معلق",
+        //         },
+        //         {
+        //             id: 5,
+        //             name: "هاجر ربيع",
+        //             mobile: "01201988345",
+        //             area: "حي اول طنطا",
+        //             subscription: "غير مشترك",
+        //             renewalDate: "غير محدد",
+        //             status: "معلق",
+        //         },
+        //         {
+        //             id: 5,
+        //             name: "هاجر ربيع",
+        //             mobile: "01201988345",
+        //             area: "حي اول طنطا",
+        //             subscription: "غير مشترك",
+        //             renewalDate: "غير محدد",
+        //             status: "معلق",
+        //         },
+        //         {
+        //             id: 5,
+        //             name: "هاجر ربيع",
+        //             mobile: "01201988345",
+        //             area: "حي اول طنطا",
+        //             subscription: "غير مشترك",
+        //             renewalDate: "غير محدد",
+        //             status: "معلق",
+        //         },
 
 
-            ])
+        //     ])
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
 
+    const fetchUserList = () => {
+        userListService(page).then((response) => {
+            console.log(response)
+            setUsers(response)
+        })
+    }
 
+    useEffect(() => {
+        if(isLoggedin){
+
+            fetchUserList()
+        }
+    }, [isLoggedin])
 
 
 
@@ -442,11 +546,10 @@ export default function CustomFilterDemo() {
 
 
 
-
     return (
         <div className="card">
-            <DataTable scrollable value={users} paginator rows={10} dataKey="id" filters={filters} filterDisplay="row"
-                globalFilterFields={['name', 'global', 'area']} header={header} emptyMessage="No users found.">
+            <DataTable scrollable value={users} dataKey="id" filters={filters} filterDisplay="row"
+                globalFilterFields={['name', 'global', 'area']} header={header} emptyMessage="No users found."   >
                 <Column header={headerCheckbox()}
                     body={checkboxTemplate}
                     style={{ textAlign: "center" }}
@@ -502,6 +605,10 @@ export default function CustomFilterDemo() {
                 ></Column>
             </DataTable>
 
+
+            <div className="card">
+                <Paginator first={first} rows={rows} totalRecords={120} rowsPerPageOptions={[10, 20, 30]} onPageChange={onPageChange} />
+            </div>
 
 
 
