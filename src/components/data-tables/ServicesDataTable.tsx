@@ -12,88 +12,60 @@ import BaseDropdown from "../ui/form/Dropdown";
 import FileInput from "../ui/form/FileInput";
 import { FilterMatchMode } from "primereact/api";
 import TableStatusDropdown from "../ui/TableStatusDropdown";
-import { getCategories} from "@/services/categoriesService";
+import { getCategoriesService } from "@/services/categoriesService";
 import { Dropdown } from "primereact/dropdown";
+import { Categories } from "@/types/categories.interface";
 
 export default function ServicesDataTable() {
-  const [selectedProducts, setSelectedProducts] = useState(null);
+  const [selectedRows, setSelectedRows] = useState(null);
   const [rowClick, setRowClick] = useState(true);
-  const [filters, setFilters] = useState({global: { value: null, matchMode: FilterMatchMode.CONTAINS },});
+  const [filters, setFilters] = useState({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  });
   const [filteredStatus, setFilteredStatus] = useState(null);
   const [globalFilterValue, setGlobalFilterValue] = useState("");
 
   const [addFormDate, setAddFormData] = useState({
-    name1: '',
-    name2: '',
-    status: '',
-  })
+    name1: "",
+    name2: "",
+    status: "",
+  });
   const [formDate, setformData] = useState({
     name1: "",
     name2: "",
     status: "",
   });
-   const handleAddFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-     console.log("changed");
-     console.log("changed name ", e.target.name);
-     console.log("changed value ", e.target.value);
-     setAddFormData((prev) => ({
-       ...prev,
-       [e.target.name]: e.target.value,
-     }));
-   };
-   const inputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-     console.log("changed");
-     console.log("changed name ", e.target.name);
-     console.log("changed value ", e.target.value);
-     setformData((prev) => ({
-       ...prev,
-       [e.target.name]: e.target.value,
-     }));
-   };
-  const [data, setData] = useState<any[]>([
-    {
-      id: 1,
-      name: "وحدات سكنية",
-      status: "active",
-      subscription: "10 مشترك",
-    },
-    {
-      id: 2,
-      name: "شقه",
-      status: "not_active",
-      subscription: "10 مشترك",
-    },
-    {
-      id: 3,
-      name: "محلات تجارية",
-      status: "pending",
-      subscription: "3 مشترك",
-    },
-    {
-      id: 4,
-      name: "مطاعم",
-      status: "active",
-      subscription: "3 مشترك",
-    },
-  ]);
+  const handleAddFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("changed");
+    console.log("changed name ", e.target.name);
+    console.log("changed value ", e.target.value);
+    setAddFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+  const inputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("changed");
+    console.log("changed name ", e.target.name);
+    console.log("changed value ", e.target.value);
+    setformData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+  const [tableData, setTableData] = useState<Categories[]>([]);
 
   const { lang, dict } = useLangAndDictionary();
 
   const handleStatusChange = (newStatus: string, id: number) => {
-    setData((prevData) =>
-      prevData.map((item) =>
-        item.id === id ? { ...item, status: newStatus } : item
-      )
-    );    
+    console.log(newStatus);
   };
-  
+
   const statusBodyTemplate = (data) => {
     return (
       <TableStatusDropdown
-        currentStatus={data.status}
-        onStatusChange={(newStatus) =>
-          handleStatusChange(newStatus, data.id)
-        }
+        currentStatus={data.is_active}
+        onStatusChange={(newStatus) => handleStatusChange(newStatus, data.id)}
       />
     );
   };
@@ -101,10 +73,10 @@ export default function ServicesDataTable() {
   const imageBodyTemplate = (data) => {
     return (
       <div className="w-20 h-10 overflow-hidden">
-        {data.imageUrl ? (
+        {data.image ? (
           <img
-            src={data.imageUrl}
-            alt={data.name}
+            src={data.image}
+            alt={data.name_en}
             className="w-full h-full object-cover"
           />
         ) : (
@@ -209,29 +181,28 @@ export default function ServicesDataTable() {
         </IconField>
         <div className="flex items-center gap-3">
           <Dropdown
-                  pt={{
-                    root: `px-0 flex justify-center items-center border-none shadow-none btn-secondary`,
-                    trigger: "text-surface",
-                    input: "pe-0",
-                  }}
-                  value={filteredStatus}
-                  onChange={(e) => {setFilteredStatus(e.value)}}
-                  options={[{
-                    label: "مفعل",
-                    value: "active",
-                  },
-                  {
-                    label: "معلق",
-                    value: "pending",
-                  },
-                  {
-                    label: "غير مفعل",
-                    value: "not_active",
-                  },
-                ]}
-                  optionLabel="label"
-                  placeholder={dict.status}
-                />
+            pt={{
+              root: `px-0 flex justify-center items-center border-none shadow-none btn-secondary`,
+              trigger: "text-surface",
+              input: "pe-0",
+            }}
+            value={filteredStatus}
+            onChange={(e) => {
+              handleStatusFilter(e.value);
+            }}
+            options={[
+              {
+                label: "مفعل",
+                value: true,
+              },
+              {
+                label: "غير مفعل",
+                value: false,
+              },
+            ]}
+            optionLabel="label"
+            placeholder={dict.status}
+          />
           <button className="btn-secondary text-xl">
             <span className="mdi mdi-tray-arrow-down"></span>
           </button>
@@ -295,9 +266,22 @@ export default function ServicesDataTable() {
 
   const header = renderHeader();
 
-  // useEffect(() => {
-  //   getCategories()
-  //   }, []);
+  const handleStatusFilter = async (value) => {
+    setFilteredStatus(value);
+
+    const query = value ? "1" : "0";
+    const response = await getCategoriesService(`?is_active=${query}`);
+    setTableData(response.data);
+  };
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const response = await getCategoriesService();
+      setTableData(response.data);
+    };
+
+    fetchCategories();
+  }, []);
 
   return (
     <>
@@ -310,14 +294,19 @@ export default function ServicesDataTable() {
           }}
           filters={filters}
           filterDisplay="menu"
-          globalFilterFields={["name", "id", "subscription"]}
+          globalFilterFields={[
+            "name_ar",
+            "name_en",
+            "id",
+            "no_of_subscriptions",
+          ]}
           header={header}
           paginator
           paginatorRight
-          rows={3}
-          value={data}
+          rows={4}
+          value={tableData}
           selectionMode={rowClick ? null : "checkbox"}
-          onSelectionChange={(e) => setSelectedProducts(e.value)}
+          onSelectionChange={(e) => setSelectedRows(e.value)}
           dataKey="id"
           tableStyle={{ minWidth: "50rem", textAlign: "center" }}
         >
@@ -360,7 +349,7 @@ export default function ServicesDataTable() {
             align="center"
             alignHeader="center"
             bodyStyle={{ borderBottom: "solid 1px #00000008" }}
-            header="صورة الخدمة"
+            header={dict.service_image}
             body={imageBodyTemplate}
           ></Column>
           <Column
@@ -375,8 +364,8 @@ export default function ServicesDataTable() {
             align="center"
             alignHeader="center"
             bodyStyle={{ borderBottom: "solid 1px #00000008" }}
-            field="name"
-            header="اسم الخدمة"
+            field={lang == "ar" ? "name_ar" : "name_en"}
+            header={dict.service_name}
           ></Column>
           <Column
             style={{ textAlign: "center" }}
@@ -391,8 +380,8 @@ export default function ServicesDataTable() {
             align="center"
             alignHeader="center"
             bodyStyle={{ borderBottom: "solid 1px #00000008" }}
-            field="subscription"
-            header="عدد الاشتراكات"
+            field="no_of_subscriptions"
+            header={dict.subscribe_number}
           ></Column>
           <Column
             style={{ textAlign: "center" }}
@@ -406,7 +395,7 @@ export default function ServicesDataTable() {
             align="center"
             alignHeader="center"
             bodyStyle={{ borderBottom: "solid 1px #00000008" }}
-            header="الحالة"
+            header={dict.status}
             body={statusBodyTemplate}
           ></Column>
           <Column
@@ -421,7 +410,7 @@ export default function ServicesDataTable() {
             align="center"
             alignHeader="center"
             bodyStyle={{ borderBottom: "solid 1px #00000008" }}
-            header="الاجراءات"
+            header={dict.actions}
             body={actionsBodyTemplate}
           ></Column>
         </DataTable>

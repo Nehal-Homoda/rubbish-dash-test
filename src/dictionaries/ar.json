@@ -24,6 +24,7 @@
   "service_request": "طلب خدمة",
   "service_name": "اسم الخدمة",
   "service_type": "نوع الخدمة",
+  "service_image": "صورة الخدمة",
   "add_region": "اضافة منطقة",
   "edit_region": "تعديل منطقة",
   "region_name_arabic": "اسم المنطقة (عربي)"  ,
@@ -104,5 +105,6 @@
   "units": "وحدات سكنية",
   "restaurants": "مطاعم",
   "month_stats": "احصائيات الشهر",
-  "year_stats": "احصائيات السنة"
+  "year_stats": "احصائيات السنة",
+  "actions":"الاجراءات"
 }

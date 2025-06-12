@@ -24,6 +24,7 @@
   "service_request": "Service Request",
   "service_name": "Service Name",
   "service_type": "Service Type",
+  "service_image": "Service Image",
   "add_region": "Add Region",
   "edit_region": "Edit Region",
   "region_name_arabic": "Region Name (Arabic)",
@@ -104,5 +105,6 @@
   "units": "Residenial units",
   "restaurants": "Restaurants",
   "month_stats": "Monthly statistics",
-  "year_stats": "Yearly statistics"
+  "year_stats": "Yearly statistics",
+  "actions": "Actions"
 }
