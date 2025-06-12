@@ -4,49 +4,41 @@ interface CheckBoxProps {
   checked: boolean;
   id: string;
   onChange: (checked: boolean) => void;
-  boxSize?: string;
-  checkStyle?: string;
-  checkBoxBg?: string;
-  checkBoxRoundedValue?: string;
-  border?: string;
-  peerChecked?: string;
+  inverted?: boolean;
 }
 export default function CheckBox({
-  text,
+  text = "",
   checked,
   id,
   onChange,
-  boxSize = "size-4",
-  checkStyle = "text-surface text-[10px] ",
-  checkBoxBg="bg-transparent",
-  checkBoxRoundedValue = "rounded-[4px]",
-  border = "border-2 border-foreground/65",
-  peerChecked = "peer-checked:border-surface",
+  inverted = false,
 }: CheckBoxProps) {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(e.target.checked);
-  };
   return (
     <>
       <label
         htmlFor={id}
-        className="text-foreground w-fit relative flex items-center gap-2 cursor-pointer"
+        className="text-foreground w-fit relative gap-2 cursor-pointer flex justify-center items-center "
       >
         <input
           type="checkbox"
-          onChange={handleChange}
+          onChange={(e) => onChange(e.target.checked)}
           checked={checked}
           id={id}
-          className="w-5 h-4 opacity-0 peer z-40 right-0 cursor-pointer absolute"
+          className="size-0 opacity-0 peer  absolute"
         />
         <div
-          className={`custom-checkbox ${boxSize} ${checkBoxBg}  flex justify-center items-center ${checkBoxRoundedValue} ${border} ${peerChecked}`}
-        >
-          {checked && (
-            <span className={`mdi mdi-check ${checkStyle}  leading-none`} />
-          )}
-        </div>
-        {text}
+          className={`custom-checkbox flex justify-center items-center transition-all duration-200 ${
+            inverted
+              ? " size-6 bg-foreground/10 peer-checked:bg-surface rounded-md "
+              : " peer-checked:border-surface border-2 border-foreground/65 rounded-[4px] bg-transparent size-4"
+          }`}
+        ></div>
+        <span
+          className={`mdi mdi-check ${
+            inverted ? "text-white" : "text-surface text-[10px]"
+          } leading-none opacity-0 peer-checked:opacity-100 transition-opacity absolute `}
+        />
+        {text && <span>{text}</span>}
       </label>
     </>
   );
