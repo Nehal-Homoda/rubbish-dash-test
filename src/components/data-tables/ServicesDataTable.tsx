@@ -297,7 +297,6 @@ export default function ServicesDataTable() {
           rows={3}
           value={data}
           selectionMode={rowClick ? null : "checkbox"}
-          selection={selectedProducts}
           onSelectionChange={(e) => setSelectedProducts(e.value)}
           dataKey="id"
           tableStyle={{ minWidth: "50rem", textAlign: "center" }}
