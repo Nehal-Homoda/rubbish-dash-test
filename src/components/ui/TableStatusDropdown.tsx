@@ -5,13 +5,13 @@ import React, { useEffect, useState } from "react";
 
 type Option = {
   label: string;
-  value: string;
+  value?: boolean;
   icon?: string;
   style?: string;
 };
 type Props = {
-  currentStatus: string;
-  onStatusChange: (newValue: string) => void;
+  currentStatus: boolean;
+  onStatusChange: (newValue: boolean) => void;
 };
 
 export default function TableStatusDropdown({ currentStatus, onStatusChange }: Props) {
@@ -20,19 +20,18 @@ export default function TableStatusDropdown({ currentStatus, onStatusChange }: P
   const statusOptions: Option[] = [
     {
       label: "مفعل",
-      value: "active",
+      value: true,
       style: "text-green-700 bg-green-100 rounded-md text-sm w-fit p-1",
       icon: "fa-solid fa-chevron-down",
     },
-    {
-      label: "معلق",
-      value: "pending",
-      style: "text-yellow-500 bg-yellow-100 rounded-md text-sm w-fit p-1",
-      icon: "fa-solid fa-chevron-down",
-    },
+    // {
+    //   label: "معلق",
+    //   style: "text-yellow-500 bg-yellow-100 rounded-md text-sm w-fit p-1",
+    //   icon: "fa-solid fa-chevron-down",
+    // },
     {
       label: "غير مفعل",
-      value: "not_active",
+      value: false,
       style: "text-red-500/80 bg-red-100/65 rounded-md text-sm w-fit p-1",
       icon: "fa-solid fa-chevron-down",
     },
@@ -57,6 +56,8 @@ export default function TableStatusDropdown({ currentStatus, onStatusChange }: P
     );
   };
 
+  const handleChange = (e) => {onStatusChange(e.value); setSelectedStatus(e.value)}
+
   useEffect(() => {
     const x = statusOptions.find((s) => s.value === currentStatus) ?? null;
     setSelectedStatus(x);
@@ -71,7 +72,7 @@ export default function TableStatusDropdown({ currentStatus, onStatusChange }: P
           input: "pe-0",
         }}
         value={selectedStatus}
-        onChange={(e) => {onStatusChange(e.value); setSelectedStatus(e.value)}}
+        onChange={(e) => handleChange(e)}
         options={statusOptions}
         optionLabel="label"
         placeholder="اختر الحالة"
