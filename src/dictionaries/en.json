@@ -25,6 +25,7 @@
   "service_name": "Service Name",
     "region_name": "Region Name",
   "service_type": "Service Type",
+  "service_image": "Service Image",
   "add_region": "Add Region",
   "edit_region": "Edit Region",
   "region_name_arabic": "Region Name (Arabic)",
@@ -109,6 +110,6 @@
   "month_stats": "Monthly statistics",
   "year_stats": "Yearly statistics",
   "regions_Empty_table_msg":"No regions found.",
-  "confirm": "Confirm"
-
+  "confirm": "Confirm",
+  "actions": "Actions"
 }

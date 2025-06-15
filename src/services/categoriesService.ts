@@ -1,13 +1,12 @@
 import { responseErrorServiceHandler } from "@/utils/shared";
 import { apiCall } from "./apiCall";
 import { ResponseData } from "@/types/shared";
-import { PackageOffer } from "@/types/packagesOffer.interface";
 import { Categories } from "@/types/categories.interface";
 
 
 
 
-export const getCategories = async (query?: string) => {
+export const getCategoriesService = async (query?: string) => {
     try {
         const response = await apiCall.get(`/admins/categories${query ?? ""}`, {
           headers: {

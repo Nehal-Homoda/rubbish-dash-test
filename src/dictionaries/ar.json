@@ -25,6 +25,7 @@
   "service_name": "اسم الخدمة",
   "region_name": "اسم المنطقة",
   "service_type": "نوع الخدمة",
+  "service_image": "صورة الخدمة",
   "add_region": "اضافة منطقة",
   "edit_region": "تعديل منطقة",
   "region_name_arabic": "اسم المنطقة (عربي)"  ,
@@ -109,5 +110,6 @@
   "month_stats": "احصائيات الشهر",
   "year_stats": "احصائيات السنة",
   "regions_Empty_table_msg": "لم يتم العثور على أي مناطق.",
-"confirm": "تأكيد"
+"confirm": "تأكيد",
+  "actions":"الاجراءات"
 }
