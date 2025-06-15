@@ -63,7 +63,7 @@ export default function BaseModal(props: Props) {
 
     return (
         <>
-        <div ref={parentRef} className="">
+        <div ref={parentRef} >
 
             <button onClick={() => setVisible(true)} className={props.style}>
                 {props.openBtnIcon ? (

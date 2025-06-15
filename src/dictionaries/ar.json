@@ -23,6 +23,7 @@
   "edit_service": "تعديل خدمة",
   "service_request": "طلب خدمة",
   "service_name": "اسم الخدمة",
+  "region_name": "اسم المنطقة",
   "service_type": "نوع الخدمة",
   "service_image": "صورة الخدمة",
   "add_region": "اضافة منطقة",
@@ -71,6 +72,7 @@
   "discount": "نسبة الخصم",
   "day": "اليوم",
   "time": "الوقت",
+  "enterTime": "ادخل الوقت",
   "status": "الحالة",
   "text": "النص",
   "rank": "ترتيب",
@@ -92,6 +94,7 @@
   "edit": "تعديل",
   "done": "تم",
   "delete": "حذف",
+  "deleteItem": "حذف عنصر",
   "cancel": "الغاء",
   "search": "بحث",
   "select": "اختر",
@@ -106,5 +109,7 @@
   "restaurants": "مطاعم",
   "month_stats": "احصائيات الشهر",
   "year_stats": "احصائيات السنة",
+  "regions_Empty_table_msg": "لم يتم العثور على أي مناطق.",
+"confirm": "تأكيد",
   "actions":"الاجراءات"
 }

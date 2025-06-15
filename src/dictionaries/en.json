@@ -23,6 +23,7 @@
   "edit_service": "Edit Service",
   "service_request": "Service Request",
   "service_name": "Service Name",
+    "region_name": "Region Name",
   "service_type": "Service Type",
   "service_image": "Service Image",
   "add_region": "Add Region",
@@ -71,6 +72,7 @@
   "discount": "Discount",
   "day": "Day",
   "time": "Time",
+  "enterTime": "Enter time",
   "status": "Status",
   "text": "Text",
   "rank": "Rank",
@@ -92,6 +94,7 @@
   "edit": "Edit",
   "done": "Done",
   "delete": "Delete",
+  "deleteItem": "Delete Item",
   "cancel": "Cancel",
   "search": "Search",
   "select": "Select",
@@ -106,5 +109,7 @@
   "restaurants": "Restaurants",
   "month_stats": "Monthly statistics",
   "year_stats": "Yearly statistics",
+  "regions_Empty_table_msg":"No regions found.",
+  "confirm": "Confirm",
   "actions": "Actions"
 }
