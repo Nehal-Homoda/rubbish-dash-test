@@ -1,6 +1,6 @@
 import React from "react";
 import UIThemeToggleBtn from "@/components/ui/UIThemeToggleBtn";
-import LangSwitcher from "../shared/LangSwitcher";
+// import LangSwitcher from "../shared/LangSwitcher";
 import { useLangAndDictionary } from "@/utils/lang";
 interface NavProps{
   isOpen:boolean;
@@ -16,7 +16,7 @@ export default  function DashNavbar(props:NavProps) {
           <div className="title font-bold text-lg">صباح الخير</div>
           <div className="flex justify-center items-center gap-4">
             <UIThemeToggleBtn lang={lang} />
-            <LangSwitcher dict={dict} />
+            {/* <LangSwitcher dict={dict} /> */}
             <button onClick={props.openSidebar} className="block md:hidden cursor-pointer">
               <span className="mdi mdi-menu text-2xl font-semibold text-foreground hover:text-surface transition-all"></span>
             </button>

@@ -1,7 +1,7 @@
 "use client";
 import DashSidebar from "@/components/layout/DashSidebar";
 import UICard from "@/components/ui/UIDashCard";
-import DashNavbar from "@/components/layout/DashNavbar";
+// import DashNavbar from "@/components/layout/DashNavbar";
 import { useState } from "react";
 import { useLangAndDictionary } from "@/utils/lang";
 
@@ -31,7 +31,7 @@ export default function RootLayout({ children }: Props) {
         </aside>
 
         <div className="md:ps-[293px] w-[97%] mx-auto">
-          <DashNavbar isOpen={isOpen} openSidebar={openSidebar} />
+          {/* <DashNavbar isOpen={isOpen} openSidebar={openSidebar} /> */}
           {children}
           {/* <UICard title={"الخريطة"}>example</UICard> */}
         </div>

@@ -10,11 +10,11 @@ export default function regions() {
   return (
     <>
       <div>
-        <UIDashCard shadow="shadow-xl">
+        {/* <UIDashCard shadow="shadow-xl">
 
           <RegionsDataTable lang={lang} dict={dict} />
 
-        </UIDashCard>
+        </UIDashCard> */}
       </div>
     </>
   );
