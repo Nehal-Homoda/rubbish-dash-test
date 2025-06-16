@@ -1,6 +1,24 @@
-@import "primeicons/primeicons.css";
+/* @import "primeicons/primeicons.css"; */
 
-@layer tailwind-base, primereact, tailwind-utilities;
+/* @layer tailwind-base, primereact, tailwind-utilities; */
+/* @import "tailwindcss"; */
+
+@plugin "flowbite/plugin";
+
+@source "../node_modules/flowbite";
+
+@theme {
+    --color-primary-50: #eff6ff;
+    --color-primary-100: #dbeafe;
+    --color-primary-200: #bfdbfe;
+    --color-primary-300: #93c5fd;
+    --color-primary-400: #60a5fa;
+    --color-primary-500: #3b82f6;
+    --color-primary-600: #2563eb;
+    --color-primary-700: #1d4ed8;
+    --color-primary-800: #1e40af;
+    --color-primary-900: #1e3a8a;
+}
 
 @layer tailwind-base {
   @tailwind base;
@@ -119,38 +137,3 @@ input[type="number"] {
   background: rgb(var(--color-surface));
   color: white;
 }
-.p-dropdown-label {
-  color: #009414;
-}
-.p-icon {
-  color: #009414;
-}
-
-.p-dropdown-item .p-highlight {
-  color: #009414;
-}
-.p-dropdown-item-label {
-  color: black;
-}
-
-html[dir="rtl"] .region-table .p-dropdown .p-dropdown-clear-icon {
-  right: 10px;
-  left: auto;
-  top: 55%;
-}
-
-html[dir="ltr"] .region-table .p-dropdown .p-dropdown-clear-icon {
-  left: 10px;
-  right: auto;
-  top: 55%;
-}
-/*
-.table-row {
-  @apply border-b-[1px] border-foreground/10 text-center ;
-}
-.table-headers {
-  @apply text-foreground/65 capitalize font-normal p-4;
-}
-.table-content {
-  @apply text-foreground font-normal  p-4;
-} */

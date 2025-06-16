@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "@fortawesome/fontawesome-free/css/all.min.css";
 import "@/style/globals.css";
 import StoreProvider from "../StoreProvider";
 import { ThemeModeScript } from "flowbite-react";
@@ -35,9 +34,8 @@ export default async function RootLayout({
   const { lang } = await params;
 
   return (
-    <html dir={lang == "ar" ? "rtl" : "ltr"} lang={lang}>
+    <html dir={lang == "ar" ? "rtl" : "ltr"} lang={lang} data-mode="light" suppressHydrationWarning>
       <head>
-        <ThemeModeScript />
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
@@ -54,7 +52,7 @@ export default async function RootLayout({
           id="primereact-theme"
           href="https://unpkg.com/primereact/resources/themes/lara-light-blue/theme.css"
         />
-        
+        <ThemeModeScript  />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <StoreProvider>{children}</StoreProvider>
