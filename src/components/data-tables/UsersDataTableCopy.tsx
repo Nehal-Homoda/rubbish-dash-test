@@ -86,7 +86,7 @@ export default function CustomFilterDemo() {
 
 
     const onPageChange = (event) => {
-        // event.page += 1
+    
         setFirst(event.first);
         setRows(event.rows);
         setPage(event.page+1)

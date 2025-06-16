@@ -10,9 +10,9 @@ export default function services() {
   return (
     <>
       <div>
-        <UIDashCard shadow="shadow-xl">
+        {/* <UIDashCard shadow="shadow-xl">
           <ServicesDataTable />
-        </UIDashCard>
+        </UIDashCard> */}
       </div>
     </>
   );

@@ -1,6 +1,6 @@
 
 "use client";
-import ChartDemo from "@/components/ui/UIChart";
+// import ChartDemo from "@/components/ui/UIChart";
 import UIDashCard from "@/components/ui/UIDashCard";
 import { useState } from "react";
 import { useLangAndDictionary } from "@/utils/lang";
@@ -22,7 +22,7 @@ export default function Home() {
       <div className="home-page">
 
         <div className="w-1/2">
-          <UIDashCard>
+          {/* <UIDashCard>
             <div className="flex items-center gap-4 mb-10">
               <button
                 onClick={() => {
@@ -64,7 +64,7 @@ export default function Home() {
               </button>
             </div>
             <ChartDemo labels={chartLabels} myData={chartData} />
-          </UIDashCard>
+          </UIDashCard> */}
         </div>
       </div>
     </>

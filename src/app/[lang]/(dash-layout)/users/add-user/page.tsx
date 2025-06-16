@@ -24,7 +24,7 @@ export default function page() {
 
                     <div>
 
-                        <TextFieldNada name='name' type='text' handleChange={takeValue} value={form.name} label='اسم المستخدم' placeholder='اسم المستخدم'></TextFieldNada>
+                        {/* <TextFieldNada name='name' type='text' handleChange={takeValue} value={form.name} label='اسم المستخدم' placeholder='اسم المستخدم'></TextFieldNada> */}
                     </div>
                 </div>
 

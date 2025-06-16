@@ -7,10 +7,10 @@ export default function users() {
   return (
     <>
       {" "}
-      <UIDashCard shadow="shadow-xl">
+      {/* <UIDashCard shadow="shadow-xl"> */}
         {/* <UsersDataTable /> */}
-        <UsersDataTableCopy />
-      </UIDashCard>
+        {/* <UsersDataTableCopy /> */}
+      {/* </UIDashCard> */}
     </>
   );
 }
