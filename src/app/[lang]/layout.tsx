@@ -52,10 +52,11 @@ export default async function RootLayout({
           id="primereact-theme"
           href="https://unpkg.com/primereact/resources/themes/lara-light-blue/theme.css"
         />
-        <ThemeModeScript  />
+        <ThemeModeScript />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <StoreProvider>{children}</StoreProvider>
+        <script src="../path/to/flowbite/dist/flowbite.min.js"></script>
       </body>
     </html>
   );
