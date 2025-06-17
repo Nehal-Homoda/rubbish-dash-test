@@ -1,15 +1,16 @@
-const flowbiteReact = require("flowbite-react/plugin/tailwindcss");
+// const flowbiteReact = require("flowbite-react/plugin/tailwindcss");
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-    darkMode: ['selector', '[data-mode="dark"]'],
+    darkMode: ["selector", '[data-mode="dark"]'],
     content: [
         "./app/**/*.{js,ts,jsx,tsx,mdx}",
         "./pages/**/*.{js,ts,jsx,tsx,mdx}",
         "./components/**/*.{js,ts,jsx,tsx,mdx}",
         // Or if using `src` directory:
         "./src/**/*.{js,ts,jsx,tsx,mdx}",
-        ".flowbite-react\\class-list.json",
+        "./node_modules/flowbite/**/*.js", //
+        // ".flowbite-react\\class-list.json",
     ],
     theme: {
         extend: {
@@ -54,5 +55,5 @@ module.exports = {
             },
         },
     },
-    plugins: [flowbiteReact],
+    plugins: [require("flowbite/plugin")],
 };
