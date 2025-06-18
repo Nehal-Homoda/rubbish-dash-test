@@ -2,7 +2,10 @@
 
 import React, { useEffect, useState } from "react";
 import CustomDataTable from "@/components/data-tables/customDataTable";
-import { subscriptionListService, userListService } from "@/services/sharedService";
+import {
+  subscriptionListService,
+  userListService,
+} from "@/services/sharedService";
 import DropDown from "@/components/shared/StateDropDown";
 import BaseDropDown from "@/components/shared/BaseDropDown";
 import { Avatar } from "flowbite-react";
@@ -35,44 +38,42 @@ export default function rubbush_collectors() {
     { id: 1, name: "حي اول طنطا" },
     { id: 2, name: "حي ثان طنطا" },
     { id: 3, name: "حي ثالث طنطا" },
-  ]
+  ];
   const statusList = [
-    { id: 1, name: 'مفعل' },
-    { id: 2, name: 'غير مفعل' },
-    { id: 3, name: 'معلق' },
-  ]
+    { id: 1, name: "مفعل" },
+    { id: 2, name: "غير مفعل" },
+    { id: 3, name: "معلق" },
+  ];
 
   const subscriptionList = [
-    { id: 1, name: 'باقة شهرية' },
-    { id: 2, name: 'مشترك/3شهور' },
-    { id: 3, name: 'غير مشترك' },
-    { id: 4, name: 'مشترك/6شهور' },
-  ]
-
-
+    { id: 1, name: "باقة شهرية" },
+    { id: 2, name: "مشترك/3شهور" },
+    { id: 3, name: "غير مشترك" },
+    { id: 4, name: "مشترك/6شهور" },
+  ];
 
   const [filteredArr, setFilteredArr] = useState<User[]>([]);
   const [checkBoxValue, setCheckBoxValue] = useState(false);
-  const [userIsActive, setUserIsActive] = useState(false)
+  const [userIsActive, setUserIsActive] = useState(false);
 
-  const takeValue = (e) => {
-    console.log("sjkdhfu");
-    console.log(e);
-    const x = users.filter((item) => {
-      return item.name.includes(e);
-    });
+  // const takeValue = (e) => {
+  //   console.log("sjkdhfu");
+  //   console.log(e);
+  //   const x = users.filter((item) => {
+  //     return item.name.includes(e);
+  //   });
 
-    setFilteredArr([...x]);
-    // setFilteredArr(x)
+  //   setFilteredArr([...x]);
+  //   // setFilteredArr(x)
 
-    console.log(filteredArr);
-  };
+  //   console.log(filteredArr);
+  // };
 
   const fetchUserList = () => {
     userListService(1).then((response) => {
       console.log(response);
       setUsers(response.data);
-      setFilteredArr(response.data);
+      // setFilteredArr(response.data);
     });
   };
   // const fetchSubscriptionList = () => {
@@ -88,65 +89,53 @@ export default function rubbush_collectors() {
     setCheckBoxValue(e.target.checked);
   };
 
-  const sortList = (headItem, type: string) => {
-    const itemKey = headItem.name;
-    // const itemValue = users.map((item) => {
-    //   return item[itemKey];
-    // });
-    // console.log(itemValue);
-    // const sortedUser = itemValue.sort((a, b) => a - b);
-    // console.log(sortedUser);
+  // const sortList = (headItem, type: string) => {
+  //   const itemKey = headItem.name;
+  //   // const itemValue = users.map((item) => {
+  //   //   return item[itemKey];
+  //   // });
+  //   // console.log(itemValue);
+  //   // const sortedUser = itemValue.sort((a, b) => a - b);
+  //   // console.log(sortedUser);
 
-    const sortedUser = [...filteredArr || []].sort((a, b) => {
-      const valA = a[itemKey];
-      const valB = b[itemKey];
-      
-      if (type == 'asc') {
-        return valA - valB;
+  //   const sortedUser = [...(filteredArr || [])].sort((a, b) => {
+  //     const valA = a[itemKey];
+  //     const valB = b[itemKey];
 
-      }
-      if (type == 'desc') {
-        return valB - valA;
-
-      }
-
-    });
-    console.log(sortedUser)
-    setFilteredArr(sortedUser)
-  };
-
+  //     if (type == "asc") {
+  //       return valA - valB;
+  //     }
+  //     if (type == "desc") {
+  //       return valB - valA;
+  //     }
+  //   });
+  //   console.log(sortedUser);
+  //   setFilteredArr(sortedUser);
+  // };
 
   const updateUserActive = (selectedItem, itemIndex) => {
-
-    console.log('item', selectedItem)
-    console.log('index', itemIndex)
-    handleActivation(selectedItem.text, itemIndex)
-
-
-
-
-  }
+    console.log("item", selectedItem);
+    console.log("index", itemIndex);
+    handleActivation(selectedItem.text, itemIndex);
+  };
 
   const handleActivation = (state: string, itemIndex: number) => {
     const arr = users.map((item, index) => {
       if (index == itemIndex) {
-        if (state == 'غير مفعل') {
-          return { ...item, ['is_active']: false }
-
+        if (state == "غير مفعل") {
+          return { ...item, ["is_active"]: false };
         }
         // if(state=='مفعل'){
         //   return { ...item, ['is_active']:true }
 
         // }
-        return { ...item, ['is_active']: true }
-
-
+        return { ...item, ["is_active"]: true };
       }
 
-      return item
-    })
-    setUsers(arr)
-  }
+      return item;
+    });
+    setUsers(arr);
+  };
 
   // const filterUser = (selectedItem, selectedIndex) => {
   //   console.log('selected', selectedItem)
@@ -159,8 +148,6 @@ export default function rubbush_collectors() {
   //     }
   //     return item
   //   })
-
-
 
   // }
 
@@ -175,51 +162,44 @@ export default function rubbush_collectors() {
   return (
     <>
       <div className="py-20">
-
-
         <CustomDataTable
-          handleSort={sortList}
+          
           handleAllCheck={takeCheckValue}
           sendValueToParent={(value) => takeValue(value)}
           tableHead={headerArr}
-          tRow={
+          listItem={users}
+          tData={(item, index) => (
             <>
-              {filteredArr &&
-                filteredArr.map((item, index) => (
-                  <tr
-                    key={index}
-                    className=" bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-100 hover:bg-gray-50 dark:hover:bg-gray-600 "
-                  >
-                    <td className="py-2 px-4">{item.id}</td>
-                    <td className="py-2 px-4">{item.name}</td>
-                    <td className="py-2 px-4">{item.phone}</td>
-                    <td className="py-2 px-4">{item.subscription_name}</td>
-                    <td className="py-2 px-4">
-                        <Avatar color="success"  placeholderInitials={item.name.slice(0, 2)} rounded />
-                      {/* <div className=" w-7 h-7 rounded-full overflow-hidden">
+              <td className="py-2 px-4">{item.id}</td>
+              <td className="py-2 px-4">{item.name}</td>
+              <td className="py-2 px-4">{item.phone}</td>
+              <td className="py-2 px-4">{item.subscription_name}</td>
+              <td className="py-2 px-4">
+                <Avatar
+                  color="success"
+                  placeholderInitials={item.name.slice(0, 2)}
+                  rounded
+                />
+                {/* <div className=" w-7 h-7 rounded-full overflow-hidden">
                         <img
                           className="w-full h-full object-contain"
                           src={item.image}
                           alt=""
                         />
                       </div> */}
-                    </td>
-                    <td className="py-2 px-4">
-                      <DropDown
-                        handleIsActive={(item) => updateUserActive(item, index)}
-                        btnName={item.is_active ? "مفعل" : "غير مفعل"}
-                        isActive={item.is_active}
-                      />
-                    </td>
-                    <td className="">{item.renewal_date}</td>
-                    <td className="">{item.renewal_date}</td>
-                  </tr>
-                ))}
+              </td>
+              <td className="py-2 px-4">
+                <DropDown
+                  handleIsActive={(item) => updateUserActive(item, index)}
+                  btnName={item.is_active ? "مفعل" : "غير مفعل"}
+                  isActive={item.is_active}
+                />
+              </td>
+              <td className="">{item.renewal_date}</td>
+              <td className="">{item.renewal_date}</td>
             </>
-          }
+          )}
         >
-
-
           {/* <div className='bg-[#0094140D]  text-center rounded-xl text-[#009414]'>
             <Dropdown value={location} onChange={(e) => handleFilterChange(e, 'area')} options={areas} optionLabel="name"
               placeholder="المنطقة" className="w-full md:w-14rem border-0 bg-transparent font-bold " />
@@ -230,21 +210,24 @@ export default function rubbush_collectors() {
           </div>
  */}
 
-
-
-
-          <div className='bg-[#0094140D]  text-center rounded-xl '>
+          <div className="bg-[#0094140D]  text-center rounded-xl ">
             {/* <Dropdown value={status} onChange={(e) => handleFilterChange(e, 'status')} options={statusList} optionLabel="name"
               placeholder="الحالة" className="w-full md:w-14rem border-0 bg-transparent font-bold " /> */}
-            <BaseDropDown handleFilterList={(item, index) => filterUser(item, index)} btnName="الحالة" listItem={statusList}></BaseDropDown>
-
+            <BaseDropDown
+              handleFilterList={(item, index) => filterUser(item, index)}
+              btnName="الحالة"
+              listItem={statusList}
+            ></BaseDropDown>
           </div>
 
-
-          <div className='bg-[#0094140D]  text-center rounded-xl '>
+          <div className="bg-[#0094140D]  text-center rounded-xl ">
             {/* <Dropdown value={subscribe} onChange={(e) => handleFilterChange(e, 'subscription')} options={subscriptionList} optionLabel="name"
               placeholder="الاشتراك" className="w-full md:w-14rem border-0 bg-transparent font-bold " /> */}
-            <BaseDropDown handleFilterList={(item, index) => filterUser(item, index)} btnName="الاشتراك" listItem={subscriptionList}></BaseDropDown>
+            <BaseDropDown
+              handleFilterList={(item, index) => filterUser(item, index)}
+              btnName="الاشتراك"
+              listItem={subscriptionList}
+            ></BaseDropDown>
           </div>
 
           <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
