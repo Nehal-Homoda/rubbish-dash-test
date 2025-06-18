@@ -88,38 +88,32 @@ export default function rubbush_collectors() {
 
     console.log('item', selectedItem)
     console.log('index', itemIndex)
-    if (selectedItem.text == 'غير مفعل' && filteredArr) {
+    handleActivation(selectedItem.text, itemIndex)
 
 
-      // setFilteredArr(prev=>
 
 
- 
-     const arr= users.map((item, index) => {
+  }
 
+  const handleActivation = (state: string, itemIndex: number) => {
+    const arr = users.map((item, index) => {
+      if (index == itemIndex) {
+        if (state == 'غير مفعل') {
+          return { ...item, ['is_active']: false }
 
-        if (index == itemIndex) {
-          
-          return {...item,['is_active']: false}
         }
+        // if(state=='مفعل'){
+        //   return { ...item, ['is_active']:true }
 
-        return item
-      })
-      setUsers(arr)
-
-      // setUsers(prevUsers =>
-      //   prevUsers.map((user, index) =>
-      //     index === itemIndex ? { ...user, is_active: false } : user
-      //   )
-      // );
+        // }
+        return { ...item, ['is_active']: true }
 
 
+      }
 
-
-    }
-
-
-
+      return item
+    })
+    setUsers(arr)
   }
 
   // const itemKey = headItem.name;
