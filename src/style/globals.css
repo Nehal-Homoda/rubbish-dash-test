@@ -2,10 +2,10 @@
 
 /* @layer tailwind-base, primereact, tailwind-utilities; */
 /* @import "tailwindcss"; */
-@import 'flowbite';
+/* @import 'flowbite';
 @plugin "flowbite/plugin";
 
-@source "../node_modules/flowbite";
+@source "../node_modules/flowbite"; */
 
 @theme {
     --color-primary-50: #eff6ff;

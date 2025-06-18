@@ -2,7 +2,7 @@
 
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import 'flowbite';
+// import 'flowbite';
 import "@/style/globals.css";
 import StoreProvider from "../StoreProvider";
 // import { ThemeModeScript } from "flowbite-react";
@@ -63,7 +63,7 @@ export default async function RootLayout({
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <StoreProvider>{children}</StoreProvider>
-        <script src="../path/to/flowbite/dist/flowbite.min.js"></script>
+        
         
         {/* <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script> */}
 

@@ -1,93 +1,122 @@
+"use client";
+import React, { useState } from "react";
 
+interface HeaderItem{
+  text:string,
+  name:string
+}
 
-'use client'
-import React, { useState } from 'react'
 
 type Props = {
-  tableHead: string[],
-  children: React.ReactNode,
-  tRow: React.ReactNode,
-  sendValueToParent: (value: string) => void
+  tableHead: HeaderItem[];
+  children: React.ReactNode;
+  tRow: React.ReactNode;
+  sendValueToParent: (value: string) => void;
+  handleAllCheck: (e) => void;
+  handleSort: (item) => void;
+};
 
-}
-export default function
-  ({ tableHead, children, tRow, sendValueToParent }: Props) {
-  const [searchInput, setSearchInput] = useState('')
+
+export default function ({
+  tableHead,
+  children,
+  tRow,
+  sendValueToParent,
+  handleAllCheck,
+  handleSort,
+}: Props) {
+  const [searchInput, setSearchInput] = useState("");
   const handleChangeValue = (e) => {
-    setSearchInput(e.target.value)
-      sendValueToParent(e.target.value)
+    setSearchInput(e.target.value);
+    sendValueToParent(e.target.value);
+  };
 
-
-  }
   return (
     <>
-      <div className='container py-20'>
+      <div className="container py-20">
         <div className="relative px-5 py-5 overflow-x-auto shadow-md sm:rounded-lg ">
-
-          <div className='flex justify-between mb-10 '>
-
+          <div className="flex justify-between mb-10 ">
             <div>
               <form className=" ">
                 <div className="relative lg:min-w-96">
                   <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                    <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                      <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                    <svg
+                      className="w-4 h-4 text-gray-500 dark:text-gray-400"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                      />
                     </svg>
                   </div>
-                  <input value={searchInput} onChange={(e) => handleChangeValue(e)} type="search" id="default-search" className="focus:outline-none  block w-full p-4 ps-10 text-sm text-gray-900  rounded-lg bg-[#ADAAAA11]  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white " placeholder="بحث" required />
+                  <input
+                    value={searchInput}
+                    onChange={(e) => handleChangeValue(e)}
+                    type="search"
+                    id="default-search"
+                    className="focus:outline-none  block w-full p-4 ps-10 text-sm text-gray-900  rounded-lg bg-[#ADAAAA11]  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white "
+                    placeholder="بحث"
+                    required
+                  />
                 </div>
-
               </form>
             </div>
 
-
-            <div className='flex justify-center items-center gap-2'>
-              <div className='bg-[#0094140D] cursor-pointer   py-2 text-center rounded-xl px-5 flex items-center justify-content-center '>
-                <i className='mdi mdi-tray-arrow-down text-[#009414] text-xl'></i>
+            <div className="flex justify-center items-center gap-2">
+              <div className="bg-[#0094140D] cursor-pointer   py-2 text-center rounded-xl px-5 flex items-center justify-content-center ">
+                <i className="mdi mdi-tray-arrow-down text-[#009414] text-xl"></i>
               </div>
-
-
 
               {children}
             </div>
-
-
           </div>
 
-
-
-
-
-
-          <table id="default-table" className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+          <table
+            id="default-table"
+            className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400"
+          >
             <thead className="  text-[#38433B8F] uppercase  dark:bg-gray-700 dark:text-gray-400">
-
-              <tr className='bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-100 hover:bg-gray-50 dark:hover:bg-gray-600 '>
+              <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-100 hover:bg-gray-50 dark:hover:bg-gray-600 ">
                 <th className="w-4 p-8">
-                  <div className='flex items-center'>
-                    <input id="checkbox-all-search" type="checkbox" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-100 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-                    <label htmlFor="checkbox-all-search" className="sr-only">checkbox</label>
-
+                  <div className="flex items-center">
+                    <input
+                      onChange={handleAllCheck}
+                      id="checkbox-all-search"
+                      type="checkbox"
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-100 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                    />
+                    <label htmlFor="checkbox-all-search" className="sr-only">
+                      checkbox
+                    </label>
                   </div>
                 </th>
 
-                {tableHead && tableHead.map((item, index) => (
-
-                  <th key={index} scope="col" className="px-6 py-3">
-                    {item}
-                  </th>
-
-                ))}
-
-
+                {tableHead &&
+                  tableHead.map((item, index) => (
+                    <th key={index} scope="col" className="px-6 py-3">
+                      <div className="flex">
+                        <div className="flex flex-col  space-y-0 justify-center items-center leading-none ">
+                          <span
+                            onClick={()=>handleSort(item)}
+                            className="mdi mdi-menu-up m-0 p-0 "
+                          ></span>
+                          <span className="mdi mdi-menu-down m-0 p-0  "></span>
+                        </div>
+                        {item.text}
+                      </div>
+                    </th>
+                  ))}
               </tr>
             </thead>
             <tbody>
-
-
               {/* <tr className="  bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600"> */}
-
-
 
               {/* <td className="w-4 p-4">
                   <div className='flex items-center'>
@@ -98,18 +127,11 @@ export default function
 
               {tRow}
 
-
-
               {/* </tr> */}
-
             </tbody>
           </table>
-
         </div>
       </div>
-
     </>
-  )
+  );
 }
-
-

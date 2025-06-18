@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect } from 'react'
-import 'flowbite';
+// import 'flowbite';
 
 // import { Dropdown, DropdownItem } from "flowbite-react";
 
@@ -18,14 +18,14 @@ export default function
 
     useEffect(() => {
         // Dynamically import and initialize dropdown from Flowbite
-        import('flowbite').then(({ Dropdown }) => {
-            const targetEl = document.getElementById('dropdownId');
-            const triggerEl = document.getElementById('dropdownDefaultButton');
+        // import('flowbite').then(({ Dropdown }) => {
+        //     const targetEl = document.getElementById('dropdownId');
+        //     const triggerEl = document.getElementById('dropdownDefaultButton');
 
-            if (triggerEl && targetEl) {
-                new Dropdown(targetEl, triggerEl); // ✅ manually initialize it
-            }
-        });
+        //     if (triggerEl && targetEl) {
+        //         new Dropdown(targetEl, triggerEl); // ✅ manually initialize it
+        //     }
+        // });
     }, []);
 
     return (

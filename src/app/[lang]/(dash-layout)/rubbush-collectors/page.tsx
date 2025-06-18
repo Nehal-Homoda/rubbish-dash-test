@@ -1,10 +1,9 @@
+"use client";
 
-'use client'
-
-import React, { useEffect, useState } from 'react'
-import CustomDataTable from '@/components/data-tables/customDataTable'
-import { userListService } from '@/services/sharedService';
-import DropDown from '@/components/shared/DropDown';
+import React, { useEffect, useState } from "react";
+import CustomDataTable from "@/components/data-tables/customDataTable";
+import { userListService } from "@/services/sharedService";
+import DropDown from "@/components/shared/DropDown";
 
 export default function rubbush_collectors() {
   interface User {
@@ -15,124 +14,147 @@ export default function rubbush_collectors() {
     image: string;
     subscription_name: string;
     is_active: boolean;
-    renewal_date: string
+    renewal_date: string;
   }
-  const [users, setUsers] = useState<User[]>([])
+  const [users, setUsers] = useState<User[]>([]);
   const headerArr = [
-    'ID',
-    'اسم المستخدم',
-    'رقم الموبيل',
-    'الاشتراك',
-    'الصورة الشخصية',
-    'الحالة',
-    'ميعاد التجديد',
-    'الاجراءات'
-  ]
- const statusList=[
-  {is_active:true,text:'مفعل'},
-  {is_active:false,text:'غير مفعل'},
- ]
+    { text: "ID", name: "id" },
+    { text: "اسم المستخدم", name: "name" },
+    { text: "رقم الموبيل", name: "phone" },
+    { text: "الاشتراك", name: "subscription_name" },
+    { text: "الصورة الشخصية", name: "image" },
+    { text: "الحالة", name: "is_active" },
+    { text: "ميعاد التجديد", name: "renewal_date" },
+    { text: "الاجراءات", name: "" },
+  ];
+  const statusList = [
+    { is_active: true, text: "مفعل" },
+    { is_active: false, text: "غير مفعل" },
+  ];
 
-  const [filteredArr, setFilteredArr] = useState<User[]>()
+  const [filteredArr, setFilteredArr] = useState<User[]>();
+  const [checkBoxValue, setCheckBoxValue] = useState(false);
 
   const takeValue = (e) => {
-    console.log('sjkdhfu')
-    console.log(e)
+    console.log("sjkdhfu");
+    console.log(e);
     const x = users.filter((item) => {
-      return item.name.includes(e)
-    })
+      return item.name.includes(e);
+    });
 
-    setFilteredArr([...x])
+    setFilteredArr([...x]);
     // setFilteredArr(x)
 
-    console.log(filteredArr)
-
-
-  }
+    console.log(filteredArr);
+  };
 
   const fetchUserList = () => {
     userListService(1).then((response) => {
-      console.log(response)
-      setUsers(response.data)
-      setFilteredArr(response.data)
-    })
-  }
-  // useEffect(() => {
+      console.log(response);
+      setUsers(response.data);
+      setFilteredArr(response.data);
+    });
+  };
+  const takeCheckValue = (e) => {
+    console.log("input checked", e.target.checked);
+    setCheckBoxValue(e.target.checked);
+  };
 
-  //   setFilteredArr(users)
-  // }, [users])
+  const sortList = (headItem) => {
+    const itemKey = headItem.name;
+    // const itemValue = users.map((item) => {
+    //   return item[itemKey];
+    // });
+    // console.log(itemValue);
+    // const sortedUser = itemValue.sort((a, b) => a - b);
+    // console.log(sortedUser);
+
+  const sortedUser=  [...filteredArr|| []].sort((a, b) => {
+      const valA = a[itemKey];
+      const valB = b[itemKey];
+
+      return valA - valB;
+    });
+    console.log(sortedUser)
+    setFilteredArr(sortedUser)
+  };
+
+  // const itemKey = headItem.name;
+  //   users[itemKey].sort((a, b) => a - b);
+  //   console.log(itemKey);
+  // };
 
   useEffect(() => {
-    fetchUserList()
-  }, [])
+    setFilteredArr(users);
+  }, [users]);
+
+  useEffect(() => {
+    fetchUserList();
+  }, []);
   return (
-    <>  <div>rubbush_collectors
-
-
-      <CustomDataTable sendValueToParent={(value) => takeValue(value)} tableHead={headerArr} tRow={
-
-        <>
-
-          {filteredArr && filteredArr.map((item, index) => (
-         
-              <tr key={index} className=" bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-100 hover:bg-gray-50 dark:hover:bg-gray-600">
-
-                <td className="w-4 p-8">
-                  <div className='flex items-center'>
-                    <input id="checkbox-table-search-1" type="checkbox" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-                    <label htmlFor="checkbox-table-search-1" className="sr-only">checkbox</label>
-                  </div>
-                </td>
-                <td className='px-6 py-4'>
-                  {item.id}
-                </td>
-                <td className='px-6 py-4'>
-                  {item.name}
-                </td>
-                <td className=''>
-                  {item.phone}
-
-                </td>
-                <td className='px-6 py-4'>
-                  {item.subscription_name}
-                </td>
-                <td className='px-16 py-4'>
-                  <div className=' w-7 h-7 rounded-full overflow-hidden'>
-                    <img className="w-full h-full object-contain" src={item.image} alt="" />
-
-                  </div>
-
-                </td>
-                <td className=''>
-                  <DropDown btnName={item.is_active ? 'مفعل' : 'غير مفعل'} listItem={statusList} />
-                </td>
-                <td className=''>
-                  {item.renewal_date}
-                </td>
-
-
-
-              </tr>
-
-
-
-
-
-          ))}
-        </>
-      }
-      >
-
-
-        <div className='bg-[#009414] py-2 rounded-xl text-center  text-white px-3'>
-          <button className='w-full h-full'>اضافة مستخدم</button>
-        </div>
-
-
-
-      </CustomDataTable>
-
-
-    </div ></>
-  )
+    <>
+      {" "}
+      <div>
+        rubbush_collectors
+        <CustomDataTable
+          handleSort={sortList}
+          handleAllCheck={takeCheckValue}
+          sendValueToParent={(value) => takeValue(value)}
+          tableHead={headerArr}
+          tRow={
+            <>
+              {filteredArr &&
+                filteredArr.map((item, index) => (
+                  <tr
+                    key={index}
+                    className=" bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-100 hover:bg-gray-50 dark:hover:bg-gray-600"
+                  >
+                    <td className="w-4 p-8">
+                      <div className="flex items-center">
+                        <input
+                          checked={checkBoxValue}
+                          id="checkbox-table-search-1"
+                          type="checkbox"
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        />
+                        <label
+                          htmlFor="checkbox-table-search-1"
+                          className="sr-only"
+                        >
+                          checkbox
+                        </label>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">{item.id}</td>
+                    <td className="px-6 py-4">{item.name}</td>
+                    <td className="">{item.phone}</td>
+                    <td className="px-6 py-4">{item.subscription_name}</td>
+                    <td className="px-16 py-4">
+                      <div className=" w-7 h-7 rounded-full overflow-hidden">
+                        <img
+                          className="w-full h-full object-contain"
+                          src={item.image}
+                          alt=""
+                        />
+                      </div>
+                    </td>
+                    <td className="">
+                      <DropDown
+                        btnName={item.is_active ? "مفعل" : "غير مفعل"}
+                        listItem={statusList}
+                      />
+                    </td>
+                    <td className="">{item.renewal_date}</td>
+                  </tr>
+                ))}
+            </>
+          }
+        >
+          <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
+            <button className="w-full h-full">اضافة مستخدم</button>
+          </div>
+        </CustomDataTable>
+      </div>
+    </>
+  );
 }

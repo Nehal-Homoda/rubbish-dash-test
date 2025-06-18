@@ -9,8 +9,8 @@ module.exports = {
         "./components/**/*.{js,ts,jsx,tsx,mdx}",
         // Or if using `src` directory:
         "./src/**/*.{js,ts,jsx,tsx,mdx}",
-        "./node_modules/flowbite/**/*.js", //
-        // ".flowbite-react\\class-list.json",
+        // "./node_modules/flowbite/**/*.js", 
+    
     ],
     theme: {
         extend: {
@@ -55,5 +55,5 @@ module.exports = {
             },
         },
     },
-    plugins: [require("flowbite/plugin")],
+    plugins: [],
 };
