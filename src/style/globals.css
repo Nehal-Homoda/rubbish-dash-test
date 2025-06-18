@@ -1,8 +1,7 @@
-/* @import "primeicons/primeicons.css";  */
-/* @import "tailwindcss"; */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap');
+/* font-family: "Cairo", sans-serif; */
 
-@layer tailwind-base, primereact, tailwind-utilities;
-/* @plugin "flowbite-react/plugin/tailwindcss"; */
+
 @source "../../.flowbite-react/class-list.json";
 
 
@@ -99,6 +98,10 @@
   .btn-secondary {
     @apply h-11 px-4 rounded-xl bg-surface-light-800/50 text-surface;
   }
+}
+*{
+
+  font-family: "Cairo", sans-serif !important;
 }
 html {
   font-family: "Cairo", sans-serif;
