@@ -1,5 +1,6 @@
 'use client'
 
+import { Dropdown, DropdownItem } from 'flowbite-react';
 import React, { useEffect } from 'react'
 // import 'flowbite';
 
@@ -8,14 +9,19 @@ import React, { useEffect } from 'react'
 
 type Props = {
     btnName: String,
-    listItem: Array<any>
+    isActive: Boolean,
+    handleIsActive: (item) => void
+
 }
 
 
 export default function
 
-    ({ btnName, listItem }: Props) {
-
+    ({ btnName, isActive, handleIsActive }: Props) {
+    const statusList = [
+        { is_active: false, text: "مفعل" },
+        { is_active: false, text: "غير مفعل" },
+    ];
     useEffect(() => {
         // Dynamically import and initialize dropdown from Flowbite
         // import('flowbite').then(({ Dropdown }) => {
@@ -38,7 +44,7 @@ export default function
       <DropdownItem>Sign out</DropdownItem>
     </Dropdown> */}
 
-            <button data-dropdown-toggle="dropdownId" id="dropdownDefaultButton" className="focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center" type="button"> {btnName} <svg className="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+            {/* <button data-dropdown-toggle="dropdownId" id="dropdownDefaultButton" className="focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center" type="button"> {btnName} <svg className="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4" />
             </svg>
             </button>
@@ -50,7 +56,13 @@ export default function
                     </li>))}
 
                 </ul>
-            </div>
+            </div> */}
+
+
+            <Dropdown className={` ${isActive ? 'bg-green-600' : 'bg-red-500'}`} label={btnName} dismissOnClick={false}>
+               {statusList.map((item)=>(<DropdownItem onClick={()=>handleIsActive(item)}>{item.text}</DropdownItem>)) }
+
+            </Dropdown>
 
 
         </div>

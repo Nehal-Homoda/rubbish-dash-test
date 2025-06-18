@@ -1,4 +1,5 @@
-// const flowbiteReact = require("flowbite-react/plugin/tailwindcss");
+const flowbiteReact = require("flowbite-react/plugin/tailwindcss");
+// const flowbite = require("flowbite/plugin");
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -9,8 +10,8 @@ module.exports = {
         "./components/**/*.{js,ts,jsx,tsx,mdx}",
         // Or if using `src` directory:
         "./src/**/*.{js,ts,jsx,tsx,mdx}",
-        // "./node_modules/flowbite/**/*.js", 
-    
+        "./node_modules/flowbite/**/*.js",
+        "./node_modules/flowbite-react/**/*.js", 
     ],
     theme: {
         extend: {
@@ -55,5 +56,5 @@ module.exports = {
             },
         },
     },
-    plugins: [],
+    plugins: [ flowbiteReact,],
 };

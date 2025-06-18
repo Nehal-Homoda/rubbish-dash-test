@@ -1,9 +1,10 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import arrowImage from '@/assets/images/icons/arrow-left.png'
 
-interface HeaderItem{
-  text:string,
-  name:string
+interface HeaderItem {
+  text: string,
+  name: string
 }
 
 
@@ -13,7 +14,7 @@ type Props = {
   tRow: React.ReactNode;
   sendValueToParent: (value: string) => void;
   handleAllCheck: (e) => void;
-  handleSort: (item) => void;
+  handleSort: (item, type: String) => void;
 };
 
 
@@ -26,10 +27,13 @@ export default function ({
   handleSort,
 }: Props) {
   const [searchInput, setSearchInput] = useState("");
+  const [isUpActive, setIsUpActive] = useState(false)
+  const [isDownActive, setIsDownActive] = useState(false)
   const handleChangeValue = (e) => {
     setSearchInput(e.target.value);
     sendValueToParent(e.target.value);
   };
+
 
   return (
     <>
@@ -103,11 +107,23 @@ export default function ({
                     <th key={index} scope="col" className="px-6 py-3">
                       <div className="flex">
                         <div className="flex flex-col  space-y-0 justify-center items-center leading-none ">
-                          <span
-                            onClick={()=>handleSort(item)}
-                            className="mdi mdi-menu-up m-0 p-0 "
-                          ></span>
-                          <span className="mdi mdi-menu-down m-0 p-0  "></span>
+
+                          {/* <span
+                            onClick={() => handleSort(item, 'asc')}
+                            className="mdi mdi-menu-up m-0 p-0  "
+                          ></span> */}
+                          {/* <span onClick={() => handleSort(item, 'desc')} className="mdi mdi-menu-down m-0 p-0  "></span> */}
+
+
+                          <div onClick={() => [handleSort(item, 'asc'), setIsUpActive(true),setIsDownActive(false)]} className={`arrow-img-wrap w-3 h-3  ${!isUpActive ? 'opacity-45' : 'opacity-80'}`}>
+                            <img className="arrow-img w-full h-full object-contain rotate-180" src={arrowImage.src} alt="" />
+                          </div>
+
+                          <div onClick={() => [handleSort(item, 'desc'), setIsDownActive(true),setIsUpActive(false)]} className={`arrow-img-wrap w-3 h-3  ${!isDownActive ? 'opacity-45' : 'opacity-80'}`}>
+                            <img className="arrow-img w-full h-full object-contain" src={arrowImage.src} alt="" />
+                          </div>
+
+
                         </div>
                         {item.text}
                       </div>

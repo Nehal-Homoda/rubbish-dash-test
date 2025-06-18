@@ -27,13 +27,10 @@ export default function rubbush_collectors() {
     { text: "ميعاد التجديد", name: "renewal_date" },
     { text: "الاجراءات", name: "" },
   ];
-  const statusList = [
-    { is_active: true, text: "مفعل" },
-    { is_active: false, text: "غير مفعل" },
-  ];
 
-  const [filteredArr, setFilteredArr] = useState<User[]>();
+  const [filteredArr, setFilteredArr] = useState<User[]>([]);
   const [checkBoxValue, setCheckBoxValue] = useState(false);
+  const [userIsActive, setUserIsActive] = useState(false)
 
   const takeValue = (e) => {
     console.log("sjkdhfu");
@@ -60,7 +57,7 @@ export default function rubbush_collectors() {
     setCheckBoxValue(e.target.checked);
   };
 
-  const sortList = (headItem) => {
+  const sortList = (headItem, type: string) => {
     const itemKey = headItem.name;
     // const itemValue = users.map((item) => {
     //   return item[itemKey];
@@ -69,15 +66,61 @@ export default function rubbush_collectors() {
     // const sortedUser = itemValue.sort((a, b) => a - b);
     // console.log(sortedUser);
 
-  const sortedUser=  [...filteredArr|| []].sort((a, b) => {
+    const sortedUser = [...filteredArr || []].sort((a, b) => {
       const valA = a[itemKey];
       const valB = b[itemKey];
+      if (type == 'asc') {
+        return valA - valB;
 
-      return valA - valB;
+      }
+      if (type == 'desc') {
+        return valB - valA;
+
+      }
+
     });
     console.log(sortedUser)
     setFilteredArr(sortedUser)
   };
+
+
+  const updateUserActive = (selectedItem, itemIndex) => {
+
+    console.log('item', selectedItem)
+    console.log('index', itemIndex)
+    if (selectedItem.text == 'غير مفعل' && filteredArr) {
+
+
+      // setFilteredArr(prev=>
+
+
+ 
+     const arr= users.map((item, index) => {
+
+
+        if (index == itemIndex) {
+          
+          return {...item,['is_active']: false}
+        }
+
+        return item
+      })
+      setUsers(arr)
+
+      // setUsers(prevUsers =>
+      //   prevUsers.map((user, index) =>
+      //     index === itemIndex ? { ...user, is_active: false } : user
+      //   )
+      // );
+
+
+
+
+    }
+
+
+
+  }
 
   // const itemKey = headItem.name;
   //   users[itemKey].sort((a, b) => a - b);
@@ -140,8 +183,9 @@ export default function rubbush_collectors() {
                     </td>
                     <td className="">
                       <DropDown
+                        handleIsActive={(item) => updateUserActive(item, index)}
                         btnName={item.is_active ? "مفعل" : "غير مفعل"}
-                        listItem={statusList}
+                        isActive={item.is_active}
                       />
                     </td>
                     <td className="">{item.renewal_date}</td>
@@ -150,6 +194,27 @@ export default function rubbush_collectors() {
             </>
           }
         >
+
+          <div className='bg-[#0094140D]  text-center rounded-xl text-[#009414]'>
+            {/* <Dropdown value={location} onChange={(e) => handleFilterChange(e, 'area')} options={areas} optionLabel="name"
+              placeholder="المنطقة" className="w-full md:w-14rem border-0 bg-transparent font-bold " /> */}
+          </div>
+
+
+
+
+
+          <div className='bg-[#0094140D]  text-center rounded-xl '>
+            {/* <Dropdown value={status} onChange={(e) => handleFilterChange(e, 'status')} options={statusList} optionLabel="name"
+              placeholder="الحالة" className="w-full md:w-14rem border-0 bg-transparent font-bold " /> */}
+          </div>
+
+
+          <div className='bg-[#0094140D]  text-center rounded-xl '>
+            {/* <Dropdown value={subscribe} onChange={(e) => handleFilterChange(e, 'subscription')} options={subscriptionList} optionLabel="name"
+              placeholder="الاشتراك" className="w-full md:w-14rem border-0 bg-transparent font-bold " /> */}
+          </div>
+
           <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
             <button className="w-full h-full">اضافة مستخدم</button>
           </div>

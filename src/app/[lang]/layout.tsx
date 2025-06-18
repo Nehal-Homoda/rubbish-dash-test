@@ -5,7 +5,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 // import 'flowbite';
 import "@/style/globals.css";
 import StoreProvider from "../StoreProvider";
-// import { ThemeModeScript } from "flowbite-react";
+import { ThemeModeScript } from "flowbite-react";
 
 
 const geistSans = Geist({
@@ -38,7 +38,7 @@ export default async function RootLayout({
   const { lang } = await params;
 
   return (
-    <html dir={lang == "ar" ? "rtl" : "ltr"} lang={lang} data-mode="light" >
+    <html dir={lang == "ar" ? "rtl" : "ltr"} lang={lang} data-mode="light" suppressHydrationWarning >
       <head>
         {/* <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" /> */}
 
@@ -59,7 +59,7 @@ export default async function RootLayout({
           href="https://unpkg.com/primereact/resources/themes/lara-light-blue/theme.css"
         />
 
-        {/* <ThemeModeScript /> */}
+        <ThemeModeScript />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <StoreProvider>{children}</StoreProvider>
