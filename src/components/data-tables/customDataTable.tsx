@@ -77,8 +77,8 @@ export default function ({
               <div className="bg-[#0094140D] cursor-pointer   py-2 text-center rounded-xl px-5 flex items-center justify-content-center ">
                 <i className="mdi mdi-tray-arrow-down text-[#009414] text-xl"></i>
               </div>
-
               {children}
+
             </div>
           </div>
 
@@ -115,11 +115,11 @@ export default function ({
                           {/* <span onClick={() => handleSort(item, 'desc')} className="mdi mdi-menu-down m-0 p-0  "></span> */}
 
 
-                          <div onClick={() => [handleSort(item, 'asc'), setIsUpActive(true),setIsDownActive(false)]} className={`arrow-img-wrap w-3 h-3  ${!isUpActive ? 'opacity-45' : 'opacity-80'}`}>
+                          <div onClick={() => [handleSort(item, 'asc'), setIsUpActive(true), setIsDownActive(false)]} className={`arrow-img-wrap w-3 h-3  ${!isUpActive ? 'opacity-45' : 'opacity-80'}`}>
                             <img className="arrow-img w-full h-full object-contain rotate-180" src={arrowImage.src} alt="" />
                           </div>
 
-                          <div onClick={() => [handleSort(item, 'desc'), setIsDownActive(true),setIsUpActive(false)]} className={`arrow-img-wrap w-3 h-3  ${!isDownActive ? 'opacity-45' : 'opacity-80'}`}>
+                          <div onClick={() => [handleSort(item, 'desc'), setIsDownActive(true), setIsUpActive(false)]} className={`arrow-img-wrap w-3 h-3  ${!isDownActive ? 'opacity-45' : 'opacity-80'}`}>
                             <img className="arrow-img w-full h-full object-contain" src={arrowImage.src} alt="" />
                           </div>
 
