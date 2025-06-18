@@ -58,9 +58,9 @@ export default function
                 </ul>
             </div> */}
 
-
-            <Dropdown className={` ${isActive ? 'bg-green-600' : 'bg-red-500'}`} label={btnName} dismissOnClick={false}>
-               {statusList.map((item)=>(<DropdownItem onClick={()=>handleIsActive(item)}>{item.text}</DropdownItem>)) }
+           
+            <Dropdown className={` hover:bg-transparent focus:outline-none  ${isActive ? 'bg-[#0094140D] text-[#31D000]' : 'bg-[#F9285A12] text-[#F9285A]'}`} label={btnName} dismissOnClick={false}>
+                {statusList.map((item) => (<DropdownItem className='bg-white' onClick={() => handleIsActive(item)}>{item.text}</DropdownItem>))}
 
             </Dropdown>
 
