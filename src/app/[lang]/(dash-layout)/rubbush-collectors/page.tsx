@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import CustomDataTable from "@/components/data-tables/customDataTable";
-import { userListService } from "@/services/sharedService";
+import { subscriptionListService, userListService } from "@/services/sharedService";
 import DropDown from "@/components/shared/StateDropDown";
 import BaseDropDown from "@/components/shared/BaseDropDown";
 
@@ -18,6 +18,7 @@ export default function rubbush_collectors() {
     renewal_date: string;
   }
   const [users, setUsers] = useState<User[]>([]);
+  // const [subscriptionList, setSubscriptionList] = useState(false)
   const headerArr = [
     { text: "ID", name: "id" },
     { text: "اسم المستخدم", name: "name" },
@@ -41,7 +42,7 @@ export default function rubbush_collectors() {
   ]
 
   const subscriptionList = [
-    { id: 1, name: 'مشترك/شهرية' },
+    { id: 1, name: 'باقة شهرية' },
     { id: 2, name: 'مشترك/3شهور' },
     { id: 3, name: 'غير مشترك' },
     { id: 4, name: 'مشترك/6شهور' },
@@ -73,6 +74,14 @@ export default function rubbush_collectors() {
       setFilteredArr(response.data);
     });
   };
+  // const fetchSubscriptionList = () => {
+  //   subscriptionListService().then((response) => {
+  //     console.log(response);
+  //     setSubscriptionList(response.data)
+  //     // setUsers(response.data);
+  //     // setFilteredArr(response.data);
+  //   });
+  // };
   const takeCheckValue = (e) => {
     console.log("input checked", e.target.checked);
     setCheckBoxValue(e.target.checked);
@@ -90,6 +99,7 @@ export default function rubbush_collectors() {
     const sortedUser = [...filteredArr || []].sort((a, b) => {
       const valA = a[itemKey];
       const valB = b[itemKey];
+      
       if (type == 'asc') {
         return valA - valB;
 
@@ -137,10 +147,21 @@ export default function rubbush_collectors() {
     setUsers(arr)
   }
 
-  // const itemKey = headItem.name;
-  //   users[itemKey].sort((a, b) => a - b);
-  //   console.log(itemKey);
-  // };
+  // const filterUser = (selectedItem, selectedIndex) => {
+  //   console.log('selected', selectedItem)
+  //   console.log('index', index)
+  //   const arr = users.map((item, index) => {
+  //     return item.subscription_name == selectedItem.name
+
+  //     if (index == selectedIndex) {
+  //       return
+  //     }
+  //     return item
+  //   })
+
+
+
+  // }
 
   useEffect(() => {
     setFilteredArr(users);
@@ -148,6 +169,7 @@ export default function rubbush_collectors() {
 
   useEffect(() => {
     fetchUserList();
+    // fetchSubscriptionList()
   }, []);
   return (
     <>
@@ -204,18 +226,23 @@ export default function rubbush_collectors() {
                       />
                     </td>
                     <td className="">{item.renewal_date}</td>
+                    <td className="">{item.renewal_date}</td>
                   </tr>
                 ))}
             </>
           }
         >
 
-          <div className='bg-[#0094140D]  text-center rounded-xl text-[#009414]'>
-            {/* <Dropdown value={location} onChange={(e) => handleFilterChange(e, 'area')} options={areas} optionLabel="name"
-              placeholder="المنطقة" className="w-full md:w-14rem border-0 bg-transparent font-bold " /> */}
+
+          {/* <div className='bg-[#0094140D]  text-center rounded-xl text-[#009414]'>
+            <Dropdown value={location} onChange={(e) => handleFilterChange(e, 'area')} options={areas} optionLabel="name"
+              placeholder="المنطقة" className="w-full md:w-14rem border-0 bg-transparent font-bold " />
+          </div> */}
+
+          {/* <div className='bg-[#0094140D]  text-center rounded-xl text-[#009414]'>
             <BaseDropDown btnName="المنطقة" listItem={areas}></BaseDropDown>
           </div>
-
+ */}
 
 
 
@@ -223,7 +250,7 @@ export default function rubbush_collectors() {
           <div className='bg-[#0094140D]  text-center rounded-xl '>
             {/* <Dropdown value={status} onChange={(e) => handleFilterChange(e, 'status')} options={statusList} optionLabel="name"
               placeholder="الحالة" className="w-full md:w-14rem border-0 bg-transparent font-bold " /> */}
-            <BaseDropDown btnName="الحالة" listItem={statusList}></BaseDropDown>
+            <BaseDropDown handleFilterList={(item, index) => filterUser(item, index)} btnName="الحالة" listItem={statusList}></BaseDropDown>
 
           </div>
 
@@ -231,7 +258,7 @@ export default function rubbush_collectors() {
           <div className='bg-[#0094140D]  text-center rounded-xl '>
             {/* <Dropdown value={subscribe} onChange={(e) => handleFilterChange(e, 'subscription')} options={subscriptionList} optionLabel="name"
               placeholder="الاشتراك" className="w-full md:w-14rem border-0 bg-transparent font-bold " /> */}
-            <BaseDropDown btnName="الاشتراك" listItem={subscriptionList}></BaseDropDown>
+            <BaseDropDown handleFilterList={(item, index) => filterUser(item, index)} btnName="الاشتراك" listItem={subscriptionList}></BaseDropDown>
           </div>
 
           <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">

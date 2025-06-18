@@ -4,17 +4,18 @@ import { Dropdown, DropdownItem } from "flowbite-react";
 
 type Props = {
     listItem: any[],
-    btnName: string
+    btnName: string,
+    handleFilterList?:(item,index)=>void
 }
 export default function
 
-    ({ listItem, btnName }: Props) {
+    ({ listItem, btnName,handleFilterList }: Props) {
     return (
         <div>
             <Dropdown className='bg-transparent text-[#009414] hover:bg-transparent focus:outline-none ' label={btnName} dismissOnClick={false}>
-                {listItem.map((item, index) => (<DropdownItem key={index}>
+                {listItem.map((item, index) => (<DropdownItem onClick={()=>handleFilterList(item,index)} className='bg-white' key={index}>
 
-                    {item.text}
+                    {item.name}
                 </DropdownItem>))}
             </Dropdown>
         </div>
