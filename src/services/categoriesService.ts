@@ -6,9 +6,9 @@ import { Categories } from "@/types/categories.interface";
 
 
 
-export const getCategoriesService = async (query?: string) => {
+export const getCategoriesService = async () => {
     try {
-        const response = await apiCall.get(`/admins/categories${query ?? ""}`, {
+        const response = await apiCall.get(`/admins/categories`, {
           headers: {
             // "Content-Type": "application/json",
           },

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import CustomDataTable from "@/components/data-tables/customDataTable";
 import {
+  activateUserService,
   filterUserBySearchService,
   filterUserByStateService,
   filterUserBySubscriptionService,
@@ -49,8 +50,8 @@ export default function rubbush_collectors() {
     { id: 3, name: "حي ثالث طنطا" },
   ];
   const statusList = [
-    { is_active: 1, name: "مفعل" },
-    { is_active: 0, name: "غير مفعل" },
+    { is_active: true, name: "مفعل" },
+    { is_active: false, name: "غير مفعل" },
     { id: 3, name: "معلق" },
   ];
 
@@ -59,13 +60,7 @@ export default function rubbush_collectors() {
     { is_subscribe: 0, name: "غير مشترك" },
   ];
 
-  // const subscriptionList = [
-  //   { id: 1, name: "باقة شهرية" },
-  //   { id: 2, name: "مشترك/3شهور" },
-  //   { id: 3, name: "غير مشترك" },
-  //   { id: 4, name: "مشترك/6شهور" },
-  // ];
-
+  
   const [filteredArr, setFilteredArr] = useState<User[]>([]);
   const [checkBoxValue, setCheckBoxValue] = useState(false);
   const [page, setPage] = useState(1);
@@ -95,15 +90,7 @@ export default function rubbush_collectors() {
     console.log(e);
     filterUserBySearch(page, e);
   };
-  // const x = users.filter((item) => {
-  //   return item.name.includes(e);
-  // });
-
-  //   setFilteredArr([...x]);
-  //   // setFilteredArr(x)
-
-  //   console.log(filteredArr);
-  // };
+  
 
   const filterUserByState = (selectedItem) => {
     console.log(selectedItem.is_active);
@@ -139,30 +126,41 @@ export default function rubbush_collectors() {
     router.push(`/users/add-user`);
   };
 
-  // const updateUserActive = (selectedItem, itemIndex) => {
-  //   console.log("item", selectedItem);
-  //   console.log("index", itemIndex);
-  //   handleActivation(selectedItem.text, itemIndex);
-  // };
+  const updateUserActive = (selectedItem, itemIndex) => {
+    console.log("item", selectedItem);
+    console.log("index", itemIndex);
+    const user = users.find((item, index) => {
+      return index == itemIndex;
+    });
+    if (!user) return;
+    if (selectedItem.is_active) {
+      activateUserService(user.id, 1).then((response) => {
+        const arr = users.map((item, index) => {
+          if (index == itemIndex) {
+            console.log("user is", item);
+            return { ...item, ["is_active"]: true };
+          }
+          return item
+        });
+        setUsers(arr);
 
-  // const handleActivation = (state: string, itemIndex: number) => {
-  //   const arr = users.map((item, index) => {
-  //     if (index == itemIndex) {
-  //       if (state == "غير مفعل") {
-  //         return { ...item, ["is_active"]: false };
-  //       }
-  //       // if(state=='مفعل'){
-  //       //   return { ...item, ['is_active']:true }
+        console.log(response);
+      });
+    } else {
+      activateUserService(user.id, 0).then((response) => {
+        const arr = users.map((item, index) => {
+          if (index == itemIndex) return { ...item, ["is_active"]: false };
+          return item
+        });
+        setUsers(arr);
+        console.log(response);
+      });
+    }
 
-  //       // }
-  //       return { ...item, ["is_active"]: true };
-  //     }
+  };
+  
 
-  //     return item;
-  //   });
-  //   setUsers(arr);
-  // };
-
+ 
   useEffect(() => {
     setFilteredArr(users);
   }, [users]);

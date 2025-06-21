@@ -38,4 +38,16 @@ export const apiCall = {
       },
     });
   },
+  put: async (endpoint: string, id:number, init?: RequestInit) => {
+    const url = `${BASE_URL}${decodeURIComponent(endpoint)}/${id}`;
+    return fetch(url, {
+      method: "PUT",
+      body: init?.body,
+      ...init,
+      headers: {
+        ...APP_API_HEADERS(),
+        ...init?.headers,
+      },
+    });
+  },
 };
