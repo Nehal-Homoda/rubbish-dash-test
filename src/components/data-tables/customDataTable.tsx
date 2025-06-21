@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import arrowImage from "@/assets/images/icons/arrow-left.png";
+import { Pagination } from "flowbite-react";
 
 interface HeaderItem {
   text: string;
@@ -15,6 +16,7 @@ type Props = {
   listItem: any[];
   sendValueToParent: (value: string) => void;
   handleAllCheck: (e) => void;
+  selectedPage: (pageNum: number) => void;
   //   handleSort: (item, type: String) => void;
 };
 
@@ -26,12 +28,18 @@ export default function ({
   listItem,
   sendValueToParent,
   handleAllCheck,
+  selectedPage,
 }: //   handleSort,
 Props) {
   const [searchInput, setSearchInput] = useState("");
   const [isUpActive, setIsUpActive] = useState(false);
   const [isDownActive, setIsDownActive] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
+  const onPageChange = (page: number) => {
+    selectedPage(page);
+    setCurrentPage(page);
+  };
   const handleChangeValue = (e) => {
     setSearchInput(e.target.value);
     sendValueToParent(e.target.value);
@@ -52,7 +60,6 @@ Props) {
     });
 
     console.log("sort item", sorted);
-   
   };
 
   return (
@@ -119,7 +126,7 @@ Props) {
 
                         <div
                           onClick={() => [
-                            handleSort(item,"asc"),
+                            handleSort(item, "asc"),
                             setIsUpActive(true),
                             setIsDownActive(false),
                           ]}
@@ -136,7 +143,7 @@ Props) {
 
                         <div
                           onClick={() => [
-                            handleSort(item,"desc"),
+                            handleSort(item, "desc"),
                             setIsDownActive(true),
                             setIsUpActive(false),
                           ]}
@@ -170,6 +177,16 @@ Props) {
               ))}
           </tbody>
         </table>
+
+        <div className="flex overflow-x-auto sm:justify-center">
+          <Pagination
+            currentPage={currentPage}
+            // itemsPerPage={10}
+            // totalItems={listItem.length}
+            totalPages={100}
+            onPageChange={onPageChange}
+          />
+        </div>
       </div>
     </>
   );

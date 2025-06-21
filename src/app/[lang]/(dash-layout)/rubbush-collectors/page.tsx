@@ -3,12 +3,19 @@
 import React, { useEffect, useState } from "react";
 import CustomDataTable from "@/components/data-tables/customDataTable";
 import {
+  filterUserBySearchService,
+  filterUserByStateService,
+  filterUserBySubscriptionService,
   subscriptionListService,
+  userListByPageService,
   userListService,
 } from "@/services/sharedService";
 import DropDown from "@/components/shared/StateDropDown";
 import BaseDropDown from "@/components/shared/BaseDropDown";
 import { Avatar } from "flowbite-react";
+import { getPackagesService } from "@/services/packagesOffersService";
+import { PackageOffer } from "@/types/packagesOffer.interface";
+import { useRouter } from "next/navigation";
 
 export default function rubbush_collectors() {
   interface User {
@@ -22,12 +29,14 @@ export default function rubbush_collectors() {
     renewal_date: string;
   }
   const [users, setUsers] = useState<User[]>([]);
-  // const [subscriptionList, setSubscriptionList] = useState(false)
+  const [subscriptionList, setSubscriptionList] = useState<PackageOffer[]>([]);
+  const router=useRouter()
   const headerArr = [
     { text: "ID", name: "id" },
     { text: "اسم المستخدم", name: "name" },
     { text: "رقم الموبيل", name: "phone" },
-    { text: "الاشتراك", name: "subscription_name" },
+    { text: " الاشتراك", name: "subscription_name" },
+    { text: "نوع الاشتراك", name: "subscription_name" },
     { text: "الصورة الشخصية", name: "image" },
     { text: "الحالة", name: "is_active" },
     { text: "ميعاد التجديد", name: "renewal_date" },
@@ -40,28 +49,55 @@ export default function rubbush_collectors() {
     { id: 3, name: "حي ثالث طنطا" },
   ];
   const statusList = [
-    { id: 1, name: "مفعل" },
-    { id: 2, name: "غير مفعل" },
+    { is_active: 1, name: "مفعل" },
+    { is_active: 0, name: "غير مفعل" },
     { id: 3, name: "معلق" },
   ];
 
-  const subscriptionList = [
-    { id: 1, name: "باقة شهرية" },
-    { id: 2, name: "مشترك/3شهور" },
-    { id: 3, name: "غير مشترك" },
-    { id: 4, name: "مشترك/6شهور" },
+  const hasSubscriptionList = [
+    { is_subscribe: 1, name: "مشترك" },
+    { is_subscribe: 0, name: "غير مشترك" },
   ];
+
+  // const subscriptionList = [
+  //   { id: 1, name: "باقة شهرية" },
+  //   { id: 2, name: "مشترك/3شهور" },
+  //   { id: 3, name: "غير مشترك" },
+  //   { id: 4, name: "مشترك/6شهور" },
+  // ];
 
   const [filteredArr, setFilteredArr] = useState<User[]>([]);
   const [checkBoxValue, setCheckBoxValue] = useState(false);
+  const [page, setPage] = useState(1);
   const [userIsActive, setUserIsActive] = useState(false);
 
-  // const takeValue = (e) => {
-  //   console.log("sjkdhfu");
-  //   console.log(e);
-  //   const x = users.filter((item) => {
-  //     return item.name.includes(e);
-  //   });
+  const fetchUserList = (pageNumber) => {
+    userListByPageService(pageNumber).then((response) => {
+      console.log(response);
+      setUsers(response.data);
+      // setFilteredArr(response.data);
+    });
+  };
+  const fetchPackages = () => {
+    getPackagesService().then((response) => {
+      console.log(response);
+      setSubscriptionList(response.data);
+    });
+  };
+
+  const filterUserBySearch = (pageNumber, searchValue) => {
+    filterUserBySearchService(pageNumber, searchValue).then((response) => {
+      setUsers(response.data);
+    });
+  };
+  const takeValue = (e) => {
+    console.log("sjkdhfu");
+    console.log(e);
+    filterUserBySearch(page, e);
+  };
+  // const x = users.filter((item) => {
+  //   return item.name.includes(e);
+  // });
 
   //   setFilteredArr([...x]);
   //   // setFilteredArr(x)
@@ -69,13 +105,72 @@ export default function rubbush_collectors() {
   //   console.log(filteredArr);
   // };
 
-  const fetchUserList = () => {
-    userListService(1).then((response) => {
-      console.log(response);
+  const filterUserByState = (selectedItem) => {
+    console.log(selectedItem.is_active);
+    filterUserByStateService(page, selectedItem.is_active).then((response) => {
       setUsers(response.data);
-      // setFilteredArr(response.data);
+      console.log("yes im active");
     });
   };
+
+  const takeSelectedPage = (pageNum: number) => {
+    console.log(pageNum);
+    // setPage(pageNum)
+
+    fetchUserList(pageNum);
+  };
+
+  const filterBySubscription = (selectedSubscription) => {
+    console.log(selectedSubscription);
+    filterUserBySubscriptionService(
+      page,
+      selectedSubscription.is_subscribe
+    ).then((response) => {
+      setUsers(response.data);
+    });
+  };
+
+  const takeCheckValue = (e) => {
+    console.log("input checked", e.target.checked);
+    setCheckBoxValue(e.target.checked);
+  };
+
+  const updateUserActive = (selectedItem, itemIndex) => {
+    console.log("item", selectedItem);
+    console.log("index", itemIndex);
+    handleActivation(selectedItem.text, itemIndex);
+  };
+
+  const handleActivation = (state: string, itemIndex: number) => {
+    const arr = users.map((item, index) => {
+      if (index == itemIndex) {
+        if (state == "غير مفعل") {
+          return { ...item, ["is_active"]: false };
+        }
+        // if(state=='مفعل'){
+        //   return { ...item, ['is_active']:true }
+
+        // }
+        return { ...item, ["is_active"]: true };
+      }
+
+      return item;
+    });
+    setUsers(arr);
+  };
+const goToAddPage=()=>{
+  router.push(`/users/add-user`)
+}
+  useEffect(() => {
+    setFilteredArr(users);
+  }, [users]);
+
+  useEffect(() => {
+    fetchUserList(1);
+    fetchPackages();
+    // fetchSubscriptionList()
+  }, []);
+
   // const fetchSubscriptionList = () => {
   //   subscriptionListService().then((response) => {
   //     console.log(response);
@@ -84,10 +179,6 @@ export default function rubbush_collectors() {
   //     // setFilteredArr(response.data);
   //   });
   // };
-  const takeCheckValue = (e) => {
-    console.log("input checked", e.target.checked);
-    setCheckBoxValue(e.target.checked);
-  };
 
   // const sortList = (headItem, type: string) => {
   //   const itemKey = headItem.name;
@@ -113,57 +204,24 @@ export default function rubbush_collectors() {
   //   setFilteredArr(sortedUser);
   // };
 
-  const updateUserActive = (selectedItem, itemIndex) => {
-    console.log("item", selectedItem);
-    console.log("index", itemIndex);
-    handleActivation(selectedItem.text, itemIndex);
-  };
-
-  const handleActivation = (state: string, itemIndex: number) => {
-    const arr = users.map((item, index) => {
-      if (index == itemIndex) {
-        if (state == "غير مفعل") {
-          return { ...item, ["is_active"]: false };
-        }
-        // if(state=='مفعل'){
-        //   return { ...item, ['is_active']:true }
-
-        // }
-        return { ...item, ["is_active"]: true };
-      }
-
-      return item;
-    });
-    setUsers(arr);
-  };
-
   // const filterUser = (selectedItem, selectedIndex) => {
-  //   console.log('selected', selectedItem)
-  //   console.log('index', index)
+  //   console.log("selected", selectedItem);
+  //   console.log("index", index);
   //   const arr = users.map((item, index) => {
-  //     return item.subscription_name == selectedItem.name
+  //     return item.subscription_name == selectedItem.name;
 
   //     if (index == selectedIndex) {
-  //       return
+  //       return;
   //     }
-  //     return item
-  //   })
+  //     return item;
+  //   });
+  // };
 
-  // }
-
-  useEffect(() => {
-    setFilteredArr(users);
-  }, [users]);
-
-  useEffect(() => {
-    fetchUserList();
-    // fetchSubscriptionList()
-  }, []);
   return (
     <>
       <div className="py-20">
         <CustomDataTable
-          
+          selectedPage={(pageNum: number) => takeSelectedPage(pageNum)}
           handleAllCheck={takeCheckValue}
           sendValueToParent={(value) => takeValue(value)}
           tableHead={headerArr}
@@ -173,6 +231,9 @@ export default function rubbush_collectors() {
               <td className="py-2 px-4">{item.id}</td>
               <td className="py-2 px-4">{item.name}</td>
               <td className="py-2 px-4">{item.phone}</td>
+              <td className="py-2 px-4">
+                {item.has_subscription ? "مشترك" : "غير مشترك"}
+              </td>
               <td className="py-2 px-4">{item.subscription_name}</td>
               <td className="py-2 px-4">
                 <Avatar
@@ -214,7 +275,7 @@ export default function rubbush_collectors() {
             {/* <Dropdown value={status} onChange={(e) => handleFilterChange(e, 'status')} options={statusList} optionLabel="name"
               placeholder="الحالة" className="w-full md:w-14rem border-0 bg-transparent font-bold " /> */}
             <BaseDropDown
-              handleFilterList={(item, index) => filterUser(item, index)}
+              handleFilterList={(item, index) => filterUserByState(item)}
               btnName="الحالة"
               listItem={statusList}
             ></BaseDropDown>
@@ -224,14 +285,14 @@ export default function rubbush_collectors() {
             {/* <Dropdown value={subscribe} onChange={(e) => handleFilterChange(e, 'subscription')} options={subscriptionList} optionLabel="name"
               placeholder="الاشتراك" className="w-full md:w-14rem border-0 bg-transparent font-bold " /> */}
             <BaseDropDown
-              handleFilterList={(item, index) => filterUser(item, index)}
+              handleFilterList={(item, index) => filterBySubscription(item)}
               btnName="الاشتراك"
-              listItem={subscriptionList}
+              listItem={hasSubscriptionList}
             ></BaseDropDown>
           </div>
 
           <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
-            <button className="w-full h-full">اضافة مستخدم</button>
+            <button onClick={goToAddPage} className="w-full h-full">اضافة مستخدم</button>
           </div>
         </CustomDataTable>
       </div>

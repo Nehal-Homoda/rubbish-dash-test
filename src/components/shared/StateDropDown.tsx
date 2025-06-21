@@ -19,8 +19,8 @@ export default function
 
     ({ btnName, isActive, handleIsActive }: Props) {
     const statusList = [
-        { is_active: false, text: "مفعل" },
-        { is_active: false, text: "غير مفعل" },
+        { is_active:1, text: "مفعل" },
+        { is_active: 0, text: "غير مفعل" },
     ];
     useEffect(() => {
         // Dynamically import and initialize dropdown from Flowbite
@@ -60,7 +60,7 @@ export default function
 
            
             <Dropdown className={` hover:bg-transparent focus:outline-none  ${isActive ? 'bg-[#0094140D] text-[#31D000]' : 'bg-[#F9285A12] text-[#F9285A]'}`} label={btnName} dismissOnClick={false}>
-                {statusList.map((item) => (<DropdownItem className='bg-white' onClick={() => handleIsActive(item)}>{item.text}</DropdownItem>))}
+                {statusList.map((item) => (<DropdownItem className='bg-white' onClick={() => handleIsActive(item.is_active)}>{item.text}</DropdownItem>))}
 
             </Dropdown>
 
