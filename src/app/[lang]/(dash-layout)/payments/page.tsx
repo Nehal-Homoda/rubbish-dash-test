@@ -280,7 +280,7 @@ export default function rubbush_collectors() {
             <>
               <td className="py-2 px-4">{item.id}</td>
 
-              <td className="py-2 px-4">{item.}</td>
+              <td className="py-2 px-4">{item.category}</td>
               <td className="py-2 px-4">{item.category}</td>
               <td className="py-2 px-4">{item.price_per_unit}</td>
               <td className="py-2 px-4">{item.days_count}</td>
