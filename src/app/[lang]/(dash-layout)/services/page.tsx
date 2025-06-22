@@ -45,16 +45,16 @@ export default function rubbush_collectors() {
     { is_active: 1, name: "مفعل" },
     { is_active: 0, name: "غير مفعل" },
   ];
-
-  const [checkBoxValue, setCheckBoxValue] = useState(false);
   const [page, setPage] = useState(1);
-  const [categoryIsActive, setCategoryIsActive] = useState(false);
-
   const [openModal, setOpenModal] = useState(false);
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
-  // const [selectedUpdate, setSelectedUpdate] = useState(null);
   const [selectedItemToUpdate, setSelectedItemToUpdate] =
     useState<Categories | null>(null);
+
+  const [checkBoxValue, setCheckBoxValue] = useState(false);
+  const [categoryIsActive, setCategoryIsActive] = useState(false);
+
+  // const [selectedUpdate, setSelectedUpdate] = useState(null);
 
   const [formData, setFormData] = useState({
     name_ar: "",
@@ -174,7 +174,7 @@ export default function rubbush_collectors() {
       return index == itemIndex;
     });
     if (!service) return;
-    const toggledIsActive = service.is_active ? 0 : 1;
+    const toggledIsActive = service.is_active && !selectedItem.is_active ? 0 : 1;
     activateCategoryService(service.id, toggledIsActive).then((response) => {
       const arr = categoryList.map((item, index) => {
         if (index == itemIndex) {
