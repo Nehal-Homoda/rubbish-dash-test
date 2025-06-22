@@ -3,131 +3,164 @@
 import React, { useEffect, useState } from "react";
 import CustomDataTable from "@/components/data-tables/customDataTable";
 import {
-  filterUserBySearchService,
-  filterUserByStateService,
-  filterUserBySubscriptionService,
-  subscriptionListService,
-  userListByPageService,
-  userListService,
-} from "@/services/sharedService";
+  activateCollectorService,
+  filterCollectorBySearchService,
+  filterCollectorByStateService,
+  collectorListByPageService,
+  addCollectorService,
+  deleteCollectorService,
+  updateCollectorService,
+} from "@/services/collectorsService";
 import DropDown from "@/components/shared/StateDropDown";
 import BaseDropDown from "@/components/shared/BaseDropDown";
-import { Avatar } from "flowbite-react";
-import { getPackagesService } from "@/services/packagesOffersService";
-import { PackageOffer } from "@/types/packagesOffer.interface";
+
+import { getCollectorService } from "@/services/collectorsService";
+import { Collector } from "@/types/collectors.interface";
 import { useRouter } from "next/navigation";
+import {
+  Button,
+  Checkbox,
+  Label,
+  Modal,
+  ModalBody,
+  ModalHeader,
+  TextInput,
+} from "flowbite-react";
+import TextFieldNada from "@/components/ui/form/TextFieldNada";
+import FileInput from "@/components/ui/form/FileInput";
 
 export default function rubbush_collectors() {
-  interface User {
-    id: number;
-    created_at: string;
-    name: string;
-    phone: string;
-    image: string;
-    subscription_name: string;
-    is_active: boolean;
-    renewal_date: string;
-  }
-  const [users, setUsers] = useState<User[]>([]);
-  const [subscriptionList, setSubscriptionList] = useState<PackageOffer[]>([]);
-  const router=useRouter()
+  const [collectorList, setCollectorList] = useState<Collector[]>([]);
+  const router = useRouter();
   const headerArr = [
     { text: "ID", name: "id" },
-    { text: "اسم المستخدم", name: "name" },
-    { text: "رقم الموبيل", name: "phone" },
-    { text: " الاشتراك", name: "subscription_name" },
-    { text: "نوع الاشتراك", name: "subscription_name" },
-    { text: "الصورة الشخصية", name: "image" },
+    { text: " الاسم ", name: "name" },
+    { text: "  رقم الموبيل", name: "phone" },
+    { text: "الصورة", name: "image" },
+    { text: "المنطقة", name: "districts" },
+    { text: "الزيارات", name: "visits" },
+    { text: "تم التجميع", name: "count_collected" },
+    { text: "تعذر التجميع", name: "count_not_collected" },
     { text: "الحالة", name: "is_active" },
-    { text: "ميعاد التجديد", name: "renewal_date" },
     { text: "الاجراءات", name: "" },
   ];
 
-  const areas = [
-    { id: 1, name: "حي اول طنطا" },
-    { id: 2, name: "حي ثان طنطا" },
-    { id: 3, name: "حي ثالث طنطا" },
-  ];
   const statusList = [
     { is_active: 1, name: "مفعل" },
     { is_active: 0, name: "غير مفعل" },
-    { id: 3, name: "معلق" },
   ];
 
-  const hasSubscriptionList = [
-    { is_subscribe: 1, name: "مشترك" },
-    { is_subscribe: 0, name: "غير مشترك" },
-  ];
-
-  // const subscriptionList = [
-  //   { id: 1, name: "باقة شهرية" },
-  //   { id: 2, name: "مشترك/3شهور" },
-  //   { id: 3, name: "غير مشترك" },
-  //   { id: 4, name: "مشترك/6شهور" },
-  // ];
-
-  const [filteredArr, setFilteredArr] = useState<User[]>([]);
   const [checkBoxValue, setCheckBoxValue] = useState(false);
   const [page, setPage] = useState(1);
-  const [userIsActive, setUserIsActive] = useState(false);
+  const [collectorIsActive, setCollectorIsActive] = useState(false);
 
-  const fetchUserList = (pageNumber) => {
-    userListByPageService(pageNumber).then((response) => {
+  const [openModal, setOpenModal] = useState(false);
+  const [openUpdateModal, setOpenUpdateModal] = useState(false);
+  // const [selectedUpdate, setSelectedUpdate] = useState(null);
+  const [selectedItemToUpdate, setSelectedItemToUpdate] =
+    useState<Collector | null>(null);
+
+  const [formData, setFormData] = useState({
+    name_ar: "",
+    name_en: "",
+    order: 0,
+    is_active: 0,
+  });
+
+  const [updateFormData, setUpdateFormData] = useState({
+    id: 0,
+    name_ar: "",
+    name_en: "",
+    order: 0,
+    is_active: 0,
+  });
+
+  const onCloseModal = () => {
+    setOpenModal(false);
+
+    setFormData({
+      name_ar: "",
+      name_en: "",
+      order: 0,
+      is_active: 0,
+    });
+  };
+  const onCloseUpdateModal = () => {
+    setOpenUpdateModal(false);
+
+    setUpdateFormData({
+      id: 0,
+      name_ar: "",
+      name_en: "",
+      order: 0,
+      is_active: 0,
+    });
+  };
+
+  const takeFormValue = (e, formName: string, name: string) => {
+    console.log("nn", e.target.value);
+    if (formName == "formData") {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: e.target.value,
+      }));
+    } else {
+      setUpdateFormData((prev) => ({
+        ...prev,
+        [name]: e.target.value,
+      }));
+    }
+  };
+  const takeSelectedStateInFormData = (e) => {
+    const value = Number(e.target.value);
+    console.log(e.target.value);
+    setFormData((prev) => ({
+      ...prev,
+      is_active: value,
+    }));
+  };
+  const takeSelectedState = (e) => {
+    const value = Number(e.target.value);
+    setUpdateFormData((prev) => ({
+      ...prev,
+      is_active: value,
+    }));
+  };
+
+  const fetchCollectorList = (pageNumber) => {
+    collectorListByPageService(pageNumber).then((response) => {
       console.log(response);
-      setUsers(response.data);
+      setCollectorList(response.data);
       // setFilteredArr(response.data);
     });
   };
-  const fetchPackages = () => {
-    getPackagesService().then((response) => {
-      console.log(response);
-      setSubscriptionList(response.data);
-    });
-  };
 
-  const filterUserBySearch = (pageNumber, searchValue) => {
-    filterUserBySearchService(pageNumber, searchValue).then((response) => {
-      setUsers(response.data);
+  const filterServiceBySearch = (pageNumber, searchValue) => {
+    filterCollectorBySearchService(pageNumber, searchValue).then((response) => {
+      setCollectorList(response.data);
     });
   };
   const takeValue = (e) => {
     console.log("sjkdhfu");
     console.log(e);
-    filterUserBySearch(page, e);
+    filterServiceBySearch(page, e);
   };
-  // const x = users.filter((item) => {
-  //   return item.name.includes(e);
-  // });
 
-  //   setFilteredArr([...x]);
-  //   // setFilteredArr(x)
-
-  //   console.log(filteredArr);
-  // };
-
-  const filterUserByState = (selectedItem) => {
+  const filterCollectorByState = (selectedItem) => {
     console.log(selectedItem.is_active);
-    filterUserByStateService(page, selectedItem.is_active).then((response) => {
-      setUsers(response.data);
-      console.log("yes im active");
-    });
+    filterCollectorByStateService(page, selectedItem.is_active).then(
+      (response) => {
+        setCollectorList(response.data);
+        console.log("yes im active");
+      }
+    );
   };
 
   const takeSelectedPage = (pageNum: number) => {
     console.log(pageNum);
     // setPage(pageNum)
 
-    fetchUserList(pageNum);
-  };
-
-  const filterBySubscription = (selectedSubscription) => {
-    console.log(selectedSubscription);
-    filterUserBySubscriptionService(
-      page,
-      selectedSubscription.is_subscribe
-    ).then((response) => {
-      setUsers(response.data);
-    });
+    fetchCollectorList(pageNum);
   };
 
   const takeCheckValue = (e) => {
@@ -135,87 +168,101 @@ export default function rubbush_collectors() {
     setCheckBoxValue(e.target.checked);
   };
 
-  const updateUserActive = (selectedItem, itemIndex) => {
-    console.log("item", selectedItem);
-    console.log("index", itemIndex);
-    handleActivation(selectedItem.text, itemIndex);
-  };
-
-  const handleActivation = (state: string, itemIndex: number) => {
-    const arr = users.map((item, index) => {
-      if (index == itemIndex) {
-        if (state == "غير مفعل") {
-          return { ...item, ["is_active"]: false };
-        }
-        // if(state=='مفعل'){
-        //   return { ...item, ['is_active']:true }
-
-        // }
-        return { ...item, ["is_active"]: true };
-      }
-
-      return item;
+  const updateCollectorActive = (selectedItem, itemIndex) => {
+    const service = collectorList.find((item, index) => {
+      return index == itemIndex;
     });
-    setUsers(arr);
+    if (!service) return;
+    const toggledIsActive = service.is_active ? 0 : 1;
+    activateCollectorService(service.id, toggledIsActive).then((response) => {
+      const arr = collectorList.map((item, index) => {
+        if (index == itemIndex) {
+          console.log("Service is", item);
+          return {
+            ...item,
+            is_active: toggledIsActive,
+          };
+        }
+        return item;
+      });
+      setCollectorList(arr);
+
+      console.log(response);
+    });
   };
-const goToAddPage=()=>{
-  router.push(`/users/add-user`)
-}
-  useEffect(() => {
-    setFilteredArr(users);
-  }, [users]);
+
+  const deleteCollector = (item, selectedIndex) => {
+    console.log(item);
+    deleteCollectorService(item.id).then((response) => {
+      const updatedArr = [...collectorList];
+      updatedArr.splice(selectedIndex, 1);
+      setCollectorList(updatedArr);
+    });
+  };
+
+  const fetchCollectors = () => {
+    getCollectorService().then((response) => {
+      setCollectorList(response.data);
+    });
+  };
+  const addCollectorSubmit = (e) => {
+    e.preventDefault();
+    const fd = new FormData();
+    fd.append("name_ar", formData.name_ar);
+    fd.append("name_en", formData.name_en);
+    fd.append("order", formData.order);
+    fd.append("is_active", formData.is_active);
+    addCollectorService(fd).then((response) => {
+      // setCollectorList(response.data)
+      onCloseModal();
+    });
+  };
+
+  const openUpdateDialog = (item, index) => {
+    setSelectedItemToUpdate(item);
+    // setUpdateFormData({
+    //   id:item.id,
+    //   name_ar: item.name_ar,
+    //   name_en: item.name_en,
+    //   order: item.order,
+    //   is_active:  Number(item.is_active),
+    //   image: item.image,
+    // });
+
+    setOpenUpdateModal(true);
+  };
+
+  const updateCollectorSubmit = (e) => {
+    e.preventDefault();
+    if (!updateFormData) return;
+    console.log("updated", updateFormData);
+    updateCollectorService(updateFormData.id, updateFormData).then(
+      (response) => {
+        fetchCollectors()
+        // setCollectorList(response.data);
+        onCloseUpdateModal();
+      }
+    );
+  };
 
   useEffect(() => {
-    fetchUserList(1);
-    fetchPackages();
-    // fetchSubscriptionList()
+    fetchCollectors();
   }, []);
 
-  // const fetchSubscriptionList = () => {
-  //   subscriptionListService().then((response) => {
-  //     console.log(response);
-  //     setSubscriptionList(response.data)
-  //     // setUsers(response.data);
-  //     // setFilteredArr(response.data);
-  //   });
-  // };
+  useEffect(() => {
+    if (selectedItemToUpdate) {
+      setUpdateFormData({
+        id: selectedItemToUpdate.id,
+        name_ar: selectedItemToUpdate.name_ar,
+        name_en: selectedItemToUpdate.name_en,
+        order: selectedItemToUpdate.order,
+        is_active: Number(selectedItemToUpdate.is_active),
+        image: selectedItemToUpdate.image,
+      });
 
-  // const sortList = (headItem, type: string) => {
-  //   const itemKey = headItem.name;
-  //   // const itemValue = users.map((item) => {
-  //   //   return item[itemKey];
-  //   // });
-  //   // console.log(itemValue);
-  //   // const sortedUser = itemValue.sort((a, b) => a - b);
-  //   // console.log(sortedUser);
-
-  //   const sortedUser = [...(filteredArr || [])].sort((a, b) => {
-  //     const valA = a[itemKey];
-  //     const valB = b[itemKey];
-
-  //     if (type == "asc") {
-  //       return valA - valB;
-  //     }
-  //     if (type == "desc") {
-  //       return valB - valA;
-  //     }
-  //   });
-  //   console.log(sortedUser);
-  //   setFilteredArr(sortedUser);
-  // };
-
-  // const filterUser = (selectedItem, selectedIndex) => {
-  //   console.log("selected", selectedItem);
-  //   console.log("index", index);
-  //   const arr = users.map((item, index) => {
-  //     return item.subscription_name == selectedItem.name;
-
-  //     if (index == selectedIndex) {
-  //       return;
-  //     }
-  //     return item;
-  //   });
-  // };
+      setOpenUpdateModal(true);
+    }
+  }, [selectedItemToUpdate]);
 
   return (
     <>
@@ -225,76 +272,229 @@ const goToAddPage=()=>{
           handleAllCheck={takeCheckValue}
           sendValueToParent={(value) => takeValue(value)}
           tableHead={headerArr}
-          listItem={users}
+          listItem={collectorList}
           tData={(item, index) => (
             <>
               <td className="py-2 px-4">{item.id}</td>
+
               <td className="py-2 px-4">{item.name}</td>
+              {/* <td className="py-2 px-4">{item.no_of_subscriptions}</td> */}
               <td className="py-2 px-4">{item.phone}</td>
-              <td className="py-2 px-4">
-                {item.has_subscription ? "مشترك" : "غير مشترك"}
+              <td>
+              <div className="w-8 h-8 rounded-full">
+                <img
+                  className="w-full h-full object-contain"
+                  src={item.image}
+                  alt=""
+                />
+              </div>
+
               </td>
-              <td className="py-2 px-4">{item.subscription_name}</td>
-              <td className="py-2 px-4">
+              
+              <td className="py-2 px-4"></td>
+              <td className="py-2 px-4"></td>
+                <td className="py-2 px-4">{item.count_collected}</td>
+                <td className="py-2 px-4">{item.count_not_collected}</td>
+
+              {/* <td className="py-2 px-4">
                 <Avatar
                   color="success"
                   placeholderInitials={item.name.slice(0, 2)}
                   rounded
                 />
-                {/* <div className=" w-7 h-7 rounded-full overflow-hidden">
-                        <img
-                          className="w-full h-full object-contain"
-                          src={item.image}
-                          alt=""
-                        />
-                      </div> */}
-              </td>
+              </td> */}
               <td className="py-2 px-4">
                 <DropDown
-                  handleIsActive={(item) => updateUserActive(item, index)}
+                  handleIsActive={(item) => updateCollectorActive(item, index)}
                   btnName={item.is_active ? "مفعل" : "غير مفعل"}
                   isActive={item.is_active}
                 />
               </td>
-              <td className="">{item.renewal_date}</td>
-              <td className="">{item.renewal_date}</td>
+              <td className="">
+                <div className="flex justify-center gap-3">
+                  <button
+                    onClick={() => deleteCollector(item, index)}
+                    className="bg-[#F9285A0A] p-1 rounded-lg"
+                  >
+                    <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
+                  </button>
+                  <button
+                    onClick={() => openUpdateDialog(item, index)}
+                    className="bg-[#0094140D] p-1 rounded-lg"
+                  >
+                    <span className="mdi mdi-folder-edit-outline text-[#009414]"></span>
+                  </button>
+                </div>
+              </td>
             </>
           )}
         >
-          {/* <div className='bg-[#0094140D]  text-center rounded-xl text-[#009414]'>
-            <Dropdown value={location} onChange={(e) => handleFilterChange(e, 'area')} options={areas} optionLabel="name"
-              placeholder="المنطقة" className="w-full md:w-14rem border-0 bg-transparent font-bold " />
-          </div> */}
-
-          {/* <div className='bg-[#0094140D]  text-center rounded-xl text-[#009414]'>
-            <BaseDropDown btnName="المنطقة" listItem={areas}></BaseDropDown>
-          </div>
- */}
-
           <div className="bg-[#0094140D]  text-center rounded-xl ">
-            {/* <Dropdown value={status} onChange={(e) => handleFilterChange(e, 'status')} options={statusList} optionLabel="name"
-              placeholder="الحالة" className="w-full md:w-14rem border-0 bg-transparent font-bold " /> */}
             <BaseDropDown
-              handleFilterList={(item, index) => filterUserByState(item)}
+              handleFilterList={(item, index) => filterCollectorByState(item)}
               btnName="الحالة"
               listItem={statusList}
             ></BaseDropDown>
           </div>
 
-          <div className="bg-[#0094140D]  text-center rounded-xl ">
-            {/* <Dropdown value={subscribe} onChange={(e) => handleFilterChange(e, 'subscription')} options={subscriptionList} optionLabel="name"
-              placeholder="الاشتراك" className="w-full md:w-14rem border-0 bg-transparent font-bold " /> */}
-            <BaseDropDown
-              handleFilterList={(item, index) => filterBySubscription(item)}
-              btnName="الاشتراك"
-              listItem={hasSubscriptionList}
-            ></BaseDropDown>
-          </div>
-
           <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
-            <button onClick={goToAddPage} className="w-full h-full">اضافة مستخدم</button>
+            <button
+              onClick={() => setOpenModal(true)}
+              className="w-full h-full"
+            >
+              اضافة منطقة
+            </button>
           </div>
         </CustomDataTable>
+
+        <Modal show={openModal} size="md" onClose={onCloseModal} popup>
+          <ModalHeader />
+          <ModalBody>
+            <form onSubmit={addCollectorService}>
+              <div className="space-y-6">
+                <h3 className="text-center text-xl font-medium text-gray-900 dark:text-white">
+                  اضافة خدمة
+                </h3>
+                <div>
+                  <TextFieldNada
+                    name="name"
+                    type="text"
+                    handleChange={(e) =>
+                      takeFormValue(e, "formData", "name_ar")
+                    }
+                    value={formData.name_ar}
+                    label=" اسم المنطقة ( عربي ) *"
+                    placeholder=" اسم المنطقة  *"
+                  ></TextFieldNada>
+                </div>
+                <div>
+                  <TextFieldNada
+                    name="name"
+                    type="text"
+                    handleChange={(e) =>
+                      takeFormValue(e, "formData", "name_en")
+                    }
+                    value={formData.name_en}
+                    label=" اسم المنطقة ( انجليزي ) *"
+                    placeholder=" اسم المنطقة  *"
+                  ></TextFieldNada>
+                </div>
+
+                <div className="relative p-2 border border-surface-light-700 rounded-2xl">
+                  <div className="label flex items-center gap-1 absolute -top-4 start-4 bg-background w-fit px-3 font-semibold">
+                    <label htmlFor="collector">الحالة</label>
+                  </div>
+
+                  <select
+                    onChange={(e) => takeSelectedStateInFormData(e)}
+                    value={formData.is_active}
+                    className="w-full h-full"
+                    id="collector"
+                    required
+                  >
+                    {statusList.map((item, index) => (
+                      <option key={index} value={item.is_active}>
+                        {item.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="mx-auto w-[50%] py-5 flex gap-4">
+                  <button className="bg-[#009414] rounded-xl px-3 py-2 text-white w-full">
+                    اضافة
+                  </button>
+                  <button className="bg-[#00941412] text-[#009414] w-full rounded-xl px-3 py-2">
+                    الغاء
+                  </button>
+                </div>
+              </div>
+            </form>
+          </ModalBody>
+        </Modal>
+        <Modal
+          show={openUpdateModal}
+          size="md"
+          onClose={onCloseUpdateModal}
+          popup
+        >
+          <ModalHeader />
+          <ModalBody>
+            <form onSubmit={updateCollectorSubmit}>
+              <div className="space-y-6">
+                <h3 className="text-center text-xl font-medium text-gray-900 dark:text-white">
+                  تعديل منطقه
+                </h3>
+                <div className="mx-auto text-center">
+                  <FileInput
+                    fileUrl={updateFormData.image}
+                    state="edit"
+                    onFileChange={(file) => {
+                      console.log("Received base64 in parent:", file);
+                      setUpdateFormData((prev) => ({ ...prev, image: file }));
+                    }}
+                  />
+                </div>
+                <div>
+                  <TextFieldNada
+                    name="name"
+                    type="text"
+                    handleChange={(e) =>
+                      takeFormValue(e, "updateFormData", "name_ar")
+                    }
+                    value={updateFormData.name_ar}
+                    label=" اسم المنطقة ( عربي ) *"
+                    placeholder=" اسم المنطقه  *"
+                  ></TextFieldNada>
+                </div>
+                <div>
+                  <TextFieldNada
+                    name="name"
+                    type="text"
+                    handleChange={(e) =>
+                      takeFormValue(e, "updateFormData", "name_en")
+                    }
+                    value={updateFormData.name_en}
+                    label=" اسم المنطقة ( انجليزي ) *"
+                    placeholder=" اسم المنطقه  *"
+                  ></TextFieldNada>
+                </div>
+
+                <div className="relative p-2 border border-surface-light-700 rounded-2xl">
+                  <div className="label flex items-center gap-1 absolute -top-4 start-4 bg-background w-fit px-3 font-semibold">
+                    <label htmlFor="collector">الحالة</label>
+                  </div>
+
+                  <select
+                    onChange={(e) => takeSelectedState(e)}
+                    value={Number(updateFormData.is_active)}
+                    className="w-full h-full"
+                    id="collector"
+                    required
+                  >
+                    {statusList.map((item, index) => (
+                      <option key={index} value={item.is_active}>
+                        {item.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="mx-auto w-[50%] py-5 flex gap-4">
+                  <button
+                    type="submit"
+                    className="bg-[#009414] rounded-xl px-3 py-2 text-white w-full"
+                  >
+                    حفظ
+                  </button>
+                  <button className="bg-[#00941412] text-[#009414] w-full rounded-xl px-3 py-2">
+                    الغاء
+                  </button>
+                </div>
+              </div>
+            </form>
+          </ModalBody>
+        </Modal>
       </div>
     </>
   );
