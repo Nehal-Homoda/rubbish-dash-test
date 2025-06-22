@@ -94,11 +94,32 @@ export const filterPackageByStateService = async (
         throw new Error(error.message);
     }
 };
-
-export const activatePackageService = async (
-    id: number,
-    is_active: number
+export const filterPackageByCategoryService = async (
+    pageNumber: number,
+    category_id: number
 ) => {
+    try {
+        const response = await apiCall.get(
+            `/admins/packages?page=${pageNumber}&category_id=${category_id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+        if (!response.ok) {
+            await responseErrorServiceHandler(response, "package list");
+        }
+        const data = await response.json();
+        console.log("response data =>>>>", data);
+        return data;
+    } catch (error: any) {
+        throw new Error(error.message);
+    }
+};
+
+export const activatePackageService = async (id: number, is_active: number) => {
     try {
         const response = await apiCall.put("/admins/packages", id, {
             body: JSON.stringify({ is_active }),
@@ -174,4 +195,3 @@ export const updatePackageService = async (id: number, item) => {
         throw new Error(error.message);
     }
 };
-

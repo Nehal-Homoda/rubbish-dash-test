@@ -53,6 +53,8 @@ export default function rubbush_collectors() {
 
   const [checkBoxValue, setCheckBoxValue] = useState(false);
   const [categoryIsActive, setCategoryIsActive] = useState(false);
+  const [isImg, setIsImg] = useState(false);
+  const [imgUrl,setImgUrl]=useState('')
 
   // const [selectedUpdate, setSelectedUpdate] = useState(null);
 
@@ -89,7 +91,7 @@ export default function rubbush_collectors() {
     setOpenUpdateModal(false);
 
     setUpdateFormData({
-      id:0,
+      id: 0,
       name_ar: "",
       name_en: "",
       order: 0,
@@ -215,6 +217,7 @@ export default function rubbush_collectors() {
     fd.append("is_active", formData.is_active);
     fd.append("image", formData.image);
     addCategoryService(fd).then((response) => {
+      fetchCategories()
       // setCategoryList(response.data)
       onCloseModal();
     });
@@ -265,6 +268,11 @@ export default function rubbush_collectors() {
       setOpenUpdateModal(true);
     }
   }, [selectedItemToUpdate]);
+
+  const takeUploadedImage = (imgUrl) => {
+    console.log(imgUrl)
+    setImgUrl(imgUrl)
+  }
 
   return (
     <>
@@ -341,16 +349,23 @@ export default function rubbush_collectors() {
           </div>
         </CustomDataTable>
 
-        <Modal show={openModal} size="md" onClose={onCloseModal} popup>
+        <Modal show={openModal} size="2xl" className="rounded-3xl " onClose={onCloseModal} popup>
           <ModalHeader />
           <ModalBody>
             <form onSubmit={addServiceSubmit}>
-              <div className="space-y-6">
+              <div className="space-y-10 p-2">
                 <h3 className="text-center text-xl font-medium text-gray-900 dark:text-white">
                   اضافة خدمة
                 </h3>
+
+                <div className="flex justify-center items-center  ">
+                  <FileInput  fileUrl={formData.image} state="addToTable" onFileChange={(image) => takeUploadedImage(image)} />
+                </div>
+
                 <div>
                   <TextFieldNada
+                    // prependIcon="mdi mdi-layers-triple-outline"
+                    prependIcon="mdi mdi-layers-triple-outline"
                     name="name"
                     type="text"
                     handleChange={(e) =>
@@ -358,11 +373,12 @@ export default function rubbush_collectors() {
                     }
                     value={formData.name_ar}
                     label=" اسم الخدمة ( عربي ) *"
-                    placeholder=" اسم الخدمة  *"
+                    placeholder=" ادخل اسم الخدمة باللغة العربية  *"
                   ></TextFieldNada>
                 </div>
                 <div>
                   <TextFieldNada
+                    prependIcon="mdi mdi-layers-triple-outline"
                     name="name"
                     type="text"
                     handleChange={(e) =>
@@ -370,11 +386,11 @@ export default function rubbush_collectors() {
                     }
                     value={formData.name_en}
                     label=" اسم الخدمة ( انجليزي ) *"
-                    placeholder=" اسم الخدمة  *"
+                    placeholder=" ادخل اسم الخدمة باللغة الانجليزية  *"
                   ></TextFieldNada>
                 </div>
 
-                <div className="relative p-2 border border-surface-light-700 rounded-2xl">
+                <div className="relative  p-5  border border-surface-light-700 rounded-2xl">
                   <div className="label flex items-center gap-1 absolute -top-4 start-4 bg-background w-fit px-3 font-semibold">
                     <label htmlFor="category">الحالة</label>
                   </div>
@@ -398,7 +414,7 @@ export default function rubbush_collectors() {
                   <button className="bg-[#009414] rounded-xl px-3 py-2 text-white w-full">
                     اضافة
                   </button>
-                  <button className="bg-[#00941412] text-[#009414] w-full rounded-xl px-3 py-2">
+                  <button onClick={onCloseModal} className="bg-[#00941412] text-[#009414] w-full rounded-xl px-3 py-2">
                     الغاء
                   </button>
                 </div>
@@ -406,28 +422,34 @@ export default function rubbush_collectors() {
             </form>
           </ModalBody>
         </Modal>
+
+
+
         <Modal
-          show={openUpdateModal}
-          size="md"
+          show={openUpdateModal  }
+          size="2xl"
           onClose={onCloseUpdateModal}
           popup
         >
           <ModalHeader />
           <ModalBody>
             <form onSubmit={updateServiceSubmit}>
-              <div className="space-y-6">
+              <div className="space-y-6  p-2">
                 <h3 className="text-center text-xl font-medium text-gray-900 dark:text-white">
                   تعديل خدمة
                 </h3>
-                <div className="mx-auto text-center">
-                  <FileInput
-                    fileUrl={updateFormData.image}
-                    state="edit"
-                    onFileChange={(file) => {
-                      console.log("Received base64 in parent:", file);
-                      setUpdateFormData((prev) => ({ ...prev, image: file }));
-                    }}
-                  />
+                <div className="flex justify-center items-center py-6 ">
+                  <div className="">
+                    <FileInput
+                    handleRemoveImage={()=>setIsImg(true)}
+                      fileUrl={!isImg ?updateFormData.image : ''}
+                      state={isImg ? "addToTable" : "edit"}
+                      onFileChange={(file) => {
+                        console.log("Received base64 in parent:", file);
+                        setUpdateFormData((prev) => ({ ...prev, image: file }));
+                      }}
+                    />
+                  </div>
                 </div>
                 <div>
                   <TextFieldNada
@@ -481,7 +503,7 @@ export default function rubbush_collectors() {
                   >
                     حفظ
                   </button>
-                  <button className="bg-[#00941412] text-[#009414] w-full rounded-xl px-3 py-2">
+                  <button onClick={onCloseUpdateModal} className="bg-[#00941412] text-[#009414] w-full rounded-xl px-3 py-2">
                     الغاء
                   </button>
                 </div>

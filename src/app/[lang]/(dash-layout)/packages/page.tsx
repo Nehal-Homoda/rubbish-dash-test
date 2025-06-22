@@ -10,6 +10,7 @@ import {
   addPackageService,
   deletePackageService,
   updatePackageService,
+  filterPackageByCategoryService,
 } from "@/services/packagesOffersService";
 import DropDown from "@/components/shared/StateDropDown";
 import BaseDropDown from "@/components/shared/BaseDropDown";
@@ -28,9 +29,14 @@ import {
 } from "flowbite-react";
 import TextFieldNada from "@/components/ui/form/TextFieldNada";
 import FileInput from "@/components/ui/form/FileInput";
+import { getCategoriesService } from "@/services/categoriesService";
+import { Categories } from "@/types/categories.interface";
 
 export default function rubbush_collectors() {
-  const [districtList, setPackageList] = useState<Categories[]>([]);
+  const [packageList, setPackageList] = useState<PackageOffer[]>([]);
+  const [categoryList, setCategoryList] = useState<Categories[]>([]);
+
+
   const router = useRouter();
   const headerArr = [
     { text: "ID", name: "id" },
@@ -38,7 +44,6 @@ export default function rubbush_collectors() {
     { text: " نوع الخدمة", name: "category" },
     { text: "سعر الوحدة", name: "price_per_unit" },
     { text: "مدة الباقة", name: "days_count" },
-    { text: "عدد الاشتراكات", name: "no_of_subscriptions" },
     { text: "الحالة", name: "is_active" },
     { text: "الاجراءات", name: "" },
   ];
@@ -50,7 +55,7 @@ export default function rubbush_collectors() {
 
   const [checkBoxValue, setCheckBoxValue] = useState(false);
   const [page, setPage] = useState(1);
-  const [districtIsActive, setPackageIsActive] = useState(false);
+  const [packageIsActive, setPackageIsActive] = useState(false);
 
   const [openModal, setOpenModal] = useState(false);
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
@@ -59,22 +64,26 @@ export default function rubbush_collectors() {
     useState<PackageOffer | null>(null);
 
   const [formData, setFormData] = useState({
-    name: "",
-    category: "",
-    price_per_unit: 0,
-    days_count: 0,
-    no_of_subscriptions: 0,
+    id: 0,
+    name_ar: "",
+    name_en: "",
+    category_id: 0,
     is_active: 0,
+    price_per_unit: 0,
+    order: "",
+    days_count: 0
 
   });
 
   const [updateFormData, setUpdateFormData] = useState({
-    name: "",
-    category: "",
-    price_per_unit: 0,
-    days_count: 0,
-    no_of_subscriptions: 0,
+    id: 0,
+    name_ar: "",
+    name_en: "",
+    category_id: 0,
     is_active: 0,
+    price_per_unit: 0,
+    order: "",
+    days_count: 0
   });
 
   const onCloseModal = () => {
@@ -104,15 +113,20 @@ export default function rubbush_collectors() {
 
   const takeFormValue = (e, formName: string, name: string) => {
     console.log("nn", e.target.value);
+    let value = e.target.value
+    if (e.target.type === 'number') {
+      value = Number(e.target.value)
+    }
+
     if (formName == "formData") {
       setFormData((prev) => ({
         ...prev,
-        [name]: e.target.value,
+        [name]: value,
       }));
     } else {
       setUpdateFormData((prev) => ({
         ...prev,
-        [name]: e.target.value,
+        [name]: value,
       }));
     }
   };
@@ -124,6 +138,28 @@ export default function rubbush_collectors() {
       is_active: value,
     }));
   };
+
+
+  const takeSelectedCategoryFormData = (e, formDataName: string) => {
+    if (formDataName == 'formData') {
+
+      setFormData((prev) => ({
+        ...prev,
+        category_id: selectedCategoryId,
+      }));
+    }
+    else {
+      setUpdateFormData((prev) => ({
+        ...prev,
+        category_id: selectedCategoryId,
+      }));
+
+    }
+    const selectedCategoryId = Number(e.target.value);
+    console.log(selectedCategoryId)
+    console.log(formData)
+  };
+
   const takeSelectedState = (e) => {
     const value = Number(e.target.value);
     setUpdateFormData((prev) => ({
@@ -160,6 +196,21 @@ export default function rubbush_collectors() {
       }
     );
   };
+  const filterPackageByCategory = (selectedItem, selectedIndex) => {
+    if (!selectedItem) return
+    const x = categoryList.find((item, index) => {
+      return index == selectedIndex
+
+    })
+    if (!x) return
+    console.log(x)
+    filterPackageByCategoryService(page, x.id).then(
+      (response) => {
+        setPackageList(response.data);
+        console.log("yes im active");
+      }
+    );
+  };
 
   const takeSelectedPage = (pageNum: number) => {
     console.log(pageNum);
@@ -174,13 +225,13 @@ export default function rubbush_collectors() {
   };
 
   const updatePackageActive = (selectedItem, itemIndex) => {
-    const service = districtList.find((item, index) => {
+    const service = packageList.find((item, index) => {
       return index == itemIndex;
     });
     if (!service) return;
     const toggledIsActive = service.is_active ? 0 : 1;
     activatePackageService(service.id, toggledIsActive).then((response) => {
-      const arr = districtList.map((item, index) => {
+      const arr = packageList.map((item, index) => {
         if (index == itemIndex) {
           console.log("Service is", item);
           return {
@@ -199,7 +250,7 @@ export default function rubbush_collectors() {
   const deletePackage = (item, selectedIndex) => {
     console.log(item);
     deletePackageService(item.id).then((response) => {
-      const updatedArr = [...districtList];
+      const updatedArr = [...packageList];
       updatedArr.splice(selectedIndex, 1);
       setPackageList(updatedArr);
     });
@@ -214,7 +265,15 @@ export default function rubbush_collectors() {
     e.preventDefault();
     const fd = new FormData();
 
+    fd.append('name_ar', formData.name_ar)
+    fd.append('name_en', formData.name_en)
+    fd.append('category_id', formData.category_id)
+    fd.append('days_count', Number(formData.days_count))
+    fd.append('is_active', formData.is_active)
+    fd.append('price_per_unit', formData.price_per_unit)
+
     addPackageService(fd).then((response) => {
+      fetchPackages();
       // setPackageList(response.data)
       onCloseModal();
     });
@@ -247,7 +306,14 @@ export default function rubbush_collectors() {
     );
   };
 
+  const fetchCategories = () => {
+    getCategoriesService().then((response) => {
+      setCategoryList(response.data);
+    });
+  };
+
   useEffect(() => {
+    fetchCategories()
     fetchPackages();
   }, []);
 
@@ -255,11 +321,13 @@ export default function rubbush_collectors() {
     if (selectedItemToUpdate) {
       setUpdateFormData({
         id: selectedItemToUpdate.id,
-
-        name: selectedItemToUpdate.name,
+        name_ar: selectedItemToUpdate.name_ar,
+        name_en: selectedItemToUpdate.name_en,
+        category_id: selectedItemToUpdate.category_id,
+        is_active: selectedItemToUpdate.is_active,
+        price_per_unit: selectedItemToUpdate.price_per_unit,
         order: selectedItemToUpdate.order,
-        is_active: Number(selectedItemToUpdate.is_active),
-        image: selectedItemToUpdate.image,
+        days_count: selectedItemToUpdate.days_count
       });
 
       setOpenUpdateModal(true);
@@ -274,7 +342,7 @@ export default function rubbush_collectors() {
           handleAllCheck={takeCheckValue}
           sendValueToParent={(value) => takeValue(value)}
           tableHead={headerArr}
-          listItem={districtList}
+          listItem={packageList}
           tData={(item, index) => (
             <>
               <td className="py-2 px-4">{item.id}</td>
@@ -283,7 +351,6 @@ export default function rubbush_collectors() {
               <td className="py-2 px-4">{item.category}</td>
               <td className="py-2 px-4">{item.price_per_unit}</td>
               <td className="py-2 px-4">{item.days_count}</td>
-              <td className="py-2 px-4">{item.no_of_subscriptions}</td>
 
 
               <td className="py-2 px-4">
@@ -320,12 +387,12 @@ export default function rubbush_collectors() {
             ></BaseDropDown>
           </div>
 
-          
+
           <div className="bg-[#0094140D]  text-center rounded-xl ">
             <BaseDropDown
-              handleFilterList={(item, index) => filterPackageByState(item)}
+              handleFilterList={(item, index) => filterPackageByCategory(item, index)}
               btnName="نوع الخدمة"
-              listItem={statusList}
+              listItem={categoryList}
             ></BaseDropDown>
           </div>
 
@@ -339,13 +406,13 @@ export default function rubbush_collectors() {
           </div>
         </CustomDataTable>
 
-        {/* <Modal show={openModal} size="md" onClose={onCloseModal} popup>
+        <Modal show={openModal} size="2xl" onClose={onCloseModal} popup>
           <ModalHeader />
           <ModalBody>
             <form onSubmit={addPackageSubmit}>
               <div className="space-y-6">
                 <h3 className="text-center text-xl font-medium text-gray-900 dark:text-white">
-                  اضافة خدمة
+                  اضافة باقة
                 </h3>
                 <div>
                   <TextFieldNada
@@ -354,8 +421,8 @@ export default function rubbush_collectors() {
                     handleChange={(e) =>
                       takeFormValue(e, "formData", "name_ar")
                     }
-                    value={formData.name}
-                    label=" اسم الباقه*"
+                    value={formData.name_ar}
+                    label=" اسم الباقة ( عربي ) **"
                     placeholder=" اسم الباقه  *"
                   ></TextFieldNada>
                 </div>
@@ -367,21 +434,69 @@ export default function rubbush_collectors() {
                       takeFormValue(e, "formData", "name_en")
                     }
                     value={formData.name_en}
-                    label=" اسم المنطقة ( انجليزي ) *"
-                    placeholder=" اسم المنطقة  *"
+                    label=" اسم الباقة ( انجليزي ) **"
+                    placeholder=" اسم الباقه  *"
+                  ></TextFieldNada>
+                </div>
+                <div>
+                  <TextFieldNada
+                    name="name"
+                    type="number"
+                    handleChange={(e) =>
+                      takeFormValue(e, "formData", "price_per_unit")
+                    }
+                    value={formData.price_per_unit}
+                    label=" سعر الوحدة **"
+                    placeholder=" سعر الوحدة *  *"
+                  ></TextFieldNada>
+                </div>
+                <div>
+                  <TextFieldNada
+                    name="name"
+                    type="number"
+                    handleChange={(e) =>
+                      takeFormValue(e, "formData", "days_count")
+                    }
+                    value={Number(formData.days_count)}
+                    label="مدة الباقة*"
+                    placeholder=" مدة الباقه  *"
                   ></TextFieldNada>
                 </div>
 
-                <div className="relative p-2 border border-surface-light-700 rounded-2xl">
+
+                <div className="relative p-5 border border-surface-light-700 rounded-2xl">
                   <div className="label flex items-center gap-1 absolute -top-4 start-4 bg-background w-fit px-3 font-semibold">
-                    <label htmlFor="district">الحالة</label>
+                    <label htmlFor="package">نوع الخدمة</label>
+                  </div>
+
+                  <select
+                    onChange={(e) => takeSelectedCategoryFormData(e,'formData')}
+
+                    value={Number(formData.category_id)}
+                    className="w-full h-full"
+                    id="package"
+                    required
+                  >
+                    {categoryList.map((item, index) => (
+                      <option key={index} value={item.id}>
+                        {item.name_ar}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+
+
+                <div className="relative p-5 border border-surface-light-700 rounded-2xl">
+                  <div className="label flex items-center gap-1 absolute -top-4 start-4 bg-background w-fit px-3 font-semibold">
+                    <label htmlFor="package">الحالة</label>
                   </div>
 
                   <select
                     onChange={(e) => takeSelectedStateInFormData(e)}
                     value={formData.is_active}
                     className="w-full h-full"
-                    id="district"
+                    id="package"
                     required
                   >
                     {statusList.map((item, index) => (
@@ -404,29 +519,23 @@ export default function rubbush_collectors() {
             </form>
           </ModalBody>
         </Modal>
+
+
+
         <Modal
           show={openUpdateModal}
-          size="md"
+          size="2xl"
           onClose={onCloseUpdateModal}
           popup
         >
           <ModalHeader />
           <ModalBody>
             <form onSubmit={updatePackageSubmit}>
-              <div className="space-y-6">
+              <div className="space-y-6 ">
                 <h3 className="text-center text-xl font-medium text-gray-900 dark:text-white">
-                  تعديل منطقه
+                  تعديل الباقة
                 </h3>
-                <div className="mx-auto text-center">
-                  <FileInput
-                    fileUrl={updateFormData.image}
-                    state="edit"
-                    onFileChange={(file) => {
-                      console.log("Received base64 in parent:", file);
-                      setUpdateFormData((prev) => ({ ...prev, image: file }));
-                    }}
-                  />
-                </div>
+
                 <div>
                   <TextFieldNada
                     name="name"
@@ -435,8 +544,8 @@ export default function rubbush_collectors() {
                       takeFormValue(e, "updateFormData", "name_ar")
                     }
                     value={updateFormData.name_ar}
-                    label=" اسم المنطقة ( عربي ) *"
-                    placeholder=" اسم المنطقه  *"
+                    label=" اسم الباقة ( عربي ) *"
+                    placeholder=" اسم الباقة  *"
                   ></TextFieldNada>
                 </div>
                 <div>
@@ -447,21 +556,73 @@ export default function rubbush_collectors() {
                       takeFormValue(e, "updateFormData", "name_en")
                     }
                     value={updateFormData.name_en}
-                    label=" اسم المنطقة ( انجليزي ) *"
-                    placeholder=" اسم المنطقه  *"
+                    label=" اسم الباقة ( انجليزي ) *"
+                    placeholder=" اسم الباقة  *"
                   ></TextFieldNada>
                 </div>
 
-                <div className="relative p-2 border border-surface-light-700 rounded-2xl">
+
+
+
+                <div>
+                  <TextFieldNada
+                    name="name"
+                    type="number"
+                    handleChange={(e) =>
+                      takeFormValue(e, "updateFormData", "price_per_unit")
+                    }
+                    value={updateFormData.price_per_unit}
+                    label=" سعر الوحدة **"
+                    placeholder=" سعر الوحدة *  *"
+                  ></TextFieldNada>
+                </div>
+                <div>
+                  <TextFieldNada
+                    name="name"
+                    type="number"
+                    handleChange={(e) =>
+                      takeFormValue(e, "updateFormData", "days_count")
+                    }
+                    value={Number(updateFormData.days_count)}
+                    label="مدة الباقة*"
+                    placeholder=" مدة الباقه  *"
+                  ></TextFieldNada>
+                </div>
+
+
+                <div className="relative p-5 border border-surface-light-700 rounded-2xl">
                   <div className="label flex items-center gap-1 absolute -top-4 start-4 bg-background w-fit px-3 font-semibold">
-                    <label htmlFor="district">الحالة</label>
+                    <label htmlFor="package">نوع الخدمة</label>
+                  </div>
+
+                  <select
+                    onChange={(e) => takeSelectedCategoryFormData(e,'updateFormData')}
+
+                    value={Number(updateFormData.category_id)}
+                    className="w-full h-full"
+                    id="package"
+                    required
+                  >
+                    {categoryList.map((item, index) => (
+                      <option key={index} value={item.id}>
+                        {item.name_ar}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+
+
+                <div className="relative p-5 border border-surface-light-700 rounded-2xl">
+                  <div className="label flex items-center gap-1 absolute -top-4 start-4 bg-background w-fit px-3 font-semibold">
+                    <label htmlFor="package">الحالة</label>
                   </div>
 
                   <select
                     onChange={(e) => takeSelectedState(e)}
                     value={Number(updateFormData.is_active)}
                     className="w-full h-full"
-                    id="district"
+                    id="package"
                     required
                   >
                     {statusList.map((item, index) => (
@@ -471,6 +632,9 @@ export default function rubbush_collectors() {
                     ))}
                   </select>
                 </div>
+
+
+
 
                 <div className="mx-auto w-[50%] py-5 flex gap-4">
                   <button
@@ -486,7 +650,7 @@ export default function rubbush_collectors() {
               </div>
             </form>
           </ModalBody>
-        </Modal> */}
+        </Modal>
       </div>
     </>
   );
