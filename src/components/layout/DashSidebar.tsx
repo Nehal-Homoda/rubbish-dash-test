@@ -39,7 +39,7 @@ export default function DashSidebar(props: SideBarProps) {
 
       subLinks: [
         { name: "all", path: Routes.users },
-        { name: "users", path: "/users2" },
+        { name: "users", path: "/users" },
         { name: "deleted", path: Routes.deletedUsers },
       ],
     },

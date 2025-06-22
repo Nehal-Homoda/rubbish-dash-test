@@ -2,14 +2,23 @@ import { Calendar } from "primereact/calendar";
 import React, { useRef } from "react";
 
 interface TimePickerFieldProps {
-  value: Date;
+  value: Date | null;
   onChange: (time: Date) => void;
   label: string;
   required?: boolean;
   errorMessage?: string;
   lang?: "en" | "ar";
+  dict: { [key: string]: string };
 }
-export default function TimePicker(props: TimePickerFieldProps) {
+export default function TimePicker({
+  value,
+  onChange,
+  label,
+  required = false,
+  errorMessage,
+  lang = "en",
+  dict,
+}: TimePickerFieldProps) {
   const timePickerRef = useRef<any>(null);
 
   const handleIconClick = () => {
@@ -25,8 +34,8 @@ export default function TimePicker(props: TimePickerFieldProps) {
           htmlFor=""
           className="absolute bg-background -top-4 capitalize text-base text-foreground px-2"
         >
-          {props.label}
-          {props.required && <span className="text-red-600 text-lg">*</span>}
+          {label}
+          {required && <span className="text-red-600 text-lg">*</span>}
         </label>
         <div className="flex items-center timePicker">
           <span
@@ -34,13 +43,13 @@ export default function TimePicker(props: TimePickerFieldProps) {
             onClick={handleIconClick}
           ></span>
           <Calendar
-            value={props.value}
+            value={value}
             ref={timePickerRef}
-            onChange={(e) => props.onChange(e.value as Date)}
+            onChange={(e) => onChange(e.value as Date)}
             timeOnly
             readOnlyInput
             hourFormat="12"
-            placeholder="ادخل الوقت"
+            placeholder={dict.enterTime || "Enter time"}
             className={`w-full  ps-1 `}
             inputStyle={{
               boxShadow: "none",
@@ -52,8 +61,8 @@ export default function TimePicker(props: TimePickerFieldProps) {
           />
         </div>
       </div>
-      {props.errorMessage && (
-        <p className="err-msg text-red-600 text-sm">{props.errorMessage}</p>
+      {errorMessage && (
+        <p className="err-msg text-red-600 text-sm">{errorMessage}</p>
       )}
     </>
   );

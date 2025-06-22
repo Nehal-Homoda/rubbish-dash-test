@@ -1,28 +1,301 @@
-import React from 'react'
-import CustomDataTable from '@/components/data-tables/customDataTable'
+"use client";
+
+import React, { useEffect, useState } from "react";
+import CustomDataTable from "@/components/data-tables/customDataTable";
+import {
+  filterUserBySearchService,
+  filterUserByStateService,
+  filterUserBySubscriptionService,
+  subscriptionListService,
+  userListByPageService,
+  userListService,
+} from "@/services/sharedService";
+import DropDown from "@/components/shared/StateDropDown";
+import BaseDropDown from "@/components/shared/BaseDropDown";
+import { Avatar } from "flowbite-react";
+import { getPackagesService } from "@/services/packagesOffersService";
+import { PackageOffer } from "@/types/packagesOffer.interface";
+import { useRouter } from "next/navigation";
 
 export default function rubbush_collectors() {
+  interface User {
+    id: number;
+    created_at: string;
+    name: string;
+    phone: string;
+    image: string;
+    subscription_name: string;
+    is_active: boolean;
+    renewal_date: string;
+  }
+  const [users, setUsers] = useState<User[]>([]);
+  const [subscriptionList, setSubscriptionList] = useState<PackageOffer[]>([]);
+  const router=useRouter()
+  const headerArr = [
+    { text: "ID", name: "id" },
+    { text: "اسم المستخدم", name: "name" },
+    { text: "رقم الموبيل", name: "phone" },
+    { text: " الاشتراك", name: "subscription_name" },
+    { text: "نوع الاشتراك", name: "subscription_name" },
+    { text: "الصورة الشخصية", name: "image" },
+    { text: "الحالة", name: "is_active" },
+    { text: "ميعاد التجديد", name: "renewal_date" },
+    { text: "الاجراءات", name: "" },
+  ];
 
-const arr=[
-  'sdjfh',
-  'sdifjoi'
-]
+  const areas = [
+    { id: 1, name: "حي اول طنطا" },
+    { id: 2, name: "حي ثان طنطا" },
+    { id: 3, name: "حي ثالث طنطا" },
+  ];
+  const statusList = [
+    { is_active: 1, name: "مفعل" },
+    { is_active: 0, name: "غير مفعل" },
+    { id: 3, name: "معلق" },
+  ];
+
+  const hasSubscriptionList = [
+    { is_subscribe: 1, name: "مشترك" },
+    { is_subscribe: 0, name: "غير مشترك" },
+  ];
+
+  // const subscriptionList = [
+  //   { id: 1, name: "باقة شهرية" },
+  //   { id: 2, name: "مشترك/3شهور" },
+  //   { id: 3, name: "غير مشترك" },
+  //   { id: 4, name: "مشترك/6شهور" },
+  // ];
+
+  const [filteredArr, setFilteredArr] = useState<User[]>([]);
+  const [checkBoxValue, setCheckBoxValue] = useState(false);
+  const [page, setPage] = useState(1);
+  const [userIsActive, setUserIsActive] = useState(false);
+
+  const fetchUserList = (pageNumber) => {
+    userListByPageService(pageNumber).then((response) => {
+      console.log(response);
+      setUsers(response.data);
+      // setFilteredArr(response.data);
+    });
+  };
+  const fetchPackages = () => {
+    getPackagesService().then((response) => {
+      console.log(response);
+      setSubscriptionList(response.data);
+    });
+  };
+
+  const filterUserBySearch = (pageNumber, searchValue) => {
+    filterUserBySearchService(pageNumber, searchValue).then((response) => {
+      setUsers(response.data);
+    });
+  };
+  const takeValue = (e) => {
+    console.log("sjkdhfu");
+    console.log(e);
+    filterUserBySearch(page, e);
+  };
+  // const x = users.filter((item) => {
+  //   return item.name.includes(e);
+  // });
+
+  //   setFilteredArr([...x]);
+  //   // setFilteredArr(x)
+
+  //   console.log(filteredArr);
+  // };
+
+  const filterUserByState = (selectedItem) => {
+    console.log(selectedItem.is_active);
+    filterUserByStateService(page, selectedItem.is_active).then((response) => {
+      setUsers(response.data);
+      console.log("yes im active");
+    });
+  };
+
+  const takeSelectedPage = (pageNum: number) => {
+    console.log(pageNum);
+    // setPage(pageNum)
+
+    fetchUserList(pageNum);
+  };
+
+  const filterBySubscription = (selectedSubscription) => {
+    console.log(selectedSubscription);
+    filterUserBySubscriptionService(
+      page,
+      selectedSubscription.is_subscribe
+    ).then((response) => {
+      setUsers(response.data);
+    });
+  };
+
+  const takeCheckValue = (e) => {
+    console.log("input checked", e.target.checked);
+    setCheckBoxValue(e.target.checked);
+  };
+
+  const updateUserActive = (selectedItem, itemIndex) => {
+    console.log("item", selectedItem);
+    console.log("index", itemIndex);
+    handleActivation(selectedItem.text, itemIndex);
+  };
+
+  const handleActivation = (state: string, itemIndex: number) => {
+    const arr = users.map((item, index) => {
+      if (index == itemIndex) {
+        if (state == "غير مفعل") {
+          return { ...item, ["is_active"]: false };
+        }
+        // if(state=='مفعل'){
+        //   return { ...item, ['is_active']:true }
+
+        // }
+        return { ...item, ["is_active"]: true };
+      }
+
+      return item;
+    });
+    setUsers(arr);
+  };
+const goToAddPage=()=>{
+  router.push(`/users/add-user`)
+}
+  useEffect(() => {
+    setFilteredArr(users);
+  }, [users]);
+
+  useEffect(() => {
+    fetchUserList(1);
+    fetchPackages();
+    // fetchSubscriptionList()
+  }, []);
+
+  // const fetchSubscriptionList = () => {
+  //   subscriptionListService().then((response) => {
+  //     console.log(response);
+  //     setSubscriptionList(response.data)
+  //     // setUsers(response.data);
+  //     // setFilteredArr(response.data);
+  //   });
+  // };
+
+  // const sortList = (headItem, type: string) => {
+  //   const itemKey = headItem.name;
+  //   // const itemValue = users.map((item) => {
+  //   //   return item[itemKey];
+  //   // });
+  //   // console.log(itemValue);
+  //   // const sortedUser = itemValue.sort((a, b) => a - b);
+  //   // console.log(sortedUser);
+
+  //   const sortedUser = [...(filteredArr || [])].sort((a, b) => {
+  //     const valA = a[itemKey];
+  //     const valB = b[itemKey];
+
+  //     if (type == "asc") {
+  //       return valA - valB;
+  //     }
+  //     if (type == "desc") {
+  //       return valB - valA;
+  //     }
+  //   });
+  //   console.log(sortedUser);
+  //   setFilteredArr(sortedUser);
+  // };
+
+  // const filterUser = (selectedItem, selectedIndex) => {
+  //   console.log("selected", selectedItem);
+  //   console.log("index", index);
+  //   const arr = users.map((item, index) => {
+  //     return item.subscription_name == selectedItem.name;
+
+  //     if (index == selectedIndex) {
+  //       return;
+  //     }
+  //     return item;
+  //   });
+  // };
+
   return (
-    <>  <div>rubbush_collectors
+    <>
+      <div className="py-20">
+        <CustomDataTable
+          selectedPage={(pageNum: number) => takeSelectedPage(pageNum)}
+          handleAllCheck={takeCheckValue}
+          sendValueToParent={(value) => takeValue(value)}
+          tableHead={headerArr}
+          listItem={users}
+          tData={(item, index) => (
+            <>
+              <td className="py-2 px-4">{item.id}</td>
+              <td className="py-2 px-4">{item.name}</td>
+              <td className="py-2 px-4">{item.phone}</td>
+              <td className="py-2 px-4">
+                {item.has_subscription ? "مشترك" : "غير مشترك"}
+              </td>
+              <td className="py-2 px-4">{item.subscription_name}</td>
+              <td className="py-2 px-4">
+                <Avatar
+                  color="success"
+                  placeholderInitials={item.name.slice(0, 2)}
+                  rounded
+                />
+                {/* <div className=" w-7 h-7 rounded-full overflow-hidden">
+                        <img
+                          className="w-full h-full object-contain"
+                          src={item.image}
+                          alt=""
+                        />
+                      </div> */}
+              </td>
+              <td className="py-2 px-4">
+                <DropDown
+                  handleIsActive={(item) => updateUserActive(item, index)}
+                  btnName={item.is_active ? "مفعل" : "غير مفعل"}
+                  isActive={item.is_active}
+                />
+              </td>
+              <td className="">{item.renewal_date}</td>
+              <td className="">{item.renewal_date}</td>
+            </>
+          )}
+        >
+          {/* <div className='bg-[#0094140D]  text-center rounded-xl text-[#009414]'>
+            <Dropdown value={location} onChange={(e) => handleFilterChange(e, 'area')} options={areas} optionLabel="name"
+              placeholder="المنطقة" className="w-full md:w-14rem border-0 bg-transparent font-bold " />
+          </div> */}
 
-      {/* <form className="max-w-sm mx-auto">
-        <label  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select an option</label>
-        <select id="countries" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-          <option selected>Choose a country</option>
-          <option value="US">United States</option>
-          <option value="CA">Canada</option>
-          <option value="FR">France</option>
-          <option value="DE">Germany</option>
-        </select>
-      </form> */}
+          {/* <div className='bg-[#0094140D]  text-center rounded-xl text-[#009414]'>
+            <BaseDropDown btnName="المنطقة" listItem={areas}></BaseDropDown>
+          </div>
+ */}
 
-      <CustomDataTable tableHead={arr}/>
+          <div className="bg-[#0094140D]  text-center rounded-xl ">
+            {/* <Dropdown value={status} onChange={(e) => handleFilterChange(e, 'status')} options={statusList} optionLabel="name"
+              placeholder="الحالة" className="w-full md:w-14rem border-0 bg-transparent font-bold " /> */}
+            <BaseDropDown
+              handleFilterList={(item, index) => filterUserByState(item)}
+              btnName="الحالة"
+              listItem={statusList}
+            ></BaseDropDown>
+          </div>
 
-    </div></>
-  )
+          <div className="bg-[#0094140D]  text-center rounded-xl ">
+            {/* <Dropdown value={subscribe} onChange={(e) => handleFilterChange(e, 'subscription')} options={subscriptionList} optionLabel="name"
+              placeholder="الاشتراك" className="w-full md:w-14rem border-0 bg-transparent font-bold " /> */}
+            <BaseDropDown
+              handleFilterList={(item, index) => filterBySubscription(item)}
+              btnName="الاشتراك"
+              listItem={hasSubscriptionList}
+            ></BaseDropDown>
+          </div>
+
+          <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
+            <button onClick={goToAddPage} className="w-full h-full">اضافة مستخدم</button>
+          </div>
+        </CustomDataTable>
+      </div>
+    </>
+  );
 }

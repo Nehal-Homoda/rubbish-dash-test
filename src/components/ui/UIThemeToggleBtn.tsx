@@ -18,7 +18,9 @@ export default function UIDarkBtn({ lang }: { lang: string }) {
   useEffect(() => {
     if (isDark === null) return;
     const html = document.documentElement;
-    isDark ? html.classList.add("dark") : html.classList.remove("dark");
+    isDark
+      ? html.setAttribute("data-theme", "dark")
+      : html.setAttribute("data-theme", "light");
     localStorage.setItem("dark-mode", JSON.stringify(isDark));
 
     const existingLink = document.getElementById(

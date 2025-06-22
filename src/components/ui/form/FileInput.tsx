@@ -8,6 +8,7 @@ interface FileInputProps {
   title?: string;
   fileUrl?: string;
   state: "edit" | "add" | "addToTable";
+  onFileChange: (file) => void;
 }
 
 export default function FileInput({
@@ -15,6 +16,7 @@ export default function FileInput({
   title,
   fileUrl,
   state = "add",
+  onFileChange,
 }: FileInputProps) {
   const [fileName, setFileName] = useState("");
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -44,17 +46,24 @@ export default function FileInput({
 
       if (file.type.startsWith("image/")) {
         const reader = new FileReader();
-        reader.readAsDataURL(file);
+       
         reader.onload = () => {
+          const base64 = reader.result as string;
           setImageUrl(reader.result as string);
+          if (onFileChange) {
+            onFileChange(base64);
+          }
         };
+         reader.readAsDataURL(file);
       } else {
         setImageUrl(null);
+         if (onFileChange) onFileChange(null);
       }
     } else {
       setFileName("");
       setFileType(null);
       setImageUrl(null);
+      if (onFileChange) onFileChange(null);
     }
   };
 

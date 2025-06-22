@@ -1,8 +1,7 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { DataTable, DataTableFilterMeta } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Tag } from "primereact/tag";
 import BaseModal from "../ui/BaseModal";
 import TextField from "../ui/form/TextFieldNada";
 import TimePicker from "../ui/form/TimePicker";
@@ -10,51 +9,62 @@ import { InputText } from "primereact/inputtext";
 import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
 import { FilterMatchMode } from "primereact/api";
-import downloadIcon from "../../assets/images/icons/download-icon.png";
+import downloadIcon from "@/assets/images/icons/download-icon.png";
 import Image from "next/image";
-interface Regions {
-  id: number;
-  areaName: string;
-  subscriptionsNumber: string;
-  status: string;
-}
-interface RgionTableProps {
+import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
+import { getRegionsService } from "@/services/regionsService";
+import type { Region } from "@/types/regions.interface";
+import TableStatusDropdown from "../ui/TableStatusDropdown";
+interface RegionsTableProps {
   lang?: "en" | "ar";
   dict?: { [key: string]: string };
 }
-interface TimeRange {
-  from: Date;
-  to: Date;
+interface regionNames {
+  id: number;
+  name_ar: string;
+  name_en: string;
 }
-
+interface TimeRange {
+  from: Date | null;
+  to: Date | null;
+}
 export default function RegionsDataTable({
   lang = "en",
   dict = {},
-}: RgionTableProps) {
-  const [regionNameArabic, setRegionNameArabic] = useState<string>("");
-  const [selectedRegions, setSelectedRegions] = useState<any>(null);
-  const [filters, setFilters] = useState<DataTableFilterMeta>({
+}: RegionsTableProps) {
+  const [regionForm, setRegionForm] = useState<{
+    nameAr: string;
+    nameEn: string;
+    timeRanges: TimeRange[];
+  }>({
+    nameAr: "",
+    nameEn: "",
+    timeRanges: [{ from: null, to: null }],
+  });
+  const [regions, setRegions] = useState<any>([]);
+  const [selectedRegions, setSelectedRegions] = useState<Region[]>([]);
+  const [filters, setFilters] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     id: { value: null, matchMode: FilterMatchMode.EQUALS },
-    areaName: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    name_ar: { value: null, matchMode: FilterMatchMode.EQUALS },
+    name_en: { value: null, matchMode: FilterMatchMode.EQUALS },
     status: { value: null, matchMode: FilterMatchMode.EQUALS },
-    subscriptionsNumber: { value: null, matchMode: FilterMatchMode.EQUALS },
+    no_of_subscriptions: { value: null, matchMode: FilterMatchMode.EQUALS },
   });
   const [globalFilterValue, setGlobalFilterValue] = useState<string>("");
-  const [regionNameEnglish, setRegionNameEnglish] = useState<string>("");
-  const [timeRanges, setTimeRanges] = useState<TimeRange[]>([
-    { from: null, to: null },
-  ]);
-  const handleRegionNameArabicChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setRegionNameArabic(e.target.value);
+
+  const regionNames: regionNames[] = [
+    { id: 1, name_ar: "الحى 1", name_en: "District 1" },
+    { id: 2, name_ar: "الحى 2", name_en: "District 2" },
+    { id: 3, name_ar: "الحى 3", name_en: "District 3" },
+  ];
+
+  const handleNameArChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setRegionForm({ ...regionForm, nameAr: e.target.value });
   };
 
-  const handleRegionNameEnglishChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setRegionNameEnglish(e.target.value);
+  const handleNameEnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setRegionForm({ ...regionForm, nameEn: e.target.value });
   };
 
   const handleTimeChange = (
@@ -62,60 +72,38 @@ export default function RegionsDataTable({
     field: "from" | "to",
     value: Date
   ) => {
-    const updated = [...timeRanges];
+    const updated = [...regionForm.timeRanges];
     updated[index][field] = value;
-    setTimeRanges(updated);
+    setRegionForm({ ...regionForm, timeRanges: updated });
   };
 
   const handleAddTime = () => {
-    setTimeRanges([...timeRanges, { from: null, to: null }]);
+    setRegionForm({
+      ...regionForm,
+      timeRanges: [...regionForm.timeRanges, { from: null, to: null }],
+    });
   };
+
   const handleRemoveTime = () => {
-    setTimeRanges((prev) => prev.slice(0, -1));
+    setRegionForm({
+      ...regionForm,
+      timeRanges: regionForm.timeRanges.slice(0, -1),
+    });
   };
 
-  const regions: Regions[] = [
-    {
-      id: 1,
-      areaName: "حي ثان طنطا",
-      subscriptionsNumber: "25 مشترك",
-      status: "مفعل",
-    },
-    {
-      id: 2,
-      areaName: "حي ثالث طنطا",
-      subscriptionsNumber: "15 مشترك",
-      status: "معلق",
-    },
-    {
-      id: 3,
-      areaName: "حي اول طنطا",
-      subscriptionsNumber: "10 مشترك",
-      status: "غير مفعل",
-    },
-  ];
-
-  const getStatusSeverity = (status: string) => {
-    switch (status) {
-      case "مفعل":
-        return "success";
-      case "غير مفعل":
-        return "danger";
-      case "معلق":
-        return "warning";
-      default:
-        return "info";
-    }
+  const handleStatusChange = (newStatus: string, id: number) => {
+    console.log("hi");
   };
 
-  const statusBodyTemplate = (rowData: Regions) => {
+  const statusBodyTemplate = (data: any) => {
     return (
-      <Tag
-        value={rowData.status}
-        severity={getStatusSeverity(rowData.status)}
+      <TableStatusDropdown
+        currentStatus={data.is_active}
+        onStatusChange={(newStatus) => handleStatusChange(newStatus, data.id)}
       />
     );
   };
+
   const actionsBodyTemplate = () => {
     return (
       <div className="flex items-center justify-center gap-3">
@@ -128,8 +116,8 @@ export default function RegionsDataTable({
         >
           <div className="flex flex-col gap-12">
             <TextField
-              handleChange={handleRegionNameArabicChange}
-              value={regionNameArabic}
+              handleChange={handleNameArChange}
+              value={regionForm.nameAr}
               label={dict.region_name_arabic || "Region Name (Arabic)"}
               name="region_name_arabic"
               placeholder={
@@ -141,8 +129,8 @@ export default function RegionsDataTable({
               iconType="mdi"
             />
             <TextField
-              handleChange={handleRegionNameEnglishChange}
-              value={regionNameEnglish}
+              handleChange={handleNameEnChange}
+              value={regionForm.nameEn}
               label={dict.region_name_english || "Region Name (English)"}
               name="region_name_english"
               placeholder={
@@ -154,14 +142,16 @@ export default function RegionsDataTable({
               iconType="mdi"
             />
             <div className="flex flex-col items-center gap-6">
-              {timeRanges.map((range, index) => (
+              {regionForm.timeRanges.map((range, index) => (
                 <div key={index} className="flex gap-3 items-center">
                   <TimePicker
+                    dict={dict}
                     label={dict.from || "From"}
                     value={range.from}
                     onChange={(val) => handleTimeChange(index, "from", val)}
                   />
                   <TimePicker
+                    dict={dict}
                     label={dict.to || "To"}
                     value={range.to}
                     onChange={(val) => handleTimeChange(index, "to", val)}
@@ -169,7 +159,7 @@ export default function RegionsDataTable({
                   {index === 0 && (
                     <button
                       onClick={handleAddTime}
-                      disabled={timeRanges.length > 2}
+                      disabled={regionForm.timeRanges.length > 2}
                       className="mdi mdi-plus outline-none border-none bg-surface px-[7px] py-1 rounded-md text-white hover:bg-surface-light-100 transition-all duration-300 cursor-pointer  disabled:bg-gray-400/50 disabled:text-white disabled:cursor-not-allowed"
                     ></button>
                   )}
@@ -186,21 +176,17 @@ export default function RegionsDataTable({
           </div>
         </BaseModal>
         <BaseModal
-          title={"حذف عنصر"}
-          actionBtn={"تأكيد"}
+          title={dict.deleteItem || "Delete item"}
+          actionBtn={dict.confirm || "Confirm"}
           iconType="mdi"
           openBtnIcon={"mdi mdi-delete-outline text-lg "}
           style="text-red-600 bg-red-50 rounded-lg px-2 py-1"
         >
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis,
-            vero!
-          </p>
+          <p>Sure?</p>
         </BaseModal>
       </div>
     );
   };
-
   const renderHeader = () => {
     return (
       <div className="flex justify-between items-center">
@@ -216,10 +202,50 @@ export default function RegionsDataTable({
             }}
           />
         </IconField>
-        <div className="flex items-center gap-3">
-          <button className="btn-secondary  ">
-            <Image src={downloadIcon} alt="download" width={20} height={20}/>
-          </button>
+        <div className="flex items-center gap-3 overflow-x-auto ">
+          <Dropdown
+            value={
+              lang === "ar" ? filters.name_ar.value : filters.name_en.value
+            }
+            options={regionNames}
+            onChange={async (e: DropdownChangeEvent) => {
+              const updatedFilters = {
+                ...filters,
+                name_ar: {
+                  value: lang === "ar" ? e.value : null,
+                  matchMode: FilterMatchMode.EQUALS,
+                },
+                name_en: {
+                  value: lang === "en" ? e.value : null,
+                  matchMode: FilterMatchMode.EQUALS,
+                },
+              };
+              setFilters(updatedFilters);
+
+              try {
+                const queryParam = lang === "ar" ? "name_ar" : "name_en";
+                const query = e.value
+                  ? `?${queryParam}=${encodeURIComponent(e.value)}`
+                  : "";
+
+                const response = await getRegionsService(query);
+                setRegions(response.data);
+              } catch (error) {
+                console.error("Error while filtering regions:", error);
+              }
+            }}
+            optionLabel={lang === "ar" ? "name_ar" : "name_en"}
+            optionValue={lang === "ar" ? "name_ar" : "name_en"}
+            placeholder={dict.region}
+            className={`btn-secondary  border-0 ${
+              lang === "ar" ? "p-0" : "pe-0"
+            } `}
+            showClear
+          />
+
+          <div className="btn-secondary flex-shrink-0 flex justify-center items-center cursor-pointer">
+            <Image src={downloadIcon} alt="download" width={20} height={20} />
+          </div>
           <BaseModal
             openBtnLabel={dict.add_region}
             style="base-btn"
@@ -228,8 +254,8 @@ export default function RegionsDataTable({
           >
             <div className="flex flex-col gap-12">
               <TextField
-                handleChange={handleRegionNameArabicChange}
-                value={regionNameArabic}
+                handleChange={handleNameArChange}
+                value={regionForm.nameAr}
                 label={dict.region_name_arabic || "Region Name (Arabic)"}
                 name="region_name_arabic"
                 placeholder={
@@ -241,8 +267,8 @@ export default function RegionsDataTable({
                 iconType="mdi"
               />
               <TextField
-                handleChange={handleRegionNameEnglishChange}
-                value={regionNameEnglish}
+                handleChange={handleNameEnChange}
+                value={regionForm.nameEn}
                 label={dict.region_name_english || "Region Name (English)"}
                 name="region_name_english"
                 placeholder={
@@ -254,42 +280,46 @@ export default function RegionsDataTable({
                 iconType="mdi"
               />
               <div className="flex flex-col items-center gap-6">
-              {timeRanges.map((range, index) => (
-                <div key={index} className="flex gap-3 items-center">
-                  <TimePicker
-                    label={dict.from || "From"}
-                    value={range.from}
-                    onChange={(val) => handleTimeChange(index, "from", val)}
-                  />
-                  <TimePicker
-                    label={dict.to || "To"}
-                    value={range.to}
-                    onChange={(val) => handleTimeChange(index, "to", val)}
-                  />
-                  {index === 0 && (
-                    <button
-                      onClick={handleAddTime}
-                      disabled={timeRanges.length > 2}
-                      className="mdi mdi-plus outline-none border-none bg-surface px-[7px] py-1 rounded-md text-white hover:bg-surface-light-100 transition-all duration-300 cursor-pointer  disabled:bg-gray-400/50 disabled:text-white disabled:cursor-not-allowed"
-                    ></button>
-                  )}
-                  {index > 0 && (
-                    <button
-                      onClick={handleRemoveTime}
-                      className="mdi mdi-close outline-none border-none bg-rose-500 
- px-[7px] py-1 rounded-md text-white hover:opacity-85 transition-all duration-300 cursor-pointer"
-                    ></button>
-                  )}
-                </div>
-              ))}
-            </div>
+                {regionForm.timeRanges.map((range, index) => (
+                  <div key={index} className="flex gap-3 items-center w-full">
+                    <TimePicker
+                      dict={dict}
+                      label={dict.from || "From"}
+                      value={range.from}
+                      onChange={(val) => handleTimeChange(index, "from", val)}
+                    />
+                    <TimePicker
+                      dict={dict}
+                      label={dict.to || "To"}
+                      value={range.to}
+                      onChange={(val) => handleTimeChange(index, "to", val)}
+                    />
+                    {index === 0 && (
+                      <button
+                        onClick={handleAddTime}
+                        disabled={regionForm.timeRanges.length > 2}
+                        className="mdi mdi-plus outline-none border-none bg-surface px-[7px] py-1 rounded-md text-white hover:bg-surface-light-100 transition-all duration-300 cursor-pointer  disabled:opacity-65  disabled:cursor-not-allowed"
+                      ></button>
+                    )}
+                    {index > 0 && (
+                      <button
+                        onClick={handleRemoveTime}
+                        className="mdi mdi-close outline-none border-none bg-rose-500 
+                         px-[7px] py-1 rounded-md text-white hover:opacity-85 transition-all duration-300 cursor-pointer"
+                      ></button>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           </BaseModal>
         </div>
       </div>
     );
   };
-  const onGlobalFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onGlobalFilterChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const value = e.target.value;
     let _filters = { ...filters };
 
@@ -298,11 +328,29 @@ export default function RegionsDataTable({
 
     setFilters(_filters);
     setGlobalFilterValue(value);
+
+    try {
+      const query = value ? `?search=${encodeURIComponent(value)}` : "";
+      const response = await getRegionsService(query);
+      setRegions(response.data);
+    } catch (error) {
+      console.error("Error while searching regions:", error);
+    }
   };
+  useEffect(() => {
+    getRegionsService()
+      .then((res) => {
+        console.log(res);
+        setRegions(res.data);
+      })
+      .catch((err) => {
+        console.error("Error while fetching regions:", err.message);
+      });
+  }, []);
   const header = renderHeader();
 
   return (
-    <div className="card">
+    <div className="card region-table">
       <DataTable
         value={regions}
         header={header}
@@ -311,20 +359,22 @@ export default function RegionsDataTable({
         rows={5}
         filters={filters}
         selection={selectedRegions!}
+        globalFilterFields={[
+          "id",
+          "name_ar",
+          "name_en",
+          "status",
+          "no_of_subscriptions",
+        ]}
         onSelectionChange={(e) => setSelectedRegions(e.value)}
         dataKey="id"
-        emptyMessage="No regions found."
+        emptyMessage={dict.regions_Empty_table_msg}
       >
-        <Column
-          selectionMode="multiple"
-          style={{ textAlign: "center" }}
-          align={"center"}
-        />
+        <Column selectionMode="multiple" align={"center"} />
         <Column
           field="id"
           header="ID"
           sortable
-          style={{ textAlign: "center" }}
           align={"center"}
           headerStyle={{
             color: "rgb(var(--color-foreground))",
@@ -333,9 +383,8 @@ export default function RegionsDataTable({
           }}
         ></Column>
         <Column
-          field="areaName"
-          header="اسم المنطقة"
-          style={{ textAlign: "center" }}
+          field={lang === "en" ? "name_en" : "name_ar"}
+          header={dict.region_name}
           align={"center"}
           headerStyle={{
             color: "rgb(var(--color-foreground))",
@@ -344,8 +393,8 @@ export default function RegionsDataTable({
           }}
         />
         <Column
-          field="subscriptionsNumber"
-          header="عدد الاشتراكات"
+          field="no_of_subscriptions"
+          header={dict.subscribe_number}
           sortable
           style={{
             textAlign: "center",
@@ -358,10 +407,8 @@ export default function RegionsDataTable({
           }}
         />
         <Column
-          field="status"
-          header="الحالة"
+          header={dict.status}
           body={statusBodyTemplate}
-          style={{ textAlign: "center" }}
           align={"center"}
           headerStyle={{
             color: "rgb(var(--color-foreground))",
@@ -371,9 +418,8 @@ export default function RegionsDataTable({
         />
         <Column
           field="actions"
-          header="الإجراءات"
+          header={dict.actions || "Actions"}
           body={actionsBodyTemplate}
-          style={{ textAlign: "center" }}
           align={"center"}
           headerStyle={{
             color: "rgb(var(--color-foreground))",

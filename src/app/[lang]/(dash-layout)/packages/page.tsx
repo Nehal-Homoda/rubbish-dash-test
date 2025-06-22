@@ -6,9 +6,9 @@ export default function packages() {
   return (
     <>
       <div>
-        <UIDashCard shadow="shadow-xl">
+        {/* <UIDashCard shadow="shadow-xl">
           <PackagesDataTable />
-        </UIDashCard>
+        </UIDashCard> */}
       </div>
     </>
   );
