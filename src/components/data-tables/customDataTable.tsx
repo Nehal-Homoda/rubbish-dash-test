@@ -64,8 +64,8 @@ Props) {
 
   return (
     <>
-      <div className="relative px-7 py-10 overflow-x-auto shadow-[0_0_1rem_#00000015] sm:rounded-xl ">
-        <div className="flex justify-between mb-10 ">
+      <div className='container py-20'>
+        <div className="relative overflow-x-auto shadow-md sm:rounded-lg ">
           <div>
             <form className=" ">
               <div className="relative lg:min-w-96">
@@ -97,6 +97,7 @@ Props) {
                 />
               </div>
             </form>
+
           </div>
 
           <div className="flex justify-center items-center gap-2 flex-shrink-0">
