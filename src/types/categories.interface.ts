@@ -3,7 +3,7 @@ export interface Categories {
   name_ar: string;
   name_en: string;
   image: string;
-  is_active: boolean;
+  is_active: number;
   order: any;
   no_of_subscriptions: number;
 }

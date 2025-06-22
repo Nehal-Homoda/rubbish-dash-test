@@ -4,6 +4,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
+    images: {
+    domains: ['rubbish.arabapps.cloud'],
+  },
 };
+export default nextConfig;
 
 // export default withFlowbiteReact(nextConfig);

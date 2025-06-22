@@ -50,9 +50,8 @@ export default function rubbush_collectors() {
     { id: 3, name: "حي ثالث طنطا" },
   ];
   const statusList = [
-    { is_active: true, name: "مفعل" },
-    { is_active: false, name: "غير مفعل" },
-    { id: 3, name: "معلق" },
+    { is_active: 1, name: "مفعل" },
+    { is_active: 0, name: "غير مفعل" },
   ];
 
   const hasSubscriptionList = [
@@ -60,7 +59,6 @@ export default function rubbush_collectors() {
     { is_subscribe: 0, name: "غير مشترك" },
   ];
 
-  
   const [filteredArr, setFilteredArr] = useState<User[]>([]);
   const [checkBoxValue, setCheckBoxValue] = useState(false);
   const [page, setPage] = useState(1);
@@ -90,7 +88,6 @@ export default function rubbush_collectors() {
     console.log(e);
     filterUserBySearch(page, e);
   };
-  
 
   const filterUserByState = (selectedItem) => {
     console.log(selectedItem.is_active);
@@ -133,34 +130,21 @@ export default function rubbush_collectors() {
       return index == itemIndex;
     });
     if (!user) return;
-    if (selectedItem.is_active) {
-      activateUserService(user.id, 1).then((response) => {
-        const arr = users.map((item, index) => {
-          if (index == itemIndex) {
-            console.log("user is", item);
-            return { ...item, ["is_active"]: true };
-          }
-          return item
-        });
-        setUsers(arr);
-
-        console.log(response);
+    const newIsActive = user.is_active ? 0 : 1;
+    activateUserService(user.id, newIsActive).then((response) => {
+      const arr = users.map((item, index) => {
+        if (index == itemIndex) {
+          console.log("user is", item);
+          return { ...item, is_active: newIsActive };
+        }
+        return item;
       });
-    } else {
-      activateUserService(user.id, 0).then((response) => {
-        const arr = users.map((item, index) => {
-          if (index == itemIndex) return { ...item, ["is_active"]: false };
-          return item
-        });
-        setUsers(arr);
-        console.log(response);
-      });
-    }
+      setUsers(arr);
 
+      console.log(response);
+    });
   };
-  
 
- 
   useEffect(() => {
     setFilteredArr(users);
   }, [users]);
