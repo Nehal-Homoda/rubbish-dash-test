@@ -30,7 +30,7 @@ export default function ({
   handleAllCheck,
   selectedPage,
 }: //   handleSort,
-Props) {
+  Props) {
   const [searchInput, setSearchInput] = useState("");
   const [isUpActive, setIsUpActive] = useState(false);
   const [isDownActive, setIsDownActive] = useState(false);
@@ -64,43 +64,41 @@ Props) {
 
   return (
     <>
-      <div className='container py-20'>
-        <div className="relative overflow-x-auto shadow-md sm:rounded-lg ">
-          <div>
-            <form className=" ">
-              <div className="relative lg:min-w-96">
-                <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                  <svg
-                    className="w-4 h-4 text-gray-500 dark:text-gray-400"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-                    />
-                  </svg>
-                </div>
-                <input
-                  value={searchInput}
-                  onChange={(e) => handleChangeValue(e)}
-                  type="search"
-                  id="default-search"
-                  className="focus:outline-none  block w-full p-4 ps-10 text-sm text-gray-900  rounded-lg bg-[#ADAAAA11]  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white "
-                  placeholder="بحث"
-                  required
-                />
+      <div className='relative px-7 py-10 overflow-x-auto shadow-[0_0_1rem_#00000015] sm:rounded-xl '>
+        <div className="w-full flex items-center justify-between relative ">
+          <form className="w-full ">
+            <div className="relative">
+              <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                <svg
+                  className="w-4 h-4 text-gray-500 dark:text-gray-400"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                  />
+                </svg>
               </div>
-            </form>
+              <input
+                value={searchInput}
+                onChange={(e) => handleChangeValue(e)}
+                type="search"
+                id="default-search"
+                className="focus:outline-none  block min-w-[300px] p-4 ps-10 text-sm text-gray-900  rounded-lg bg-[#ADAAAA11]  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white "
+                placeholder="بحث"
+                required
+              />
+            </div>
+          </form>
 
-          </div>
 
-          <div className="flex justify-center items-center gap-2 flex-shrink-0">
+          <div className="flex justify-center items-center gap-2 flex-shrink-0 flex-grow-0">
             {children}
             <div className="bg-[#0094140D] cursor-pointer   py-2 text-center rounded-xl px-5 flex items-center justify-content-center ">
               <i className="mdi mdi-tray-arrow-down text-[#009414] text-xl"></i>
@@ -131,9 +129,8 @@ Props) {
                             setIsUpActive(true),
                             setIsDownActive(false),
                           ]}
-                          className={`arrow-img-wrap w-2 h-2  ${
-                            !isUpActive ? "opacity-40" : "opacity-90"
-                          }`}
+                          className={`arrow-img-wrap w-2 h-2  ${!isUpActive ? "opacity-40" : "opacity-90"
+                            }`}
                         >
                           <img
                             className="arrow-img w-full h-full object-contain rotate-180"
@@ -148,9 +145,8 @@ Props) {
                             setIsDownActive(true),
                             setIsUpActive(false),
                           ]}
-                          className={`arrow-img-wrap w-2 h-2  ${
-                            !isDownActive ? "opacity-40" : "opacity-90"
-                          }`}
+                          className={`arrow-img-wrap w-2 h-2  ${!isDownActive ? "opacity-40" : "opacity-90"
+                            }`}
                         >
                           <img
                             className="arrow-img w-full h-full object-contain"
