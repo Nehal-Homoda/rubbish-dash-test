@@ -15,7 +15,7 @@ export default function
             <Dropdown className='bg-transparent text-[#009414] hover:bg-transparent focus:outline-none ' label={btnName} dismissOnClick={false}>
                 {listItem.map((item, index) => (<DropdownItem onClick={()=>handleFilterList(item,index)} className='bg-white' key={index}>
 
-                    {item.name}
+                    {item.name_ar || item.name }
                 </DropdownItem>))}
             </Dropdown>
         </div>

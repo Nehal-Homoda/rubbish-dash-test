@@ -1,20 +1,479 @@
 "use client";
-import RegionsDataTable from "@/components/data-tables/RegionsDataTable";
-import UIDashCard from "@/components/ui/UIDashCard";
-import { useLangAndDictionary } from "@/utils/lang";
-import React from "react";
 
-export default function regions() {
-  const { lang, dict } = useLangAndDictionary();
+import React, { useEffect, useState } from "react";
+import CustomDataTable from "@/components/data-tables/customDataTable";
+import {
+  activateDistrictService,
+  filterDistrictBySearchService,
+  filterDistrictByStateService,
+  districtListByPageService,
+  addDistrictService,
+  deleteDistrictService,
+  updateDistrictService,
+} from "@/services/districtService";
+import DropDown from "@/components/shared/StateDropDown";
+import BaseDropDown from "@/components/shared/BaseDropDown";
+
+import { getDistrictService } from "@/services/districtService";
+import { District } from "@/types/district.interface";
+import { useRouter } from "next/navigation";
+import {
+  Button,
+  Checkbox,
+  Label,
+  Modal,
+  ModalBody,
+  ModalHeader,
+  TextInput,
+} from "flowbite-react";
+import TextFieldNada from "@/components/ui/form/TextFieldNada";
+import FileInput from "@/components/ui/form/FileInput";
+
+export default function rubbush_collectors() {
+  const [districtList, setDistrictList] = useState<Categories[]>([]);
+  const router = useRouter();
+  const headerArr = [
+    { text: "ID", name: "id" },
+    { text: " اسم المنطقة", name: "name_ar" },
+    { text: " عدد الاشتراكات", name: "no_of_subscriptions" },
+    { text: "الحالة", name: "is_active" },
+    { text: "الاجراءات", name: "image" },
+  ];
+
+  const statusList = [
+    { is_active: 1, name: "مفعل" },
+    { is_active: 0, name: "غير مفعل" },
+  ];
+
+  const [checkBoxValue, setCheckBoxValue] = useState(false);
+  const [page, setPage] = useState(1);
+  const [districtIsActive, setDistrictIsActive] = useState(false);
+
+  const [openModal, setOpenModal] = useState(false);
+  const [openUpdateModal, setOpenUpdateModal] = useState(false);
+  // const [selectedUpdate, setSelectedUpdate] = useState(null);
+  const [selectedItemToUpdate, setSelectedItemToUpdate] =
+    useState<District | null>(null);
+
+  const [formData, setFormData] = useState({
+    name_ar: "",
+    name_en: "",
+    order: 0,
+    is_active: 0,
+  });
+
+  const [updateFormData, setUpdateFormData] = useState({
+    id: 0,
+    name_ar: "",
+    name_en: "",
+    order: 0,
+    is_active: 0,
+  });
+
+  const onCloseModal = () => {
+    setOpenModal(false);
+
+    setFormData({
+      name_ar: "",
+      name_en: "",
+      order: 0,
+      is_active: 0,
+    });
+  };
+  const onCloseUpdateModal = () => {
+    setOpenUpdateModal(false);
+
+    setUpdateFormData({
+      id: 0,
+      name_ar: "",
+      name_en: "",
+      order: 0,
+      is_active: 0,
+    });
+  };
+
+  const takeFormValue = (e, formName: string, name: string) => {
+    console.log("nn", e.target.value);
+    if (formName == "formData") {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: e.target.value,
+      }));
+    } else {
+      setUpdateFormData((prev) => ({
+        ...prev,
+        [name]: e.target.value,
+      }));
+    }
+  };
+  const takeSelectedStateInFormData = (e) => {
+    const value = Number(e.target.value);
+    console.log(e.target.value);
+    setFormData((prev) => ({
+      ...prev,
+      is_active: value,
+    }));
+  };
+  const takeSelectedState = (e) => {
+    const value = Number(e.target.value);
+    setUpdateFormData((prev) => ({
+      ...prev,
+      is_active: value,
+    }));
+  };
+
+  const fetchDistrictList = (pageNumber) => {
+    districtListByPageService(pageNumber).then((response) => {
+      console.log(response);
+      setDistrictList(response.data);
+      // setFilteredArr(response.data);
+    });
+  };
+
+  const filterServiceBySearch = (pageNumber, searchValue) => {
+    filterDistrictBySearchService(pageNumber, searchValue).then((response) => {
+      setDistrictList(response.data);
+    });
+  };
+  const takeValue = (e) => {
+    console.log("sjkdhfu");
+    console.log(e);
+    filterServiceBySearch(page, e);
+  };
+
+  const filterDistrictByState = (selectedItem) => {
+    console.log(selectedItem.is_active);
+    filterDistrictByStateService(page, selectedItem.is_active).then(
+      (response) => {
+        setDistrictList(response.data);
+        console.log("yes im active");
+      }
+    );
+  };
+
+  const takeSelectedPage = (pageNum: number) => {
+    console.log(pageNum);
+    // setPage(pageNum)
+
+    fetchDistrictList(pageNum);
+  };
+
+  const takeCheckValue = (e) => {
+    console.log("input checked", e.target.checked);
+    setCheckBoxValue(e.target.checked);
+  };
+
+  const updateDistrictActive = (selectedItem, itemIndex) => {
+    const service = districtList.find((item, index) => {
+      return index == itemIndex;
+    });
+    if (!service) return;
+    const toggledIsActive = service.is_active ? 0 : 1;
+    activateDistrictService(service.id, toggledIsActive).then((response) => {
+      const arr = districtList.map((item, index) => {
+        if (index == itemIndex) {
+          console.log("Service is", item);
+          return {
+            ...item,
+            is_active: toggledIsActive,
+          };
+        }
+        return item;
+      });
+      setDistrictList(arr);
+
+      console.log(response);
+    });
+  };
+
+  const deleteDistrict = (item, selectedIndex) => {
+    console.log(item);
+    deleteDistrictService(item.id).then((response) => {
+      const updatedArr = [...districtList];
+      updatedArr.splice(selectedIndex, 1);
+      setDistrictList(updatedArr);
+    });
+  };
+
+  const fetchDistricts = () => {
+    getDistrictService().then((response) => {
+      setDistrictList(response.data);
+    });
+  };
+  const addDistrictSubmit = (e) => {
+    e.preventDefault();
+    const fd = new FormData();
+    fd.append("name_ar", formData.name_ar);
+    fd.append("name_en", formData.name_en);
+    fd.append("order", formData.order);
+    fd.append("is_active", formData.is_active);
+    addDistrictService(fd).then((response) => {
+      // setDistrictList(response.data)
+      onCloseModal();
+    });
+  };
+
+  const openUpdateDialog = (item, index) => {
+    setSelectedItemToUpdate(item);
+    // setUpdateFormData({
+    //   id:item.id,
+    //   name_ar: item.name_ar,
+    //   name_en: item.name_en,
+    //   order: item.order,
+    //   is_active:  Number(item.is_active),
+    //   image: item.image,
+    // });
+
+    setOpenUpdateModal(true);
+  };
+
+  const updateDistrictSubmit = (e) => {
+    e.preventDefault();
+    if (!updateFormData) return;
+    console.log("updated", updateFormData);
+    updateDistrictService(updateFormData.id, updateFormData).then(
+      (response) => {
+        fetchDistricts()
+        // setDistrictList(response.data);
+        onCloseUpdateModal();
+      }
+    );
+  };
+
+  useEffect(() => {
+    fetchDistricts();
+  }, []);
+
+  useEffect(() => {
+    if (selectedItemToUpdate) {
+      setUpdateFormData({
+        id: selectedItemToUpdate.id,
+        name_ar: selectedItemToUpdate.name_ar,
+        name_en: selectedItemToUpdate.name_en,
+        order: selectedItemToUpdate.order,
+        is_active: Number(selectedItemToUpdate.is_active),
+        image: selectedItemToUpdate.image,
+      });
+
+      setOpenUpdateModal(true);
+    }
+  }, [selectedItemToUpdate]);
 
   return (
     <>
-      <div>
-        {/* <UIDashCard shadow="shadow-xl">
+      <div className="py-20">
+        <CustomDataTable
+          selectedPage={(pageNum: number) => takeSelectedPage(pageNum)}
+          handleAllCheck={takeCheckValue}
+          sendValueToParent={(value) => takeValue(value)}
+          tableHead={headerArr}
+          listItem={districtList}
+          tData={(item, index) => (
+            <>
+              <td className="py-2 px-4">{item.id}</td>
+             
+              <td className="py-2 px-4">{item.name_ar}</td>
+              <td className="py-2 px-4">{item.no_of_subscriptions}</td>
 
-          <RegionsDataTable lang={lang} dict={dict} />
+              {/* <td className="py-2 px-4">
+                <Avatar
+                  color="success"
+                  placeholderInitials={item.name.slice(0, 2)}
+                  rounded
+                />
+              </td> */}
+              <td className="py-2 px-4">
+                <DropDown
+                  handleIsActive={(item) => updateDistrictActive(item, index)}
+                  btnName={item.is_active ? "مفعل" : "غير مفعل"}
+                  isActive={item.is_active}
+                />
+              </td>
+              <td className="">
+                <div className="flex justify-center gap-3">
+                  <button
+                    onClick={() => deleteDistrict(item, index)}
+                    className="bg-[#F9285A0A] p-1 rounded-lg"
+                  >
+                    <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
+                  </button>
+                  <button
+                    onClick={() => openUpdateDialog(item, index)}
+                    className="bg-[#0094140D] p-1 rounded-lg"
+                  >
+                    <span className="mdi mdi-folder-edit-outline text-[#009414]"></span>
+                  </button>
+                </div>
+              </td>
+            </>
+          )}
+        >
+          <div className="bg-[#0094140D]  text-center rounded-xl ">
+            <BaseDropDown
+              handleFilterList={(item, index) => filterDistrictByState(item)}
+              btnName="الحالة"
+              listItem={statusList}
+            ></BaseDropDown>
+          </div>
 
-        </UIDashCard> */}
+          <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
+            <button
+              onClick={() => setOpenModal(true)}
+              className="w-full h-full"
+            >
+              اضافة منطقة
+            </button>
+          </div>
+        </CustomDataTable>
+
+        <Modal show={openModal} size="md" onClose={onCloseModal} popup>
+          <ModalHeader />
+          <ModalBody>
+            <form onSubmit={addDistrictService}>
+              <div className="space-y-6">
+                <h3 className="text-center text-xl font-medium text-gray-900 dark:text-white">
+                  اضافة خدمة
+                </h3>
+                <div>
+                  <TextFieldNada
+                    name="name"
+                    type="text"
+                    handleChange={(e) =>
+                      takeFormValue(e, "formData", "name_ar")
+                    }
+                    value={formData.name_ar}
+                    label=" اسم المنطقة ( عربي ) *"
+                    placeholder=" اسم المنطقة  *"
+                  ></TextFieldNada>
+                </div>
+                <div>
+                  <TextFieldNada
+                    name="name"
+                    type="text"
+                    handleChange={(e) =>
+                      takeFormValue(e, "formData", "name_en")
+                    }
+                    value={formData.name_en}
+                    label=" اسم المنطقة ( انجليزي ) *"
+                    placeholder=" اسم المنطقة  *"
+                  ></TextFieldNada>
+                </div>
+
+                <div className="relative p-2 border border-surface-light-700 rounded-2xl">
+                  <div className="label flex items-center gap-1 absolute -top-4 start-4 bg-background w-fit px-3 font-semibold">
+                    <label htmlFor="district">الحالة</label>
+                  </div>
+
+                  <select
+                    onChange={(e) => takeSelectedStateInFormData(e)}
+                    value={formData.is_active}
+                    className="w-full h-full"
+                    id="district"
+                    required
+                  >
+                    {statusList.map((item, index) => (
+                      <option key={index} value={item.is_active}>
+                        {item.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="mx-auto w-[50%] py-5 flex gap-4">
+                  <button className="bg-[#009414] rounded-xl px-3 py-2 text-white w-full">
+                    اضافة
+                  </button>
+                  <button className="bg-[#00941412] text-[#009414] w-full rounded-xl px-3 py-2">
+                    الغاء
+                  </button>
+                </div>
+              </div>
+            </form>
+          </ModalBody>
+        </Modal>
+        <Modal
+          show={openUpdateModal}
+          size="md"
+          onClose={onCloseUpdateModal}
+          popup
+        >
+          <ModalHeader />
+          <ModalBody>
+            <form onSubmit={updateDistrictSubmit}>
+              <div className="space-y-6">
+                <h3 className="text-center text-xl font-medium text-gray-900 dark:text-white">
+                  تعديل منطقه
+                </h3>
+                <div className="mx-auto text-center">
+                  <FileInput
+                    fileUrl={updateFormData.image}
+                    state="edit"
+                    onFileChange={(file) => {
+                      console.log("Received base64 in parent:", file);
+                      setUpdateFormData((prev) => ({ ...prev, image: file }));
+                    }}
+                  />
+                </div>
+                <div>
+                  <TextFieldNada
+                    name="name"
+                    type="text"
+                    handleChange={(e) =>
+                      takeFormValue(e, "updateFormData", "name_ar")
+                    }
+                    value={updateFormData.name_ar}
+                    label=" اسم المنطقة ( عربي ) *"
+                    placeholder=" اسم المنطقه  *"
+                  ></TextFieldNada>
+                </div>
+                <div>
+                  <TextFieldNada
+                    name="name"
+                    type="text"
+                    handleChange={(e) =>
+                      takeFormValue(e, "updateFormData", "name_en")
+                    }
+                    value={updateFormData.name_en}
+                    label=" اسم المنطقة ( انجليزي ) *"
+                    placeholder=" اسم المنطقه  *"
+                  ></TextFieldNada>
+                </div>
+
+                <div className="relative p-2 border border-surface-light-700 rounded-2xl">
+                  <div className="label flex items-center gap-1 absolute -top-4 start-4 bg-background w-fit px-3 font-semibold">
+                    <label htmlFor="district">الحالة</label>
+                  </div>
+
+                  <select
+                    onChange={(e) => takeSelectedState(e)}
+                    value={Number(updateFormData.is_active)}
+                    className="w-full h-full"
+                    id="district"
+                    required
+                  >
+                    {statusList.map((item, index) => (
+                      <option key={index} value={item.is_active}>
+                        {item.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="mx-auto w-[50%] py-5 flex gap-4">
+                  <button
+                    type="submit"
+                    className="bg-[#009414] rounded-xl px-3 py-2 text-white w-full"
+                  >
+                    حفظ
+                  </button>
+                  <button className="bg-[#00941412] text-[#009414] w-full rounded-xl px-3 py-2">
+                    الغاء
+                  </button>
+                </div>
+              </div>
+            </form>
+          </ModalBody>
+        </Modal>
       </div>
     </>
   );

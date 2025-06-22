@@ -89,6 +89,7 @@ export default function rubbush_collectors() {
     setOpenUpdateModal(false);
 
     setUpdateFormData({
+      id:0,
       name_ar: "",
       name_en: "",
       order: 0,
