@@ -5,8 +5,10 @@ import { loginService } from "@/services/authServices";
 import Link from "next/link";
 import React, { useState } from "react";
 import logoImg from '@/assets/images/login-img.png'
+import { useRouter } from "next/navigation";
 
 export default function AuthLoginPage() {
+
     const [formData, setFormData] = useState({
         email: "",
         password: "",
@@ -17,6 +19,7 @@ export default function AuthLoginPage() {
         email: "",
         password: "",
     });
+    const router=useRouter()
 
     const inputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData((prev) => ({
@@ -33,6 +36,7 @@ export default function AuthLoginPage() {
         fd.append('phone', formData.phone)
 
         loginService(fd).then((response) => {
+            router.push('/')
             console.log('login', response)
         })
 
