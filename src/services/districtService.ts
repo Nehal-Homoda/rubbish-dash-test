@@ -27,28 +27,6 @@ export const getDistrictService = async (query?: string) => {
     }
 };
 
-export const activateDistrictService = async (
-    id: number,
-    is_active: number
-) => {
-    try {
-        const response = await apiCall.put("/admins/districts", id, {
-            body: JSON.stringify({ is_active }),
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
-        if (!response.ok) {
-            await responseErrorServiceHandler(response, "update district");
-        }
-        const data = (await response.json()) as ResponseData<District>;
-        console.log("response data =>>>>", data);
-        return data;
-    } catch (error: any) {
-        throw new Error(error.message);
-    }
-};
-
 export const addDistrictService = async (form: FormData) => {
     try {
         const response = await apiCall.post(`/admins/districts`, {
@@ -60,20 +38,18 @@ export const addDistrictService = async (form: FormData) => {
         if (!response.ok) {
             await responseErrorServiceHandler(response, "add district");
         }
-        const data = await response.json();
+        const data = (await response.json()) as ResponseData<District>;
         console.log("response data =>>>>", data);
         return data;
     } catch (error: any) {
         throw new Error(error.message);
     }
 };
-
 export const deleteDistrictService = async (id: number) => {
     try {
         const response = await apiCall.delete("/admins/districts", id, {
             headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
+                // "Content-Type": "application/json",
             },
         });
         if (!response.ok) {
