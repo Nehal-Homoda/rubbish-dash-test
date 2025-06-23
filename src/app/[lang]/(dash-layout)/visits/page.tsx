@@ -58,7 +58,7 @@ export default function rubbush_collectors() {
     []
   );
 
-  
+
   const [selectedItemToUpdate, setSelectedItemToUpdate] =
     useState<Visits | null>(null);
   const router = useRouter();
@@ -121,15 +121,15 @@ export default function rubbush_collectors() {
   const fetchVisitsList = ({
     search = "",
     // is_active = undefined,
-    status="",
-  }: { search?: string; status?:string} = {}) => {
+    status = "",
+  }: { search?: string; status?: string } = {}) => {
     // console.log(is_active);
     // const isActive =
-      // is_active != undefined
-      //   ? is_active
-      //     ? "&is_active=" + 1
-      //     : "&is_active=" + 0
-      //   : "";
+    // is_active != undefined
+    //   ? is_active
+    //     ? "&is_active=" + 1
+    //     : "&is_active=" + 0
+    //   : "";
     const hasSearch = search ? "&search=" + search : "";
     const hasStatus = status ? "&status=" + status : "";
 
@@ -234,6 +234,26 @@ export default function rubbush_collectors() {
     }
   };
 
+  const deleteVisits = (item, selectedIndex) => {
+    console.log(item);
+    deleteVisitsService(item.id).then((response) => {
+      const updatedArr = [...visitsList];
+      updatedArr.splice(selectedIndex, 1);
+      setVisitsList(updatedArr);
+    });
+  };
+
+  const  toggleRubbishCollector=(item,selectedIndex)=>{
+    const obj=visitsList.find((item,index)=>{
+      return index==selectedIndex
+    })
+    if(!obj) return
+    console.log('ddd',item)
+    activateVisitsService(obj.id,item).then((response)=>{
+console.log(response)
+    })
+
+  }
   // const addVisitsSubmit = (e: React.FormEvent<HTMLFormElement>) => {
   //   console.log("hiiii");
   //   e.preventDefault();
@@ -291,7 +311,7 @@ export default function rubbush_collectors() {
           الحالة
         </UIPrimaryDropdown>
 
-      
+
 
         <UIBaseDialog
           title="اضافة منطقه"
@@ -307,8 +327,8 @@ export default function rubbush_collectors() {
           }
         >
           {/* <form onSubmit={addVisitsSubmit} id="update-form"> */}
-            <div className="space-y-6">
-              {/* <div>
+          <div className="space-y-6">
+            {/* <div>
                 <TextFieldNada
                   name="name"
                   type="text"
@@ -318,38 +338,38 @@ export default function rubbush_collectors() {
                   placeholder=" اسم المنطقة  *"
                 ></TextFieldNada>
               </div> */}
-              <div>
-                <TextFieldNada
-                  name="name"
-                  type="text"
-                  handleChange={(e) => takeFormValue(e, "formData", "name_en")}
-                  value={formData.name_en}
-                  label=" اسم المنطقة ( انجليزي ) *"
-                  placeholder=" اسم المنطقة  *"
-                ></TextFieldNada>
+            <div>
+              <TextFieldNada
+                name="name"
+                type="text"
+                handleChange={(e) => takeFormValue(e, "formData", "name_en")}
+                value={formData.name_en}
+                label=" اسم المنطقة ( انجليزي ) *"
+                placeholder=" اسم المنطقة  *"
+              ></TextFieldNada>
+            </div>
+
+            <div className="relative p-2 border border-surface-light-700 rounded-2xl">
+              <div className="label flex items-center gap-1 absolute -top-4 start-4 bg-background w-fit px-3 font-semibold">
+                <label htmlFor="district">الحالة</label>
               </div>
 
-              <div className="relative p-2 border border-surface-light-700 rounded-2xl">
-                <div className="label flex items-center gap-1 absolute -top-4 start-4 bg-background w-fit px-3 font-semibold">
-                  <label htmlFor="district">الحالة</label>
-                </div>
+              <select
+                onChange={(e) => takeSelectedState(e, "formData")}
+                value={formData.is_active}
+                className="w-full h-full"
+                id="district"
+                required
+              >
+                {statusList.map((item, index) => (
+                  <option key={index} value={item.is_active}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-                <select
-                  onChange={(e) => takeSelectedState(e, "formData")}
-                  value={formData.is_active}
-                  className="w-full h-full"
-                  id="district"
-                  required
-                >
-                  {statusList.map((item, index) => (
-                    <option key={index} value={item.is_active}>
-                      {item.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* <div>
+            {/* <div>
                 <div className="flex max-w-md flex-col gap-4" id="checkbox">
                   {districtDays.map((item, index) => (
                     <>
@@ -368,7 +388,7 @@ export default function rubbush_collectors() {
                 </div>
               </div> */}
 
-              {/* <div>
+            {/* <div>
                 <div className="flex max-w-md flex-col gap-4">
                   {districtTime.map((item, index) => (
                     <div key={index} className="flex items-center gap-2">
@@ -383,7 +403,7 @@ export default function rubbush_collectors() {
                   ))}
                 </div>
               </div> */}
-            </div>
+          </div>
           {/* </form> */}
         </UIBaseDialog>
       </>
@@ -410,7 +430,28 @@ export default function rubbush_collectors() {
               <td className="py-2 px-4">{item.category_name}</td>
               <td className="py-2 px-4">{item.user_name}</td>
               <td className="py-2 px-4">{item.collector_name}</td>
-              <td className="py-2 px-4">{item.status}</td>
+
+
+              <td className="">
+
+                <UIPrimaryDropdown
+                btnColorTailwindClass={`rounded-xl text-center   ${item.status == 'collected' ? 'bg-[#31D00012] text-[#31D000]' : 'bg-[#F9285A12] text-[#F9285A]'} `}
+                  itemName="name"
+                  itemValue="status"
+                  onSelected={(item) => {
+                   toggleRubbishCollector(item,index)
+                  }}
+                  items={statusList}
+                >
+                   <span> {item.status}</span>
+
+                </UIPrimaryDropdown>
+
+              </td>
+
+
+
+
               <td className="py-2 px-4">{item.user_note}</td>
               <td className="py-2 px-4">{item.created_at}</td>
               {/* <td className="py-2 px-4">{item.collector_note}</td> */}

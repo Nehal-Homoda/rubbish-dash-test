@@ -31,11 +31,11 @@ export const getVisitsService = async (query?: string) => {
 
 export const activateVisitsService = async (
     id: number,
-    is_active: number
+    status: string
 ) => {
     try {
         const response = await apiCall.put("/admins/visits", id, {
-            body: JSON.stringify({ is_active }),
+            body: JSON.stringify({ status }),
             headers: {
                 "Content-Type": "application/json",
             },
