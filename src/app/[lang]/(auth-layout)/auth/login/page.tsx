@@ -1,15 +1,18 @@
 "use client";
 import TextFieldNada from "@/components/ui/form/TextFieldNada";
 import UIBtn from "@/components/ui/UIBtn";
+import { loginService } from "@/services/authServices";
 import Link from "next/link";
 import React, { useState } from "react";
 
 export default function AuthLoginPage() {
-    const [formDate, setFormData] = useState({
+    const [formData, setFormData] = useState({
         email: "",
         password: "",
+
+      
     });
-    const [formDateError, setFormDataError] = useState({
+    const [formDataError, setFormDataError] = useState({
         email: "",
         password: "",
     });
@@ -20,6 +23,19 @@ export default function AuthLoginPage() {
             [e.target.name]: e.target.value,
         }));
     };
+
+    const handleLoginSubmit = (e) => {
+        e.preventDefault()
+        const fd = new FormData()
+        fd.append('email', formData.email)
+        fd.append('password', formData.password)
+        fd.append('phone', formData.phone)
+
+        loginService(fd).then((response) => {
+            console.log('login', response)
+        })
+
+    }
 
     return (
         <>
@@ -33,19 +49,45 @@ export default function AuthLoginPage() {
                             <p className="text-muted font-semibold">
                                 قم بإدخال بياناتك لتسجيل الدخول
                             </p>
-                            <form className="pt-20">
+                            <form onSubmit={handleLoginSubmit} className="pt-20">
+
+
+
                                 <div className="input-wrap mb-14">
                                     <TextFieldNada
-                                        errorMessage={formDateError.email}
-                                        label="الايميل"
+                                        errorMessage={formDataError.email}
+                                        label="البريد الالكتروني"
                                         name="email"
                                         type="email"
-                                        placeholder="example@mail.com"
-                                        value={formDate.email}
+                                        placeholder="ادخل البريد الالكتروني"
+                                        value={formData.email}
                                         handleChange={inputChangeHandler}
                                     ></TextFieldNada>
                                 </div>
-                                <div className="input-wrap">
+                                <div className="input-wrap mb-14">
+                                    <TextFieldNada
+                                        errorMessage={formDataError.password}
+                                        label="الرقم السري"
+                                        name="password"
+                                        type="password"
+                                        placeholder="الرقم السري"
+                                        value={formData.password}
+                                        handleChange={inputChangeHandler}
+                                    ></TextFieldNada>
+                                </div>
+                                {/* <div className="input-wrap mb-14">
+                                    <TextFieldNada
+                                        errorMessage={formDataError.phone}
+                                        label="رقم الموبايل"
+                                        name="phone"
+                                        type="number"
+                                        placeholder="رقم الموبايل"
+                                        value={formData.phone}
+                                        handleChange={inputChangeHandler}
+                                    ></TextFieldNada>
+                                </div> */}
+
+                                {/* <div className="input-wrap">
                                     <TextFieldNada
                                         errorMessage={formDateError.password}
                                         label="كلمة المرور"
@@ -55,17 +97,17 @@ export default function AuthLoginPage() {
                                         value={formDate.password}
                                         handleChange={inputChangeHandler}
                                     ></TextFieldNada>
-                                </div>
+                                </div> */}
 
-                                <div className="mt-1 mb-12 text-end">
+                                {/* <div className="mt-1 mb-12 text-end">
                                     <Link className="text-surface underline" href={'/auth/reset-password'}>نسيت كلمة المرور؟</Link>
-                                </div>
+                                </div> */}
 
 
                                 <button className="base-btn block w-full">
                                     سجل الدخول
                                 </button>
-                                
+
                             </form>
                         </div>
                         <div className="col-span-1"></div>
