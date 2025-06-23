@@ -41,7 +41,7 @@ export const activateVisitsService = async (
             },
         });
         if (!response.ok) {
-            await responseErrorServiceHandler(response, "update district");
+            await responseErrorServiceHandler(response, "update visits");
         }
         const data = (await response.json()) as ResponseData<Visits>;
         console.log("response data =>>>>", data);
