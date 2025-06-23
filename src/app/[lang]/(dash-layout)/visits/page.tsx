@@ -243,14 +243,15 @@ export default function rubbush_collectors() {
     });
   };
 
-  const  toggleRubbishCollector=(item,selectedIndex)=>{
-    const obj=visitsList.find((item,index)=>{
-      return index==selectedIndex
+  const toggleRubbishCollector = (item, selectedIndex) => {
+    const obj = visitsList.find((item, index) => {
+      return index == selectedIndex
     })
-    if(!obj) return
-    console.log('ddd',item)
-    activateVisitsService(obj.id,item).then((response)=>{
-console.log(response)
+    if (!obj) return
+    console.log('ddd', item)
+    activateVisitsService(obj.id, item).then((response) => {
+      console.log(response)
+      fetchVisitsList()
     })
 
   }
@@ -314,7 +315,7 @@ console.log(response)
 
 
         <UIBaseDialog
-          title="اضافة منطقه"
+          title="اضافة زيارة"
           confirmHandler={() => { }}
           confirmText="اضافة"
           form="update-form"
@@ -435,15 +436,15 @@ console.log(response)
               <td className="">
 
                 <UIPrimaryDropdown
-                btnColorTailwindClass={`rounded-xl text-center   ${item.status == 'collected' ? 'bg-[#31D00012] text-[#31D000]' : 'bg-[#F9285A12] text-[#F9285A]'} `}
+                  btnColorTailwindClass={`rounded-xl text-center   ${item.status == 'collected' ? 'bg-[#31D00012] text-[#31D000]' : 'bg-[#F9285A12] text-[#F9285A]'} `}
                   itemName="name"
                   itemValue="status"
                   onSelected={(item) => {
-                   toggleRubbishCollector(item,index)
+                    toggleRubbishCollector(item, index)
                   }}
                   items={statusList}
                 >
-                   <span> {item.status}</span>
+                  <span> {item.status}</span>
 
                 </UIPrimaryDropdown>
 
@@ -469,7 +470,7 @@ console.log(response)
                     <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
                   </button>
                   <UIBaseDialog
-                    title="تعديل منطقه"
+                    title="تعديل زيارة"
                     confirmHandler={() => { }}
                     confirmText="اضافة"
                     form="update-form"
