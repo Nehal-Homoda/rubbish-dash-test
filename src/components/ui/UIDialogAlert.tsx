@@ -1,3 +1,4 @@
+"use client";
 import {
     Dialog,
     DialogPanel,
@@ -5,43 +6,47 @@ import {
     Transition,
     TransitionChild,
 } from "@headlessui/react";
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
+import alertImg from "@/assets/images/alert.png";
+type Props = {};
 
-type Props = {
-    btn: React.ReactNode;
-    children: React.ReactNode;
-    title: string;
-    form?: string;
-    confirmHandler: () => void;
-    confirmText: string;
-};
+export default function UIDialogAlert({}: Props) {
+    const [isOpen, setIsOpen] = useState(true);
 
-export default function UIBaseDialog({
-    btn,
-    children,
-    title,
-    confirmText,
-    form,
-    confirmHandler,
-}: Props) {
-    let [isOpen, setIsOpen] = useState(false);
+    const updateDialogFromWindow = () => {
+        if (typeof window !== "undefined") {
+            //@ts-ignore
+            setIsOpen(Boolean(window.dialog));
+        }
+    };
 
-    function closeModal() {
+    useEffect(() => {
+        updateDialogFromWindow(); // run once on mount
+
+        // Listen to custom event
+        window.addEventListener("dialog-toggle", updateDialogFromWindow);
+
+        return () => {
+            window.removeEventListener("dialog-toggle", updateDialogFromWindow);
+        };
+    }, []);
+
+    const closeModal = () => {
         setIsOpen(false);
-    }
+        //@ts-ignore
+        window.dialog = false;
+    };
 
-    function openModal() {
+    const openModal = () => {
         setIsOpen(true);
-    }
+        //@ts-ignore
+        window.dialog = true;
+    };
 
     return (
         <>
-            <div className="" onClick={openModal}>
-                {btn}
-            </div>
-
             <Transition appear show={isOpen} as={Fragment}>
-                <Dialog as="div" className=" relative z-50" onClose={closeModal}>
+                <Dialog as="div" className="relative z-50" onClose={closeModal}>
                     <TransitionChild
                         as={Fragment}
                         enter="ease-out duration-300"
@@ -54,7 +59,7 @@ export default function UIBaseDialog({
                         <div className="fixed inset-0 bg-black/25" />
                     </TransitionChild>
 
-                    <div className="fixed inset-0 overflow-y-auto">
+                    <div className="fixed inset-0 overflow-y-auto pt-5">
                         <div className="flex min-h-full items-center justify-center p-4 text-center">
                             <TransitionChild
                                 as={Fragment}
@@ -65,37 +70,39 @@ export default function UIBaseDialog({
                                 leaveFrom="opacity-100 scale-100"
                                 leaveTo="opacity-0 scale-95"
                             >
-                                <DialogPanel className="w-full max-w-[750px] transform rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                                <DialogPanel className="w-full max-w-[500px] transform rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                                     <DialogTitle
                                         as="h3"
-                                        className="relative text-lg font-bold leading-6 text-center text-gray-900 "
+                                        className="relative text-lg font-bold leading-6 text-end text-gray-900"
                                     >
-                                        <div className="w-24 h-1 rounded-2xl mb-5 bg-gray-300 mx-auto"></div>
-                                        {title}
                                         <button
                                             onClick={closeModal}
-                                            className="absolute bottom-[-2px] left-2 bg-transparent"
+                                            className="bg-transparent"
                                         >
                                             <span className="text-2xl mdi mdi-close"></span>
                                         </button>
                                     </DialogTitle>
-                                    <div className="my-10">{children}</div>
+
+                                    <div className="mb-10 flex items-center flex-col gap-5">
+                                        <div className="w-full max-w-[200px] aspect-square">
+                                            <img
+                                                src={alertImg.src}
+                                                alt=""
+                                                className="w-full h-full object-contain"
+                                            />
+                                        </div>
+
+                                        <p className="font-bold">
+                                            لقد تمت العملية بنجاح
+                                        </p>
+                                    </div>
 
                                     <div className="mt-4 flex items-center justify-center gap-4">
                                         <button
-                                            type={form ? 'submit': 'button'}
                                             className="base-btn min-w-[200px]"
-                                            onClick={confirmHandler}
-                                            form={form ?? undefined}
-                                        >
-                                            {confirmText}
-                                        </button>
-                                        <button
-                                            type="button"
-                                            className="btn-secondary px-10"
                                             onClick={closeModal}
                                         >
-                                            الغاء
+                                            حسناً
                                         </button>
                                     </div>
                                 </DialogPanel>

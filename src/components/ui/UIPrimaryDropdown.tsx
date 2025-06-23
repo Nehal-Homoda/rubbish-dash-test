@@ -35,7 +35,7 @@ export default function UIPrimaryDropdown({
             <Menu as="div" className="relative inline-block">
                 <div>
                     <MenuButton
-                        className={`inline-flex w-full justify-center gap-1 rounded-lg    text-sm font-semibold focus:outline-none ${btnColorTailwindClass} ${tiny? 'py-1 px-2': 'py-3 px-5'}`}
+                        className={`inline-flex w-full justify-center gap-1 rounded-lg text-nowrap   text-sm font-semibold focus:outline-none ${btnColorTailwindClass} ${tiny? 'py-1 px-2': 'py-3 px-5'}`}
                     >
                         {children}
                         <span className="mdi mdi-chevron-down"></span>

@@ -2,7 +2,7 @@
 import { useState } from "react";
 
 type Props = {
-  value: string;
+  value: any;
   label: string;
   placeholder: string;
   name: string;
@@ -41,8 +41,8 @@ export default function TextFieldNada({
 
   return (
     <>
-      <div className="relative p-5 border border-surface-light-700 rounded-2xl">
-        <div className="label flex items-center gap-1 absolute -top-4 start-4 bg-background w-fit px-3 font-semibold">
+      <div className="relative py-3 px-5 border border-surface-light-700 rounded-2xl">
+        <div className="label flex items-center gap-1 absolute -top-4 start-4 bg-background w-fit px-3 text-sm font-semibold">
           <label htmlFor={name}>{label}</label>
           {required && <span className="text-red-600">*</span>}
         </div>

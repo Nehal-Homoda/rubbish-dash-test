@@ -172,3 +172,9 @@ export const responseErrorServiceHandler = async (
     }
     throw new Error(`Failed to ${serviceMessage}!`);
 };
+
+export const successDialog = (open: boolean) => {
+    //@ts-ignore
+    window.dialog = open;
+    window.dispatchEvent(new Event("dialog-toggle"));
+};
