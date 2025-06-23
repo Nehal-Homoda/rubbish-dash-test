@@ -178,8 +178,7 @@ export default function ({
         <div className="flex overflow-x-auto sm:justify-center">
           <Pagination
             currentPage={currentPage}
-            // itemsPerPage={10}
-            // totalItems={listItem.length}
+            
             totalPages={100}
             onPageChange={onPageChange}
           />
