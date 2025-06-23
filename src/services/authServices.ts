@@ -20,6 +20,7 @@ export const loginService = async (form: FormData) => {
         throw new Error(error.message);
     }
 };
+
 export const logoutService = async (form: FormData) => {
     try {
         const response = await apiCall.post(`/admins/auth/login`, {
