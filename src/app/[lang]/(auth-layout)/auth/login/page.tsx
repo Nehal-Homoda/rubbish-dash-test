@@ -4,18 +4,22 @@ import UIBtn from "@/components/ui/UIBtn";
 import { loginService } from "@/services/authServices";
 import Link from "next/link";
 import React, { useState } from "react";
+import logoImg from '@/assets/images/login-img.png'
+import { useRouter } from "next/navigation";
 
 export default function AuthLoginPage() {
+
     const [formData, setFormData] = useState({
         email: "",
         password: "",
 
-      
+
     });
     const [formDataError, setFormDataError] = useState({
         email: "",
         password: "",
     });
+    const router=useRouter()
 
     const inputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData((prev) => ({
@@ -32,6 +36,7 @@ export default function AuthLoginPage() {
         fd.append('phone', formData.phone)
 
         loginService(fd).then((response) => {
+            router.push('/')
             console.log('login', response)
         })
 
@@ -41,8 +46,10 @@ export default function AuthLoginPage() {
         <>
             <div className="w-full min-h-screen pt-20">
                 <div className="container">
-                    <div className="grid md:grid-cols-2">
-                        <div className="col-span-1">
+                    <div className="grid md:grid-cols-2 gap-20">
+
+
+                        <div className="col-span-1 pt-28">
                             <h3 className="text-2xl font-bold">
                                 مرحباً بعودتك مرة اخري 👋
                             </h3>
@@ -110,7 +117,13 @@ export default function AuthLoginPage() {
 
                             </form>
                         </div>
-                        <div className="col-span-1"></div>
+                        <div className="col-span-1">
+
+                            <div className="w-full h-full">
+                                <img className="w-full h-full object-cover" src={logoImg.src} alt="" />
+                            </div>
+
+                        </div>
                     </div>
                 </div>
             </div>
