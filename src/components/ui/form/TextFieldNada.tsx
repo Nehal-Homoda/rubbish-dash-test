@@ -14,7 +14,7 @@ type Props = {
   errorMessage?: string;
   required?: boolean;
   iconType?: "mdi" | "fa";
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 export default function TextFieldNada({

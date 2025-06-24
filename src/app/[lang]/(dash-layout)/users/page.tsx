@@ -22,7 +22,7 @@ import SelectInput from "@/components/ui/form/SelectInput";
 import { successDialog } from "@/utils/shared";
 import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
 import { useRouter } from "next/navigation";
-import { getUserService } from "@/services/userService";
+import { getUserService, updateUserService } from "@/services/userService";
 import { Users } from "@/types/auth.interface";
 import { PackageOffer } from "@/types/packagesOffer.interface";
 
@@ -90,12 +90,10 @@ export default function rubbush_collectors() {
     is_subscription = undefined,
   }: { search?: string; is_active?: boolean | undefined; is_subscription?: boolean | undefined; } = {}) => {
     console.log(is_active);
-    const isActive =
-      is_active != undefined
-        ? is_active
-          ? "&is_active=" + 1
-          : "&is_active=" + 0
-        : "";
+    const isActive = is_active != undefined ? is_active ? "&is_active=" + 1 : "&is_active=" + 0 : "";
+
+
+
     const isSubscribe =
       is_subscription != undefined
         ? is_subscription
@@ -130,7 +128,7 @@ export default function rubbush_collectors() {
       is_active: value,
     });
 
-    updateDistrictService(service.id, body)
+    updateUserService(service.id, body)
       .then((response) => {
         const arr = [...dataList];
         arr[index].is_active = value;
@@ -351,7 +349,7 @@ export default function rubbush_collectors() {
 
 
               <td className="">
-                <div className="flex justify-center gap-3">
+                <div className="flex justify-center items-center gap-3">
                   <UIDialogConfirm
                     danger
                     title="هل انت متأكد من حذف العنصر"
@@ -487,6 +485,9 @@ export default function rubbush_collectors() {
                       </div>
                     </form>
                   </UIBaseDialog>
+
+
+                  <span onClick={()=>router.push(`/users/${item.id}`)} className="mdi mdi-eye-outline cursor-pointer"></span>
                 </div>
               </td>
             </tr>
