@@ -13,6 +13,7 @@ import { getPackagesService } from "@/services/packagesOffersService";
 import { PackageOffer } from "@/types/packagesOffer.interface";
 import { getCategoriesService } from "@/services/categoriesService";
 import { Categories } from "@/types/categories.interface";
+import SelectInput from "@/components/ui/form/SelectInput";
 
 export default function page() {
   const [district, setDistrict] = useState<Region[]>([]);
@@ -22,10 +23,9 @@ export default function page() {
   const [selectedPackage, setSelectedPackage] = useState<PackageOffer | null>(
     null
   );
-  const [selectedCategory, setSelectedCategory] = useState<Categories | null>(
-    null
-  );
+  const [packagePrice, setPackagePrice] = useState(0)
   const [totalPrice, setTotalPrice] = useState(0);
+
 
   const takeValue = (e, name) => {
     console.log(e.target.value);
@@ -62,13 +62,9 @@ export default function page() {
     addUserService(fd);
   };
 
-  const handleSelectedDistrict = () => {};
 
-  const handleSelectedDate = (date) => {
-    console.log("hi");
-    console.log(formData.days);
-    setSelectedDate(date);
-  };
+
+
 
   const fetchPackages = () => {
     getPackagesService().then((response) => {
@@ -92,15 +88,7 @@ export default function page() {
       setTotalPrice(selectedPackage.price_per_unit * formData.units);
     }
   };
-  const takeSelectedCategory = (e) => {
-    const selectedId = e.target.value;
-    const selectedCategoryItem = categoryList.find((item) => {
-      return item.id == selectedId;
-    });
-    if (selectedCategoryItem) {
-      setSelectedCategory(selectedCategoryItem);
-    }
-  };
+
   const [switch1, setSwitch1] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -121,6 +109,22 @@ export default function page() {
     address_details: "",
   });
 
+  const handleSelectedItem = (item: any, name: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      [name]: item
+    }))
+    if (name == "package_id") {
+      setPackagePrice(item.price_per_unit)
+    }
+
+  };
+
+  const takeUploadedImg = (img) => {
+    console.log(img)
+
+  }
+
   useEffect(() => {
     if (selectedPackage) {
       setTotalPrice(selectedPackage.price_per_unit * formData.units);
@@ -135,15 +139,27 @@ export default function page() {
     fetchPackages();
     fetchCategories();
   }, []);
+  useEffect(() => {
+    setPackagePrice
+  }, [formData.package_id])
 
   return (
     <div>
       <div className="py-20">
         <div className="bg-white rounded-xl p-5 ">
-          <p className="font-bold">اضافة مستخدم جديد</p>
 
-          <form onSubmit={handleAddUserSubmit} className="pt-12">
-            <div className="grid grid-cols-12 gap-7">
+
+          <div className="mb-14">
+            <p className="font-bold">اضافة مستخدم جديد</p>
+          </div>
+
+          <form onSubmit={handleAddUserSubmit} className="">
+
+
+
+            <div className="grid grid-cols-12 space-y-5 gap-7">
+
+
               <div className="col-span-12">
                 <TextFieldNada
                   name="name"
@@ -154,6 +170,8 @@ export default function page() {
                   placeholder="اسم المستخدم"
                 ></TextFieldNada>
               </div>
+
+
               <div className="col-span-6">
                 <TextFieldNada
                   name="phone"
@@ -176,7 +194,7 @@ export default function page() {
               </div>
             </div>
 
-            <div className=" ">
+            <div className="py-6 ">
               <ToggleSwitch
                 checked={switch1}
                 label="اشتراك"
@@ -185,28 +203,17 @@ export default function page() {
             </div>
 
             {switch1 && (
-              <div className="mt-7">
+              <div className="mt-5">
+
+
                 <div className="grid grid-cols-12 gap-7">
                   <div className="col-span-6">
-                    <div className="relative p-2 border border-surface-light-700 rounded-2xl">
-                      <div className="label flex items-center gap-1 absolute -top-4 start-4 bg-background w-fit px-3 font-semibold">
-                        <label htmlFor="district">المنطقه</label>
-                      </div>
 
-                      <select
-                        className="border-none outline-none  "
-                        id="district"
-                        required
-                      >
-                        {district.map((item) => (
-                          <option value={item.id}>
-                            {item.name_ar}
-                          </option>
-                        ))}
-                      </select>
+                    <SelectInput placeholder="ادخل اسم المنطقة" name="name_ar" itemName="name_ar" itemValue="id" value={formData.district_id} items={district} label="اسم المنطقة" onChange={(item) => handleSelectedItem(item, 'district_id')} >
 
-                      {/* {required && <span className="text-red-600">*</span>} */}
-                    </div>
+                    </SelectInput>
+
+                    {/* {required && <span className="text-red-600">*</span>} */}
                   </div>
 
                   <div className="col-span-6">
@@ -221,43 +228,27 @@ export default function page() {
                   </div>
 
                   <div className="col-span-6">
-                    <div className="relative p-2 border border-surface-light-700 rounded-2xl">
-                      <div className="label flex items-center gap-1 absolute -top-4 start-4 bg-background w-fit px-3 font-semibold">
-                        <label htmlFor="category">نوع الخدمة</label>
-                      </div>
+                    <SelectInput items={categoryList} placeholder="ادخل نوع الخدمة" name="" itemName="name_ar" itemValue="id" value={formData.category_id} label=" نوع الخدمة" onChange={(item) => handleSelectedItem(item, 'category_id')} >
 
-                      <select
-                       
-                        onChange={takeSelectedCategory}
-                        className="w-full h-full"
-                        id="category"
-                        required
-                      >
-                        {categoryList.map((item,index) => (
-                          <option key={index} value={item.id}>{item.name_ar}</option>
-                        ))}
-                      </select>
-                    </div>
+                    </SelectInput>
                   </div>
 
                   <div className="col-span-6">
-                    <div className="relative p-2 border border-surface-light-700 rounded-2xl">
-                      <div className="label flex items-center gap-1 absolute -top-4 start-4 bg-background w-fit px-3 font-semibold">
-                        <label htmlFor="package">الباقة</label>
-                      </div>
+                    <SelectInput items={packagesList} placeholder="ادخل نوع الباقه" name="" itemName="name_ar" itemValue="id" value={formData.package_id} label=" نوع الباقة" onChange={(item) => handleSelectedItem(item, 'package_id')} >
 
-                      <select
-                       
-                        onChange={takeSelectedPackage}
-                        className=""
-                        id="package"
-                        required
-                      >
-                        {packagesList.map((item,index) => (
-                          <option key={index} value={item.id}>{item.name}</option>
-                        ))}
-                      </select>
-                    </div>
+                    </SelectInput>
+                  </div>
+
+                  <div className="col-span-6">
+                    <TextFieldNada
+                      name="price"
+                      type="number"
+                      handleChange={(e) => takeValue(e, "units")}
+                      value={packagePrice}
+                      label=" سعر الباقة *"
+                      placeholder="  سعر الباقة *"
+                    ></TextFieldNada>
+
                   </div>
 
                   <div className="col-span-6">
@@ -279,25 +270,21 @@ export default function page() {
                       handleChange={(e) => takeValue(e, "price")}
                       value={totalPrice.toString()}
                       label="السعر الكلي *"
-                      placeholder=" عدد الوحدات *"
+                      placeholder="  السعر الكلي *"
                     ></TextFieldNada>
                   </div>
 
                   <div className="col-span-6">
-                    <FileInput state="add" title="ارفاق صورة التحويل" />
+                    <FileInput onFileChange={(img) => takeUploadedImg(img)} state="add" title="ارفاق صورة التحويل" />
                   </div>
 
 
                 </div>
 
-                {/* <TextFieldNada
-                  name="password"
-                  type="password"
-                  handleChange={(e) => takeValue(e, "password")}
-                  value={formData.password}
-                  label="المنطقه "
-                  placeholder=" المنطقه"
-                ></TextFieldNada> */}
+
+
+
+
               </div>
             )}
 
@@ -309,6 +296,8 @@ export default function page() {
                 الغاء
               </button>
             </div>
+
+
           </form>
         </div>
       </div>

@@ -1,287 +1,514 @@
-"use client";
 
+
+
+"use client";
 import React, { useEffect, useState } from "react";
-import CustomDataTable from "@/components/data-tables/customDataTable";
+import { Checkbox, Label } from "flowbite-react";
+import { Radio } from "flowbite-react";
 import {
-  activateUserService,
-  filterUserBySearchService,
-  filterUserByStateService,
-  filterUserBySubscriptionService,
-  subscriptionListService,
-  userListByPageService,
-  userListService,
-} from "@/services/sharedService";
-import DropDown from "@/components/shared/StateDropDown";
-import BaseDropDown from "@/components/shared/BaseDropDown";
-import { Avatar } from "flowbite-react";
-import { getPackagesService } from "@/services/packagesOffersService";
-import { PackageOffer } from "@/types/packagesOffer.interface";
+  addDistrictService,
+  deleteDistrictService,
+  updateDistrictService,
+} from "@/services/districtService";
+
+import { getDistrictService } from "@/services/districtService";
+import { District } from "@/types/district.interface";
+import TextFieldNada from "@/components/ui/form/TextFieldNada";
+import BaseDataTable from "@/components/data-tables/BaseDataTable";
+import UIPrimaryDropdown from "@/components/ui/UIPrimaryDropdown";
+import UIBaseDialog from "@/components/ui/UIBaseDialog";
+import MultiCheckbox from "@/components/ui/form/MultiCheckbox";
+import SelectInput from "@/components/ui/form/SelectInput";
+import { successDialog } from "@/utils/shared";
+import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
 import { useRouter } from "next/navigation";
+import { getUserService } from "@/services/userService";
+import { Users } from "@/types/auth.interface";
+import { PackageOffer } from "@/types/packagesOffer.interface";
 
 export default function rubbush_collectors() {
-  interface User {
-    id: number;
-    created_at: string;
-    name: string;
-    phone: string;
-    image: string;
-    subscription_name: string;
-    is_active: boolean;
-    renewal_date: string;
-  }
-  const [users, setUsers] = useState<User[]>([]);
-  const [subscriptionList, setSubscriptionList] = useState<PackageOffer[]>([]);
-  const router = useRouter();
+  const [dataList, setDataList] = useState<Users[]>([]);
   const headerArr = [
     { text: "ID", name: "id" },
     { text: "اسم المستخدم", name: "name" },
     { text: "رقم الموبيل", name: "phone" },
-    { text: " الاشتراك", name: "subscription_name" },
+    { text: " الاشتراك", name: "has_subscription" },
     { text: "نوع الاشتراك", name: "subscription_name" },
     { text: "الصورة الشخصية", name: "image" },
     { text: "الحالة", name: "is_active" },
     { text: "ميعاد التجديد", name: "renewal_date" },
     { text: "الاجراءات", name: "" },
   ];
-
-  const areas = [
-    { id: 1, name: "حي اول طنطا" },
-    { id: 2, name: "حي ثان طنطا" },
-    { id: 3, name: "حي ثالث طنطا" },
-  ];
   const statusList = [
     { is_active: 1, name: "مفعل" },
     { is_active: 0, name: "غير مفعل" },
   ];
-
   const hasSubscriptionList = [
     { is_subscribe: 1, name: "مشترك" },
     { is_subscribe: 0, name: "غير مشترك" },
   ];
-
-  const [filteredArr, setFilteredArr] = useState<User[]>([]);
-  const [checkBoxValue, setCheckBoxValue] = useState(false);
+  const [totalPages, setTotalPages] = useState(1);
   const [page, setPage] = useState(1);
-  const [userIsActive, setUserIsActive] = useState(false);
+  const [districtDays, setDistrictDays] = useState<string[]>([]);
+  const [districtTime, setDistrictTime] = useState<string[]>([]);
+  const [selectedDataItem, setSelectedDataItem] = useState<District | null>(
+    null
+  );
 
-  const fetchUserList = (pageNumber) => {
-    userListByPageService(pageNumber).then((response) => {
-      console.log(response);
-      setUsers(response.data);
-      // setFilteredArr(response.data);
+  const [subscriptionList, setSubscriptionList] = useState<PackageOffer[]>([]);
+  type FormDataType = {
+    name_ar: string;
+    name_en: string;
+    order: number;
+    is_active: number;
+    available_days: string[];
+    available_times: string[];
+  };
+  const [formData, setFormData] = useState<FormDataType>({
+    name_ar: "",
+    name_en: "",
+    order: 0,
+    is_active: 0,
+    available_days: [],
+    available_times: [],
+  });
+
+  const [updateFormData, setUpdateFormData] = useState<FormDataType>({
+    name_ar: "",
+    name_en: "",
+    order: 0,
+    is_active: 0,
+    available_days: [],
+    available_times: [],
+  });
+
+  const router = useRouter()
+
+  const fetchDataList = ({
+    search = "",
+    is_active = undefined,
+    is_subscription = undefined,
+  }: { search?: string; is_active?: boolean | undefined; is_subscription?: boolean | undefined; } = {}) => {
+    console.log(is_active);
+    const isActive =
+      is_active != undefined
+        ? is_active
+          ? "&is_active=" + 1
+          : "&is_active=" + 0
+        : "";
+    const isSubscribe =
+      is_subscription != undefined
+        ? is_subscription
+          ? "&is_subscribe=" + 1
+          : "&is_subscribe=" + 0
+        : "";
+    const hasSearch = search ? "&search=" + search : "";
+
+    const query = `?page=${page}${hasSearch}${isActive}${isSubscribe}`;
+
+    getUserService(query).then((response) => {
+      setDataList(response.data);
+      // response.data.map((item, index) => {
+      //   setDistrictDays(item.available_days);
+      //   setDistrictTime(item.available_times);
+      // });
+      setTotalPages(response.meta.last_page);
     });
   };
-  const fetchPackages = () => {
-    getPackagesService().then((response) => {
-      console.log(response);
-      setSubscriptionList(response.data);
+  const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    fetchDataList({ search: e.target.value });
+  };
+
+  const updateDataItemActive = (value: any, index: number) => {
+    const service = dataList.find((item, i) => {
+      return index == i;
+    });
+
+    if (!service) return;
+
+    const body = JSON.stringify({
+      is_active: value,
+    });
+
+    updateDistrictService(service.id, body)
+      .then((response) => {
+        const arr = [...dataList];
+        arr[index].is_active = value;
+
+        setDataList(arr);
+
+        console.log(response);
+      })
+      .catch((error) => { });
+  };
+
+  const deleteSubmit = (item: District, selectedIndex: number) => {
+    deleteDistrictService(item.id)
+      .then((response) => {
+        const updatedArr = [...dataList];
+        updatedArr.splice(selectedIndex, 1);
+        setDataList(updatedArr);
+        successDialog(true);
+      })
+      .catch((error) => { });
+  };
+
+  const updateDistrictItem = (item: District) => {
+    setSelectedDataItem(item);
+    setUpdateFormData({
+      name_ar: item.name_ar,
+      name_en: item.name_en,
+      order: item.order,
+      is_active: item.is_active ? 1 : 0,
+      available_days: item.available_days,
+      available_times: item.available_times,
     });
   };
 
-  const filterUserBySearch = (pageNumber, searchValue) => {
-    filterUserBySearchService(pageNumber, searchValue).then((response) => {
-      setUsers(response.data);
+  const updateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!selectedDataItem) return;
+
+    const body = JSON.stringify({
+      ...updateFormData,
     });
-  };
-  const takeValue = (e) => {
-    console.log("sjkdhfu");
-    console.log(e);
-    filterUserBySearch(page, e);
-  };
 
-  const filterUserByState = (selectedItem) => {
-    console.log(selectedItem.is_active);
-    filterUserByStateService(page, selectedItem.is_active).then((response) => {
-      setUsers(response.data);
-      console.log("yes im active");
-    });
+    updateDistrictService(selectedDataItem.id, body)
+      .then((response) => {
+        fetchDataList();
+        successDialog(true);
+      })
+      .catch((error) => { });
   };
 
-  const takeSelectedPage = (pageNum: number) => {
-    console.log(pageNum);
-    // setPage(pageNum)
+  const addFormChangeHander = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index?: number
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
 
-    fetchUserList(pageNum);
+    console.log(e.target.name, e.target.value);
+  };
+  const updateFormChangeHander = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index?: number
+  ) => {
+    setUpdateFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+
+    console.log(e.target.name, e.target.value);
   };
 
-  const filterBySubscription = (selectedSubscription) => {
-    console.log(selectedSubscription.is_subscribe);
-    filterUserBySubscriptionService(
-      page,
-      selectedSubscription.is_subscribe
-    ).then((response) => {
-      setUsers(response.data);
-    });
+  const createSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const fd = new FormData();
+    fd.append("name_ar", formData.name_ar);
+    fd.append("name_en", formData.name_en);
+    fd.append("order", formData.order.toString());
+    formData.available_days.forEach((day, index) =>
+      fd.append(`available_days[${index}]`, day)
+    );
+    formData.available_days.forEach((time, index) =>
+      fd.append(`available_times[${index}]`, time)
+    );
+    fd.append("is_active", formData.is_active.toString());
+
+    addDistrictService(fd)
+      .then((response) => {
+        fetchDataList();
+        //@ts-ignore
+        successDialog(true);
+        setFormData({
+          name_ar: "",
+          name_en: "",
+          order: 0,
+          is_active: 0,
+          available_days: [],
+          available_times: [],
+        });
+      })
+      .catch((error) => { });
   };
 
-  const takeCheckValue = (e) => {
-    console.log("input checked", e.target.checked);
-    setCheckBoxValue(e.target.checked);
+
+  const tableHeadActionsSlot = () => {
+    return (
+      <>
+
+
+
+
+
+        <UIPrimaryDropdown
+          items={statusList}
+          itemName="name"
+          itemValue="is_active"
+          onSelected={(value) => {
+            fetchDataList({ is_active: value });
+          }}
+        >
+          الحالة
+        </UIPrimaryDropdown>
+
+        <UIPrimaryDropdown
+          items={hasSubscriptionList}
+          itemName="name"
+          itemValue="is_subscribe"
+          onSelected={(value) => {
+            fetchDataList({ is_subscription: value });
+          }}
+        >
+          الاشتراك
+        </UIPrimaryDropdown>
+
+
+        <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
+          <button onClick={() => router.push('/users/add-user')} className="bg-[#0094140D] p-1 rounded-lg">
+            اضافة مستخدم
+          </button>
+        </div>
+
+
+
+      </>
+    );
   };
-
-  const goToAddPage = () => {
-    router.push(`/users/add-user`);
-  };
-
-  const updateUserActive = (selectedItem, itemIndex) => {
-    console.log("item", selectedItem);
-    console.log("index", itemIndex);
-    const user = users.find((item, index) => {
-      return index == itemIndex;
-    });
-    if (!user) return;
-    const newIsActive = user.is_active ? 0 : 1;
-    activateUserService(user.id, newIsActive).then((response) => {
-      const arr = users.map((item, index) => {
-        if (index == itemIndex) {
-          console.log("user is", item);
-          return { ...item, is_active: newIsActive };
-        }
-        return item;
-      });
-      setUsers(arr);
-
-      console.log(response);
-    });
-  };
-
   useEffect(() => {
-    setFilteredArr(users);
-  }, [users]);
-
-  useEffect(() => {
-    fetchUserList(1);
-    fetchPackages();
-    // fetchSubscriptionList()
-  }, []);
-
-  // const fetchSubscriptionList = () => {
-  //   subscriptionListService().then((response) => {
-  //     console.log(response);
-  //     setSubscriptionList(response.data)
-  //     // setUsers(response.data);
-  //     // setFilteredArr(response.data);
-  //   });
-  // };
-
-  // const sortList = (headItem, type: string) => {
-  //   const itemKey = headItem.name;
-  //   // const itemValue = users.map((item) => {
-  //   //   return item[itemKey];
-  //   // });
-  //   // console.log(itemValue);
-  //   // const sortedUser = itemValue.sort((a, b) => a - b);
-  //   // console.log(sortedUser);
-
-  //   const sortedUser = [...(filteredArr || [])].sort((a, b) => {
-  //     const valA = a[itemKey];
-  //     const valB = b[itemKey];
-
-  //     if (type == "asc") {
-  //       return valA - valB;
-  //     }
-  //     if (type == "desc") {
-  //       return valB - valA;
-  //     }
-  //   });
-  //   console.log(sortedUser);
-  //   setFilteredArr(sortedUser);
-  // };
-
-  // const filterUser = (selectedItem, selectedIndex) => {
-  //   console.log("selected", selectedItem);
-  //   console.log("index", index);
-  //   const arr = users.map((item, index) => {
-  //     return item.subscription_name == selectedItem.name;
-
-  //     if (index == selectedIndex) {
-  //       return;
-  //     }
-  //     return item;
-  //   });
-  // };
+    fetchDataList();
+  }, [page]); // runs every time `page` changes
 
   return (
     <>
       <div className="py-20">
-        <CustomDataTable
-          selectedPage={(pageNum: number) => takeSelectedPage(pageNum)}
-          handleAllCheck={takeCheckValue}
-          sendValueToParent={(value) => takeValue(value)}
-          tableHead={headerArr}
-          listItem={users}
-          tData={(item, index) => (
-            <>
+        <BaseDataTable
+          headItems={headerArr}
+          onPageChange={setPage}
+          totalPages={totalPages}
+          onSearchChange={tableSearchHandler}
+          headerActionsSlot={tableHeadActionsSlot()}
+        >
+          {dataList.map((item, index) => (
+            <tr key={index}>
               <td className="py-2 px-4">{item.id}</td>
               <td className="py-2 px-4">{item.name}</td>
               <td className="py-2 px-4">{item.phone}</td>
+
+
+
               <td className="py-2 px-4">
-                {item.has_subscription ? "مشترك" : "غير مشترك"}
+                <div className={` rounded-lg py-1 text-center ${item.has_subscription ? 'text-[#31D000] bg-[#31D00012] ' : ' bg-red-100 text-red-600 hover:bg-text-red-200'} `}>
+                  <span> {item.has_subscription ? "مشترك" : "غير مشترك"}</span>
+                </div>
               </td>
+
               <td className="py-2 px-4">{item.subscription_name}</td>
               <td className="py-2 px-4">
-                <Avatar
-                  color="success"
-                  placeholderInitials={item.name.slice(0, 2)}
-                  rounded
-                />
-                {/* <div className=" w-7 h-7 rounded-full overflow-hidden">
-                        <img
-                          className="w-full h-full object-contain"
-                          src={item.image}
-                          alt=""
-                        />
-                      </div> */}
+                <div className=" w-7 h-7 rounded-full overflow-hidden">
+                  <img
+                    className="w-full h-full object-contain"
+                    src={item.image}
+                    alt=""
+                  />
+                </div>
               </td>
+
+
+
+
               <td className="py-2 px-4">
-                <DropDown
-                  handleIsActive={(item) => updateUserActive(item, index)}
-                  btnName={item.is_active ? "مفعل" : "غير مفعل"}
-                  isActive={item.is_active}
-                />
+                <UIPrimaryDropdown
+                  tiny={true}
+                  itemName="name"
+                  itemValue="is_active"
+                  btnColorTailwindClass={
+                    !item.is_active
+                      ? "bg-red-100 text-red-600 hover:bg-text-red-200"
+                      : undefined
+                  }
+                  onSelected={(value) => {
+                    updateDataItemActive(value, index);
+                  }}
+                  items={statusList}
+                >
+                  {item.is_active ? "مفعل" : "غير مفعل"}
+                </UIPrimaryDropdown>
               </td>
-              <td className="">{item.renewal_date}</td>
-              <td className="">{item.renewal_date}</td>
-            </>
-          )}
-        >
-          {/* <div className='bg-[#0094140D]  text-center rounded-xl text-[#009414]'>
-            <Dropdown value={location} onChange={(e) => handleFilterChange(e, 'area')} options={areas} optionLabel="name"
-              placeholder="المنطقة" className="w-full md:w-14rem border-0 bg-transparent font-bold " />
-          </div> */}
 
-          {/* <div className='bg-[#0094140D]  text-center rounded-xl text-[#009414]'>
-            <BaseDropDown btnName="المنطقة" listItem={areas}></BaseDropDown>
-          </div>
- */}
+              <td className="py-2 px-4">{item.renewal_date}</td>
 
-          <div className="bg-[#0094140D]  text-center rounded-xl ">
-            {/* <Dropdown value={status} onChange={(e) => handleFilterChange(e, 'status')} options={statusList} optionLabel="name"
-              placeholder="الحالة" className="w-full md:w-14rem border-0 bg-transparent font-bold " /> */}
-            <BaseDropDown
-              handleFilterList={(item, index) => filterUserByState(item)}
-              btnName="الحالة"
-              listItem={statusList}
-            ></BaseDropDown>
-          </div>
 
-          <div className="bg-[#0094140D]  text-center rounded-xl ">
-            {/* <Dropdown value={subscribe} onChange={(e) => handleFilterChange(e, 'subscription')} options={subscriptionList} optionLabel="name"
-              placeholder="الاشتراك" className="w-full md:w-14rem border-0 bg-transparent font-bold " /> */}
-            <BaseDropDown
-              handleFilterList={(item, index) => filterBySubscription(item)}
-              btnName="الاشتراك"
-              listItem={hasSubscriptionList}
-            ></BaseDropDown>
-          </div>
 
-          <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
-            <button onClick={goToAddPage} className="w-full h-full">
-              اضافة مستخدم
-            </button>
-          </div>
-        </CustomDataTable>
+
+
+
+
+
+              <td className="">
+                <div className="flex justify-center gap-3">
+                  <UIDialogConfirm
+                    danger
+                    title="هل انت متأكد من حذف العنصر"
+                    confirmHandler={() => {
+                      deleteSubmit(item, index);
+                    }}
+                  >
+                    <button className="bg-[#F9285A0A] p-1 rounded-lg">
+                      <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
+                    </button>
+                  </UIDialogConfirm>
+                  <UIBaseDialog
+                    title="تعديل منطقه"
+                    confirmHandler={() => { }}
+                    confirmText="اضافة"
+                    form="update-form"
+                    btn={
+                      <button
+                        onClick={() => {
+                          updateDistrictItem(item);
+                        }}
+                        className="bg-[#0094140D] p-1 rounded-lg"
+                      >
+                        <span className="mdi mdi-folder-edit-outline text-[#009414]"></span>
+                      </button>
+                    }
+                  >
+                    <form
+                      onSubmit={updateSubmit}
+                      id="update-form"
+                    >
+                      <div className="space-y-7">
+                        <TextFieldNada
+                          name="name_ar"
+                          type="text"
+                          handleChange={
+                            updateFormChangeHander
+                          }
+                          value={
+                            updateFormData.name_ar
+                          }
+                          label=" اسم المنطقة ( عربي ) "
+                          placeholder=" اسم المنطقة  "
+                        ></TextFieldNada>
+
+                        <TextFieldNada
+                          name="name_en"
+                          type="text"
+                          handleChange={
+                            updateFormChangeHander
+                          }
+                          value={
+                            updateFormData.name_en
+                          }
+                          label=" اسم المنطقة ( انجليزي ) "
+                          placeholder=" اسم المنطقة  "
+                        ></TextFieldNada>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div className="col-span-1">
+                            <MultiCheckbox
+                              items={districtDays}
+                              value={
+                                updateFormData.available_days
+                              }
+                              label="اليوم"
+                              required={true}
+                              name="available_days"
+                              placeholder="اختر اليوم"
+                              prependIcon="mdi mdi-calendar-month-outline"
+                              iconType="mdi"
+                              onChange={(
+                                value
+                              ) => {
+                                setUpdateFormData(
+                                  (prev) => ({
+                                    ...prev,
+                                    ["available_days"]:
+                                      value,
+                                  })
+                                );
+                              }}
+                            ></MultiCheckbox>
+                          </div>
+                          <div className="col-span-1">
+                            <MultiCheckbox
+                              items={districtTime}
+                              value={
+                                updateFormData.available_times
+                              }
+                              label="الوقت"
+                              required={true}
+                              name="available_times"
+                              placeholder="اختر الوقت"
+                              prependIcon="mdi mdi-calendar-month-outline"
+                              iconType="mdi"
+                              onChange={(
+                                value
+                              ) => {
+                                setUpdateFormData(
+                                  (prev) => ({
+                                    ...prev,
+                                    ["available_times"]:
+                                      value,
+                                  })
+                                );
+                              }}
+                            ></MultiCheckbox>
+                          </div>
+                        </div>
+
+                        <SelectInput
+                          value={
+                            updateFormData.is_active
+                          }
+                          items={statusList}
+                          itemName="name"
+                          itemValue="is_active"
+                          label="الحالة"
+                          placeholder="لختر الحالة"
+                          name="is_active"
+                          required={true}
+                          onChange={(value) => {
+                            setUpdateFormData(
+                              (prev) => ({
+                                ...prev,
+                                ["is_active"]:
+                                  value,
+                              })
+                            );
+                          }}
+                        ></SelectInput>
+                      </div>
+                    </form>
+                  </UIBaseDialog>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </BaseDataTable>
       </div>
     </>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
