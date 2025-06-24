@@ -93,21 +93,4 @@ export const registerService = async (form: FormData) => {
         throw new Error(error.message);
     }
 };
-export const addUserService = async (form: FormData) => {
-    try {
-        const response = await apiCall.post(`/admins/users`, {
-            body: form,
-            headers: {
-                // "Content-Type": "application/json",
-            },
-        });
-        if (!response.ok) {
-            await responseErrorServiceHandler(response, "add user");
-        }
-        const data = (await response.json()) as User;
-        console.log("response data =>>>>", data);
-        return data;
-    } catch (error: any) {
-        throw new Error(error.message);
-    }
-};
+

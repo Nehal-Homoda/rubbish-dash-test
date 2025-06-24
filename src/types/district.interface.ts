@@ -15,3 +15,5 @@ export interface District {
   collector: Collector[]
   created_at: string
 }
+
+
