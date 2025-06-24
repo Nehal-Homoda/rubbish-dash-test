@@ -1,15 +1,5 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Checkbox, Label } from "flowbite-react";
-import { Radio } from "flowbite-react";
-import {
-    addDistrictService,
-    deleteDistrictService,
-    updateDistrictService,
-} from "@/services/districtService";
-
-import { getDistrictService } from "@/services/districtService";
-import { District } from "@/types/district.interface";
 import TextFieldNada from "@/components/ui/form/TextFieldNada";
 import BaseDataTable from "@/components/data-tables/BaseDataTable";
 import UIPrimaryDropdown from "@/components/ui/UIPrimaryDropdown";
@@ -18,74 +8,83 @@ import MultiCheckbox from "@/components/ui/form/MultiCheckbox";
 import SelectInput from "@/components/ui/form/SelectInput";
 import { successDialog } from "@/utils/shared";
 import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
+import {
+    addPackageService,
+    deletePackageService,
+    getPackagesService,
+    updatePackageService,
+} from "@/services/packagesOffersService";
+import { getCategoriesService } from "@/services/categoriesService";
+import { Category } from "@/types/categories.interface";
+import { Visit } from "@/types/visits.interface";
+import {
+    deleteVisitsService,
+    getVisitsService,
+    updateVisitsService,
+} from "@/services/visitService";
 
 export default function rubbush_collectors() {
-    const [dataList, setDataList] = useState<District[]>([]);
+    const [dataList, setDataList] = useState<Visit[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
     const headerArr = [
         { text: "ID", name: "id" },
-        { text: " اسم المنطقة", name: "name_ar" },
-        { text: " عدد الاشتراكات", name: "no_of_subscriptions" },
+        { text: " المنطقة ", name: "name" },
+        { text: " نوع الخدمة", name: "category" },
+        { text: "المستخدم", name: "price_per_unit" },
+        { text: "جامع القمامة", name: "days_count" },
+        { text: "تاريخ الزيارة", name: "price_per_unit" },
         { text: "الحالة", name: "is_active" },
-        { text: "الاجراءات", name: "image" },
+        { text: "ملاحظة", name: "" },
     ];
     const statusList = [
-        { is_active: 1, name: "مفعل" },
-        { is_active: 0, name: "غير مفعل" },
+        { is_active: "pending", name: "قيد الانتظار" },
+        { is_active: "collected", name: "مجمع" },
+        { is_active: "not_collected", name: "غير مجمع" },
     ];
     const [totalPages, setTotalPages] = useState(1);
     const [page, setPage] = useState(1);
-    const [districtDays, setDistrictDays] = useState<string[]>([]);
-    const [districtTime, setDistrictTime] = useState<string[]>([]);
-    const [selectedDataItem, setSelectedDataItem] = useState<District | null>(
+    const [selectedDataItem, setSelectedDataItem] = useState<Visit | null>(
         null
     );
     type FormDataType = {
         name_ar: string;
         name_en: string;
-        order: number;
+        category_id: number | string;
         is_active: number;
-        available_days: string[];
-        available_times: string[];
+        price_per_unit: number | string;
+        order: number;
+        days_count: number | string;
     };
-    const [formData, setFormData] = useState<FormDataType>({
-        name_ar: "",
-        name_en: "",
-        order: 0,
-        is_active: 0,
-        available_days: [],
-        available_times: [],
-    });
 
     const [updateFormData, setUpdateFormData] = useState<FormDataType>({
         name_ar: "",
         name_en: "",
-        order: 0,
+        category_id: "",
         is_active: 0,
-        available_days: [],
-        available_times: [],
+        price_per_unit: "",
+        order: 0,
+        days_count: "",
     });
 
     const fetchDataList = ({
         search = "",
-        is_active = undefined,
-    }: { search?: string; is_active?: boolean | undefined } = {}) => {
-        console.log(is_active);
-        const isActive =
-            is_active != undefined
-                ? is_active
-                    ? "&is_active=" + 1
-                    : "&is_active=" + 0
-                : "";
+        status = undefined,
+        category_id = undefined,
+    }: {
+        search?: string;
+        status?: string;
+        category_id?: number | undefined;
+    } = {}) => {
+        console.log(status);
+        const statusParam = status != undefined ? "&status=" + status : "";
+        const category =
+            category_id != undefined ? "&category_id=" + category_id : "";
         const hasSearch = search ? "&search=" + search : "";
 
-        const query = `?page=${page}${hasSearch}${isActive}`;
+        const query = `?page=${page}${hasSearch}${statusParam}${category}`;
 
-        getDistrictService(query).then((response) => {
+        getVisitsService(query).then((response) => {
             setDataList(response.data);
-            response.data.map((item, index) => {
-                setDistrictDays(item.available_days);
-                setDistrictTime(item.available_times);
-            });
             setTotalPages(response.meta.last_page);
         });
     };
@@ -101,13 +100,13 @@ export default function rubbush_collectors() {
         if (!service) return;
 
         const body = JSON.stringify({
-            is_active: value,
+            status: value,
         });
 
-        updateDistrictService(service.id, body)
+        updateVisitsService(service.id, body)
             .then((response) => {
                 const arr = [...dataList];
-                arr[index].is_active = value;
+                arr[index].status = value;
 
                 setDataList(arr);
 
@@ -116,8 +115,8 @@ export default function rubbush_collectors() {
             .catch((error) => {});
     };
 
-    const deleteSubmit = (item: District, selectedIndex: number) => {
-        deleteDistrictService(item.id)
+    const deleteSubmit = (item: Visit, selectedIndex: number) => {
+        deleteVisitsService(item.id)
             .then((response) => {
                 const updatedArr = [...dataList];
                 updatedArr.splice(selectedIndex, 1);
@@ -127,16 +126,8 @@ export default function rubbush_collectors() {
             .catch((error) => {});
     };
 
-    const updateDataItem = (item: District) => {
+    const updateDataItem = (item: Visit) => {
         setSelectedDataItem(item);
-        setUpdateFormData({
-            name_ar: item.name_ar,
-            name_en: item.name_en,
-            order: item.order,
-            is_active: item.is_active ? 1 : 0,
-            available_days: item.available_days,
-            available_times: item.available_times,
-        });
     };
 
     const updateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -148,7 +139,7 @@ export default function rubbush_collectors() {
             ...updateFormData,
         });
 
-        updateDistrictService(selectedDataItem.id, body)
+        updateVisitsService(selectedDataItem.id, body)
             .then((response) => {
                 fetchDataList();
                 successDialog(true);
@@ -156,17 +147,6 @@ export default function rubbush_collectors() {
             .catch((error) => {});
     };
 
-    const addFormChangeHander = (
-        e: React.ChangeEvent<HTMLInputElement>,
-        index?: number
-    ) => {
-        setFormData((prev) => ({
-            ...prev,
-            [e.target.name]: e.target.value,
-        }));
-
-        console.log(e.target.name, e.target.value);
-    };
     const updateFormChangeHander = (
         e: React.ChangeEvent<HTMLInputElement>,
         index?: number
@@ -179,143 +159,58 @@ export default function rubbush_collectors() {
         console.log(e.target.name, e.target.value);
     };
 
-    const createSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-
-        const fd = new FormData();
-        fd.append("name_ar", formData.name_ar);
-        fd.append("name_en", formData.name_en);
-        fd.append("order", formData.order.toString());
-        formData.available_days.forEach((day, index) =>
-            fd.append(`available_days[${index}]`, day)
-        );
-        formData.available_days.forEach((time, index) =>
-            fd.append(`available_times[${index}]`, time)
-        );
-        fd.append("is_active", formData.is_active.toString());
-
-        addDistrictService(fd)
-            .then((response) => {
-                fetchDataList();
-                //@ts-ignore
-                successDialog(true);
-                setFormData({
-                    name_ar: "",
-                    name_en: "",
-                    order: 0,
-                    is_active: 0,
-                    available_days: [],
-                    available_times: [],
-                });
-            })
-            .catch((error) => {});
+    const statusDropdownColor = (name: string) => {
+        if (name === "not_collected")
+            return "bg-red-100 text-red-600 hover:bg-text-red-200";
+        if (name === "collected") return undefined;
+        if (name === "pending")
+            return "bg-yellow-100 text-yellow-600 hover:bg-text-yellow-200";
     };
-
+    const statusDropdownName = (name: string) => {
+        return statusList.find((item) => item.is_active === name)?.name ?? "";
+    };
 
     const tableHeadActionsSlot = () => {
         return (
             <>
-                <UIBaseDialog
-                    title="اضافة منطقه"
-                    confirmHandler={() => {}}
-                    confirmText="اضافة"
-                    form="update-form"
-                    btn={
-                        <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
-                            <button className="bg-[#0094140D] p-1 rounded-lg">
-                                اضافة منطقة
-                            </button>
-                        </div>
-                    }
+                <UIPrimaryDropdown
+                    items={categories}
+                    itemName="name_ar"
+                    itemValue="id"
+                    onSelected={(value) => {
+                        fetchDataList({ category_id: value });
+                    }}
                 >
-                    <form onSubmit={createSubmit} id="update-form">
-                        <div className="space-y-7">
-                            <TextFieldNada
-                                name="name_ar"
-                                type="text"
-                                handleChange={addFormChangeHander}
-                                value={formData.name_ar}
-                                label=" اسم المنطقة ( عربي ) "
-                                placeholder=" اسم المنطقة  "
-                            ></TextFieldNada>
-
-                            <TextFieldNada
-                                name="name_en"
-                                type="text"
-                                handleChange={addFormChangeHander}
-                                value={formData.name_en}
-                                label=" اسم المنطقة ( انجليزي ) "
-                                placeholder=" اسم المنطقة  "
-                            ></TextFieldNada>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <div className="col-span-1">
-                                    <MultiCheckbox
-                                        items={districtDays}
-                                        value={formData.available_days}
-                                        label="اليوم"
-                                        required={true}
-                                        name="available_days"
-                                        placeholder="اختر اليوم"
-                                        prependIcon="mdi mdi-calendar-month-outline"
-                                        iconType="mdi"
-                                        onChange={(value) => {
-                                            setFormData((prev) => ({
-                                                ...prev,
-                                                ["available_days"]: value,
-                                            }));
-                                        }}
-                                    ></MultiCheckbox>
-                                </div>
-                                <div className="col-span-1">
-                                    <MultiCheckbox
-                                        items={districtTime}
-                                        value={formData.available_times}
-                                        label="الوقت"
-                                        required={true}
-                                        name="available_times"
-                                        placeholder="اختر الوقت"
-                                        prependIcon="mdi mdi-calendar-month-outline"
-                                        iconType="mdi"
-                                        onChange={(value) => {
-                                            setFormData((prev) => ({
-                                                ...prev,
-                                                ["available_times"]: value,
-                                            }));
-                                        }}
-                                    ></MultiCheckbox>
-                                </div>
-                            </div>
-
-                            <SelectInput
-                                value={formData.is_active}
-                                items={statusList}
-                                itemName="name"
-                                itemValue="is_active"
-                                label="الحالة"
-                                placeholder="لختر الحالة"
-                                name="is_active"
-                                required={true}
-                                onChange={(value) => {
-                                    setFormData((prev) => ({
-                                        ...prev,
-                                        ["is_active"]: value,
-                                    }));
-                                }}
-                            ></SelectInput>
-                        </div>
-                    </form>
-                </UIBaseDialog>
+                    نوع الخدمة
+                </UIPrimaryDropdown>
+                <UIPrimaryDropdown
+                    items={statusList}
+                    itemName="name"
+                    itemValue="is_active"
+                    onSelected={(value) => {
+                        fetchDataList({ status: value });
+                    }}
+                >
+                    الحالة
+                </UIPrimaryDropdown>
             </>
         );
     };
+    const fetchCategories = () => {
+        getCategoriesService()
+            .then((response) => {
+                setCategories(response.data);
+            })
+            .catch((error) => {});
+    };
     useEffect(() => {
         fetchDataList();
+        fetchCategories();
     }, [page]); // runs every time `page` changes
 
     return (
         <>
-            <div className="py-20">
+            <div className="py-2">
                 <BaseDataTable
                     headItems={headerArr}
                     onPageChange={setPage}
@@ -327,30 +222,29 @@ export default function rubbush_collectors() {
                         <tr key={index}>
                             <td className="py-2 px-4">{item.id}</td>
 
-                            <td className="py-2 px-4">{item.name_ar}</td>
-                            <td className="py-2 px-4">
-                                {item.no_of_subscriptions}
-                            </td>
+                            <td className="py-2 px-4">{item.address}</td>
+                            <td className="py-2 px-4">{item.category_name}</td>
+                            <td className="py-2 px-4">{item.user_name}</td>
+                            <td className="py-2 px-4">{item.collector_name}</td>
+                            <td className="py-2 px-4">{item.collected_at}</td>
                             <td className="py-2 px-4">
                                 <UIPrimaryDropdown
                                     tiny={true}
                                     itemName="name"
                                     itemValue="is_active"
-                                    btnColorTailwindClass={
-                                        !item.is_active
-                                            ? "bg-red-100 text-red-600 hover:bg-text-red-200"
-                                            : undefined
-                                    }
+                                    btnColorTailwindClass={statusDropdownColor(
+                                        item.status
+                                    )}
                                     onSelected={(value) => {
                                         updateDataItemActive(value, index);
                                     }}
                                     items={statusList}
                                 >
-                                    {item.is_active ? "مفعل" : "غير مفعل"}
+                                    {statusDropdownName(item.status)}
                                 </UIPrimaryDropdown>
                             </td>
                             <td className="">
-                                <div className="flex justify-center gap-3">
+                                <div className=" flex justify-center gap-3">
                                     <UIDialogConfirm
                                         danger
                                         title="هل انت متأكد من حذف العنصر"
@@ -363,6 +257,7 @@ export default function rubbush_collectors() {
                                         </button>
                                     </UIDialogConfirm>
                                     <UIBaseDialog
+                                        hideConfirmBtn
                                         title="تعديل منطقه"
                                         confirmHandler={() => {}}
                                         confirmText="اضافة"
@@ -383,106 +278,46 @@ export default function rubbush_collectors() {
                                             id="update-form"
                                         >
                                             <div className="space-y-7">
-                                                <TextFieldNada
-                                                    name="name_ar"
-                                                    type="text"
-                                                    handleChange={
-                                                        updateFormChangeHander
-                                                    }
-                                                    value={
-                                                        updateFormData.name_ar
-                                                    }
-                                                    label=" اسم المنطقة ( عربي ) "
-                                                    placeholder=" اسم المنطقة  "
-                                                ></TextFieldNada>
-
-                                                <TextFieldNada
-                                                    name="name_en"
-                                                    type="text"
-                                                    handleChange={
-                                                        updateFormChangeHander
-                                                    }
-                                                    value={
-                                                        updateFormData.name_en
-                                                    }
-                                                    label=" اسم المنطقة ( انجليزي ) "
-                                                    placeholder=" اسم المنطقة  "
-                                                ></TextFieldNada>
-
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                                    <div className="col-span-1">
-                                                        <MultiCheckbox
-                                                            items={districtDays}
-                                                            value={
-                                                                updateFormData.available_days
-                                                            }
-                                                            label="اليوم"
-                                                            required={true}
-                                                            name="available_days"
-                                                            placeholder="اختر اليوم"
-                                                            prependIcon="mdi mdi-calendar-month-outline"
-                                                            iconType="mdi"
-                                                            onChange={(
-                                                                value
-                                                            ) => {
-                                                                setUpdateFormData(
-                                                                    (prev) => ({
-                                                                        ...prev,
-                                                                        ["available_days"]:
-                                                                            value,
-                                                                    })
-                                                                );
-                                                            }}
-                                                        ></MultiCheckbox>
+                                                <div className="relative py-3 px-5 border border-surface-light-700 rounded-2xl">
+                                                    <div className="label flex items-center gap-1 absolute -top-4 start-4 bg-background w-fit px-3 text-sm font-semibold">
+                                                        <label>
+                                                            ملاحظة المستخدم
+                                                        </label>
                                                     </div>
-                                                    <div className="col-span-1">
-                                                        <MultiCheckbox
-                                                            items={districtTime}
-                                                            value={
-                                                                updateFormData.available_times
+                                                    <div className="flex justify-between items-center">
+                                                        <div className="text-start w-full py-2 ">
+                                                            {
+                                                                selectedDataItem?.user_note
                                                             }
-                                                            label="الوقت"
-                                                            required={true}
-                                                            name="available_times"
-                                                            placeholder="اختر الوقت"
-                                                            prependIcon="mdi mdi-calendar-month-outline"
-                                                            iconType="mdi"
-                                                            onChange={(
-                                                                value
-                                                            ) => {
-                                                                setUpdateFormData(
-                                                                    (prev) => ({
-                                                                        ...prev,
-                                                                        ["available_times"]:
-                                                                            value,
-                                                                    })
-                                                                );
-                                                            }}
-                                                        ></MultiCheckbox>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="relative py-3 px-5 border border-surface-light-700 rounded-2xl">
+                                                    <div className="label flex items-center gap-1 absolute -top-4 start-4 bg-background w-fit px-3 text-sm font-semibold">
+                                                        <label>
+                                                            سبب تعذر التجميع
+                                                        </label>
+                                                    </div>
+                                                    <div className="flex justify-between items-center">
+                                                        <div className="text-start w-full py-2 ">
+                                                            {
+                                                                selectedDataItem?.collector_note
+                                                            }
+                                                        </div>
                                                     </div>
                                                 </div>
 
-                                                <SelectInput
-                                                    value={
-                                                        updateFormData.is_active
-                                                    }
-                                                    items={statusList}
-                                                    itemName="name"
-                                                    itemValue="is_active"
-                                                    label="الحالة"
-                                                    placeholder="لختر الحالة"
-                                                    name="is_active"
-                                                    required={true}
-                                                    onChange={(value) => {
-                                                        setUpdateFormData(
-                                                            (prev) => ({
-                                                                ...prev,
-                                                                ["is_active"]:
-                                                                    value,
-                                                            })
-                                                        );
-                                                    }}
-                                                ></SelectInput>
+                                                <div className="flex items-center justify-start">
+                                                    <div
+                                                        className={`text-start py-2 px-5 rounded-md ${statusDropdownColor(
+                                                            item.status
+                                                        )}`}
+                                                    >
+                                                        {statusDropdownName(
+                                                            item.status
+                                                        )}
+                                                    </div>
+                                                </div>
                                             </div>
                                         </form>
                                     </UIBaseDialog>
