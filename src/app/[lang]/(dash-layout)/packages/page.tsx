@@ -37,8 +37,6 @@ export default function rubbush_collectors() {
     ];
     const [totalPages, setTotalPages] = useState(1);
     const [page, setPage] = useState(1);
-    const [districtDays, setDistrictDays] = useState<string[]>([]);
-    const [districtTime, setDistrictTime] = useState<string[]>([]);
     const [selectedDataItem, setSelectedDataItem] =
         useState<PackageOffer | null>(null);
     type FormDataType = {
@@ -135,7 +133,7 @@ export default function rubbush_collectors() {
             .catch((error) => {});
     };
 
-    const updateDistrictItem = (item: PackageOffer) => {
+    const updateDataItem = (item: PackageOffer) => {
         setSelectedDataItem(item);
         setUpdateFormData({
             name_ar: item.name,
@@ -406,7 +404,7 @@ export default function rubbush_collectors() {
                                         btn={
                                             <button
                                                 onClick={() => {
-                                                    updateDistrictItem(item);
+                                                    updateDataItem(item);
                                                 }}
                                                 className="bg-[#0094140D] p-1 rounded-lg"
                                             >
