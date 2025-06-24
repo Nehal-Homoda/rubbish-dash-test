@@ -1,526 +1,438 @@
-// "use client";
+"use client";
+import React, { useEffect, useState } from "react";
+import { District } from "@/types/district.interface";
+import TextFieldNada from "@/components/ui/form/TextFieldNada";
+import BaseDataTable from "@/components/data-tables/BaseDataTable";
+import UIPrimaryDropdown from "@/components/ui/UIPrimaryDropdown";
+import UIBaseDialog from "@/components/ui/UIBaseDialog";
+import MultiCheckbox from "@/components/ui/form/MultiCheckbox";
+import SelectInput from "@/components/ui/form/SelectInput";
+import { successDialog } from "@/utils/shared";
+import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
 
-// import React, { useEffect, useState } from "react";
-// import CustomDataTable from "@/components/data-tables/customDataTable";
-// import {
-//   activateCategoryService,
-//   filterCategoryBySearchService,
-//   filterCategoryByStateService,
-//   categoryListByPageService,
-//   addCategoryService,
-//   deleteCategoryService,
-//   updateCategoryService,
-// } from "@/services/categoriesService";
-// import DropDown from "@/components/shared/StateDropDown";
-// import BaseDropDown from "@/components/shared/BaseDropDown";
+import {
+    addCategoryService,
+    deleteCategoryService,
+    getCategoriesService,
+    updateCategoryService,
+} from "@/services/categoriesService";
+import { Category } from "@/types/categories.interface";
+import FileInput from "@/components/ui/form/FileInput";
+import FileInputImg from "@/components/ui/form/FileInputImg";
 
-// import { getCategoriesService } from "@/services/categoriesService";
-// import { Categories } from "@/types/categories.interface";
-// import { useRouter } from "next/navigation";
-// import {
-//   Button,
-//   Checkbox,
-//   Label,
-//   Modal,
-//   ModalBody,
-//   ModalHeader,
-//   TextInput,
-// } from "flowbite-react";
-// import TextFieldNada from "@/components/ui/form/TextFieldNada";
-// import FileInput from "@/components/ui/form/FileInput";
+export default function rubbush_collectors() {
+    const [dataList, setDataList] = useState<Category[]>([]);
+    const headerArr = [
+        { text: "ID", name: "id" },
+        { text: " صورة الخدمة", name: "image" },
+        { text: " اسم الخدمة", name: "name_ar" },
+        { text: " عدد الاشتراكات", name: "no_of_subscriptions" },
+        { text: "الحالة", name: "is_active" },
+        { text: "الاجراءات", name: "image" },
+    ];
+    const statusList = [
+        { is_active: 1, name: "مفعل" },
+        { is_active: 0, name: "غير مفعل" },
+    ];
+    const [totalPages, setTotalPages] = useState(1);
+    const [page, setPage] = useState(1);
+    const [selectedDataItem, setSelectedDataItem] = useState<Category | null>(
+        null
+    );
+    type FormDataType = {
+        name_ar: string;
+        name_en: string;
+        order: number;
+        is_active: number;
+        image: File | null | string;
+    };
+    const [formData, setFormData] = useState<FormDataType>({
+        name_ar: "",
+        name_en: "",
+        order: 0,
+        is_active: 0,
+        image: null,
+    });
 
-// export default function rubbush_collectors() {
-//   const [categoryList, setCategoryList] = useState<Categories[]>([]);
-//   const router = useRouter();
-//   const headerArr = [
-//     { text: "ID", name: "id" },
-//     { text: "صورة الخدمة ", name: "name" },
-//     { text: "اسم الخدمة", name: "phone" },
-//     { text: " عدد الاشتراكات", name: "subscription_name" },
-//     { text: "الحالة", name: "subscription_name" },
-//     { text: "الاجراءات", name: "image" },
-//   ];
+    const [updateFormData, setUpdateFormData] = useState<FormDataType>({
+        name_ar: "",
+        name_en: "",
+        order: 0,
+        is_active: 0,
+        image: null,
+    });
 
-//   const statusList = [
-//     { is_active: 1, name: "مفعل" },
-//     { is_active: 0, name: "غير مفعل" },
-//   ];
-//   const [page, setPage] = useState(1);
-//   const [openModal, setOpenModal] = useState(false);
-//   const [openUpdateModal, setOpenUpdateModal] = useState(false);
-//   const [selectedItemToUpdate, setSelectedItemToUpdate] =
-//     useState<Categories | null>(null);
+    const fetchDataList = ({
+        search = "",
+        is_active = undefined,
+    }: { search?: string; is_active?: boolean | undefined } = {}) => {
+        console.log(is_active);
+        const isActive =
+            is_active != undefined
+                ? is_active
+                    ? "&is_active=" + 1
+                    : "&is_active=" + 0
+                : "";
+        const hasSearch = search ? "&search=" + search : "";
 
-//   const [checkBoxValue, setCheckBoxValue] = useState(false);
-//   const [categoryIsActive, setCategoryIsActive] = useState(false);
-//   const [isImg, setIsImg] = useState(false);
-//   const [imgUrl,setImgUrl]=useState('')
+        const query = `?page=${page}${hasSearch}${isActive}`;
 
-//   // const [selectedUpdate, setSelectedUpdate] = useState(null);
+        getCategoriesService(query).then((response) => {
+            setDataList(response.data);
+            setTotalPages(response.meta.last_page);
+        });
+    };
+    const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+        fetchDataList({ search: e.target.value });
+    };
 
-//   const [formData, setFormData] = useState({
-//     name_ar: "",
-//     name_en: "",
-//     order: 0,
-//     is_active: 0,
-//     image: "",
-//   });
+    const updateDataItemActive = (value: any, index: number) => {
+        const service = dataList.find((item, i) => {
+            return index == i;
+        });
 
-//   const defaultBase64Image = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA...";
-//   const [updateFormData, setUpdateFormData] = useState({
-//     id: 0,
-//     name_ar: "",
-//     name_en: "",
-//     order: 0,
-//     is_active: 0,
-//     image: defaultBase64Image,
-//   });
+        if (!service) return;
 
-//   const onCloseModal = () => {
-//     setOpenModal(false);
+        const body = JSON.stringify({
+            is_active: value,
+        });
 
-//     setFormData({
-//       name_ar: "",
-//       name_en: "",
-//       order: 0,
-//       is_active: 0,
-//       image: "",
-//     });
-//   };
-//   const onCloseUpdateModal = () => {
-//     setOpenUpdateModal(false);
+        updateCategoryService(service.id, body)
+            .then((response) => {
+                const arr = [...dataList];
+                arr[index].is_active = value;
 
-//     setUpdateFormData({
-//       id: 0,
-//       name_ar: "",
-//       name_en: "",
-//       order: 0,
-//       is_active: 0,
-//       image: "",
-//     });
-//   };
+                setDataList(arr);
 
-//   const takeFormValue = (e, formName: string, name: string) => {
-//     console.log("nn", e.target.value);
-//     if (formName == "formData") {
-//       setFormData((prev) => ({
-//         ...prev,
-//         [name]: e.target.value,
-//       }));
-//     } else {
-//       setUpdateFormData((prev) => ({
-//         ...prev,
-//         [name]: e.target.value,
-//       }));
-//     }
-//   };
-//   const takeSelectedStateInFormData = (e) => {
-//     const value = Number(e.target.value);
-//     console.log(e.target.value);
-//     setFormData((prev) => ({
-//       ...prev,
-//       is_active: value,
-//     }));
-//   };
-//   const takeSelectedState = (e) => {
-//     const value = Number(e.target.value);
-//     setUpdateFormData((prev) => ({
-//       ...prev,
-//       is_active: value,
-//     }));
-//   };
+                console.log(response);
+            })
+            .catch((error) => {});
+    };
 
-//   const fetchServiceList = (pageNumber) => {
-//     categoryListByPageService(pageNumber).then((response) => {
-//       console.log(response);
-//       setCategoryList(response.data);
-//       // setFilteredArr(response.data);
-//     });
-//   };
+    const deleteSubmit = (item: Category, selectedIndex: number) => {
+        deleteCategoryService(item.id)
+            .then((response) => {
+                const updatedArr = [...dataList];
+                updatedArr.splice(selectedIndex, 1);
+                setDataList(updatedArr);
+                successDialog(true);
+            })
+            .catch((error) => {});
+    };
 
-//   const filterServiceBySearch = (pageNumber, searchValue) => {
-//     filterCategoryBySearchService(pageNumber, searchValue).then((response) => {
-//       setCategoryList(response.data);
-//     });
-//   };
-//   const takeValue = (e) => {
-//     console.log("sjkdhfu");
-//     console.log(e);
-//     filterServiceBySearch(page, e);
-//   };
+    const updateDataItem = (item: Category) => {
+        setSelectedDataItem(item);
+        setUpdateFormData({
+            name_ar: item.name_ar,
+            name_en: item.name_en,
+            order: item.order,
+            is_active: item.is_active ? 1 : 0,
+            image: item.image,
+        });
+    };
 
-//   const filterServiceByState = (selectedItem) => {
-//     console.log(selectedItem.is_active);
-//     filterCategoryByStateService(page, selectedItem.is_active).then(
-//       (response) => {
-//         setCategoryList(response.data);
-//         console.log("yes im active");
-//       }
-//     );
-//   };
+    const updateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
 
-//   const takeSelectedPage = (pageNum: number) => {
-//     console.log(pageNum);
-//     // setPage(pageNum)
+        if (!selectedDataItem) return;
 
-//     fetchServiceList(pageNum);
-//   };
+        const body = JSON.stringify({
+            ...updateFormData,
+        });
 
-//   const takeCheckValue = (e) => {
-//     console.log("input checked", e.target.checked);
-//     setCheckBoxValue(e.target.checked);
-//   };
+        updateCategoryService(selectedDataItem.id, body)
+            .then((response) => {
+                fetchDataList();
+                successDialog(true);
+            })
+            .catch((error) => {});
+    };
 
-//   const updateServiceActive = (selectedItem, itemIndex) => {
-//     const service = categoryList.find((item, index) => {
-//       return index == itemIndex;
-//     });
-//     if (!service) return;
-//     const toggledIsActive = service.is_active && !selectedItem.is_active ? 0 : 1;
-//     activateCategoryService(service.id, toggledIsActive).then((response) => {
-//       const arr = categoryList.map((item, index) => {
-//         if (index == itemIndex) {
-//           console.log("Service is", item);
-//           return {
-//             ...item,
-//             is_active: toggledIsActive,
-//           };
-//         }
-//         return item;
-//       });
-//       setCategoryList(arr);
+    const addFormChangeHander = (
+        e: React.ChangeEvent<HTMLInputElement>,
+        index?: number
+    ) => {
+        setFormData((prev) => ({
+            ...prev,
+            [e.target.name]: e.target.value,
+        }));
 
-//       console.log(response);
-//     });
-//   };
+        console.log(e.target.name, e.target.value);
+    };
+    const updateFormChangeHander = (
+        e: React.ChangeEvent<HTMLInputElement>,
+        index?: number
+    ) => {
+        setUpdateFormData((prev) => ({
+            ...prev,
+            [e.target.name]: e.target.value,
+        }));
 
-//   const deleteCategory = (item, selectedIndex) => {
-//     console.log(item);
-//     deleteCategoryService(item.id).then((response) => {
-//       const updatedArr = [...categoryList];
-//       updatedArr.splice(selectedIndex, 1);
-//       setCategoryList(updatedArr);
-//     });
-//   };
+        console.log(e.target.name, e.target.value);
+    };
 
-//   const fetchCategories = () => {
-//     getCategoriesService().then((response) => {
-//       setCategoryList(response.data);
-//     });
-//   };
-//   const addServiceSubmit = (e) => {
-//     e.preventDefault();
-//     const fd = new FormData();
-//     fd.append("name_ar", formData.name_ar);
-//     fd.append("name_en", formData.name_en);
-//     fd.append("order", formData.order);
-//     fd.append("is_active", formData.is_active);
-//     fd.append("image", formData.image);
-//     addCategoryService(fd).then((response) => {
-//       fetchCategories()
-//       // setCategoryList(response.data)
-//       onCloseModal();
-//     });
-//   };
+    const createSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
 
-//   const openUpdateDialog = (item, index) => {
-//     setSelectedItemToUpdate(item);
-//     // setUpdateFormData({
-//     //   id:item.id,
-//     //   name_ar: item.name_ar,
-//     //   name_en: item.name_en,
-//     //   order: item.order,
-//     //   is_active:  Number(item.is_active),
-//     //   image: item.image,
-//     // });
+        const fd = new FormData();
+        fd.append("name_ar", formData.name_ar);
+        fd.append("name_en", formData.name_en);
+        fd.append("order", formData.order.toString());
+        fd.append("is_active", formData.is_active.toString());
+        if (formData.image) {
+            fd.append("image", formData.image);
+        }
 
-//     setOpenUpdateModal(true);
-//   };
+        addCategoryService(fd)
+            .then((response) => {
+                fetchDataList();
+                //@ts-ignore
+                successDialog(true);
+                setFormData({
+                    name_ar: "",
+                    name_en: "",
+                    order: 0,
+                    is_active: 0,
+                    image: null,
+                });
+            })
+            .catch((error) => {});
+    };
 
-//   const updateServiceSubmit = (e) => {
-//     e.preventDefault();
-//     if (!updateFormData) return;
-//     console.log("updated", updateFormData);
-//     updateCategoryService(updateFormData.id, updateFormData).then(
-//       (response) => {
-//         fetchCategories()
-//         // setCategoryList(response.data);
-//         onCloseUpdateModal();
-//       }
-//     );
-//   };
+    const tableHeadActionsSlot = () => {
+        return (
+            <>
+                <UIPrimaryDropdown
+                    items={statusList}
+                    itemName="name"
+                    itemValue="is_active"
+                    onSelected={(value) => {
+                        fetchDataList({ is_active: value });
+                    }}
+                >
+                    الحالة
+                </UIPrimaryDropdown>
+                <UIBaseDialog
+                    title="اضافة خدمة"
+                    confirmHandler={() => {}}
+                    confirmText="اضافة"
+                    form="update-form"
+                    btn={
+                        <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
+                            <button className="bg-[#0094140D] p-1 rounded-lg">
+                                اضافة خدمة
+                            </button>
+                        </div>
+                    }
+                >
+                    <form onSubmit={createSubmit} id="update-form">
+                        <div className="space-y-7">
+                            <div className="w-full flex justify-center mb-20">
+                                <FileInputImg
+                                    state="edit"
+                                    onFileChange={(arg) => {
+                                        setFormData((prev) => ({
+                                            ...prev,
+                                            ["image"]: arg?.file ?? null,
+                                        }));
+                                    }}
+                                ></FileInputImg>
+                            </div>
+                            <TextFieldNada
+                                name="name_ar"
+                                type="text"
+                                handleChange={addFormChangeHander}
+                                value={formData.name_ar}
+                                label=" اسم الخدمة ( عربي ) "
+                                placeholder=" اسم الخدمة  "
+                            ></TextFieldNada>
 
-//   useEffect(() => {
-//     fetchCategories();
-//   }, []);
+                            <TextFieldNada
+                                name="name_en"
+                                type="text"
+                                handleChange={addFormChangeHander}
+                                value={formData.name_en}
+                                label=" اسم الخدمة ( انجليزي ) "
+                                placeholder=" اسم الخدمة  "
+                            ></TextFieldNada>
 
-//   useEffect(() => {
-//     if (selectedItemToUpdate) {
-//       setUpdateFormData({
-//         id: selectedItemToUpdate.id,
-//         name_ar: selectedItemToUpdate.name_ar,
-//         name_en: selectedItemToUpdate.name_en,
-//         order: selectedItemToUpdate.order,
-//         is_active: Number(selectedItemToUpdate.is_active),
-//         image: selectedItemToUpdate.image,
-//       });
+                            <SelectInput
+                                value={formData.is_active}
+                                items={statusList}
+                                itemName="name"
+                                itemValue="is_active"
+                                label="الحالة"
+                                placeholder="لختر الحالة"
+                                name="is_active"
+                                required={true}
+                                onChange={(value) => {
+                                    setFormData((prev) => ({
+                                        ...prev,
+                                        ["is_active"]: value,
+                                    }));
+                                }}
+                            ></SelectInput>
+                        </div>
+                    </form>
+                </UIBaseDialog>
+            </>
+        );
+    };
+    useEffect(() => {
+        fetchDataList();
+    }, [page]); // runs every time `page` changes
 
-//       setOpenUpdateModal(true);
-//     }
-//   }, [selectedItemToUpdate]);
+    return (
+        <>
+            <div className="py-20">
+                <BaseDataTable
+                    headItems={headerArr}
+                    onPageChange={setPage}
+                    totalPages={totalPages}
+                    onSearchChange={tableSearchHandler}
+                    headerActionsSlot={tableHeadActionsSlot()}
+                >
+                    {dataList.map((item, index) => (
+                        <tr key={index}>
+                            <td className="py-2 px-4">{item.id}</td>
 
-//   const takeUploadedImage = (imgUrl) => {
-//     console.log(imgUrl)
-//     setImgUrl(imgUrl)
-//   }
+                            <td className="py-2 px-4">
+                                <div className="w-[100px] aspect-[3/1.5] bg-gray-50 rounded-md">
+                                    <img
+                                        src={item.image}
+                                        alt=""
+                                        className="w-full h-full object-contain"
+                                    />
+                                </div>
+                            </td>
+                            <td className="py-2 px-4">{item.name_ar}</td>
+                            <td className="py-2 px-4">
+                                {item.no_of_subscriptions}
+                            </td>
+                            <td className="py-2 px-4">
+                                <UIPrimaryDropdown
+                                    tiny={true}
+                                    itemName="name"
+                                    itemValue="is_active"
+                                    btnColorTailwindClass={
+                                        !item.is_active
+                                            ? "bg-red-100 text-red-600 hover:bg-text-red-200"
+                                            : undefined
+                                    }
+                                    onSelected={(value) => {
+                                        updateDataItemActive(value, index);
+                                    }}
+                                    items={statusList}
+                                >
+                                    {item.is_active ? "مفعل" : "غير مفعل"}
+                                </UIPrimaryDropdown>
+                            </td>
+                            <td className="">
+                                <div className="flex justify-center gap-3">
+                                    <UIDialogConfirm
+                                        danger
+                                        title="هل انت متأكد من حذف العنصر"
+                                        confirmHandler={() => {
+                                            deleteSubmit(item, index);
+                                        }}
+                                    >
+                                        <button className="bg-[#F9285A0A] p-1 rounded-lg">
+                                            <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
+                                        </button>
+                                    </UIDialogConfirm>
+                                    <UIBaseDialog
+                                        title="تعديل منطقه"
+                                        confirmHandler={() => {}}
+                                        confirmText="اضافة"
+                                        form="update-form"
+                                        btn={
+                                            <button
+                                                onClick={() => {
+                                                    updateDataItem(item);
+                                                }}
+                                                className="bg-[#0094140D] p-1 rounded-lg"
+                                            >
+                                                <span className="mdi mdi-folder-edit-outline text-[#009414]"></span>
+                                            </button>
+                                        }
+                                    >
+                                        <form
+                                            onSubmit={updateSubmit}
+                                            id="update-form"
+                                        >
+                                            <div className="space-y-7">
+                                                <div className="w-full flex justify-center mb-20">
+                                                    <FileInputImg
+                                                        state="edit"
+                                                        fileUrl={item.image}
+                                                        onFileChange={(arg) => {
+                                                            setUpdateFormData(
+                                                                (prev) => ({
+                                                                    ...prev,
+                                                                    ["image"]:
+                                                                        arg?.file64 ??
+                                                                        null,
+                                                                })
+                                                            );
+                                                        }}
+                                                    ></FileInputImg>
+                                                </div>
+                                                <TextFieldNada
+                                                    name="name_ar"
+                                                    type="text"
+                                                    handleChange={
+                                                        updateFormChangeHander
+                                                    }
+                                                    value={
+                                                        updateFormData.name_ar
+                                                    }
+                                                    label=" اسم الخدمة ( عربي ) "
+                                                    placeholder=" اسم الخدمة  "
+                                                ></TextFieldNada>
 
-//   return (
-//     <>
-//       <div className="py-20">
-//         <CustomDataTable
-//           selectedPage={(pageNum: number) => takeSelectedPage(pageNum)}
-//           handleAllCheck={takeCheckValue}
-//           sendValueToParent={(value) => takeValue(value)}
-//           tableHead={headerArr}
-//           listItem={categoryList}
-//           tData={(item, index) => (
-//             <>
-//               <td className="py-2 px-4">{item.id}</td>
-//               <td className="py-2 px-4">
-//                 <div className="w-8 h-8 rounded-full">
-//                   <img
-//                     className="w-full h-full object-contain"
-//                     src={item.image}
-//                     alt=""
-//                   />
-//                 </div>
-//               </td>
-//               <td className="py-2 px-4">{item.name_ar}</td>
-//               <td className="py-2 px-4">{item.no_of_subscriptions}</td>
+                                                <TextFieldNada
+                                                    name="name_en"
+                                                    type="text"
+                                                    handleChange={
+                                                        updateFormChangeHander
+                                                    }
+                                                    value={
+                                                        updateFormData.name_en
+                                                    }
+                                                    label=" اسم الخدمة ( انجليزي ) "
+                                                    placeholder=" اسم الخدمة  "
+                                                ></TextFieldNada>
 
-//               {/* <td className="py-2 px-4">
-//                 <Avatar
-//                   color="success"
-//                   placeholderInitials={item.name.slice(0, 2)}
-//                   rounded
-//                 />
-//               </td> */}
-//               <td className="py-2 px-4">
-//                 <DropDown
-//                   handleIsActive={(item) => updateServiceActive(item, index)}
-//                   btnName={item.is_active ? "مفعل" : "غير مفعل"}
-//                   isActive={item.is_active}
-//                 />
-//               </td>
-//               <td className="">
-//                 <div className="flex justify-center gap-3">
-//                   <button
-//                     onClick={() => deleteCategory(item, index)}
-//                     className="bg-[#F9285A0A] p-1 rounded-lg"
-//                   >
-//                     <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
-//                   </button>
-//                   <button
-//                     onClick={() => openUpdateDialog(item, index)}
-//                     className="bg-[#0094140D] p-1 rounded-lg"
-//                   >
-//                     <span className="mdi mdi-folder-edit-outline text-[#009414]"></span>
-//                   </button>
-//                 </div>
-//               </td>
-//             </>
-//           )}
-//         >
-//           <div className="bg-[#0094140D]  text-center rounded-xl ">
-//             <BaseDropDown
-//               handleFilterList={(item, index) => filterServiceByState(item)}
-//               btnName="الحالة"
-//               listItem={statusList}
-//             ></BaseDropDown>
-//           </div>
-
-//           <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
-//             <button
-//               onClick={() => setOpenModal(true)}
-//               className="w-full h-full"
-//             >
-//               اضافة خدمة
-//             </button>
-//           </div>
-//         </CustomDataTable>
-
-//         <Modal show={openModal} size="2xl" className="rounded-3xl " onClose={onCloseModal} popup>
-//           <ModalHeader />
-//           <ModalBody>
-//             <form onSubmit={addServiceSubmit}>
-//               <div className="space-y-10 p-2">
-//                 <h3 className="text-center text-xl font-medium text-gray-900 dark:text-white">
-//                   اضافة خدمة
-//                 </h3>
-
-//                 <div className="flex justify-center items-center  ">
-//                   <FileInput  fileUrl={formData.image} state="addToTable" onFileChange={(image) => takeUploadedImage(image)} />
-//                 </div>
-
-//                 <div>
-//                   <TextFieldNada
-//                     // prependIcon="mdi mdi-layers-triple-outline"
-//                     prependIcon="mdi mdi-layers-triple-outline"
-//                     name="name"
-//                     type="text"
-//                     handleChange={(e) =>
-//                       takeFormValue(e, "formData", "name_ar")
-//                     }
-//                     value={formData.name_ar}
-//                     label=" اسم الخدمة ( عربي ) *"
-//                     placeholder=" ادخل اسم الخدمة باللغة العربية  *"
-//                   ></TextFieldNada>
-//                 </div>
-//                 <div>
-//                   <TextFieldNada
-//                     prependIcon="mdi mdi-layers-triple-outline"
-//                     name="name"
-//                     type="text"
-//                     handleChange={(e) =>
-//                       takeFormValue(e, "formData", "name_en")
-//                     }
-//                     value={formData.name_en}
-//                     label=" اسم الخدمة ( انجليزي ) *"
-//                     placeholder=" ادخل اسم الخدمة باللغة الانجليزية  *"
-//                   ></TextFieldNada>
-//                 </div>
-
-//                 <div className="relative  p-5  border border-surface-light-700 rounded-2xl">
-//                   <div className="label flex items-center gap-1 absolute -top-4 start-4 bg-background w-fit px-3 font-semibold">
-//                     <label htmlFor="category">الحالة</label>
-//                   </div>
-
-//                   <select
-//                     onChange={(e) => takeSelectedStateInFormData(e)}
-//                     value={formData.is_active}
-//                     className="w-full h-full"
-//                     id="category"
-//                     required
-//                   >
-//                     {statusList.map((item, index) => (
-//                       <option key={index} value={item.is_active}>
-//                         {item.name}
-//                       </option>
-//                     ))}
-//                   </select>
-//                 </div>
-
-//                 <div className="mx-auto w-[50%] py-5 flex gap-4">
-//                   <button className="bg-[#009414] rounded-xl px-3 py-2 text-white w-full">
-//                     اضافة
-//                   </button>
-//                   <button onClick={onCloseModal} className="bg-[#00941412] text-[#009414] w-full rounded-xl px-3 py-2">
-//                     الغاء
-//                   </button>
-//                 </div>
-//               </div>
-//             </form>
-//           </ModalBody>
-//         </Modal>
-
-
-
-//         <Modal
-//           show={openUpdateModal  }
-//           size="2xl"
-//           onClose={onCloseUpdateModal}
-//           popup
-//         >
-//           <ModalHeader />
-//           <ModalBody>
-//             <form onSubmit={updateServiceSubmit}>
-//               <div className="space-y-6  p-2">
-//                 <h3 className="text-center text-xl font-medium text-gray-900 dark:text-white">
-//                   تعديل خدمة
-//                 </h3>
-//                 <div className="flex justify-center items-center py-6 ">
-//                   <div className="">
-//                     <FileInput
-//                     handleRemoveImage={()=>setIsImg(true)}
-//                       fileUrl={!isImg ?updateFormData.image : ''}
-//                       state={isImg ? "addToTable" : "edit"}
-//                       onFileChange={(file) => {
-//                         console.log("Received base64 in parent:", file);
-//                         setUpdateFormData((prev) => ({ ...prev, image: file }));
-//                       }}
-//                     />
-//                   </div>
-//                 </div>
-//                 <div>
-//                   <TextFieldNada
-//                     name="name"
-//                     type="text"
-//                     handleChange={(e) =>
-//                       takeFormValue(e, "updateFormData", "name_ar")
-//                     }
-//                     value={updateFormData.name_ar}
-//                     label=" اسم الخدمة ( عربي ) *"
-//                     placeholder=" اسم الخدمة  *"
-//                   ></TextFieldNada>
-//                 </div>
-//                 <div>
-//                   <TextFieldNada
-//                     name="name"
-//                     type="text"
-//                     handleChange={(e) =>
-//                       takeFormValue(e, "updateFormData", "name_en")
-//                     }
-//                     value={updateFormData.name_en}
-//                     label=" اسم الخدمة ( انجليزي ) *"
-//                     placeholder=" اسم الخدمة  *"
-//                   ></TextFieldNada>
-//                 </div>
-
-//                 <div className="relative p-2 border border-surface-light-700 rounded-2xl">
-//                   <div className="label flex items-center gap-1 absolute -top-4 start-4 bg-background w-fit px-3 font-semibold">
-//                     <label htmlFor="category">الحالة</label>
-//                   </div>
-
-//                   <select
-//                     onChange={(e) => takeSelectedState(e)}
-//                     value={Number(updateFormData.is_active)}
-//                     className="w-full h-full"
-//                     id="category"
-//                     required
-//                   >
-//                     {statusList.map((item, index) => (
-//                       <option key={index} value={item.is_active}>
-//                         {item.name}
-//                       </option>
-//                     ))}
-//                   </select>
-//                 </div>
-
-//                 <div className="mx-auto w-[50%] py-5 flex gap-4">
-//                   <button
-//                     type="submit"
-//                     className="bg-[#009414] rounded-xl px-3 py-2 text-white w-full"
-//                   >
-//                     حفظ
-//                   </button>
-//                   <button onClick={onCloseUpdateModal} className="bg-[#00941412] text-[#009414] w-full rounded-xl px-3 py-2">
-//                     الغاء
-//                   </button>
-//                 </div>
-//               </div>
-//             </form>
-//           </ModalBody>
-//         </Modal>
-//       </div>
-//     </>
-//   );
-// }
-
-import React from 'react'
-
-export default function page() {
-  return (
-    <div>page</div>
-  )
+                                                <SelectInput
+                                                    value={
+                                                        updateFormData.is_active
+                                                    }
+                                                    items={statusList}
+                                                    itemName="name"
+                                                    itemValue="is_active"
+                                                    label="الحالة"
+                                                    placeholder="لختر الحالة"
+                                                    name="is_active"
+                                                    required={true}
+                                                    onChange={(value) => {
+                                                        setUpdateFormData(
+                                                            (prev) => ({
+                                                                ...prev,
+                                                                ["is_active"]:
+                                                                    value,
+                                                            })
+                                                        );
+                                                    }}
+                                                ></SelectInput>
+                                            </div>
+                                        </form>
+                                    </UIBaseDialog>
+                                </div>
+                            </td>
+                        </tr>
+                    ))}
+                </BaseDataTable>
+            </div>
+        </>
+    );
 }
-

@@ -127,7 +127,7 @@ export default function rubbush_collectors() {
             .catch((error) => {});
     };
 
-    const updateDistrictItem = (item: District) => {
+    const updateDataItem = (item: District) => {
         setSelectedDataItem(item);
         setUpdateFormData({
             name_ar: item.name_ar,
@@ -370,7 +370,7 @@ export default function rubbush_collectors() {
                                         btn={
                                             <button
                                                 onClick={() => {
-                                                    updateDistrictItem(item);
+                                                    updateDataItem(item);
                                                 }}
                                                 className="bg-[#0094140D] p-1 rounded-lg"
                                             >
