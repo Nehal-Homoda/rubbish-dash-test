@@ -21,7 +21,7 @@ export default function personalData({ user }: Props) {
 
         <div className='grid grid-cols-2 lg:gap-5'>
 
-          
+
           <div className="lg:col-span-1 col-span-2 input-wrap mb-14">
             <TextFieldNada
               label="اسم المستخدم"
@@ -47,6 +47,25 @@ export default function personalData({ user }: Props) {
           </div>
 
 
+        </div>
+
+
+        <div className="mt-4 flex items-center justify-center gap-4">
+          <button
+            type="submit"
+            className="base-btn min-w-[200px]"
+          // onClick={confirmHandler}
+
+          >
+            حفظ التغييرات
+          </button>
+          <button
+            type="button"
+            className="btn-secondary px-10"
+
+          >
+            الغاء
+          </button>
         </div>
 
 
