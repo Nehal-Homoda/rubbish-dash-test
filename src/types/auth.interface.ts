@@ -1,3 +1,8 @@
+import { Category } from "./categories.interface";
+import { District } from "./collectors.interface";
+import { PackageOffer } from "./packagesOffer.interface";
+import { Payment } from "./payment.interface";
+
 export interface AuthResponse {
     data: {
         message: string;
@@ -15,15 +20,16 @@ export interface User {
 export interface Users {
     id: number;
     name: string;
-    password:string;
+    password: string;
     phone: string;
     is_active: boolean;
     has_subscription: boolean;
-    subscription_name:string;
+    subscription_name: string;
     renewal_date: any;
     image?: string;
     created_at: string;
 }
+
 
 export interface AuthResposeError {
     error: {

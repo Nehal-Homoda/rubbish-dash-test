@@ -5,7 +5,6 @@ import { ResponseData } from "@/types/shared";
 
 let token = "Bearer 160|9eiDkr7DC2EryTIiZbQbO5CoJoxE7X88IPHqcNGs7f3d3254";
 
-
 export const districtListService = async () => {
     try {
         const response = await apiCall.get(`/admins/districts`, {
@@ -24,7 +23,24 @@ export const districtListService = async () => {
         throw new Error(error.message);
     }
 };
-
+export const paymentMethodListService = async () => {
+    try {
+        const response = await apiCall.get(`/admins/payment_methods`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+        });
+        if (!response.ok) {
+            await responseErrorServiceHandler(response, "user list");
+        }
+        const data = await response.json();
+        console.log("response data =>>>>", data);
+        return data;
+    } catch (error: any) {
+        throw new Error(error.message);
+    }
+};
 
 export const subscriptionListService = async () => {
     try {

@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { Dropdown, DropdownItem, Select, ToggleSwitch } from "flowbite-react";
 // import { addUserService } from "@/services/authServices";
 import BaseDropDown from "@/components/shared/BaseDropDown";
-import { districtListService } from "@/services/sharedService";
+import { districtListService, paymentMethodListService } from "@/services/sharedService";
 import { Region } from "@/types/regions.interface";
 import DatePicker from "@/components/ui/form/DatePicker";
 import FileInput from "@/components/ui/form/FileInput";
@@ -16,6 +16,9 @@ import { Category } from "@/types/categories.interface";
 import SelectInput from "@/components/ui/form/SelectInput";
 import MultiCheckbox from "@/components/ui/form/MultiCheckbox";
 import { addUserService } from "@/services/userService";
+import { useRouter } from "next/navigation";
+import { Payment_methods } from "@/types/paymentMethod.interface";
+import { RadioGroup } from "@headlessui/react";
 
 export default function page() {
   const [district, setDistrict] = useState<Region[]>([]);
@@ -29,6 +32,11 @@ export default function page() {
   const [districtDays, setDistrictDays] = useState<string[]>([]);
   const [districtTime, setDistrictTime] = useState<string[]>([]);
   const [packageItem, setPackageItem] = useState<PackageOffer | null>(null)
+
+  const [paymentMethodList, setPaymentMethodList] = useState<Payment_methods[]>([])
+  const [selected, setSelected] = useState(paymentMethodList[0])
+
+  const router = useRouter()
 
 
   const takeValue = (e, name) => {
@@ -79,13 +87,20 @@ export default function page() {
     fd.append("time_from", formData.time_from)
     fd.append("time_to", formData.time_to)
     fd.append("address_title", formData.address_title)
+    fd.append("has_subscription", formData.has_subscription)
     fd.append("units", formData.units)
+    fd.append("package_id", formData.package_id)
+    fd.append("payment_method_id", formData.payment_method_id)
+    fd.append("address_lat", '34.1531')
+    fd.append("address_lng", '34.1531')
     formData.days.forEach((day, index) =>
       fd.append(`days[${index}]`, day)
     );
 
 
-    addUserService(fd);
+    addUserService(fd).then((response) => {
+      router.push('/users')
+    })
   };
 
 
@@ -106,13 +121,23 @@ export default function page() {
   };
 
 
+
+  const fetchPaymentList = () => {
+    paymentMethodListService().then((response) => {
+      setPaymentMethodList(response.data)
+    })
+  }
+
+
   const [switch1, setSwitch1] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
     password: "",
     district_id: "",
+    has_subscription: 0,
     package_id: "",
+    
     payment_method_id: "",
     days: [],
     time_from: "",
@@ -121,8 +146,8 @@ export default function page() {
     category_id: "",
     payment_verification: "",
     address_title: "",
-    address_lat: "",
-    address_lng: "",
+    address_lat: "34.1531",
+    address_lng: "34.1531",
     address_details: "",
   });
 
@@ -143,14 +168,38 @@ export default function page() {
       ...prev,
       ['package_id']: value
     }))
-   getPackageByIdService(value).then((response)=>{
-    setPackageItem(response.data)
-   })
+    getPackageByIdService(value).then((response) => {
+      setPackageItem(response.data)
+    })
   }
+
+
+  const handleCheckSubscription = () => {
+    setSwitch1(true)
+    setFormData((prev => ({
+      ...prev,
+      ["has_subscription"]: 1
+    })))
+  }
+
+
+  const handleSelecteditem=(item)=>{
+    setSelected(item)
+    setFormData((prev)=>({
+      ...prev,
+      ['payment_method_id']:item.id
+    }))
+    
+    // console.log(e.target.value)
+  }
+
+
+
 
 
   useEffect(() => {
     fetchDistrict();
+    fetchPaymentList()
   }, []);
 
   useEffect(() => {
@@ -214,7 +263,7 @@ export default function page() {
               <ToggleSwitch
                 checked={switch1}
                 label="اشتراك"
-                onChange={setSwitch1}
+                onChange={handleCheckSubscription}
               />
             </div>
 
@@ -335,6 +384,63 @@ export default function page() {
                       label="الي "
                       placeholder="  السعر الكلي *"
                     ></TextFieldNada>
+
+                  </div>
+
+
+                  <div className="col-span-12">
+
+                    <RadioGroup value={selected} onChange={(e)=>handleSelecteditem(e)}>
+                      <RadioGroup.Label className="sr-only">Server size</RadioGroup.Label>
+                      <div className="grid grid-cols-2">
+                        {paymentMethodList.map((item) => (
+                          <RadioGroup.Option
+                            key={item.name_ar}
+                            value={item}
+                            className={({ active, checked }) =>
+                              `${active
+                                ? 'ring-2 ring-white/60 ring-offset-2 ring-offset-sky-300'
+                                : ''
+                              }
+                  ${checked ? 'border border-[#009414] ' : ''}
+                    relative flex cursor-pointer  rounded-lg px-5 py-4 shadow-md focus:outline-none  col-span-1`
+                            }
+                          >
+                            {({ active, checked }) => (
+                              <>
+                                <div className="flex w-full items-center justify-between">
+                                  <div className="flex items-center">
+                                    <div className="text-sm">
+                                      <RadioGroup.Label
+                                        as="p"
+                                        className={`font-medium  ${checked ? 'text-gray-900' : 'text-gray-900'
+                                          }`}
+                                      >
+                                        <div className="flex items-center gap-4">
+                                          <div className="w-10 h-10 rounded-full">
+                                            <img className="w-full h-full object-contain" src={item.image} alt="" />
+
+                                          </div>
+                                          {item.name_ar}
+                                        </div>
+                                      </RadioGroup.Label>
+
+                                    </div>
+                                  </div>
+                                  {checked && (
+                                    <div className="shrink-0 text-white">
+                                      {/* <CheckIcon className="h-6 w-6" /> */}
+                                      {/* <span className="mdi mdi-checkbox-marked-circle"></span> */}
+                                    </div>
+                                  )}
+                                </div>
+                              </>
+                            )}
+                          </RadioGroup.Option>
+                        ))}
+                      </div>
+                    </RadioGroup>
+
 
                   </div>
 
