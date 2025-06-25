@@ -241,7 +241,6 @@ export default function rubbush_collectors() {
                 />
               </td>
               <td className="">{item.renewal_date}</td>
-              <td className="">{item.renewal_date}</td>
             </>
           )}
         >

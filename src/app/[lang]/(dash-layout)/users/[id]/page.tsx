@@ -4,7 +4,7 @@ import Payment from '@/components/user-tabs/payment'
 import PersonalData from '@/components/user-tabs/personalData'
 import Subscription from '@/components/user-tabs/subscription'
 import { getUserByIdService } from '@/services/userService'
-import { User, Users } from '@/types/auth.interface'
+import { IsUser, User, Users } from '@/types/auth.interface'
 import React, { useEffect, useState } from 'react'
 
 // type Props = {
@@ -19,12 +19,13 @@ type Btn = {
 
 export default function page({ params }: { params: Promise<{ id: number }> }) {
   const { id } = React.use(params);
-  const [user, setUser] = useState<Users | null>(null)
+  const [user, setUser] = useState<IsUser | null>(null)
   const [selectedBtn, setSelectedBtn] = useState<Btn | null>(null)
   const [type, setType] = useState('personal-data')
   const fetchUserById = () => {
     getUserByIdService(id).then((response) => {
       setUser(response.data)
+
     })
   }
   const btnTabs = [
@@ -70,7 +71,7 @@ export default function page({ params }: { params: Promise<{ id: number }> }) {
         <div>
 
           {type == 'personal-data' && user && <PersonalData user={user} />}
-          {type == 'subscription' && <Subscription />}
+          {type == 'subscription' && user && <Subscription user={user} />}
           {type == 'payment' && <Payment />}
           <Payment />
         </div>

@@ -6,10 +6,11 @@ import React, { useEffect, useState } from "react";
 import { Checkbox, Label } from "flowbite-react";
 import { Radio } from "flowbite-react";
 import {
-  addDistrictService,
-  deleteDistrictService,
-  updateDistrictService,
-} from "@/services/districtService";
+  addUserService,
+  getUserService,
+  deleteUserService,
+  updateUserService,
+} from "@/services/userService";
 
 import { getDistrictService } from "@/services/districtService";
 import { District } from "@/types/district.interface";
@@ -22,7 +23,6 @@ import SelectInput from "@/components/ui/form/SelectInput";
 import { successDialog } from "@/utils/shared";
 import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
 import { useRouter } from "next/navigation";
-import { getUserService, updateUserService } from "@/services/userService";
 import { Users } from "@/types/auth.interface";
 import { PackageOffer } from "@/types/packagesOffer.interface";
 
@@ -141,7 +141,7 @@ export default function rubbush_collectors() {
   };
 
   const deleteSubmit = (item: District, selectedIndex: number) => {
-    deleteDistrictService(item.id)
+    deleteUserService(item.id)
       .then((response) => {
         const updatedArr = [...dataList];
         updatedArr.splice(selectedIndex, 1);
@@ -172,7 +172,7 @@ export default function rubbush_collectors() {
       ...updateFormData,
     });
 
-    updateDistrictService(selectedDataItem.id, body)
+    updateUserService(selectedDataItem.id, body)
       .then((response) => {
         fetchDataList();
         successDialog(true);
@@ -218,7 +218,7 @@ export default function rubbush_collectors() {
     );
     fd.append("is_active", formData.is_active.toString());
 
-    addDistrictService(fd)
+    addUserService(fd)
       .then((response) => {
         fetchDataList();
         //@ts-ignore

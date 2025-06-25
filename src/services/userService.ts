@@ -1,6 +1,6 @@
 import { responseErrorServiceHandler } from "@/utils/shared";
 import { apiCall } from "./apiCall";
-import {  User, Users } from "@/types/auth.interface";
+import {  IsUser, User, Users } from "@/types/auth.interface";
 import { ResponseData } from "@/types/shared";
 
 let token = "Bearer 160|9eiDkr7DC2EryTIiZbQbO5CoJoxE7X88IPHqcNGs7f3d3254";
@@ -38,7 +38,7 @@ export const getUserByIdService = async (id:number) => {
         if (!response.ok) {
             await responseErrorServiceHandler(response, "district");
         }
-        const data = (await response.json()) as ResponseData<Users>;
+        const data = (await response.json()) as ResponseData<IsUser>;
         console.log("response data =>>>>", data);
         return data;
     } catch (error: any) {
@@ -66,9 +66,9 @@ export const addUserService = async (form: FormData) => {
 };
 
 
-export const deleteDistrictService = async (id: number) => {
+export const deleteUserService = async (id: number) => {
     try {
-        const response = await apiCall.delete("/admins/districts", id, {
+        const response = await apiCall.delete("/admins/users", id, {
             headers: {
                 // "Content-Type": "application/json",
             },
