@@ -170,13 +170,13 @@ export default function subscription({ user }: Props) {
 
         },
         district: {
-          id: user.subscription.district.id,
+          id: Number(user.subscription.district.id),
           name: "",
           available_days: [],
           available_times: [],
         },
         package: {
-          id: 0,
+          id: user.subscription.package.id,
           name: "",
           price_per_unit: user.subscription.package.price_per_unit,
           days_count: 0,
@@ -236,7 +236,7 @@ export default function subscription({ user }: Props) {
                     ...prev.subscription,
                     package: {
                       ...prev.subscription.package,
-                      id: value,
+                      id: Number(value),
                     },
                   },
                 }))
@@ -294,9 +294,7 @@ export default function subscription({ user }: Props) {
 
           <div className="col-span-6">
 
-            <SelectInput placeholder="ادخل اسم المنطقة" name="name_ar" itemName="name_ar" itemValue="id" value={formData.subscription.district.id} items={district} label="اسم المنطقة" 
-            
-             onChange={(value) =>
+            <SelectInput placeholder="ادخل اسم المنطقة" name="name_ar" itemName="name_ar" itemValue="id" value={formData.subscription.district.id} items={district} label="اسم المنطقة" onChange={(value) =>
                 setFormData((prev) => ({
                   ...prev,
                   subscription: {
