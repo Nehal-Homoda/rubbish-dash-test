@@ -277,20 +277,9 @@ export default function subscription({ user }: Props) {
 
 
           <div className="col-span-12">
-            {<SelectInput items={categoryList} placeholder="ادخل نوع الخدمة" name="" itemName="name_ar" itemValue="id" value={formData.subscription.category.id} label=" نوع الخدمة"
+            {<SelectInput onChange={()=>{}} items={categoryList} placeholder="ادخل نوع الخدمة" name="" itemName="name_ar" itemValue="id" value={formData.subscription.category.id} label=" نوع الخدمة"
 
-              onChange={(value) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  subscription: {
-                    ...prev.subscription,
-                    category: {
-                      ...prev.subscription.category,
-                      id: value,
-                    },
-                  },
-                }))
-              }
+             
 
             >
             </SelectInput>}
@@ -301,20 +290,9 @@ export default function subscription({ user }: Props) {
 
 
           <div className="col-span-6">
-            <SelectInput items={packagesList} placeholder="ادخل نوع الباقه" name="" itemName="name_ar" itemValue="id" value={formData.subscription.package.id} label=" نوع الباقة"
+            <SelectInput onChange={()=>{}}  items={packagesList} placeholder="ادخل نوع الباقه" name="" itemName="name_ar" itemValue="id" value={formData.subscription.package.id} label=" نوع الباقة"
 
-              onChange={(value) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  subscription: {
-                    ...prev.subscription,
-                    package: {
-                      ...prev.subscription.package,
-                      id: Number(value),
-                    },
-                  },
-                }))
-              }
+             
 
 
 
@@ -328,7 +306,7 @@ export default function subscription({ user }: Props) {
             <TextFieldNada
               name="price"
               type="number"
-              handleChange={(e) => takeValue(e, "units")}
+              // handleChange={(e) => takeValue(e, "units")}
               value={formData.subscription.package.price_per_unit}
               label=" سعر الباقة *"
               placeholder="  سعر الباقة *"
@@ -346,7 +324,7 @@ export default function subscription({ user }: Props) {
             <TextFieldNada
               name="units"
               type="number"
-              handleChange={(e) => takeValue(e, "units")}
+              // handleChange={(e) => takeValue(e, "units")}
               value={formData.subscription.units}
               label=" عدد الوحدات *"
               placeholder=" عدد الوحدات *"
@@ -368,22 +346,7 @@ export default function subscription({ user }: Props) {
 
           <div className="col-span-6">
 
-            <SelectInput placeholder="ادخل اسم المنطقة" name="name_ar" itemName="name_ar" itemValue="id" value={formData.subscription.district.id} items={district} label="اسم المنطقة" onChange={(value) =>
-              setFormData((prev) => ({
-                ...prev,
-                subscription: {
-                  ...prev.subscription,
-                  district: {
-                    ...prev.subscription.district,
-                    id: value,
-                  },
-                },
-              }))
-            }
-
-
-
-
+            <SelectInput onChange={()=>{}}  placeholder="ادخل اسم المنطقة" name="name_ar" itemName="name_ar" itemValue="id" value={formData.subscription.district.id} items={district} label="اسم المنطقة" 
             >
 
             </SelectInput>
@@ -396,7 +359,7 @@ export default function subscription({ user }: Props) {
             <TextFieldNada
               name="address"
               type="text"
-              handleChange={(e) => takeValue(e, "address_title")}
+              // handleChange={(e) => takeValue(e, "address_title")}
               value={formData.subscription.address.title}
               label=" العنوان"
               placeholder=" العنوان"
@@ -434,7 +397,7 @@ export default function subscription({ user }: Props) {
     // })) */}
 
           <div className='col-span-12'>
-            <RadioGroup value={formData.payment.payment_method} onChange={(selectedItem) => handleSelectedRadio(selectedItem)} >
+            <RadioGroup value={formData.payment.payment_method}  >
               <RadioGroup.Label className="sr-only">Server size</RadioGroup.Label>
               <div className="grid grid-cols-2">
                 {paymentMethodList.map((item) => (
@@ -504,7 +467,7 @@ export default function subscription({ user }: Props) {
             <TextFieldNada
               name="price"
               type="time"
-              handleChange={(e) => takeValue(e, "time_from")}
+              // handleChange={(e) => takeValue(e, "time_from")}
               value={formData.subscription.time_from}
               label="من "
               placeholder="  من وقت *"
@@ -517,7 +480,7 @@ export default function subscription({ user }: Props) {
             <TextFieldNada
               name="price"
               type="time"
-              handleChange={(e) => takeValue(e, "time_to")}
+              // handleChange={(e) => takeValue(e, "time_to")}
               value={formData.subscription.time_to}
               label="الي "
               placeholder="  الي وقت*"
@@ -525,31 +488,14 @@ export default function subscription({ user }: Props) {
           </div>
 
           <div className="col-span-6">
-            <FileInputImg onFileChange={(img) => takeUploadedImg(img)} state="add" title="ارفاق صورة التحويل" />
+            <FileInputImg onFileChange={() => {}} state="add" title="ارفاق صورة التحويل" />
           </div>
 
 
         </div>
 
 
-        <div className="mt-4 flex items-center justify-center gap-4">
-          <button
-            type="submit"
-            className="base-btn min-w-[200px]"
-            // onClick={confirmHandler}
-            onClick={updateUser}
-
-          >
-            تأكيد
-          </button>
-          <button
-            type="button"
-            className="btn-secondary px-10"
-
-          >
-            الغاء
-          </button>
-        </div>
+       
 
 
 
