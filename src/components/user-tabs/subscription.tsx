@@ -260,76 +260,203 @@ export default function subscription({ user }: Props) {
 
       <div className="py-20">
 
-
         <div className="grid grid-cols-12 gap-7">
 
 
 
 
           <div className="py-6 ">
-            <ToggleSwitch
+            <ToggleSwitch disabled
               checked={formData.has_subscription}
               label="مشترك"
-              onChange={(selected) => handleCheckSubscription(selected)}
+              onChange={() => {}}
             />
           </div>
 
+          {user.has_subscription &&
 
+            <>
 
-          <div className="col-span-12">
-            {<SelectInput onChange={()=>{}} items={categoryList} placeholder="ادخل نوع الخدمة" name="" itemName="name_ar" itemValue="id" value={formData.subscription.category.id} label=" نوع الخدمة"
-
-             
-
-            >
-            </SelectInput>}
-
-          </div>
+              <div className="col-span-12">
+                {<SelectInput onChange={() => { }} items={categoryList} placeholder="ادخل نوع الخدمة" name="" itemName="name_ar" itemValue="id" value={formData.subscription.category.id} label=" نوع الخدمة"
 
 
 
+                >
+                </SelectInput>}
 
-          <div className="col-span-6">
-            <SelectInput onChange={()=>{}}  items={packagesList} placeholder="ادخل نوع الباقه" name="" itemName="name_ar" itemValue="id" value={formData.subscription.package.id} label=" نوع الباقة"
-
-             
-
+              </div>
 
 
-            >
-
-            </SelectInput>
-          </div>
-
-
-          <div className="col-span-6">
-            <TextFieldNada
-              name="price"
-              type="number"
-              // handleChange={(e) => takeValue(e, "units")}
-              value={formData.subscription.package.price_per_unit}
-              label=" سعر الباقة *"
-              placeholder="  سعر الباقة *"
-            ></TextFieldNada>
-
-          </div>
+              <div className="col-span-6">
+                <SelectInput onChange={() => { }} items={packagesList} placeholder="ادخل نوع الباقه" name="" itemName="name_ar" itemValue="id" value={formData.subscription.package.id} label=" نوع الباقة"
+                >
+                </SelectInput>
+              </div>
 
 
 
+              <div className="col-span-6">
+                <TextFieldNada
+                  name="price"
+                  type="number"
+                  // handleChange={(e) => takeValue(e, "units")}
+                  value={formData.subscription.package.price_per_unit}
+                  label=" سعر الباقة *"
+                  placeholder="  سعر الباقة *"
+                ></TextFieldNada>
+
+              </div>
+
+              <div className="col-span-6">
+                <TextFieldNada
+                  name="units"
+                  type="number"
+                  // handleChange={(e) => takeValue(e, "units")}
+                  value={formData.subscription.units}
+                  label=" عدد الوحدات *"
+                  placeholder=" عدد الوحدات *"
+                ></TextFieldNada>
+              </div>
+
+
+              <div className="col-span-6">
+
+                <SelectInput onChange={() => { }} placeholder="ادخل اسم المنطقة" name="name_ar" itemName="name_ar" itemValue="id" value={formData.subscription.district.id} items={district} label="اسم المنطقة"
+                >
+
+                </SelectInput>
+
+                {/* {required && <span className="text-red-600">*</span>} */}
+              </div>
 
 
 
 
-          <div className="col-span-6">
-            <TextFieldNada
-              name="units"
-              type="number"
-              // handleChange={(e) => takeValue(e, "units")}
-              value={formData.subscription.units}
-              label=" عدد الوحدات *"
-              placeholder=" عدد الوحدات *"
-            ></TextFieldNada>
-          </div>
+              <div className='col-span-12'>
+                <RadioGroup value={formData.payment.payment_method}  >
+                  <RadioGroup.Label className="sr-only">Server size</RadioGroup.Label>
+                  <div className="grid grid-cols-2">
+                    {paymentMethodList.map((item) => (
+                      <RadioGroup.Option
+                        key={item.name_ar}
+                        value={item}
+                        className={({ active, checked }) =>
+                          `${active
+                            ? 'ring-2 ring-white/60 ring-offset-2 ring-offset-sky-300'
+                            : ''
+                          }
+                  ${checked ? 'border border-[#009414] ' : ''}
+                    relative flex cursor-pointer  rounded-lg px-5 py-4 shadow-md focus:outline-none  col-span-1`
+                        }
+                      >
+                        {({ active, checked }) => (
+                          <>
+                            <div className="flex w-full items-center justify-between">
+                              <div className="flex items-center">
+                                <div className="text-sm">
+                                  <RadioGroup.Label
+                                    as="div"
+                                    className={`font-medium  ${checked ? 'text-gray-900' : 'text-gray-900'
+                                      }`}
+                                  >
+                                    <div className="flex items-center gap-4">
+                                      <div className="w-10 h-10 rounded-full">
+                                        <img className="w-full h-full object-contain" src={item.image} alt="" />
+
+                                      </div>
+                                      {item.name_ar}
+                                    </div>
+                                  </RadioGroup.Label>
+
+                                </div>
+                              </div>
+                              {checked ? (
+                                <div className="shrink-0 w-4 h-4 rounded-full ring-1 ring-surface text-surface flex justify-center items-center text-xs">
+                                  {/* <CheckIcon className="h-6 w-6" /> */}
+                                  <span className="mdi mdi-check"></span>
+                                </div>
+                              )
+                                :
+                                (
+                                  <div className="shrink-0 w-4 h-4 rounded-full ring-1 ring-surface text-surface flex justify-center items-center">
+                                    {/* <CheckIcon className="h-6 w-6" /> */}
+                                  </div>
+                                )}
+                            </div>
+                          </>
+                        )}
+                      </RadioGroup.Option>
+                    ))}
+                  </div>
+                </RadioGroup>
+              </div>
+
+
+              <div className="col-span-6">
+                <TextFieldNada
+                  name="address"
+                  type="text"
+                  // handleChange={(e) => takeValue(e, "address_title")}
+                  value={formData.subscription.address.title}
+                  label=" العنوان"
+                  placeholder=" العنوان"
+                ></TextFieldNada>
+              </div>
+
+
+              <div className="col-span-6">
+                <TextFieldNada
+                  name="price"
+                  type="time"
+                  // handleChange={(e) => takeValue(e, "time_from")}
+                  value={formData.subscription.time_from}
+                  label="من "
+                  placeholder="  من وقت *"
+                ></TextFieldNada>
+              </div>
+
+
+
+              <div className="col-span-6">
+                <TextFieldNada
+                  name="price"
+                  type="time"
+                  // handleChange={(e) => takeValue(e, "time_to")}
+                  value={formData.subscription.time_to}
+                  label="الي "
+                  placeholder="  الي وقت*"
+                ></TextFieldNada>
+              </div>
+
+              <div className="col-span-6">
+                <FileInputImg onFileChange={() => { }} state="add" title="ارفاق صورة التحويل" />
+              </div>
+
+            </>
+
+
+
+          }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
           {/* <div className="col-span-6">
@@ -344,27 +471,10 @@ export default function subscription({ user }: Props) {
           </div> */}
 
 
-          <div className="col-span-6">
-
-            <SelectInput onChange={()=>{}}  placeholder="ادخل اسم المنطقة" name="name_ar" itemName="name_ar" itemValue="id" value={formData.subscription.district.id} items={district} label="اسم المنطقة" 
-            >
-
-            </SelectInput>
-
-            {/* {required && <span className="text-red-600">*</span>} */}
-          </div>
 
 
-          <div className="col-span-6">
-            <TextFieldNada
-              name="address"
-              type="text"
-              // handleChange={(e) => takeValue(e, "address_title")}
-              value={formData.subscription.address.title}
-              label=" العنوان"
-              placeholder=" العنوان"
-            ></TextFieldNada>
-          </div>
+
+
 
           {/* <div className="col-span-6">
             <MultiCheckbox
@@ -396,64 +506,6 @@ export default function subscription({ user }: Props) {
     //   ]
     // })) */}
 
-          <div className='col-span-12'>
-            <RadioGroup value={formData.payment.payment_method}  >
-              <RadioGroup.Label className="sr-only">Server size</RadioGroup.Label>
-              <div className="grid grid-cols-2">
-                {paymentMethodList.map((item) => (
-                  <RadioGroup.Option
-                    key={item.name_ar}
-                    value={item}
-                    className={({ active, checked }) =>
-                      `${active
-                        ? 'ring-2 ring-white/60 ring-offset-2 ring-offset-sky-300'
-                        : ''
-                      }
-                  ${checked ? 'border border-[#009414] ' : ''}
-                    relative flex cursor-pointer  rounded-lg px-5 py-4 shadow-md focus:outline-none  col-span-1`
-                    }
-                  >
-                    {({ active, checked }) => (
-                      <>
-                        <div className="flex w-full items-center justify-between">
-                          <div className="flex items-center">
-                            <div className="text-sm">
-                              <RadioGroup.Label
-                                as="div"
-                                className={`font-medium  ${checked ? 'text-gray-900' : 'text-gray-900'
-                                  }`}
-                              >
-                                <div className="flex items-center gap-4">
-                                  <div className="w-10 h-10 rounded-full">
-                                    <img className="w-full h-full object-contain" src={item.image} alt="" />
-
-                                  </div>
-                                  {item.name_ar}
-                                </div>
-                              </RadioGroup.Label>
-
-                            </div>
-                          </div>
-                          {checked ? (
-                            <div className="shrink-0 w-4 h-4 rounded-full ring-1 ring-surface text-surface flex justify-center items-center text-xs">
-                              {/* <CheckIcon className="h-6 w-6" /> */}
-                              <span className="mdi mdi-check"></span>
-                            </div>
-                          )
-                            :
-                            (
-                              <div className="shrink-0 w-4 h-4 rounded-full ring-1 ring-surface text-surface flex justify-center items-center">
-                                {/* <CheckIcon className="h-6 w-6" /> */}
-                              </div>
-                            )}
-                        </div>
-                      </>
-                    )}
-                  </RadioGroup.Option>
-                ))}
-              </div>
-            </RadioGroup>
-          </div>
 
 
 
@@ -463,39 +515,14 @@ export default function subscription({ user }: Props) {
 
 
 
-          <div className="col-span-6">
-            <TextFieldNada
-              name="price"
-              type="time"
-              // handleChange={(e) => takeValue(e, "time_from")}
-              value={formData.subscription.time_from}
-              label="من "
-              placeholder="  من وقت *"
-            ></TextFieldNada>
-          </div>
 
 
-
-          <div className="col-span-6">
-            <TextFieldNada
-              name="price"
-              type="time"
-              // handleChange={(e) => takeValue(e, "time_to")}
-              value={formData.subscription.time_to}
-              label="الي "
-              placeholder="  الي وقت*"
-            ></TextFieldNada>
-          </div>
-
-          <div className="col-span-6">
-            <FileInputImg onFileChange={() => {}} state="add" title="ارفاق صورة التحويل" />
-          </div>
 
 
         </div>
 
 
-       
+
 
 
 
