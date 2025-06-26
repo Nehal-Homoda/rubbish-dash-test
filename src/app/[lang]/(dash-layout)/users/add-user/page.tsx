@@ -3,28 +3,40 @@
 import TextFieldNada from "@/components/ui/form/TextFieldNada";
 import React, { useEffect, useState } from "react";
 import { Dropdown, DropdownItem, Select, ToggleSwitch } from "flowbite-react";
-import { addUserService } from "@/services/authServices";
+// import { addUserService } from "@/services/authServices";
 import BaseDropDown from "@/components/shared/BaseDropDown";
-import { districtListService } from "@/services/sharedService";
+import { districtListService, paymentMethodListService } from "@/services/sharedService";
 import { Region } from "@/types/regions.interface";
 import DatePicker from "@/components/ui/form/DatePicker";
 import FileInput from "@/components/ui/form/FileInput";
-import { getPackagesService } from "@/services/packagesOffersService";
+import { getPackageByIdService, getPackagesService } from "@/services/packagesOffersService";
 import { PackageOffer } from "@/types/packagesOffer.interface";
 import { getCategoriesService } from "@/services/categoriesService";
-import { Categories } from "@/types/categories.interface";
+import { Category } from "@/types/categories.interface";
 import SelectInput from "@/components/ui/form/SelectInput";
+import MultiCheckbox from "@/components/ui/form/MultiCheckbox";
+import { addUserService } from "@/services/userService";
+import { useRouter } from "next/navigation";
+import { Payment_methods } from "@/types/paymentMethod.interface";
+import { RadioGroup } from "@headlessui/react";
 
 export default function page() {
   const [district, setDistrict] = useState<Region[]>([]);
   const [selectedDate, setSelectedDate] = useState();
   const [packagesList, setpackagesList] = useState<PackageOffer[]>([]);
-  const [categoryList, setCategoryList] = useState<Categories[]>([]);
+  const [categoryList, setCategoryList] = useState<Category[]>([]);
   const [selectedPackage, setSelectedPackage] = useState<PackageOffer | null>(
     null
   );
-  const [packagePrice, setPackagePrice] = useState(0)
   const [totalPrice, setTotalPrice] = useState(0);
+  const [districtDays, setDistrictDays] = useState<string[]>([]);
+  const [districtTime, setDistrictTime] = useState<string[]>([]);
+  const [packageItem, setPackageItem] = useState<PackageOffer | null>(null)
+
+  const [paymentMethodList, setPaymentMethodList] = useState<Payment_methods[]>([])
+  const [selected, setSelected] = useState(paymentMethodList[0])
+
+  const router = useRouter()
 
 
   const takeValue = (e, name) => {
@@ -34,10 +46,16 @@ export default function page() {
       [name]: e.target.value,
     }));
     if (name == "units") {
-      if (selectedPackage) {
+      if (packageItem) {
+        // setFormData((prev)=>({
+        //   ...prev,
+
+
+        // }))
         setTotalPrice(selectedPackage.price_per_unit * formData.units);
       }
     }
+
   };
 
   //   const form = {
@@ -49,6 +67,11 @@ export default function page() {
   const fetchDistrict = () => {
     districtListService().then((response) => {
       setDistrict(response.data);
+
+      response.data.map((item, index) => {
+        setDistrictDays(item.available_days);
+        setDistrictTime(item.available_times);
+      });
     });
   };
 
@@ -59,7 +82,25 @@ export default function page() {
     fd.append("phone", formData.phone);
     fd.append("password", formData.password);
 
-    addUserService(fd);
+    fd.append("district_id", formData.district_id)
+    fd.append("category_id", formData.category_id)
+    fd.append("time_from", formData.time_from)
+    fd.append("time_to", formData.time_to)
+    fd.append("address_title", formData.address_title)
+    fd.append("has_subscription", formData.has_subscription)
+    fd.append("units", formData.units)
+    fd.append("package_id", formData.package_id)
+    fd.append("payment_method_id", formData.payment_method_id)
+    fd.append("address_lat", '34.1531')
+    fd.append("address_lng", '34.1531')
+    formData.days.forEach((day, index) =>
+      fd.append(`days[${index}]`, day)
+    );
+
+
+    addUserService(fd).then((response) => {
+      router.push('/users')
+    })
   };
 
 
@@ -78,16 +119,15 @@ export default function page() {
       setCategoryList(response.data);
     });
   };
-  const takeSelectedPackage = (e) => {
-    const selectedId = e.target.value;
-    const selectedPackage = packagesList.find((item) => {
-      return item.id == selectedId;
-    });
-    if (selectedPackage) {
-      setSelectedPackage(selectedPackage);
-      setTotalPrice(selectedPackage.price_per_unit * formData.units);
-    }
-  };
+
+
+
+  const fetchPaymentList = () => {
+    paymentMethodListService().then((response) => {
+      setPaymentMethodList(response.data)
+    })
+  }
+
 
   const [switch1, setSwitch1] = useState(false);
   const [formData, setFormData] = useState({
@@ -95,30 +135,22 @@ export default function page() {
     phone: "",
     password: "",
     district_id: "",
+    has_subscription: 0,
     package_id: "",
+    
     payment_method_id: "",
-    days: new Date(),
+    days: [],
     time_from: "",
     time_to: "",
     units: 1,
     category_id: "",
     payment_verification: "",
     address_title: "",
-    address_lat: "",
-    address_lng: "",
+    address_lat: "34.1531",
+    address_lng: "34.1531",
     address_details: "",
   });
 
-  const handleSelectedItem = (item: any, name: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: item
-    }))
-    if (name == "package_id") {
-      setPackagePrice(item.price_per_unit)
-    }
-
-  };
 
   const takeUploadedImg = (img) => {
     console.log(img)
@@ -126,22 +158,55 @@ export default function page() {
   }
 
   useEffect(() => {
-    if (selectedPackage) {
-      setTotalPrice(selectedPackage.price_per_unit * formData.units);
+    if (packageItem) {
+      setTotalPrice(Number(packageItem.price_per_unit) * formData.units);
     }
   }, [formData.units]);
 
+  const handleSelectPackage = (value) => {
+    setFormData((prev) => ({
+      ...prev,
+      ['package_id']: value
+    }))
+    getPackageByIdService(value).then((response) => {
+      setPackageItem(response.data)
+    })
+  }
+
+
+  const handleCheckSubscription = () => {
+    setSwitch1(true)
+    setFormData((prev => ({
+      ...prev,
+      ["has_subscription"]: 1
+    })))
+  }
+
+
+  const handleSelecteditem=(item)=>{
+    setSelected(item)
+    setFormData((prev)=>({
+      ...prev,
+      ['payment_method_id']:item.id
+    }))
+    
+    // console.log(e.target.value)
+  }
+
+
+
+
+
   useEffect(() => {
     fetchDistrict();
+    fetchPaymentList()
   }, []);
 
   useEffect(() => {
     fetchPackages();
     fetchCategories();
   }, []);
-  useEffect(() => {
-    setPackagePrice
-  }, [formData.package_id])
+
 
   return (
     <div>
@@ -198,7 +263,7 @@ export default function page() {
               <ToggleSwitch
                 checked={switch1}
                 label="اشتراك"
-                onChange={setSwitch1}
+                onChange={handleCheckSubscription}
               />
             </div>
 
@@ -209,7 +274,10 @@ export default function page() {
                 <div className="grid grid-cols-12 gap-7">
                   <div className="col-span-6">
 
-                    <SelectInput placeholder="ادخل اسم المنطقة" name="name_ar" itemName="name_ar" itemValue="id" value={formData.district_id} items={district} label="اسم المنطقة" onChange={(item) => handleSelectedItem(item, 'district_id')} >
+                    <SelectInput placeholder="ادخل اسم المنطقة" name="name_ar" itemName="name_ar" itemValue="id" value={formData.district_id} items={district} label="اسم المنطقة" onChange={(value) => setFormData((prev) => ({
+                      ...prev,
+                      ['district_id']: value
+                    }))} >
 
                     </SelectInput>
 
@@ -228,13 +296,16 @@ export default function page() {
                   </div>
 
                   <div className="col-span-6">
-                    <SelectInput items={categoryList} placeholder="ادخل نوع الخدمة" name="" itemName="name_ar" itemValue="id" value={formData.category_id} label=" نوع الخدمة" onChange={(item) => handleSelectedItem(item, 'category_id')} >
+                    <SelectInput items={categoryList} placeholder="ادخل نوع الخدمة" name="" itemName="name_ar" itemValue="id" value={formData.category_id} label=" نوع الخدمة" onChange={(value) => setFormData((prev) => ({
+                      ...prev,
+                      ['category_id']: value
+                    }))} >
 
                     </SelectInput>
                   </div>
 
                   <div className="col-span-6">
-                    <SelectInput items={packagesList} placeholder="ادخل نوع الباقه" name="" itemName="name_ar" itemValue="id" value={formData.package_id} label=" نوع الباقة" onChange={(item) => handleSelectedItem(item, 'package_id')} >
+                    <SelectInput items={packagesList} placeholder="ادخل نوع الباقه" name="" itemName="name_ar" itemValue="id" value={formData.package_id} label=" نوع الباقة" onChange={(value) => handleSelectPackage(value)}  >
 
                     </SelectInput>
                   </div>
@@ -244,7 +315,7 @@ export default function page() {
                       name="price"
                       type="number"
                       handleChange={(e) => takeValue(e, "units")}
-                      value={packagePrice}
+                      value={packageItem ? packageItem.price_per_unit : 0}
                       label=" سعر الباقة *"
                       placeholder="  سعر الباقة *"
                     ></TextFieldNada>
@@ -274,6 +345,105 @@ export default function page() {
                     ></TextFieldNada>
                   </div>
 
+
+                  <div className="col-span-6">
+                    <MultiCheckbox
+                      items={districtDays}
+                      value={formData.days}
+                      label="اليوم"
+                      required={true}
+                      name="available_days"
+                      placeholder="اختر اليوم"
+                      prependIcon="mdi mdi-calendar-month-outline"
+                      iconType="mdi"
+                      onChange={(value) => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          ["days"]: value,
+                        }));
+                      }}
+                    ></MultiCheckbox>
+                  </div>
+                  <div className="col-span-6">
+                    <TextFieldNada
+                      name="price"
+                      type="time"
+                      handleChange={(e) => takeValue(e, "time_from")}
+                      value={formData.time_from}
+                      label="من "
+                      placeholder="  السعر الكلي *"
+                    ></TextFieldNada>
+
+                  </div>
+                  <div className="col-span-6">
+                    <TextFieldNada
+                      name="price"
+                      type="time"
+                      handleChange={(e) => takeValue(e, "time_to")}
+                      value={formData.time_to}
+                      label="الي "
+                      placeholder="  السعر الكلي *"
+                    ></TextFieldNada>
+
+                  </div>
+
+
+                  <div className="col-span-12">
+
+                    <RadioGroup value={selected} onChange={(e)=>handleSelecteditem(e)}>
+                      <RadioGroup.Label className="sr-only">Server size</RadioGroup.Label>
+                      <div className="grid grid-cols-2">
+                        {paymentMethodList.map((item) => (
+                          <RadioGroup.Option
+                            key={item.name_ar}
+                            value={item}
+                            className={({ active, checked }) =>
+                              `${active
+                                ? 'ring-2 ring-white/60 ring-offset-2 ring-offset-sky-300'
+                                : ''
+                              }
+                  ${checked ? 'border border-[#009414] ' : ''}
+                    relative flex cursor-pointer  rounded-lg px-5 py-4 shadow-md focus:outline-none  col-span-1`
+                            }
+                          >
+                            {({ active, checked }) => (
+                              <>
+                                <div className="flex w-full items-center justify-between">
+                                  <div className="flex items-center">
+                                    <div className="text-sm">
+                                      <RadioGroup.Label
+                                        as="p"
+                                        className={`font-medium  ${checked ? 'text-gray-900' : 'text-gray-900'
+                                          }`}
+                                      >
+                                        <div className="flex items-center gap-4">
+                                          <div className="w-10 h-10 rounded-full">
+                                            <img className="w-full h-full object-contain" src={item.image} alt="" />
+
+                                          </div>
+                                          {item.name_ar}
+                                        </div>
+                                      </RadioGroup.Label>
+
+                                    </div>
+                                  </div>
+                                  {checked && (
+                                    <div className="shrink-0 text-white">
+                                      {/* <CheckIcon className="h-6 w-6" /> */}
+                                      {/* <span className="mdi mdi-checkbox-marked-circle"></span> */}
+                                    </div>
+                                  )}
+                                </div>
+                              </>
+                            )}
+                          </RadioGroup.Option>
+                        ))}
+                      </div>
+                    </RadioGroup>
+
+
+                  </div>
+
                   <div className="col-span-6">
                     <FileInput onFileChange={(img) => takeUploadedImg(img)} state="add" title="ارفاق صورة التحويل" />
                   </div>
@@ -289,7 +459,7 @@ export default function page() {
             )}
 
             <div className="mx-auto w-[50%] py-5 flex gap-4">
-              <button className="bg-[#009414] rounded-xl px-3 py-2 text-white w-full">
+              <button type="submit" className="bg-[#009414] rounded-xl px-3 py-2 text-white w-full">
                 اضافة
               </button>
               <button className="bg-[#00941412] text-[#009414] w-full rounded-xl px-3 py-2">

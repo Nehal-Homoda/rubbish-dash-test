@@ -15,7 +15,24 @@ export const getPackagesService = async (query?: string) => {
         if (!response.ok) {
             await responseErrorServiceHandler(response, "packages");
         }
-        const data = (await response.json()) as ResponseData<PackageOffer[]>;
+        const data = (await response.json()) as ResponseData<PackageOffer[] | PackageOffer>;
+        console.log("response data =>>>>", data);
+        return data;
+    } catch (error: any) {
+        throw new Error(error.message);
+    }
+};
+export const getPackageByIdService = async (id:number) => {
+    try {
+        const response = await apiCall.get(`/admins/packages/${id}`, {
+            headers: {
+                // "Content-Type": "application/json",
+            },
+        });
+        if (!response.ok) {
+            await responseErrorServiceHandler(response, "packages");
+        }
+        const data = (await response.json()) as ResponseData<PackageOffer>;
         console.log("response data =>>>>", data);
         return data;
     } catch (error: any) {

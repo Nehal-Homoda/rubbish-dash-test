@@ -19,7 +19,7 @@ export const getDistrictService = async (query?: string) => {
         if (!response.ok) {
             await responseErrorServiceHandler(response, "district");
         }
-        const data = (await response.json()) as ResponseData<District[]>;
+        const data = (await response.json()) as ResponseData<Region[]>;
         console.log("response data =>>>>", data);
         return data;
     } catch (error: any) {

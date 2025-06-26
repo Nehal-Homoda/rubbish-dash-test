@@ -6,10 +6,11 @@ import React, { useEffect, useState } from "react";
 import { Checkbox, Label } from "flowbite-react";
 import { Radio } from "flowbite-react";
 import {
-  addDistrictService,
-  deleteDistrictService,
-  updateDistrictService,
-} from "@/services/districtService";
+  addUserService,
+  getUserService,
+  deleteUserService,
+  updateUserService,
+} from "@/services/userService";
 
 import { getDistrictService } from "@/services/districtService";
 import { District } from "@/types/district.interface";
@@ -22,7 +23,6 @@ import SelectInput from "@/components/ui/form/SelectInput";
 import { successDialog } from "@/utils/shared";
 import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
 import { useRouter } from "next/navigation";
-import { getUserService } from "@/services/userService";
 import { Users } from "@/types/auth.interface";
 import { PackageOffer } from "@/types/packagesOffer.interface";
 
@@ -90,12 +90,10 @@ export default function rubbush_collectors() {
     is_subscription = undefined,
   }: { search?: string; is_active?: boolean | undefined; is_subscription?: boolean | undefined; } = {}) => {
     console.log(is_active);
-    const isActive =
-      is_active != undefined
-        ? is_active
-          ? "&is_active=" + 1
-          : "&is_active=" + 0
-        : "";
+    const isActive = is_active != undefined ? is_active ? "&is_active=" + 1 : "&is_active=" + 0 : "";
+
+
+
     const isSubscribe =
       is_subscription != undefined
         ? is_subscription
@@ -130,7 +128,7 @@ export default function rubbush_collectors() {
       is_active: value,
     });
 
-    updateDistrictService(service.id, body)
+    updateUserService(service.id, body)
       .then((response) => {
         const arr = [...dataList];
         arr[index].is_active = value;
@@ -143,7 +141,7 @@ export default function rubbush_collectors() {
   };
 
   const deleteSubmit = (item: District, selectedIndex: number) => {
-    deleteDistrictService(item.id)
+    deleteUserService(item.id)
       .then((response) => {
         const updatedArr = [...dataList];
         updatedArr.splice(selectedIndex, 1);
@@ -174,7 +172,7 @@ export default function rubbush_collectors() {
       ...updateFormData,
     });
 
-    updateDistrictService(selectedDataItem.id, body)
+    updateUserService(selectedDataItem.id, body)
       .then((response) => {
         fetchDataList();
         successDialog(true);
@@ -220,7 +218,7 @@ export default function rubbush_collectors() {
     );
     fd.append("is_active", formData.is_active.toString());
 
-    addDistrictService(fd)
+    addUserService(fd)
       .then((response) => {
         fetchDataList();
         //@ts-ignore
@@ -351,7 +349,7 @@ export default function rubbush_collectors() {
 
 
               <td className="">
-                <div className="flex justify-center gap-3">
+                <div className="flex justify-center items-center gap-3">
                   <UIDialogConfirm
                     danger
                     title="هل انت متأكد من حذف العنصر"
@@ -487,6 +485,9 @@ export default function rubbush_collectors() {
                       </div>
                     </form>
                   </UIBaseDialog>
+
+
+                  <span onClick={()=>router.push(`/users/${item.id}`)} className="mdi mdi-eye-outline cursor-pointer"></span>
                 </div>
               </td>
             </tr>
