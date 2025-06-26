@@ -1,16 +1,42 @@
 import React, { useEffect, useState } from 'react'
 import TextFieldNada from '../ui/form/TextFieldNada'
 import { IsUser, Users } from '@/types/auth.interface'
+import { updateUserService } from '@/services/userService'
 
 
 type Props = {
   user: IsUser | null
+  // confirmHandler: () => void
 }
 export default function personalData({ user }: Props) {
 
   useEffect(() => {
     console.log('user', user)
   })
+
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+
+  })
+
+  useEffect(() => {
+    setFormData({
+      name: user.name,
+      phone: user.phone,
+
+    })
+  }, [])
+
+  const updateUser = () => {
+    const body = JSON.stringify({
+      name: formData.name,
+      phone: formData.phone
+    })
+    updateUserService(user.id, body).then((response) => {
+      console.log(response)
+    })
+  }
 
   return (
     <div className='container'>
@@ -28,10 +54,15 @@ export default function personalData({ user }: Props) {
               name="phone"
               type="text"
               placeholder="اسم المستخدم"
-              value={user?.name}
+              value={formData.name}
 
-              handleChange={() => { }}
+              handleChange={(e) => {
+                setFormData((prev) => ({
+                  ...prev,
+                  ['name']: e.target.value
 
+                }))
+              }}
             ></TextFieldNada>
           </div>
           <div className="lg:col-span-1 col-span-2 input-wrap mb-14">
@@ -40,8 +71,14 @@ export default function personalData({ user }: Props) {
               name="phone"
               type="number"
               placeholder="رقم الموبايل"
-              value={user ? user.phone : ''}
-              handleChange={() => { }}
+              value={formData.phone}
+              handleChange={(e) => {
+                setFormData((prev) => ({
+                  ...prev,
+                  ['phone']: e.target.value
+
+                }))
+              }}
 
             ></TextFieldNada>
           </div>
@@ -54,7 +91,7 @@ export default function personalData({ user }: Props) {
           <button
             type="submit"
             className="base-btn min-w-[200px]"
-          // onClick={confirmHandler}
+            onClick={updateUser}
 
           >
             حفظ التغييرات
