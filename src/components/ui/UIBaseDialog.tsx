@@ -14,6 +14,7 @@ type Props = {
     form?: string;
     confirmHandler: () => void;
     confirmText: string;
+    hideConfirmBtn?: boolean;
 };
 
 export default function UIBaseDialog({
@@ -23,6 +24,7 @@ export default function UIBaseDialog({
     confirmText,
     form,
     confirmHandler,
+    hideConfirmBtn = false,
 }: Props) {
     let [isOpen, setIsOpen] = useState(false);
 
@@ -41,7 +43,11 @@ export default function UIBaseDialog({
             </div>
 
             <Transition appear show={isOpen} as={Fragment}>
-                <Dialog as="div" className=" relative z-50" onClose={closeModal}>
+                <Dialog
+                    as="div"
+                    className=" relative z-50"
+                    onClose={closeModal}
+                >
                     <TransitionChild
                         as={Fragment}
                         enter="ease-out duration-300"
@@ -82,14 +88,18 @@ export default function UIBaseDialog({
                                     <div className="my-10">{children}</div>
 
                                     <div className="mt-4 flex items-center justify-center gap-4">
-                                        <button
-                                            type={form ? 'submit': 'button'}
-                                            className="base-btn min-w-[200px]"
-                                            onClick={confirmHandler}
-                                            form={form ?? undefined}
-                                        >
-                                            {confirmText}
-                                        </button>
+                                        {!hideConfirmBtn && (
+                                            <button
+                                                type={
+                                                    form ? "submit" : "button"
+                                                }
+                                                className="base-btn min-w-[200px]"
+                                                onClick={confirmHandler}
+                                                form={form ?? undefined}
+                                            >
+                                                {confirmText}
+                                            </button>
+                                        )}
                                         <button
                                             type="button"
                                             className="btn-secondary px-10"

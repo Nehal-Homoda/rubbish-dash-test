@@ -1,7 +1,7 @@
 import { responseErrorServiceHandler } from "@/utils/shared";
 import { apiCall } from "./apiCall";
 import { ResponseData } from "@/types/shared";
-import { Visits } from "@/types/visits.interface";
+import { Visit } from "@/types/visits.interface";
 import { Region } from "@/types/regions.interface";
 
 let token = "Bearer 160|9eiDkr7DC2EryTIiZbQbO5CoJoxE7X88IPHqcNGs7f3d3254";
@@ -19,38 +19,13 @@ export const getVisitsService = async (query?: string) => {
         if (!response.ok) {
             await responseErrorServiceHandler(response, "district");
         }
-        const data = (await response.json()) as ResponseData<Visits[]>;
+        const data = (await response.json()) as ResponseData<Visit[]>;
         console.log("response data =>>>>", data);
         return data;
     } catch (error: any) {
         throw new Error(error.message);
     }
 };
-
-
-
-export const activateVisitsService = async (
-    id: number,
-    status: string
-) => {
-    try {
-        const response = await apiCall.put("/admins/visits", id, {
-            body: JSON.stringify({ status }),
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
-        if (!response.ok) {
-            await responseErrorServiceHandler(response, "update visits");
-        }
-        const data = (await response.json()) as ResponseData<Visits>;
-        console.log("response data =>>>>", data);
-        return data;
-    } catch (error: any) {
-        throw new Error(error.message);
-    }
-};
-
 export const addVisitsService = async (form: FormData) => {
     try {
         const response = await apiCall.post(`/admins/visits`, {
@@ -60,26 +35,24 @@ export const addVisitsService = async (form: FormData) => {
             },
         });
         if (!response.ok) {
-            await responseErrorServiceHandler(response, "add district");
+            await responseErrorServiceHandler(response, "add visits");
         }
-        const data = await response.json();
+        const data = (await response.json()) as ResponseData<Visit>;
         console.log("response data =>>>>", data);
         return data;
     } catch (error: any) {
         throw new Error(error.message);
     }
 };
-
 export const deleteVisitsService = async (id: number) => {
     try {
         const response = await apiCall.delete("/admins/visits", id, {
             headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
+                // "Content-Type": "application/json",
             },
         });
         if (!response.ok) {
-            await responseErrorServiceHandler(response, "delete district");
+            await responseErrorServiceHandler(response, "delete visits");
         }
         const data = await response.json();
         console.log("response data =>>>>", data);
@@ -97,9 +70,9 @@ export const updateVisitsService = async (id: number, body: string) => {
             },
         });
         if (!response.ok) {
-            await responseErrorServiceHandler(response, "update district");
+            await responseErrorServiceHandler(response, "update visits");
         }
-        const data = (await response.json()) as ResponseData<Visits>;
+        const data = (await response.json()) as ResponseData<Visit>;
         console.log("response data =>>>>", data);
         return data;
     } catch (error: any) {
