@@ -1,7 +1,7 @@
 
 
 export interface IsUser {
-    id: number;
+    id:number,
     name: string;
     phone: string;
     is_active: boolean;
@@ -9,7 +9,7 @@ export interface IsUser {
     renewal_date: string;
     subscription_name: string;
     image: any;
-    payment: Payment[];
+    payment: any;
     subscription: Subscription;
     created_at: string;
 }
@@ -22,7 +22,7 @@ export interface Payment {
     status: string;
     user_id: number;
     user_name: string;
-    payment_method: PaymentMethod;
+    payment_method: null |PaymentMethod;
     created_at: string;
 }
 

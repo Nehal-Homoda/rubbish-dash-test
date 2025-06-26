@@ -46,9 +46,16 @@ export default function SelectInput({
 
     useEffect(() => {
         if (itemName && itemValue) {
-            const item = items.find((item) => item[itemValue] == value);
+            console.log('itemsss',items)
+            const item = items.find((item) => {
+                console.log('item issss',item)
+                return item[itemValue] == value
+
+            });
 
             console.log("iteeeeee", item);
+            console.log("iteeeeee value", value);
+            
 
             if (item) {
                 setSelected(item[itemName]);
@@ -56,7 +63,7 @@ export default function SelectInput({
         } else {
             setSelected(value);
         }
-    }, [value]);
+    }, [value,items]);
 
     return (
         <>
