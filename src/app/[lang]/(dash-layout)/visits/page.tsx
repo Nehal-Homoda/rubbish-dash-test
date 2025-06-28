@@ -38,6 +38,7 @@ export default function rubbush_collectors() {
     ];
     const statusList = [
         { is_active: "pending", name: "قيد الانتظار" },
+        { is_active: "in_progress", name: "قيد التنفيذ" },
         { is_active: "collected", name: "مجمع" },
         { is_active: "not_collected", name: "غير مجمع" },
     ];
@@ -162,6 +163,7 @@ export default function rubbush_collectors() {
     const statusDropdownColor = (name: string) => {
         if (name === "not_collected")
             return "bg-red-100 text-red-600 hover:bg-text-red-200";
+        if (name === "in_progress") return "bg-blue-100 text-blue-600 hover:bg-text-blue-200";
         if (name === "collected") return undefined;
         if (name === "pending")
             return "bg-yellow-100 text-yellow-600 hover:bg-text-yellow-200";
@@ -252,7 +254,7 @@ export default function rubbush_collectors() {
                                             deleteSubmit(item, index);
                                         }}
                                     >
-                                        <button className="bg-[#F9285A0A] p-1 rounded-lg">
+                                        <button className="bg-[#F9285A0A] p-1 px-2 text-sm rounded-lg">
                                             <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
                                         </button>
                                     </UIDialogConfirm>
@@ -267,9 +269,9 @@ export default function rubbush_collectors() {
                                                 onClick={() => {
                                                     updateDataItem(item);
                                                 }}
-                                                className="bg-[#0094140D] p-1 rounded-lg"
+                                                className="bg-blue-100 p-1 px-2 text-sm rounded-lg"
                                             >
-                                                <span className="mdi mdi-folder-edit-outline text-[#009414]"></span>
+                                                <span className="mdi mdi-eye-outline text-blue-500"></span>
                                             </button>
                                         }
                                     >
@@ -287,7 +289,7 @@ export default function rubbush_collectors() {
                                                     <div className="flex justify-between items-center">
                                                         <div className="text-start w-full py-2 ">
                                                             {
-                                                                selectedDataItem?.user_note
+                                                                selectedDataItem?.user_note  ? selectedDataItem?.user_note : 'لا يوجد ملاحظة'
                                                             }
                                                         </div>
                                                     </div>
@@ -301,7 +303,7 @@ export default function rubbush_collectors() {
                                                     <div className="flex justify-between items-center">
                                                         <div className="text-start w-full py-2 ">
                                                             {
-                                                                selectedDataItem?.collector_note
+                                                                selectedDataItem?.collector_note ? selectedDataItem?.collector_note : 'لا يوجد سبب'
                                                             }
                                                         </div>
                                                     </div>
