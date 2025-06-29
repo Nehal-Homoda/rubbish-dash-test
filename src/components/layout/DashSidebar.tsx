@@ -1,18 +1,17 @@
 "use client";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import logo from "@/assets/images/logo.png";
 import type { ListItem } from "@/types/sidebarListItem";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import Routes from "@/core/manager/route.manager";
-interface SideBarProps {
-  isOpen: boolean;
-  openSidebar: () => void;
-  lang: "en" | "ar";
-  dict: { [key: string]: string };
-}
-export default function DashSidebar(props: SideBarProps) {
+import { useLangAndDictionary } from "@/utils/lang";
+
+
+export default function DashSidebar() {
+  const [isOpen, setIsOpen] = useState(true)
+  const { lang, dict } = useLangAndDictionary();
   const ListItems: ListItem[] = [
     {
       icon: "mdi-view-dashboard-outline",
@@ -38,8 +37,8 @@ export default function DashSidebar(props: SideBarProps) {
       iconType: "mdi",
 
       subLinks: [
-        { name: "all", path: Routes.users },
-        { name: "users", path: "/users" },
+        // { name: "all", path: Routes.users },
+        { name: "users", path: Routes.users },
         { name: "deleted", path: Routes.deletedUsers },
       ],
     },
@@ -108,11 +107,14 @@ export default function DashSidebar(props: SideBarProps) {
   const langPrefix = params.lang ? `/${params.lang}` : "";
   const cleanPathname = pathname.replace(langPrefix, "") || "/";
 
+  const openSidebar = () => {
+
+  }
   return (
     <div
       className={`side-bar z-50 bg-surface text-white/85 fixed top-0 md:flex duration-300 flex-col h-full
   ${
-    props.isOpen
+    isOpen
       ? "flex"
       : "md:translate-x-0 " +
         (params.lang === "ar" ? "translate-x-full" : "-translate-x-full")
@@ -121,7 +123,7 @@ export default function DashSidebar(props: SideBarProps) {
     >
       <span
         className="mdi mdi-close text-lg md:hidden py-2 px-3 cursor-pointer"
-        onClick={() => props.openSidebar()}
+        onClick={() => openSidebar()}
       ></span>
 
       <div className="title uppercase flex items-center justify-start gap-2 ps-9 pt-4 md:pt-9 pb-5">
@@ -158,7 +160,7 @@ export default function DashSidebar(props: SideBarProps) {
                   <i className={`fa ${item.icon}  me-2 text-2xl`}></i>
                 ) : null}
 
-                <span>{props.dict[item.name] || item.name}</span>
+                <span>{dict[item.name] || item.name}</span>
               </div>
               {item.subLinks && (
                 <span
@@ -183,7 +185,7 @@ export default function DashSidebar(props: SideBarProps) {
                     ${cleanPathname === dropKey.path ? "text-white " : ""}
                     `}
                 >
-                  {props.dict[dropKey.name] || dropKey.name}
+                  {dict[dropKey.name] || dropKey.name}
                 </Link>
               ))}
             </div>

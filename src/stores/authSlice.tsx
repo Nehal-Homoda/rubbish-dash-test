@@ -42,6 +42,8 @@ export const authSlice = createSlice({
                     state.user = JSON.parse(storedUser);
                     state.token = storedToken;
                     state.isLoggedIn = true;
+                } else {
+                    throw new Error('logout')
                 }
                 state.isEnter = true;
             } catch (error: any) {
