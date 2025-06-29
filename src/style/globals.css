@@ -150,8 +150,8 @@ input[type="number"] {
   background: rgb(var(--color-surface));
   color: white;
 }
-[data-testid="flowbite-toggleswitch-toggle"] {
-  
+button[aria-checked="true"] [data-testid="flowbite-toggleswitch-toggle"] {
   background-color: #009414F0; 
   border-radius: 9999px;
 }
+

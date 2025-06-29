@@ -38,7 +38,7 @@ export default function page() {
 
   const router = useRouter()
 
-//@ts-ignore
+  //@ts-ignore
   const takeValue = (e, name) => {
     console.log(e.target.value);
     setFormData((prev) => ({
@@ -68,14 +68,14 @@ export default function page() {
   const fetchDistrict = () => {
     districtListService().then((response) => {
       setDistrict(response.data);
-//@ts-ignore
+      //@ts-ignore
       response.data.map((item, index) => {
         setDistrictDays(item.available_days);
         setDistrictTime(item.available_times);
       });
     });
   };
-//@ts-ignore
+  //@ts-ignore
   const handleAddUserSubmit = (e) => {
     e.preventDefault();
     const fd = new FormData();
@@ -140,7 +140,7 @@ export default function page() {
     district_id: "",
     has_subscription: 0,
     package_id: "",
-    
+
     payment_method_id: "",
     days: [],
     time_from: "",
@@ -154,7 +154,7 @@ export default function page() {
     address_details: "",
   });
 
-//@ts-ignore
+  //@ts-ignore
   const takeUploadedImg = (img) => {
     console.log(img)
 
@@ -165,7 +165,7 @@ export default function page() {
       setTotalPrice(Number(packageItem.price_per_unit) * formData.units);
     }
   }, [formData.units]);
-//@ts-ignore
+  //@ts-ignore
   const handleSelectPackage = (value) => {
     setFormData((prev) => ({
       ...prev,
@@ -178,21 +178,21 @@ export default function page() {
 
 
   const handleCheckSubscription = () => {
-    setSwitch1(true)
+    setSwitch1(!switch1)
     setFormData((prev => ({
       ...prev,
       ["has_subscription"]: 1
     })))
   }
 
-//@ts-ignore
-  const handleSelecteditem=(item)=>{
+  //@ts-ignore
+  const handleSelecteditem = (item) => {
     setSelected(item)
-    setFormData((prev)=>({
+    setFormData((prev) => ({
       ...prev,
-      ['payment_method_id']:item.id
+      ['payment_method_id']: item.id
     }))
-    
+
     // console.log(e.target.value)
   }
 
@@ -394,9 +394,9 @@ export default function page() {
 
                   <div className="col-span-12">
 
-                    <RadioGroup value={selected} onChange={(e)=>handleSelecteditem(e)}>
+                    <RadioGroup value={selected} onChange={(e) => handleSelecteditem(e)}>
                       <RadioGroup.Label className="sr-only">Server size</RadioGroup.Label>
-                      <div className="grid grid-cols-2">
+                      <div className="grid grid-cols-2 gap-7">
                         {paymentMethodList.map((item) => (
                           <RadioGroup.Option
                             key={item.name_ar}
@@ -416,7 +416,7 @@ export default function page() {
                                   <div className="flex items-center">
                                     <div className="text-sm">
                                       <RadioGroup.Label
-                                        as="p"
+                                        as="div"
                                         className={`font-medium  ${checked ? 'text-gray-900' : 'text-gray-900'
                                           }`}
                                       >
