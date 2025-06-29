@@ -5,6 +5,9 @@
 import React, { useEffect, useState } from "react";
 import { Checkbox, Label } from "flowbite-react";
 import { Radio } from "flowbite-react";
+import trashImg from '@/assets/images/icons/trash.png'
+import editImg from '@/assets/images/icons/edit.png'
+import eyeImg from '@/assets/images/icons/eye.png'
 import {
   addUserService,
   getUserService,
@@ -23,7 +26,7 @@ import SelectInput from "@/components/ui/form/SelectInput";
 import { successDialog } from "@/utils/shared";
 import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
 import { useRouter } from "next/navigation";
-import { Users } from "@/types/auth.interface";
+import { User, Users } from "@/types/auth.interface";
 import { PackageOffer } from "@/types/packagesOffer.interface";
 
 export default function rubbush_collectors() {
@@ -49,37 +52,27 @@ export default function rubbush_collectors() {
   ];
   const [totalPages, setTotalPages] = useState(1);
   const [page, setPage] = useState(1);
-  const [districtDays, setDistrictDays] = useState<string[]>([]);
-  const [districtTime, setDistrictTime] = useState<string[]>([]);
-  const [selectedDataItem, setSelectedDataItem] = useState<District | null>(
+  const [selectedDataItem, setSelectedDataItem] = useState<Users | null>(
     null
   );
 
   const [subscriptionList, setSubscriptionList] = useState<PackageOffer[]>([]);
   type FormDataType = {
-    name_ar: string;
-    name_en: string;
-    order: number;
-    is_active: number;
-    available_days: string[];
-    available_times: string[];
+    name: "",
+    phone: "",
+    is_active: 0,
+    
   };
   const [formData, setFormData] = useState<FormDataType>({
-    name_ar: "",
-    name_en: "",
-    order: 0,
+    name: "",
+    phone: "",
     is_active: 0,
-    available_days: [],
-    available_times: [],
   });
 
-  const [updateFormData, setUpdateFormData] = useState<FormDataType>({
-    name_ar: "",
-    name_en: "",
-    order: 0,
+  const [updateFormData, setUpdateFormData] = useState({
+    name: "",
+    phone: "",
     is_active: 0,
-    available_days: [],
-    available_times: [],
   });
 
   const router = useRouter()
@@ -152,16 +145,25 @@ export default function rubbush_collectors() {
       .catch((error) => { });
   };
 
-  const updateDistrictItem = (item: District) => {
+  const updateUserItem = (item: Users) => {
     setSelectedDataItem(item);
     setUpdateFormData({
-      name_ar: item.name_ar,
-      name_en: item.name_en,
-      order: item.order,
+      name: item.name,
+      phone: item.phone,
       is_active: item.is_active ? 1 : 0,
-      available_days: item.available_days,
-      available_times: item.available_times,
     });
+  };
+
+   const updateFormChangeHander = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index?: number
+  ) => {
+    setUpdateFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+
+    console.log(e.target.name, e.target.value);
   };
 
   const updateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -175,66 +177,16 @@ export default function rubbush_collectors() {
 
     updateUserService(selectedDataItem.id, body)
       .then((response) => {
+        console.log('yesssss updated')
         fetchDataList();
         successDialog(true);
       })
       .catch((error) => { });
   };
 
-  const addFormChangeHander = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    index?: number
-  ) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+  
 
-    console.log(e.target.name, e.target.value);
-  };
-  const updateFormChangeHander = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    index?: number
-  ) => {
-    setUpdateFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-
-    console.log(e.target.name, e.target.value);
-  };
-
-  const createSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    const fd = new FormData();
-    fd.append("name_ar", formData.name_ar);
-    fd.append("name_en", formData.name_en);
-    fd.append("order", formData.order.toString());
-    formData.available_days.forEach((day, index) =>
-      fd.append(`available_days[${index}]`, day)
-    );
-    formData.available_days.forEach((time, index) =>
-      fd.append(`available_times[${index}]`, time)
-    );
-    fd.append("is_active", formData.is_active.toString());
-
-    addUserService(fd)
-      .then((response) => {
-        fetchDataList();
-        //@ts-ignore
-        successDialog(true);
-        setFormData({
-          name_ar: "",
-          name_en: "",
-          order: 0,
-          is_active: 0,
-          available_days: [],
-          available_times: [],
-        });
-      })
-      .catch((error) => { });
-  };
+ 
 
 
   const tableHeadActionsSlot = () => {
@@ -360,11 +312,15 @@ export default function rubbush_collectors() {
                     }}
                   >
                     <button className="bg-[#F9285A0A] p-1 rounded-lg">
-                      <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
+                      {/* <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span> */}
+                      <div className="w-4 h-4">
+                        <img className="w-full h-full object-contain" src={trashImg.src} alt="" />
+                      </div>
+
                     </button>
                   </UIDialogConfirm>
                   <UIBaseDialog
-                    title="تعديل منطقه"
+                    title="تعديل مستخدم"
                     confirmHandler={() => { }}
                     confirmText="اضافة"
                     form="update-form"
@@ -372,11 +328,16 @@ export default function rubbush_collectors() {
                       <button
                         onClick={() => {
                           //@ts-ignore
-                          updateDistrictItem(item);
+                          updateUserItem(item);
                         }}
                         className="bg-[#0094140D] p-1 rounded-lg"
                       >
-                        <span className="mdi mdi-folder-edit-outline text-[#009414]"></span>
+                        {/* <span className="mdi mdi-folder-edit-outline text-[#009414]"></span> */}
+                        <div className="w-4 h-4">
+                          <img className="w-full h-full object-contain" src={editImg.src} alt="" />
+                        </div>
+
+
                       </button>
                     }
                   >
@@ -385,84 +346,38 @@ export default function rubbush_collectors() {
                       id="update-form"
                     >
                       <div className="space-y-7">
+
+
                         <TextFieldNada
-                          name="name_ar"
+                          name="name"
                           type="text"
                           handleChange={
                             updateFormChangeHander
                           }
                           value={
-                            updateFormData.name_ar
+                            updateFormData.name
                           }
-                          label=" اسم المنطقة ( عربي ) "
-                          placeholder=" اسم المنطقة  "
+                          label=" اسم المستخدم"
+                          placeholder=" ادخل اسم المستخدم  "
                         ></TextFieldNada>
 
+
                         <TextFieldNada
-                          name="name_en"
-                          type="text"
+                          name="phone"
+                          type="number"
                           handleChange={
                             updateFormChangeHander
                           }
                           value={
-                            updateFormData.name_en
+                            updateFormData.phone
                           }
-                          label=" اسم المنطقة ( انجليزي ) "
-                          placeholder=" اسم المنطقة  "
+                          label=" رقم الموبايل"
+                          placeholder="ادخل رقم الموبايل  "
                         ></TextFieldNada>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          <div className="col-span-1">
-                            <MultiCheckbox
-                              items={districtDays}
-                              value={
-                                updateFormData.available_days
-                              }
-                              label="اليوم"
-                              required={true}
-                              name="available_days"
-                              placeholder="اختر اليوم"
-                              prependIcon="mdi mdi-calendar-month-outline"
-                              iconType="mdi"
-                              onChange={(
-                                value
-                              ) => {
-                                setUpdateFormData(
-                                  (prev) => ({
-                                    ...prev,
-                                    ["available_days"]:
-                                      value,
-                                  })
-                                );
-                              }}
-                            ></MultiCheckbox>
-                          </div>
-                          <div className="col-span-1">
-                            <MultiCheckbox
-                              items={districtTime}
-                              value={
-                                updateFormData.available_times
-                              }
-                              label="الوقت"
-                              required={true}
-                              name="available_times"
-                              placeholder="اختر الوقت"
-                              prependIcon="mdi mdi-calendar-month-outline"
-                              iconType="mdi"
-                              onChange={(
-                                value
-                              ) => {
-                                setUpdateFormData(
-                                  (prev) => ({
-                                    ...prev,
-                                    ["available_times"]:
-                                      value,
-                                  })
-                                );
-                              }}
-                            ></MultiCheckbox>
-                          </div>
-                        </div>
+
+
+
 
                         <SelectInput
                           value={
@@ -490,7 +405,11 @@ export default function rubbush_collectors() {
                   </UIBaseDialog>
 
 
-                  <span onClick={()=>router.push(`/users/${item.id}`)} className="mdi mdi-eye-outline cursor-pointer"></span>
+                  {/* <span onClick={() => router.push(`/users/${item.id}`)} className="mdi mdi-eye-outline cursor-pointer"></span> */}
+
+                  <div className="w-4 h-4 cursor-pointer" onClick={() => router.push(`/users/${item.id}`)}>
+                    <img className="w-full h-full object-contain" src={eyeImg.src} alt="" />
+                  </div>
                 </div>
               </td>
             </tr>

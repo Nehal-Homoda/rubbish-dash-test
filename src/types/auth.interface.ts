@@ -20,14 +20,14 @@ export interface User {
 export interface Users {
     id: number;
     name: string;
-    password: string;
     phone: string;
     is_active: boolean;
-    has_subscription: boolean;
-    subscription_name: string;
-    renewal_date: any;
     image?: string;
-    created_at: string;
+    password?: string;
+    has_subscription?: boolean;
+    subscription_name?: string;
+    renewal_date?: any;
+    created_at?: string;
 }
 
 
