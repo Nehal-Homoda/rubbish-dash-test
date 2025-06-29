@@ -32,7 +32,8 @@ export default function rubbush_collectors() {
 
         { text: "الحالة", name: "is_active" },
         { text: "طريقة الدفع", name: "is_active" },
-        { text: "الاجراءات", name: "" },
+        { text: "صورة التحويل", name: "" },
+        { text: "االاجراءات", name: "" },
     ];
     const statusList = [
         { is_active: 1, name: "مفعل" },
@@ -364,22 +365,7 @@ export default function rubbush_collectors() {
                             <td className="py-2 px-4">{item.total_price}</td>
 
                             <td className="py-2 px-4">
-                                <UIPrimaryDropdown
-                                    tiny={true}
-                                    itemName="name"
-                                    itemValue="is_active"
-                                    btnColorTailwindClass={
-                                        !item.is_active
-                                            ? "bg-red-100 text-red-600 hover:bg-text-red-200"
-                                            : undefined
-                                    }
-                                    onSelected={(value) => {
-                                        updateDataItemActive(value, index);
-                                    }}
-                                    items={statusList}
-                                >
-                                    {item.is_active ? "مفعل" : "غير مفعل"}
-                                </UIPrimaryDropdown>
+                              {item.status}
                             </td>
 
                             <td className="py-2 px-4">
@@ -393,103 +379,7 @@ export default function rubbush_collectors() {
 
                             <td className="">
                                 <div className=" flex justify-center gap-3">
-                                    <UIDialogConfirm
-                                        danger
-                                        title="هل انت متأكد من حذف العنصر"
-                                        confirmHandler={() => {
-                                            deleteSubmit(item, index);
-                                        }}
-                                    >
-                                        <button className="bg-[#F9285A0A] p-1 rounded-lg">
-                                            {/* <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span> */}
-
-                                            <div className="w-4 h-4">
-                                                <img className="w-full h-full object-contain" src={trashImg.src} alt="" />
-                                            </div>
-                                        </button>
-                                    </UIDialogConfirm>
-                                    <UIBaseDialog
-                                        title="تعديل منطقه"
-                                        confirmHandler={() => { }}
-                                        confirmText="اضافة"
-                                        form="update-form"
-                                        btn={
-                                            <button
-                                                onClick={() => {
-                                                    updateDataItem(item);
-                                                }}
-                                                className="bg-[#0094140D] p-1 rounded-lg"
-                                            >
-                                                {/* <span className="mdi mdi-folder-edit-outline text-[#009414]"></span> */}
-
-                                                <div className="w-4 h-4">
-                                                    <img className="w-full h-full object-contain" src={editImg.src} alt="" />
-                                                </div>
-
-                                            </button>
-                                        }
-                                    >
-                                        <form
-                                            onSubmit={updateSubmit}
-                                            id="update-form"
-                                        >
-                                            <div className="space-y-7">
-
-
-
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-
-                                                    <div className="col-span-1">
-                                                        <SelectInput
-                                                            value={
-                                                                updateFormData.is_active
-                                                            }
-                                                            items={statusList}
-                                                            itemName="name"
-                                                            itemValue="is_active"
-                                                            label="الحالة"
-                                                            placeholder="اختر الحالة"
-                                                            name="is_active"
-                                                            required={true}
-                                                            onChange={(
-                                                                value
-                                                            ) => {
-                                                                setUpdateFormData(
-                                                                    (prev) => ({
-                                                                        ...prev,
-                                                                        ["is_active"]:
-                                                                            value,
-                                                                    })
-                                                                );
-                                                            }}
-                                                        ></SelectInput>
-                                                    </div>
-                                                </div>
-                                                <TextFieldNada
-                                                    name="price_per_unit"
-                                                    type="number"
-                                                    handleChange={
-                                                        updateFormChangeHander
-                                                    }
-                                                    value={
-                                                        updateFormData.price_per_unit
-                                                    }
-                                                    label=" سعر الوحدة"
-                                                    placeholder=" ادخل سعر الوحدة "
-                                                ></TextFieldNada>
-                                                <TextFieldNada
-                                                    name="days_count"
-                                                    type="number"
-                                                    handleChange={
-                                                        updateFormChangeHander
-                                                    }
-                                                    value={updateFormData.days_count}
-                                                    label=" مدة الباقة "
-                                                    placeholder=" ادخل مدة الباقة  "
-                                                ></TextFieldNada>
-                                            </div>
-                                        </form>
-                                    </UIBaseDialog>
+                                  
                                 </div>
                             </td>
 

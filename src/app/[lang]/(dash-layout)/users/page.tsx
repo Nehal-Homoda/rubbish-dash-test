@@ -90,8 +90,8 @@ export default function rubbush_collectors() {
     const isSubscribe =
       is_subscription != undefined
         ? is_subscription
-          ? "&is_subscribe=" + 1
-          : "&is_subscribe=" + 0
+          ? "&is_subscription=" + 1
+          : "&is_subscription=" + 0
         : "";
     const hasSearch = search ? "&search=" + search : "";
 
