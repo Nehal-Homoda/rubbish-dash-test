@@ -22,7 +22,8 @@ export function middleware(request: NextRequest) {
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
   );
   if (pathnameHasLocale) return;
-  const locale = getLocale(request);
+  // const locale = getLocale(request);
+  const locale = defaultLocale;
   request.nextUrl.pathname = `/${locale}${pathname}`;
   const response = NextResponse.redirect(request.nextUrl);
 

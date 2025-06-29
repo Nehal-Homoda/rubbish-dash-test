@@ -1,6 +1,6 @@
 import { responseErrorServiceHandler } from "@/utils/shared";
 import { apiCall } from "./apiCall";
-import { LogoutResponse, User } from "@/types/auth.interface";
+import { AuthResponse, LogoutResponse, User } from "@/types/auth.interface";
 
 export const loginService = async (form: FormData) => {
     try {
@@ -13,7 +13,7 @@ export const loginService = async (form: FormData) => {
         if (!response.ok) {
             await responseErrorServiceHandler(response, "login");
         }
-        const data = (await response.json()) as User;
+        const data = (await response.json()) as AuthResponse;
         console.log("response data =>>>>", data);
         return data;
     } catch (error: any) {

@@ -26,7 +26,7 @@ export default function rubbush_collectors() {
     const [dataList, setDataList] = useState<Notification[]>([]);
     const [usersList, setUsersList] = useState<AppUser[]>([]);
     const [collectorsList, setCollectorsList] = useState<Collector[]>([]);
-    const [selectedAudience, setSelectedAudience] = useState('');
+    const [selectedAudience, setSelectedAudience] = useState("");
     const headerArr = [
         { text: "ID", name: "id" },
         { text: " العنوان ", name: "image" },
@@ -40,7 +40,7 @@ export default function rubbush_collectors() {
         { is_active: "all_users", name: "كل المستخدمين" },
         { is_active: "all_collectors", name: "كل جامعي القمامة" },
         { is_active: "specific_user", name: "مستخدم محدد" },
-        { is_active: "specific_collector ", name: "جامع قمامة محدد" },
+        { is_active: "specific_collector", name: "جامع قمامة محدد" },
     ];
     const [totalPages, setTotalPages] = useState(1);
     const [page, setPage] = useState(1);
@@ -80,13 +80,12 @@ export default function rubbush_collectors() {
 
         const query = `?page=${page}${hasSearch}${isActive}`;
 
-        getNotificationsService(query).then((response) => {
-            setDataList(response.data);
-            setTotalPages(response.meta.last_page);
-        })
-        .catch(() => {
-            
-        })
+        getNotificationsService(query)
+            .then((response) => {
+                setDataList(response.data);
+                setTotalPages(response.meta.last_page);
+            })
+            .catch(() => {});
     };
     const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         fetchDataList({ search: e.target.value });
@@ -163,12 +162,12 @@ export default function rubbush_collectors() {
         fd.append("body_ar", formData.body_ar);
         fd.append("body_en", formData.body_en);
         fd.append("target_audience", formData.target_audience);
-        
+
         if (formData.target_audience === "specific_user") {
-          fd.append("specific_user", selectedAudience);
+            fd.append("specific_user", selectedAudience);
         }
         if (formData.target_audience === "specific_collector") {
-          fd.append("specific_collector", selectedAudience);
+            fd.append("specific_collector", selectedAudience);
         }
 
         addNotificationService(fd)
@@ -203,12 +202,11 @@ export default function rubbush_collectors() {
         const hasSearch = search ? "&search=" + search : "";
         const query = `?page=${page}${hasSearch}`;
 
-        getUserService(query).then((response) => {
-            setUsersList(response.data);
-        })
-        .catch(() => {
-            
-        })
+        getUserService(query)
+            .then((response) => {
+                setUsersList(response.data);
+            })
+            .catch(() => {});
     };
     const fetchCollectorsList = ({
         search = "",
@@ -216,12 +214,11 @@ export default function rubbush_collectors() {
         const hasSearch = search ? "&search=" + search : "";
         const query = `?page=${page}${hasSearch}`;
 
-        getCollectorsService(query).then((response) => {
-            setCollectorsList(response.data);
-        })
-        .catch(() => {
-            
-        })
+        getCollectorsService(query)
+            .then((response) => {
+                setCollectorsList(response.data);
+            })
+            .catch(() => {});
     };
 
     const tableHeadActionsSlot = () => {
@@ -293,8 +290,7 @@ export default function rubbush_collectors() {
                                 ></MultiCheckboxWithSearch>
                             )}
 
-                            {formData.target_audience ===
-                                "specific_collector" && (
+                            {formData.target_audience === "specific_collector" && (
                                 <MultiCheckboxWithSearch
                                     items={collectorsList}
                                     value={selectedAudience}
@@ -377,11 +373,18 @@ export default function rubbush_collectors() {
             </>
         );
     };
+
     useEffect(() => {
         fetchDataList();
+    }, [page]); // runs every time `page` changes
+
+    useEffect(() => {
         fetchUsersList();
         fetchCollectorsList();
-    }, [page]); // runs every time `page` changes
+    }, []);
+    useEffect(() => {
+        console.log('audience =>>', formData.target_audience)
+    }, [formData]);
 
     return (
         <>

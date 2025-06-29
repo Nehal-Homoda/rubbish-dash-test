@@ -34,7 +34,15 @@ export default function rubbush_collectors() {
     ];
     const [totalPages, setTotalPages] = useState(1);
     const [page, setPage] = useState(1);
-    const [districtDays, setDistrictDays] = useState<string[]>([]);
+    const [districtDays, setDistrictDays] = useState([
+        "friday",
+        "tuesday",
+        "thursday",
+        "wednesday",
+        "monday",
+        "saturday",
+        "sunday",
+    ]);
     const [districtTime, setDistrictTime] = useState<string[]>([]);
     const [selectedDataItem, setSelectedDataItem] = useState<District | null>(
         null
@@ -80,17 +88,12 @@ export default function rubbush_collectors() {
 
         const query = `?page=${page}${hasSearch}${isActive}`;
 
-        getDistrictService(query).then((response) => {
-            setDataList(response.data);
-            response.data.map((item, index) => {
-                setDistrictDays(item.available_days);
-                setDistrictTime(item.available_times);
-            });
-            setTotalPages(response.meta.last_page);
-        })
-        .catch(() => {
-            
-        })
+        getDistrictService(query)
+            .then((response) => {
+                setDataList(response.data);
+                setTotalPages(response.meta.last_page);
+            })
+            .catch(() => {});
     };
     const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         fetchDataList({ search: e.target.value });
@@ -213,7 +216,6 @@ export default function rubbush_collectors() {
             })
             .catch((error) => {});
     };
-
 
     const tableHeadActionsSlot = () => {
         return (

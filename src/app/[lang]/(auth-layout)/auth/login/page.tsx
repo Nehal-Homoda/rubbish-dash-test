@@ -2,22 +2,23 @@
 import TextFieldNada from "@/components/ui/form/TextFieldNada";
 import { loginService } from "@/services/authServices";
 import React, { useState } from "react";
-import logoImg from '@/assets/images/login-img.png'
+import logoImg from "@/assets/images/login-img.png";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/stores/store";
+import { login } from "@/stores/authSlice";
 
 export default function AuthLoginPage() {
-
+    const dispatch = useDispatch<AppDispatch>()
     const [formData, setFormData] = useState({
         email: "",
         password: "",
-
-
     });
     const [formDataError, setFormDataError] = useState({
         email: "",
         password: "",
     });
-    const router=useRouter()
+    const router = useRouter();
 
     const inputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData((prev) => ({
@@ -27,26 +28,28 @@ export default function AuthLoginPage() {
     };
 
     const handleLoginSubmit = (e: any) => {
-        e.preventDefault()
-        const fd = new FormData()
-        fd.append('email', formData.email)
-        fd.append('password', formData.password)
+        e.preventDefault();
+        const fd = new FormData();
+        fd.append("email", formData.email);
+        fd.append("password", formData.password);
         // fd.append('phone', formData.phone)
 
         loginService(fd).then((response) => {
-            router.push('/')
-            console.log('login', response)
-        })
+            router.push("/");
+            console.log("login", response);
+            dispatch(login(response))
 
-    }
+        })
+        .catch(error => {
+
+        })
+    };
 
     return (
         <>
             <div className="w-full min-h-screen pt-20">
                 <div className="container">
                     <div className="grid md:grid-cols-2 gap-20">
-
-
                         <div className="col-span-1 pt-28">
                             <h3 className="text-2xl font-bold">
                                 مرحباً بعودتك مرة اخري 👋
@@ -54,10 +57,10 @@ export default function AuthLoginPage() {
                             <p className="text-muted font-semibold">
                                 قم بإدخال بياناتك لتسجيل الدخول
                             </p>
-                            <form onSubmit={handleLoginSubmit} className="pt-20">
-
-
-
+                            <form
+                                onSubmit={handleLoginSubmit}
+                                className="pt-20"
+                            >
                                 <div className="input-wrap mb-14">
                                     <TextFieldNada
                                         errorMessage={formDataError.email}
@@ -108,19 +111,19 @@ export default function AuthLoginPage() {
                                     <Link className="text-surface underline" href={'/auth/reset-password'}>نسيت كلمة المرور؟</Link>
                                 </div> */}
 
-
                                 <button className="base-btn block w-full">
                                     سجل الدخول
                                 </button>
-
                             </form>
                         </div>
                         <div className="col-span-1">
-
                             <div className="w-full h-full">
-                                <img className="w-full h-full object-cover" src={logoImg.src} alt="" />
+                                <img
+                                    className="w-full h-full object-cover"
+                                    src={logoImg.src}
+                                    alt=""
+                                />
                             </div>
-
                         </div>
                     </div>
                 </div>

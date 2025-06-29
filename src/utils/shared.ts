@@ -154,6 +154,13 @@ export const responseErrorServiceHandler = async (
     response: Response,
     serviceMessage: string
 ) => {
+    console.log(response.status)
+     if (response.status === 401) {
+        
+        throw new Error('unauthorized')
+    }
+
+
     const contentType = response.headers.get("content-type");
 
     if (!contentType?.includes("json")) {
