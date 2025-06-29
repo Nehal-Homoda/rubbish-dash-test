@@ -74,7 +74,7 @@ export default function rubbush_collectors({ user }: Props) {
                 return item.user_id == user.id
             })
             setDataList(userPayment)
-            console.log('data is ',dataList)
+           console.log('data is ',dataList)
             // setTotalPages(response.meta.last_page);
         })
             .catch(() => {
