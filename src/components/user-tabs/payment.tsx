@@ -1,5 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { getDistrictService } from "@/services/districtService";
+import { District } from "@/types/district.interface";
 import TextFieldNada from "@/components/ui/form/TextFieldNada";
 import BaseDataTable from "@/components/data-tables/BaseDataTable";
 import UIPrimaryDropdown from "@/components/ui/UIPrimaryDropdown";
@@ -8,118 +10,83 @@ import MultiCheckbox from "@/components/ui/form/MultiCheckbox";
 import SelectInput from "@/components/ui/form/SelectInput";
 import { successDialog } from "@/utils/shared";
 import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
-import trashImg from '@/assets/images/icons/trash.png'
-import editImg from '@/assets/images/icons/edit.png'
-import {
-    addPackageService,
-    deletePackageService,
-
-    updatePackageService,
-} from "@/services/packagesOffersService";
-import { PackageOffer } from "@/types/packagesOffer.interface";
-import { getCategoriesService } from "@/services/categoriesService";
-import { Category } from "@/types/categories.interface";
 import { Payment } from "@/types/payment.interface";
-import { getPaymentService } from "@/services/paymentService";
+import {
+    addPaymentService,
+    deletePaymentService,
+    getPaymentsService,
+    updatePaymentService,
+} from "@/services/paymentsService";
+import { AppUser } from "@/types/user.interface";
 
-export default function rubbush_collectors() {
+
+type Props = {
+    user: AppUser
+}
+
+export default function rubbush_collectors({ user }: Props) {
     const [dataList, setDataList] = useState<Payment[]>([]);
-    const [categories, setCategories] = useState<Category[]>([]);
     const headerArr = [
         { text: "ID", name: "id" },
-        { text: " تاريخ الدفع", name: "category" },
-        { text: "السعر الكلي", name: "total_price" },
-
+        { text: " اسم المستخدم", name: "name_ar" },
+        { text: " رقم الاستلام", name: "name_ar" },
+        { text: " السعر الكلي", name: "name_ar" },
+        { text: " تاريخ الدفع", name: "name_ar" },
         { text: "الحالة", name: "is_active" },
+        { text: " اسم طريقة الدفع", name: "name_ar" },
         { text: "طريقة الدفع", name: "is_active" },
-        { text: "صورة التحويل", name: "" },
-        { text: "االاجراءات", name: "" },
+        { text: "صورة التحويل", name: "image" },
     ];
     const statusList = [
-        { is_active: 1, name: "مفعل" },
-        { is_active: 0, name: "غير مفعل" },
+        { is_active: "pending", name: "قيد الانتظار" },
+        { is_active: "accepted", name: "مقبولة" },
+        { is_active: "rejected", name: "مرفوضة" },
     ];
     const [totalPages, setTotalPages] = useState(1);
     const [page, setPage] = useState(1);
-    const [selectedDataItem, setSelectedDataItem] =
-        useState<PackageOffer | null>(null);
 
-
-
-
+    const [selectedDataItem, setSelectedDataItem] = useState<Payment | null>(
+        null
+    );
     type FormDataType = {
         name_ar: string;
         name_en: string;
-        category_id: number | string;
-        is_active: number;
-        price_per_unit: number | string;
         order: number;
-        days_count: number | string;
+        is_active: number;
+        available_days: string[];
+        available_times: string[];
     };
-
-
-
-    const [formData, setFormData] = useState<FormDataType>({
-        name_ar: "",
-        name_en: "",
-        category_id: "",
-        is_active: 0,
-        price_per_unit: "",
-        order: 0,
-        days_count: "",
-    });
-
-    const [updateFormData, setUpdateFormData] = useState<FormDataType>({
-        name_ar: "",
-        name_en: "",
-        category_id: "",
-        is_active: 0,
-        price_per_unit: "",
-        order: 0,
-        days_count: "",
-    });
-
-
-
 
     const fetchDataList = ({
         search = "",
         is_active = undefined,
-        category_id = undefined,
-    }: {
-        search?: string;
-        is_active?: boolean | undefined;
-        category_id?: number | undefined;
-    } = {}) => {
+    }: { search?: string; is_active?: boolean | undefined } = {}) => {
         console.log(is_active);
-        const isActive =
-            is_active != undefined
-                ? is_active
-                    ? "&is_active=" + 1
-                    : "&is_active=" + 0
-                : "";
-        const category =
-            category_id != undefined ? "&category_id=" + category_id : "";
+        const isActive = is_active ? "&status=" + is_active : "";
         const hasSearch = search ? "&search=" + search : "";
 
-        const query = `?page=${page}${hasSearch}${isActive}${category}`;
+        const query = `?page=${page}${hasSearch}${isActive}`;
 
-        getPaymentService(query).then((response) => {
-            setDataList(response.data);
-            setTotalPages(response.meta.last_page);
-        });
+        getPaymentsService(query).then((response) => {
+            // setDataList(response.data);
+            console.log(response.data)
+            const userPayment = response.data.filter((item, index) => {
+                return item.user_id == user.id
+            })
+            setDataList(userPayment)
+            console.log('data is ',dataList)
+            // setTotalPages(response.meta.last_page);
+        })
+            .catch(() => {
+
+            })
     };
-
 
 
 
     const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         fetchDataList({ search: e.target.value });
     };
-
-
-
-
 
     const updateDataItemActive = (value: any, index: number) => {
         const service = dataList.find((item, i) => {
@@ -129,13 +96,13 @@ export default function rubbush_collectors() {
         if (!service) return;
 
         const body = JSON.stringify({
-            is_active: value,
+            status: value,
         });
 
-        updatePackageService(service.id, body)
+        updatePaymentService(service.id, body)
             .then((response) => {
                 const arr = [...dataList];
-                arr[index].is_active = value;
+                arr[index].status = value;
 
                 setDataList(arr);
 
@@ -144,8 +111,8 @@ export default function rubbush_collectors() {
             .catch((error) => { });
     };
 
-    const deleteSubmit = (item: PackageOffer, selectedIndex: number) => {
-        deletePackageService(item.id)
+    const deleteSubmit = (item: Payment, selectedIndex: number) => {
+        deletePaymentService(item.id)
             .then((response) => {
                 const updatedArr = [...dataList];
                 updatedArr.splice(selectedIndex, 1);
@@ -155,196 +122,29 @@ export default function rubbush_collectors() {
             .catch((error) => { });
     };
 
-    const updateDataItem = (item: PackageOffer) => {
-        setSelectedDataItem(item);
-        setUpdateFormData({
-            name_ar: item.name,
-            name_en: item.name,
-            order: item.order ? item.order : 0,
-            is_active: item.is_active ? 1 : 0,
-            category_id: "",
-            days_count: item.days_count ? parseInt(item.days_count) : "",
-            price_per_unit: item.price_per_unit
-                ? parseInt(item.price_per_unit)
-                : "",
-        });
+
+
+    const statusDropdownColor = (name: string) => {
+        if (name === "rejected")
+            return "bg-red-100 text-red-600 hover:bg-text-red-200";
+        if (name === "accepted") return undefined;
+        if (name === "pending")
+            return "bg-yellow-100 text-yellow-600 hover:bg-text-yellow-200";
     };
-
-    const updateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-
-        if (!selectedDataItem) return;
-
-        const body = JSON.stringify({
-            ...updateFormData,
-        });
-
-        updatePackageService(selectedDataItem.id, body)
-            .then((response) => {
-                fetchDataList();
-                successDialog(true);
-            })
-            .catch((error) => { });
-    };
-
-    const addFormChangeHander = (
-        e: React.ChangeEvent<HTMLInputElement>,
-        index?: number
-    ) => {
-        setFormData((prev) => ({
-            ...prev,
-            [e.target.name]: e.target.value,
-        }));
-
-        console.log(e.target.name, e.target.value);
-    };
-    const updateFormChangeHander = (
-        e: React.ChangeEvent<HTMLInputElement>,
-        index?: number
-    ) => {
-        setUpdateFormData((prev) => ({
-            ...prev,
-            [e.target.name]: e.target.value,
-        }));
-
-        console.log(e.target.name, e.target.value);
-    };
-
-    const createSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-
-        const fd = new FormData();
-
-        for (const keyName in formData) {
-            //@ts-ignore
-            fd.append(keyName, formData[keyName]);
-        }
-
-        addPackageService(fd)
-            .then((response) => {
-                fetchDataList();
-                //@ts-ignore
-                successDialog(true);
-                setFormData({
-                    name_ar: "",
-                    name_en: "",
-                    category_id: 0,
-                    is_active: 0,
-                    price_per_unit: 0,
-                    order: 0,
-                    days_count: 0,
-                });
-            })
-            .catch((error) => { });
+    const statusDropdownName = (name: string) => {
+        return statusList.find((item) => item.is_active === name)?.name ?? "";
     };
 
     const tableHeadActionsSlot = () => {
         return (
             <>
 
-                <UIBaseDialog
-                    title="اضافة دفع"
-                    confirmHandler={() => { }}
-                    confirmText="اضافة"
-                    form="update-form"
-                    btn={
-                        <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
-                            <button className="bg-[#0094140D] p-1 rounded-lg">
-                                اضافة دفع
-                            </button>
-                        </div>
-                    }
-                >
-                    <form onSubmit={createSubmit} id="update-form">
-                        <div className="space-y-7">
-                            <TextFieldNada
-                                name="name_ar"
-                                type="text"
-                                handleChange={addFormChangeHander}
-                                value={formData.name_ar}
-                                label=" اسم الباقة ( عربي ) "
-                                placeholder=" اسم الباقة  "
-                            ></TextFieldNada>
 
-                            <TextFieldNada
-                                name="name_en"
-                                type="text"
-                                handleChange={addFormChangeHander}
-                                value={formData.name_en}
-                                label=" اسم الباقة ( انجليزي ) "
-                                placeholder=" اسم الباقة  "
-                            ></TextFieldNada>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <div className="col-span-1">
-                                    <SelectInput
-                                        value={formData.category_id}
-                                        items={categories}
-                                        itemName="name_ar"
-                                        itemValue="id"
-                                        label="نوع الخدمة"
-                                        placeholder="اختر نوع الخدمة"
-                                        name="category_id"
-                                        required={true}
-                                        onChange={(value) => {
-                                            setFormData((prev) => ({
-                                                ...prev,
-                                                ["category_id"]: value,
-                                            }));
-                                        }}
-                                    ></SelectInput>
-                                </div>
-                                <div className="col-span-1">
-                                    <SelectInput
-                                        value={formData.is_active}
-                                        items={statusList}
-                                        itemName="name"
-                                        itemValue="is_active"
-                                        label="الحالة"
-                                        placeholder="اختر الحالة"
-                                        name="is_active"
-                                        required={true}
-                                        onChange={(value) => {
-                                            setFormData((prev) => ({
-                                                ...prev,
-                                                ["is_active"]: value,
-                                            }));
-                                        }}
-                                    ></SelectInput>
-                                </div>
-                            </div>
-                            <TextFieldNada
-                                name="price_per_unit"
-                                type="number"
-                                handleChange={addFormChangeHander}
-                                value={formData.price_per_unit}
-                                label=" سعر الوحدة"
-                                placeholder=" ادخل سعر الوحدة "
-                            ></TextFieldNada>
-                            <TextFieldNada
-                                name="days_count"
-                                type="number"
-                                handleChange={addFormChangeHander}
-                                value={formData.days_count}
-                                label=" مدة الباقة "
-                                placeholder=" ادخل مدة الباقة  "
-                            ></TextFieldNada>
-                        </div>
-                    </form>
-                </UIBaseDialog>
             </>
         );
     };
-    const fetchCategories = () => {
-        getCategoriesService()
-            .then((response) => {
-                setCategories(response.data);
-            })
-            .catch((error) => { });
-    };
     useEffect(() => {
         fetchDataList();
-        fetchCategories();
     }, [page]); // runs every time `page` changes
 
     return (
@@ -360,29 +160,59 @@ export default function rubbush_collectors() {
                     {dataList.map((item, index) => (
                         <tr key={index}>
                             <td className="py-2 px-4">{item.id}</td>
-
-                            <td className="py-2 px-4">{item.created_at}</td>
+                            <td className="py-2 px-4">{item.user_name}</td>
+                            <td className="py-2 px-4">
+                                {item.receiving_number}
+                            </td>
                             <td className="py-2 px-4">{item.total_price}</td>
-
+                            <td className="py-2 px-4">{item.created_at}</td>
                             <td className="py-2 px-4">
-                              {item.status}
+                                <UIPrimaryDropdown
+                                    tiny={true}
+                                    itemName="name"
+                                    itemValue="is_active"
+                                    btnColorTailwindClass={statusDropdownColor(
+                                        item.status
+                                    )}
+                                    onSelected={(value) => {
+                                        updateDataItemActive(value, index);
+                                    }}
+                                    items={statusList}
+                                >
+                                    {statusDropdownName(item.status)}
+                                </UIPrimaryDropdown>
                             </td>
-
                             <td className="py-2 px-4">
-                                <div className="w-10 h-10 rounded-full ">
-                                    <img className="w-full h-full object-contain" src={item.payment_method.image} alt="" />
+                                {item.payment_method?.name_ar ?? "-"}
+                            </td>
+                            <td className="py-2 px-4">
+                                <div className="w-10 h-10 overflow-hidden">
+                                    <img
+                                        src={item.payment_method.image}
+                                        alt=""
+                                        className="w-full h-full object-contain"
+                                    />
                                 </div>
-
                             </td>
-
-
 
                             <td className="">
-                                <div className=" flex justify-center gap-3">
-                                  
+                                <div className="flex justify-center gap-3">
+                                    <UIDialogConfirm
+                                        danger
+                                        title="هل انت متأكد من حذف العنصر"
+                                        confirmHandler={() => {
+                                            deleteSubmit(item, index);
+                                        }}
+                                    >
+                                        <button className="bg-[#F9285A0A] p-1 px-2 rounded-lg">
+                                            <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
+                                        </button>
+                                    </UIDialogConfirm>
+                                    <button className="bg-green-100 p-1 px-2 rounded-lg">
+                                        <span className="mdi mdi-download text-green-600"></span>
+                                    </button>
                                 </div>
                             </td>
-
                         </tr>
                     ))}
                 </BaseDataTable>

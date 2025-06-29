@@ -73,7 +73,7 @@ export default function page({ params }: { params: Promise<{ id: number }> }) {
 
           {type == 'personal-data' && user && <PersonalData user={user} />}
           {type == 'subscription' && user && <Subscription user={user} />}
-          {type == 'payment' && user && <Payment />}
+          {type == 'payment' && user && <Payment user={user} />}
          
         </div>
 

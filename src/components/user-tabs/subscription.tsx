@@ -372,9 +372,9 @@ export default function subscription({ user }: Props) {
                                 </div>
                               </div>
                               {checked ? (
-                                <div className="shrink-0 w-4 h-4 rounded-full ring-1 ring-surface text-surface flex justify-center items-center text-xs">
+                                <div className="before:absolute before:content-[''] before:w-3 before:h-3 before:rounded-full before:bg-[#009414]  shrink-0 w-4 h-4 rounded-full ring-1 ring-surface text-surface flex justify-center items-center text-xs">
                                   {/* <CheckIcon className="h-6 w-6" /> */}
-                                  <span className="mdi mdi-check"></span>
+                                  {/* <span className="mdi mdi-check"></span> */}
                                 </div>
                               )
                                 :
