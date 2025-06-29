@@ -6,12 +6,14 @@ interface InitialState {
     user: null | User;
     token: null | string;
     isLoggedIn: boolean;
+    isEnter: boolean;
 }
 
 const initialState: InitialState = {
     user: null,
     token: null,
     isLoggedIn: false,
+    isEnter: false,
 };
 
 export const authSlice = createSlice({
@@ -38,9 +40,10 @@ export const authSlice = createSlice({
                 const storedToken = Cookies.get("token");
                 if (storedUser && storedToken) {
                     state.user = JSON.parse(storedUser);
-                    state.token = JSON.parse(storedToken);
+                    state.token = storedToken;
                     state.isLoggedIn = true;
                 }
+                state.isEnter = true;
             } catch (error: any) {
                 state.user = null;
                 state.token = null;
@@ -48,6 +51,7 @@ export const authSlice = createSlice({
                 Cookies.remove("token");
                 state.isLoggedIn = false;
                 console.log("Enter error ", error.message);
+                state.isEnter = true;
             }
         },
     },

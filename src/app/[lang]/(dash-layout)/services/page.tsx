@@ -19,6 +19,7 @@ import {
 import { Category } from "@/types/categories.interface";
 import FileInput from "@/components/ui/form/FileInput";
 import FileInputImg from "@/components/ui/form/FileInputImg";
+import { useRouter } from "next/navigation";
 
 export default function rubbush_collectors() {
     const [dataList, setDataList] = useState<Category[]>([]);
@@ -39,6 +40,7 @@ export default function rubbush_collectors() {
     const [selectedDataItem, setSelectedDataItem] = useState<Category | null>(
         null
     );
+    const router = useRouter()
     type FormDataType = {
         name_ar: string;
         name_en: string;
@@ -81,8 +83,10 @@ export default function rubbush_collectors() {
             setDataList(response.data);
             setTotalPages(response.meta.last_page);
         })
-        .catch(() => {
-            
+        .catch((error) => {
+                // if (error.message === 'unauthorized') {
+                //     router.replace('/auth/login')
+                // }
         })
     };
     const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {

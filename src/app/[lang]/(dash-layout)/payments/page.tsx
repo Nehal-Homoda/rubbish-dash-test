@@ -232,7 +232,7 @@ export default function rubbush_collectors() {
                 >
                     الحالة
                 </UIPrimaryDropdown>
-                <UIBaseDialog
+                {/* <UIBaseDialog
                     title="اضافة منطقه"
                     confirmHandler={() => {}}
                     confirmText="اضافة"
@@ -322,7 +322,7 @@ export default function rubbush_collectors() {
                             ></SelectInput>
                         </div>
                     </form>
-                </UIBaseDialog>
+                </UIBaseDialog> */}
             </>
         );
     };

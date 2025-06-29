@@ -1,7 +1,8 @@
 import Cookies from "js-cookie";
 
 export const APP_API_HEADERS = (): HeadersInit => {
-  const token = Cookies.get("token") || process.env.NEXT_PUBLIC_TOKEN;
+  // const token = Cookies.get("token") || process.env.NEXT_PUBLIC_TOKEN;
+  const token = process.env.NEXT_PUBLIC_TOKEN;
   console.log("token get ===> ", token);
 
   return {
