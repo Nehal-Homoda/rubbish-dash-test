@@ -43,3 +43,4 @@ export const updateSettingService = async (body: string) => {
         throw new Error(error.message);
     }
 };
+

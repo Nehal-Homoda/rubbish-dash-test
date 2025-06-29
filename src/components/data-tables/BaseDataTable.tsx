@@ -85,7 +85,7 @@ export default function ({
                         </div>
                     </div>
 
-                    <div className="w-full overflow-x-auto">
+                    <div className="w-full overflow-x-auto min-h-[350px]">
                         <table
                             id="default-table"
                             className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400"

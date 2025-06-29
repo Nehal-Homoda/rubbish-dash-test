@@ -94,3 +94,22 @@ export const registerService = async (form: FormData) => {
     }
 };
 
+
+
+export const meService = async () => {
+    try {
+        const response = await apiCall.get(`/admins/auth/me`, {
+            headers: {
+                // "Content-Type": "application/json",
+            },
+        });
+        if (!response.ok) {
+            await responseErrorServiceHandler(response, "me");
+        }
+        const data = (await response.json()) as AuthResponse;
+        console.log("response data =>>>>", data);
+        return data;
+    } catch (error: any) {
+        throw new Error(error.message);
+    }
+};
