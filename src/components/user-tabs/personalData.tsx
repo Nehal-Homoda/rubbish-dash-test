@@ -3,6 +3,8 @@ import TextFieldNada from '../ui/form/TextFieldNada'
 import {  Users } from '@/types/auth.interface'
 import { updateUserService } from '@/services/userService'
 import { AppUser } from '@/types/user.interface'
+import { useRouter } from 'next/navigation'
+import { successDialog } from '@/utils/shared'
 
 //@ts-ignore
 
@@ -22,6 +24,8 @@ export default function personalData({ user }: Props) {
 
   })
 
+  const router=useRouter()
+
   useEffect(() => {
     setFormData({
       //@ts-ignore
@@ -39,6 +43,10 @@ export default function personalData({ user }: Props) {
     })
     //@ts-ignore
     updateUserService(user.id, body).then((response) => {
+      
+       successDialog(true);
+      // router.push('/users')
+      
       console.log(response)
     })
   }
@@ -93,6 +101,7 @@ export default function personalData({ user }: Props) {
 
 
         <div className="mt-4 flex items-center justify-center gap-4">
+          
           <button
             type="submit"
             className="base-btn min-w-[200px]"

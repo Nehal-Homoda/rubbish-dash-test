@@ -258,15 +258,15 @@ export default function subscription({ user }: Props) {
     <div>
 
 
-      <div className="py-20">
+      <div className="">
 
-        <div className="grid grid-cols-12 gap-7">
-
-
+        <div className="grid grid-cols-12 gap-10">
 
 
-          <div className="py-6 ">
-            <ToggleSwitch disabled
+
+
+          <div className="py-14 ">
+            <ToggleSwitch  disabled
               checked={formData.has_subscription}
               label="مشترك"
               onChange={() => {}}
@@ -336,7 +336,7 @@ export default function subscription({ user }: Props) {
               <div className='col-span-12'>
                 <RadioGroup value={formData.payment.payment_method}  >
                   <RadioGroup.Label className="sr-only">Server size</RadioGroup.Label>
-                  <div className="grid grid-cols-2">
+                  <div className="grid grid-cols-2 gap-10">
                     {paymentMethodList.map((item) => (
                       <RadioGroup.Option
                         key={item.name_ar}
@@ -393,7 +393,7 @@ export default function subscription({ user }: Props) {
               </div>
 
 
-              <div className="col-span-6">
+              <div className="col-span-12">
                 <TextFieldNada
                   name="address"
                   type="text"
@@ -429,8 +429,8 @@ export default function subscription({ user }: Props) {
                 ></TextFieldNada>
               </div>
 
-              <div className="col-span-6">
-                <FileInputImg onFileChange={() => { }} state="add" title="ارفاق صورة التحويل" />
+              <div className="col-span-12">
+                <FileInputImg disabled={true} onFileChange={() => { }} state="add" title="ارفاق صورة التحويل" />
               </div>
 
             </>
@@ -438,85 +438,6 @@ export default function subscription({ user }: Props) {
 
 
           }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-          {/* <div className="col-span-6">
-            <TextFieldNada
-              name="price"
-              type="number"
-              handleChange={(e) => takeValue(e, "price")}
-              value={totalPrice.toString()}
-              label="السعر الكلي *"
-              placeholder="  السعر الكلي *"
-            ></TextFieldNada>
-          </div> */}
-
-
-
-
-
-
-
-          {/* <div className="col-span-6">
-            <MultiCheckbox
-              items={districtTime}
-              value={formData.available_times}
-              label="الوقت"
-              required={true}
-              name="available_times"
-              placeholder="اختر الوقت"
-              prependIcon="mdi mdi-calendar-month-outline"
-              iconType="mdi"
-              onChange={(value) => {
-                setFormData((prev) => ({
-                  ...prev,
-                  ["available_times"]: value,
-                }));
-              }}
-            ></MultiCheckbox>
-          </div> */}
-
-
-
-          {/* // setFormData((prev) => ({
-    //   ...prev,
-    //   payment: [...prev.payment,
-
-    //   ['payment_method']: selectedPayment.id
-
-    //   ]
-    // })) */}
-
-
-
-
-
-
-
-
-
-
-
-
 
 
         </div>

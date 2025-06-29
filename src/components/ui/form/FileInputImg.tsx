@@ -10,6 +10,7 @@ interface FileInputProps {
     state: "edit" | "add" | "addToTable";
     onFileChange: (args?: { file?: File; file64?: string }) => void;
     handleRemoveImage?: () => void;
+    disabled?: boolean;
 }
 
 export default function FileInputImg({
@@ -18,7 +19,8 @@ export default function FileInputImg({
     fileUrl,
     state = "add",
     onFileChange,
-    handleRemoveImage = () => {},
+    disabled,
+    handleRemoveImage = () => { },
 }: FileInputProps) {
     const [fileName, setFileName] = useState("");
     const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -80,13 +82,12 @@ export default function FileInputImg({
             <div className="">
                 {title && <p className="text-foreground mb-5">{title}</p>}
                 <div
-                    className={`relative  ${
-                        state === "add"
+                    className={`relative  ${state === "add"
                             ? "border-2 border-dashed rounded-lg "
                             : " rounded-2xl shadow-[0_0_0.5625rem_0.4375rem_rgb(0,0,0,0.07)] text-center"
-                    } w-fit`}
+                        } w-fit`}
                 >
-                    <input
+                    <input disabled={disabled}
                         type="file"
                         className="size-full w-full absolute top-0 left-0 right-0 z-10 opacity-0 cursor-pointer "
                         onChange={handleFileChange}
@@ -95,9 +96,8 @@ export default function FileInputImg({
                     />
 
                     <div
-                        className={` relative  flex items-center justify-center ${
-                            state === "add" ? " w-80 h-24" : " w-36 h-28"
-                        } gap-1 `}
+                        className={` relative  flex items-center justify-center ${state === "add" ? " w-80 h-24" : " w-36 h-28"
+                            } gap-1 `}
                     >
                         {state === "add" && !imageUrl && (
                             <>
@@ -112,9 +112,8 @@ export default function FileInputImg({
                                 <img
                                     src={imageUrl}
                                     alt={fileName}
-                                    className={`w-full h-full object-contain ${
-                                        state === "add" ? "" : "rounded-2xl"
-                                    } `}
+                                    className={`w-full h-full object-contain ${state === "add" ? "" : "rounded-2xl"
+                                        } `}
                                 />
                             )}
                         </>
