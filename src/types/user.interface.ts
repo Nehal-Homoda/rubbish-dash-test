@@ -1,6 +1,6 @@
 
 
-export interface IsUser {
+export interface AppUser {
     id:number,
     name: string;
     phone: string;

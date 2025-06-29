@@ -80,7 +80,10 @@ export default function rubbush_collectors() {
         getBannersService(query).then((response) => {
             setDataList(response.data);
             setTotalPages(response.meta.last_page);
-        });
+        })
+        .catch(() => {
+            
+        })
     };
     const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         fetchDataList({ search: e.target.value });
@@ -123,12 +126,12 @@ export default function rubbush_collectors() {
     const updateDataItem = (item: Banner) => {
         setSelectedDataItem(item);
         setUpdateFormData({
-            title_ar: item.title,
-            title_en: item.title,
-            order: item.order,
-            link: item.link,
+            title_ar: item.title ?? '',
+            title_en: item.title ?? '',
+            order: item.order  ?? 0,
+            link: item.link  ?? '',
             is_active: item.is_active ? 1 : 0,
-            image: item.image,
+            image: item.image  ?? '',
         });
     };
 
@@ -369,7 +372,7 @@ export default function rubbush_collectors() {
                                         </button>
                                     </UIDialogConfirm>
                                     <UIBaseDialog
-                                        title="تعديل الالاشاد"
+                                        title="تعديل اللافتة"
                                         confirmHandler={() => {}}
                                         confirmText="اضافة"
                                         form="update-form"

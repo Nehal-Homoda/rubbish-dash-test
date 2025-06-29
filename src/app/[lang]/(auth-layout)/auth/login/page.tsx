@@ -1,8 +1,6 @@
 "use client";
 import TextFieldNada from "@/components/ui/form/TextFieldNada";
-import UIBtn from "@/components/ui/UIBtn";
 import { loginService } from "@/services/authServices";
-import Link from "next/link";
 import React, { useState } from "react";
 import logoImg from '@/assets/images/login-img.png'
 import { useRouter } from "next/navigation";
@@ -28,12 +26,12 @@ export default function AuthLoginPage() {
         }));
     };
 
-    const handleLoginSubmit = (e) => {
+    const handleLoginSubmit = (e: any) => {
         e.preventDefault()
         const fd = new FormData()
         fd.append('email', formData.email)
         fd.append('password', formData.password)
-        fd.append('phone', formData.phone)
+        // fd.append('phone', formData.phone)
 
         loginService(fd).then((response) => {
             router.push('/')

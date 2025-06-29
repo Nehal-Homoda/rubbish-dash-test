@@ -1,15 +1,14 @@
 import { responseErrorServiceHandler } from "@/utils/shared";
 import { apiCall } from "./apiCall";
 import { ResponseData } from "@/types/shared";
-import { District } from "@/types/district.interface";
-import { Region } from "@/types/regions.interface";
+import { Notification } from "@/types/notifications.interface";
 
 let token = "Bearer 160|9eiDkr7DC2EryTIiZbQbO5CoJoxE7X88IPHqcNGs7f3d3254";
 
-export const getDistrictService = async (query?: string) => {
+export const getNotificationsService = async (query?: string) => {
     try {
         const response = await apiCall.get(
-            `/admins/districts${decodeURIComponent(query || "")}`,
+            `/admins/notifications${decodeURIComponent(query || "")}`,
             {
                 headers: {
                     // "Content-Type": "application/json",
@@ -17,43 +16,43 @@ export const getDistrictService = async (query?: string) => {
             }
         );
         if (!response.ok) {
-            await responseErrorServiceHandler(response, "district");
+            await responseErrorServiceHandler(response, "notifications");
         }
-        const data = (await response.json()) as ResponseData<District[]>;
+        const data = (await response.json()) as ResponseData<Notification[]>;
         console.log("response data =>>>>", data);
         return data;
     } catch (error: any) {
         throw new Error(error.message);
     }
 };
-
-export const addDistrictService = async (form: FormData) => {
+export const addNotificationService = async (form: FormData) => {
     try {
-        const response = await apiCall.post(`/admins/districts`, {
+        const response = await apiCall.post(`/admins/notifications`, {
             body: form,
             headers: {
                 // "Content-Type": "application/json",
             },
         });
         if (!response.ok) {
-            await responseErrorServiceHandler(response, "add district");
+            await responseErrorServiceHandler(response, "add service");
         }
-        const data = (await response.json()) as ResponseData<District>;
+        const data = (await response.json()) as ResponseData<Notification>;
         console.log("response data =>>>>", data);
         return data;
     } catch (error: any) {
         throw new Error(error.message);
     }
 };
-export const deleteDistrictService = async (id: number) => {
+export const deleteNotificationService = async (id: number) => {
     try {
-        const response = await apiCall.delete("/admins/districts", id, {
+        const response = await apiCall.delete("/admins/notifications", id, {
             headers: {
-                // "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
             },
         });
         if (!response.ok) {
-            await responseErrorServiceHandler(response, "delete district");
+            await responseErrorServiceHandler(response, "delete user");
         }
         const data = await response.json();
         console.log("response data =>>>>", data);
@@ -62,18 +61,18 @@ export const deleteDistrictService = async (id: number) => {
         throw new Error(error.message);
     }
 };
-export const updateDistrictService = async (id: number, body: string) => {
+export const updateNotificationService = async (id: number, body: string) => {
     try {
-        const response = await apiCall.put("/admins/districts", id, {
+        const response = await apiCall.put("/admins/notifications", id, {
             body: body,
             headers: {
                 "Content-Type": "application/json",
             },
         });
         if (!response.ok) {
-            await responseErrorServiceHandler(response, "update district");
+            await responseErrorServiceHandler(response, "update user");
         }
-        const data = (await response.json()) as ResponseData<District>;
+        const data = (await response.json()) as ResponseData<Notification>;
         console.log("response data =>>>>", data);
         return data;
     } catch (error: any) {

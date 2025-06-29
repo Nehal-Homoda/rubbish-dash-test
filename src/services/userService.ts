@@ -1,7 +1,8 @@
 import { responseErrorServiceHandler } from "@/utils/shared";
 import { apiCall } from "./apiCall";
-import {  IsUser, User, Users } from "@/types/auth.interface";
+import {  User, Users } from "@/types/auth.interface";
 import { ResponseData } from "@/types/shared";
+import { AppUser } from "@/types/user.interface";
 
 let token = "Bearer 160|9eiDkr7DC2EryTIiZbQbO5CoJoxE7X88IPHqcNGs7f3d3254";
 
@@ -18,7 +19,7 @@ export const getUserService = async (query?: string) => {
         if (!response.ok) {
             await responseErrorServiceHandler(response, "district");
         }
-        const data = (await response.json()) as ResponseData<Users[]>;
+        const data = (await response.json()) as ResponseData<AppUser[]>;
         console.log("response data =>>>>", data);
         return data;
     } catch (error: any) {
@@ -38,7 +39,7 @@ export const getUserByIdService = async (id:number) => {
         if (!response.ok) {
             await responseErrorServiceHandler(response, "district");
         }
-        const data = (await response.json()) as ResponseData<IsUser>;
+        const data = (await response.json()) as ResponseData<AppUser>;
         console.log("response data =>>>>", data);
         return data;
     } catch (error: any) {

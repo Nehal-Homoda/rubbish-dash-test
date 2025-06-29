@@ -15,7 +15,7 @@ export const getPackagesService = async (query?: string) => {
         if (!response.ok) {
             await responseErrorServiceHandler(response, "packages");
         }
-        const data = (await response.json()) as ResponseData<PackageOffer[] | PackageOffer>;
+        const data = (await response.json()) as ResponseData<PackageOffer[]>;
         console.log("response data =>>>>", data);
         return data;
     } catch (error: any) {

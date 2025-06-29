@@ -1,13 +1,5 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Checkbox, Label } from "flowbite-react";
-import { Radio } from "flowbite-react";
-import {
-    addDistrictService,
-    deleteDistrictService,
-    updateDistrictService,
-} from "@/services/districtService";
-
 import { getDistrictService } from "@/services/districtService";
 import { District } from "@/types/district.interface";
 import TextFieldNada from "@/components/ui/form/TextFieldNada";
@@ -18,25 +10,37 @@ import MultiCheckbox from "@/components/ui/form/MultiCheckbox";
 import SelectInput from "@/components/ui/form/SelectInput";
 import { successDialog } from "@/utils/shared";
 import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
+import { Payment } from "@/types/payment.interface";
+import {
+    addPaymentService,
+    deletePaymentService,
+    getPaymentsService,
+    updatePaymentService,
+} from "@/services/paymentsService";
 
 export default function rubbush_collectors() {
-    const [dataList, setDataList] = useState<District[]>([]);
+    const [dataList, setDataList] = useState<Payment[]>([]);
     const headerArr = [
         { text: "ID", name: "id" },
-        { text: " اسم المنطقة", name: "name_ar" },
-        { text: " عدد الاشتراكات", name: "no_of_subscriptions" },
+        { text: " اسم المستخدم", name: "name_ar" },
+        { text: " رقم الاستلام", name: "name_ar" },
+        { text: " السعر الكلي", name: "name_ar" },
+        { text: " تاريخ الدفع", name: "name_ar" },
         { text: "الحالة", name: "is_active" },
-        { text: "الاجراءات", name: "image" },
+        { text: " اسم طريقة الدفع", name: "name_ar" },
+        { text: "طريقة الدفع", name: "is_active" },
+        { text: "صورة التحويل", name: "image" },
     ];
     const statusList = [
-        { is_active: 1, name: "مفعل" },
-        { is_active: 0, name: "غير مفعل" },
+        { is_active: "pending", name: "قيد الانتظار" },
+        { is_active: "accepted", name: "مقبولة" },
+        { is_active: "rejected", name: "مرفوضة" },
     ];
     const [totalPages, setTotalPages] = useState(1);
     const [page, setPage] = useState(1);
     const [districtDays, setDistrictDays] = useState<string[]>([]);
     const [districtTime, setDistrictTime] = useState<string[]>([]);
-    const [selectedDataItem, setSelectedDataItem] = useState<District | null>(
+    const [selectedDataItem, setSelectedDataItem] = useState<Payment | null>(
         null
     );
     type FormDataType = {
@@ -70,24 +74,18 @@ export default function rubbush_collectors() {
         is_active = undefined,
     }: { search?: string; is_active?: boolean | undefined } = {}) => {
         console.log(is_active);
-        const isActive =
-            is_active != undefined
-                ? is_active
-                    ? "&is_active=" + 1
-                    : "&is_active=" + 0
-                : "";
+        const isActive = is_active ? "&status=" + is_active : "";
         const hasSearch = search ? "&search=" + search : "";
 
         const query = `?page=${page}${hasSearch}${isActive}`;
 
-        getDistrictService(query).then((response) => {
+        getPaymentsService(query).then((response) => {
             setDataList(response.data);
-            response.data.map((item, index) => {
-                setDistrictDays(item.available_days);
-                setDistrictTime(item.available_times);
-            });
             setTotalPages(response.meta.last_page);
-        });
+        })
+        .catch(() => {
+            
+        })
     };
     const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         fetchDataList({ search: e.target.value });
@@ -101,13 +99,13 @@ export default function rubbush_collectors() {
         if (!service) return;
 
         const body = JSON.stringify({
-            is_active: value,
+            status: value,
         });
 
-        updateDistrictService(service.id, body)
+        updatePaymentService(service.id, body)
             .then((response) => {
                 const arr = [...dataList];
-                arr[index].is_active = value;
+                arr[index].status = value;
 
                 setDataList(arr);
 
@@ -116,8 +114,8 @@ export default function rubbush_collectors() {
             .catch((error) => {});
     };
 
-    const deleteSubmit = (item: District, selectedIndex: number) => {
-        deleteDistrictService(item.id)
+    const deleteSubmit = (item: Payment, selectedIndex: number) => {
+        deletePaymentService(item.id)
             .then((response) => {
                 const updatedArr = [...dataList];
                 updatedArr.splice(selectedIndex, 1);
@@ -127,16 +125,16 @@ export default function rubbush_collectors() {
             .catch((error) => {});
     };
 
-    const updateDataItem = (item: District) => {
-        setSelectedDataItem(item);
-        setUpdateFormData({
-            name_ar: item.name_ar,
-            name_en: item.name_en,
-            order: item.order,
-            is_active: item.is_active ? 1 : 0,
-            available_days: item.available_days,
-            available_times: item.available_times,
-        });
+    const updateDataItem = (item: Payment) => {
+        // setSelectedDataItem(item);
+        // setUpdateFormData({
+        //     name_ar: item.name_ar,
+        //     name_en: item.name_en,
+        //     order: item.order,
+        //     is_active: item.is_active ? 1 : 0,
+        //     available_days: item.available_days,
+        //     available_times: item.available_times,
+        // });
     };
 
     const updateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -148,7 +146,7 @@ export default function rubbush_collectors() {
             ...updateFormData,
         });
 
-        updateDistrictService(selectedDataItem.id, body)
+        updatePaymentService(selectedDataItem.id, body)
             .then((response) => {
                 fetchDataList();
                 successDialog(true);
@@ -194,7 +192,7 @@ export default function rubbush_collectors() {
         );
         fd.append("is_active", formData.is_active.toString());
 
-        addDistrictService(fd)
+        addPaymentService(fd)
             .then((response) => {
                 fetchDataList();
                 //@ts-ignore
@@ -210,11 +208,30 @@ export default function rubbush_collectors() {
             })
             .catch((error) => {});
     };
-
+    const statusDropdownColor = (name: string) => {
+        if (name === "rejected")
+            return "bg-red-100 text-red-600 hover:bg-text-red-200";
+        if (name === "accepted") return undefined;
+        if (name === "pending")
+            return "bg-yellow-100 text-yellow-600 hover:bg-text-yellow-200";
+    };
+    const statusDropdownName = (name: string) => {
+        return statusList.find((item) => item.is_active === name)?.name ?? "";
+    };
 
     const tableHeadActionsSlot = () => {
         return (
             <>
+                <UIPrimaryDropdown
+                    items={statusList}
+                    itemName="name"
+                    itemValue="is_active"
+                    onSelected={(value) => {
+                        fetchDataList({ is_active: value });
+                    }}
+                >
+                    الحالة
+                </UIPrimaryDropdown>
                 <UIBaseDialog
                     title="اضافة منطقه"
                     confirmHandler={() => {}}
@@ -326,29 +343,41 @@ export default function rubbush_collectors() {
                     {dataList.map((item, index) => (
                         <tr key={index}>
                             <td className="py-2 px-4">{item.id}</td>
-
-                            <td className="py-2 px-4">{item.name_ar}</td>
+                            <td className="py-2 px-4">{item.user_name}</td>
                             <td className="py-2 px-4">
-                                {item.no_of_subscriptions}
+                                {item.receiving_number}
                             </td>
+                            <td className="py-2 px-4">{item.total_price}</td>
+                            <td className="py-2 px-4">{item.created_at}</td>
                             <td className="py-2 px-4">
                                 <UIPrimaryDropdown
                                     tiny={true}
                                     itemName="name"
                                     itemValue="is_active"
-                                    btnColorTailwindClass={
-                                        !item.is_active
-                                            ? "bg-red-100 text-red-600 hover:bg-text-red-200"
-                                            : undefined
-                                    }
+                                    btnColorTailwindClass={statusDropdownColor(
+                                        item.status
+                                    )}
                                     onSelected={(value) => {
                                         updateDataItemActive(value, index);
                                     }}
                                     items={statusList}
                                 >
-                                    {item.is_active ? "مفعل" : "غير مفعل"}
+                                    {statusDropdownName(item.status)}
                                 </UIPrimaryDropdown>
                             </td>
+                            <td className="py-2 px-4">
+                                {item.payment_method?.name_ar ?? "-"}
+                            </td>
+                            <td className="py-2 px-4">
+                                <div className="w-10 h-10 overflow-hidden">
+                                    <img
+                                        src={item.payment_method.image}
+                                        alt=""
+                                        className="w-full h-full object-contain"
+                                    />
+                                </div>
+                            </td>
+
                             <td className="">
                                 <div className="flex justify-center gap-3">
                                     <UIDialogConfirm
@@ -358,134 +387,13 @@ export default function rubbush_collectors() {
                                             deleteSubmit(item, index);
                                         }}
                                     >
-                                        <button className="bg-[#F9285A0A] p-1 rounded-lg">
+                                        <button className="bg-[#F9285A0A] p-1 px-2 rounded-lg">
                                             <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
                                         </button>
                                     </UIDialogConfirm>
-                                    <UIBaseDialog
-                                        title="تعديل منطقه"
-                                        confirmHandler={() => {}}
-                                        confirmText="اضافة"
-                                        form="update-form"
-                                        btn={
-                                            <button
-                                                onClick={() => {
-                                                    updateDataItem(item);
-                                                }}
-                                                className="bg-[#0094140D] p-1 rounded-lg"
-                                            >
-                                                <span className="mdi mdi-folder-edit-outline text-[#009414]"></span>
-                                            </button>
-                                        }
-                                    >
-                                        <form
-                                            onSubmit={updateSubmit}
-                                            id="update-form"
-                                        >
-                                            <div className="space-y-7">
-                                                <TextFieldNada
-                                                    name="name_ar"
-                                                    type="text"
-                                                    handleChange={
-                                                        updateFormChangeHander
-                                                    }
-                                                    value={
-                                                        updateFormData.name_ar
-                                                    }
-                                                    label=" اسم المنطقة ( عربي ) "
-                                                    placeholder=" اسم المنطقة  "
-                                                ></TextFieldNada>
-
-                                                <TextFieldNada
-                                                    name="name_en"
-                                                    type="text"
-                                                    handleChange={
-                                                        updateFormChangeHander
-                                                    }
-                                                    value={
-                                                        updateFormData.name_en
-                                                    }
-                                                    label=" اسم المنطقة ( انجليزي ) "
-                                                    placeholder=" اسم المنطقة  "
-                                                ></TextFieldNada>
-
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                                    <div className="col-span-1">
-                                                        <MultiCheckbox
-                                                            items={districtDays}
-                                                            value={
-                                                                updateFormData.available_days
-                                                            }
-                                                            label="اليوم"
-                                                            required={true}
-                                                            name="available_days"
-                                                            placeholder="اختر اليوم"
-                                                            prependIcon="mdi mdi-calendar-month-outline"
-                                                            iconType="mdi"
-                                                            onChange={(
-                                                                value
-                                                            ) => {
-                                                                setUpdateFormData(
-                                                                    (prev) => ({
-                                                                        ...prev,
-                                                                        ["available_days"]:
-                                                                            value,
-                                                                    })
-                                                                );
-                                                            }}
-                                                        ></MultiCheckbox>
-                                                    </div>
-                                                    <div className="col-span-1">
-                                                        <MultiCheckbox
-                                                            items={districtTime}
-                                                            value={
-                                                                updateFormData.available_times
-                                                            }
-                                                            label="الوقت"
-                                                            required={true}
-                                                            name="available_times"
-                                                            placeholder="اختر الوقت"
-                                                            prependIcon="mdi mdi-calendar-month-outline"
-                                                            iconType="mdi"
-                                                            onChange={(
-                                                                value
-                                                            ) => {
-                                                                setUpdateFormData(
-                                                                    (prev) => ({
-                                                                        ...prev,
-                                                                        ["available_times"]:
-                                                                            value,
-                                                                    })
-                                                                );
-                                                            }}
-                                                        ></MultiCheckbox>
-                                                    </div>
-                                                </div>
-
-                                                <SelectInput
-                                                    value={
-                                                        updateFormData.is_active
-                                                    }
-                                                    items={statusList}
-                                                    itemName="name"
-                                                    itemValue="is_active"
-                                                    label="الحالة"
-                                                    placeholder="لختر الحالة"
-                                                    name="is_active"
-                                                    required={true}
-                                                    onChange={(value) => {
-                                                        setUpdateFormData(
-                                                            (prev) => ({
-                                                                ...prev,
-                                                                ["is_active"]:
-                                                                    value,
-                                                            })
-                                                        );
-                                                    }}
-                                                ></SelectInput>
-                                            </div>
-                                        </form>
-                                    </UIBaseDialog>
+                                    <button className="bg-green-100 p-1 px-2 rounded-lg">
+                                        <span className="mdi mdi-download text-green-600"></span>
+                                    </button>
                                 </div>
                             </td>
                         </tr>

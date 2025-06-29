@@ -38,7 +38,7 @@ export default function page() {
 
   const router = useRouter()
 
-
+//@ts-ignore
   const takeValue = (e, name) => {
     console.log(e.target.value);
     setFormData((prev) => ({
@@ -52,6 +52,7 @@ export default function page() {
 
 
         // }))
+        //@ts-ignore
         setTotalPrice(selectedPackage.price_per_unit * formData.units);
       }
     }
@@ -67,14 +68,14 @@ export default function page() {
   const fetchDistrict = () => {
     districtListService().then((response) => {
       setDistrict(response.data);
-
+//@ts-ignore
       response.data.map((item, index) => {
         setDistrictDays(item.available_days);
         setDistrictTime(item.available_times);
       });
     });
   };
-
+//@ts-ignore
   const handleAddUserSubmit = (e) => {
     e.preventDefault();
     const fd = new FormData();
@@ -87,7 +88,9 @@ export default function page() {
     fd.append("time_from", formData.time_from)
     fd.append("time_to", formData.time_to)
     fd.append("address_title", formData.address_title)
+    //@ts-ignore
     fd.append("has_subscription", formData.has_subscription)
+    //@ts-ignore
     fd.append("units", formData.units)
     fd.append("package_id", formData.package_id)
     fd.append("payment_method_id", formData.payment_method_id)
@@ -151,7 +154,7 @@ export default function page() {
     address_details: "",
   });
 
-
+//@ts-ignore
   const takeUploadedImg = (img) => {
     console.log(img)
 
@@ -162,7 +165,7 @@ export default function page() {
       setTotalPrice(Number(packageItem.price_per_unit) * formData.units);
     }
   }, [formData.units]);
-
+//@ts-ignore
   const handleSelectPackage = (value) => {
     setFormData((prev) => ({
       ...prev,
@@ -182,7 +185,7 @@ export default function page() {
     })))
   }
 
-
+//@ts-ignore
   const handleSelecteditem=(item)=>{
     setSelected(item)
     setFormData((prev)=>({
@@ -357,6 +360,7 @@ export default function page() {
                       prependIcon="mdi mdi-calendar-month-outline"
                       iconType="mdi"
                       onChange={(value) => {
+                        //@ts-ignore
                         setFormData((prev) => ({
                           ...prev,
                           ["days"]: value,

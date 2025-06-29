@@ -105,6 +105,7 @@ export default function rubbush_collectors() {
     const query = `?page=${page}${hasSearch}${isActive}${isSubscribe}`;
 
     getUserService(query).then((response) => {
+      //@ts-ignore
       setDataList(response.data);
       // response.data.map((item, index) => {
       //   setDistrictDays(item.available_days);
@@ -354,6 +355,7 @@ export default function rubbush_collectors() {
                     danger
                     title="هل انت متأكد من حذف العنصر"
                     confirmHandler={() => {
+                      //@ts-ignore
                       deleteSubmit(item, index);
                     }}
                   >
@@ -369,6 +371,7 @@ export default function rubbush_collectors() {
                     btn={
                       <button
                         onClick={() => {
+                          //@ts-ignore
                           updateDistrictItem(item);
                         }}
                         className="bg-[#0094140D] p-1 rounded-lg"

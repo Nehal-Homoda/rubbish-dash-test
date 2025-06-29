@@ -87,7 +87,10 @@ export default function rubbush_collectors() {
                 setDistrictTime(item.available_times);
             });
             setTotalPages(response.meta.last_page);
-        });
+        })
+        .catch(() => {
+            
+        })
     };
     const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         fetchDataList({ search: e.target.value });

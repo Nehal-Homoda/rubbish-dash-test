@@ -4,7 +4,8 @@ import Payment from '@/components/user-tabs/payment'
 import PersonalData from '@/components/user-tabs/personalData'
 import Subscription from '@/components/user-tabs/subscription'
 import { getUserByIdService } from '@/services/userService'
-import { IsUser, User, Users } from '@/types/auth.interface'
+import { User, Users } from '@/types/auth.interface'
+import { AppUser } from '@/types/user.interface'
 import React, { useEffect, useState } from 'react'
 
 // type Props = {
@@ -19,7 +20,7 @@ type Btn = {
 
 export default function page({ params }: { params: Promise<{ id: number }> }) {
   const { id } = React.use(params);
-  const [user, setUser] = useState<IsUser | null>(null)
+  const [user, setUser] = useState<AppUser | null>(null)
   const [selectedBtn, setSelectedBtn] = useState<Btn | null>(null)
   const [type, setType] = useState('personal-data')
   const fetchUserById = () => {
@@ -33,7 +34,7 @@ export default function page({ params }: { params: Promise<{ id: number }> }) {
     { name: 'الاشتراك', type: "subscription" },
     { name: 'المدفوعات', type: "payment" }
   ]
-
+//@ts-ignore
   const handleChangeBtnType = (item) => {
     setType(item)
   }

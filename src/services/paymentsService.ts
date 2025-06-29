@@ -1,11 +1,11 @@
 import { responseErrorServiceHandler } from "@/utils/shared";
 import { apiCall } from "./apiCall";
 import { ResponseData } from "@/types/shared";
-import { Payment } from "@/types/payment.interface";
+import { Payment } from "@/types/payments.interface";
 
 let token = "Bearer 160|9eiDkr7DC2EryTIiZbQbO5CoJoxE7X88IPHqcNGs7f3d3254";
 
-export const getPaymentService = async (query?: string) => {
+export const getPaymentsService = async (query?: string) => {
     try {
         const response = await apiCall.get(
             `/admins/payments${decodeURIComponent(query || "")}`,
@@ -16,7 +16,7 @@ export const getPaymentService = async (query?: string) => {
             }
         );
         if (!response.ok) {
-            await responseErrorServiceHandler(response, "packages");
+            await responseErrorServiceHandler(response, "payments");
         }
         const data = (await response.json()) as ResponseData<Payment[]>;
         console.log("response data =>>>>", data);
@@ -25,28 +25,23 @@ export const getPaymentService = async (query?: string) => {
         throw new Error(error.message);
     }
 };
-
-
-export const activatePaymentService = async (id: number, is_active: number) => {
+export const getPaymentByIdService = async (id: number) => {
     try {
-        const response = await apiCall.put("/admins/payments", id, {
-            body: JSON.stringify({ is_active }),
+        const response = await apiCall.get(`/admins/payments/${id}`, {
             headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
+                // "Content-Type": "application/json",
             },
         });
         if (!response.ok) {
-            await responseErrorServiceHandler(response, "update Payment");
+            await responseErrorServiceHandler(response, "payments");
         }
-        const data = await response.json();
+        const data = (await response.json()) as ResponseData<Payment>;
         console.log("response data =>>>>", data);
         return data;
     } catch (error: any) {
         throw new Error(error.message);
     }
 };
-
 export const addPaymentService = async (form: FormData) => {
     try {
         const response = await apiCall.post(`/admins/payments`, {
@@ -56,9 +51,9 @@ export const addPaymentService = async (form: FormData) => {
             },
         });
         if (!response.ok) {
-            await responseErrorServiceHandler(response, "add Payment");
+            await responseErrorServiceHandler(response, "add payment");
         }
-        const data = await response.json();
+        const data = (await response.json()) as ResponseData<Payment>;
         console.log("response data =>>>>", data);
         return data;
     } catch (error: any) {
@@ -75,7 +70,7 @@ export const deletePaymentService = async (id: number) => {
             },
         });
         if (!response.ok) {
-            await responseErrorServiceHandler(response, "delete Payment");
+            await responseErrorServiceHandler(response, "delete payment");
         }
         const data = await response.json();
         console.log("response data =>>>>", data);
@@ -84,20 +79,18 @@ export const deletePaymentService = async (id: number) => {
         throw new Error(error.message);
     }
 };
-//@ts-ignore
-export const updatePaymentService = async (id: number, item) => {
+export const updatePaymentService = async (id: number, body: string) => {
     try {
         const response = await apiCall.put("/admins/payments", id, {
-            body: JSON.stringify(item),
+            body: body,
             headers: {
-                Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
         });
         if (!response.ok) {
-            await responseErrorServiceHandler(response, "update Payment");
+            await responseErrorServiceHandler(response, "update payment");
         }
-        const data = await response.json();
+        const data = (await response.json()) as ResponseData<Payment>;
         console.log("response data =>>>>", data);
         return data;
     } catch (error: any) {

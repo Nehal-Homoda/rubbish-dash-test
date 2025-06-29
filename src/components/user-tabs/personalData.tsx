@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import TextFieldNada from '../ui/form/TextFieldNada'
-import { IsUser, Users } from '@/types/auth.interface'
+import {  Users } from '@/types/auth.interface'
 import { updateUserService } from '@/services/userService'
+import { AppUser } from '@/types/user.interface'
 
+//@ts-ignore
 
 type Props = {
-  user: IsUser | null
+  user: AppUser | null
   // confirmHandler: () => void
 }
 export default function personalData({ user }: Props) {
@@ -22,7 +24,9 @@ export default function personalData({ user }: Props) {
 
   useEffect(() => {
     setFormData({
+      //@ts-ignore
       name: user.name,
+      //@ts-ignore
       phone: user.phone,
 
     })
@@ -33,6 +37,7 @@ export default function personalData({ user }: Props) {
       name: formData.name,
       phone: formData.phone
     })
+    //@ts-ignore
     updateUserService(user.id, body).then((response) => {
       console.log(response)
     })

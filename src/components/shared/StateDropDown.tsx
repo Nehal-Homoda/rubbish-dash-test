@@ -10,6 +10,7 @@ import React, { useEffect } from 'react'
 type Props = {
     btnName: String,
     isActive: Boolean,
+    //@ts-ignore
     handleIsActive: (item) => void
 
 }

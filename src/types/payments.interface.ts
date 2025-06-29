@@ -1,4 +1,3 @@
-
 export interface Payment {
     id: number;
     total_price: number;
@@ -11,12 +10,11 @@ export interface Payment {
     created_at: string;
 }
 
-
 export interface PaymentMethod {
-  id: number
-  name_en: string
-  name_ar: string
-  image: string
-  order?: number
-  is_active: boolean
+    id: number;
+    name_en: string;
+    name_ar: string;
+    image: string;
+    order?: number;
+    is_active: boolean;
 }

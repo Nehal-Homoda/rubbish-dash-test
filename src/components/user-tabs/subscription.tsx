@@ -16,12 +16,12 @@ import { PackageOffer } from '@/types/packagesOffer.interface';
 import { RadioGroup } from '@headlessui/react';
 import { Payment_methods } from '@/types/paymentMethod.interface';
 import FileInputImg from '../ui/form/FileInputImg';
-import { IsUser, Payment } from '@/types/user.interface';
+import { AppUser, Payment } from '@/types/user.interface';
 import { updateUserService } from '@/services/userService';
 
 
 type Props = {
-  user: IsUser
+  user: AppUser
 }
 
 interface UserFormData {

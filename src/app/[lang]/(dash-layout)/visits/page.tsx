@@ -87,7 +87,10 @@ export default function rubbush_collectors() {
         getVisitsService(query).then((response) => {
             setDataList(response.data);
             setTotalPages(response.meta.last_page);
-        });
+        })
+        .catch(() => {
+            
+        })
     };
     const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         fetchDataList({ search: e.target.value });

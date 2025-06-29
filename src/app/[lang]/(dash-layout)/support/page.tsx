@@ -61,7 +61,10 @@ export default function rubbush_collectors() {
         getTicketsService(query).then((response) => {
             setDataList(response.data);
             setTotalPages(response.meta.last_page);
-        });
+        })
+        .catch(() => {
+            
+        })
     };
     const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         fetchDataList({ search: e.target.value });
@@ -103,14 +106,14 @@ export default function rubbush_collectors() {
 
     const updateDataItem = (item: Ticket) => {
         setSelectedDataItem(item);
-        setUpdateFormData({
-            title_ar: item.title,
-            title_en: item.title,
-            order: item.order,
-            link: item.link,
-            is_active: item.is_active ? 1 : 0,
-            image: item.image,
-        });
+        // setUpdateFormData({
+        //     title_ar: item.title,
+        //     title_en: item.title,
+        //     order: item.order,
+        //     link: item.link,
+        //     is_active: item.is_active ? 1 : 0,
+        //     image: item.image,
+        // });
     };
 
     const updateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -157,28 +160,28 @@ export default function rubbush_collectors() {
         e.preventDefault();
 
         const fd = new FormData();
-        fd.append("title_ar", formData.title_ar);
-        fd.append("title_en", formData.title_en);
-        fd.append("order", formData.order.toString());
-        fd.append("link", formData.link);
-        fd.append("is_active", formData.is_active.toString());
-        if (formData.image) {
-            fd.append("image", formData.image);
-        }
+        // fd.append("title_ar", formData.title_ar);
+        // fd.append("title_en", formData.title_en);
+        // fd.append("order", formData.order.toString());
+        // fd.append("link", formData.link);
+        // fd.append("is_active", formData.is_active.toString());
+        // if (formData.image) {
+        //     fd.append("image", formData.image);
+        // }
 
         addTicketService(fd)
             .then((response) => {
                 fetchDataList();
                 //@ts-ignore
                 successDialog(true);
-                setFormData({
-                    title_ar: "",
-                    title_en: "",
-                    order: 0,
-                    link: "",
-                    is_active: 0,
-                    image: null,
-                });
+                // setFormData({
+                //     title_ar: "",
+                //     title_en: "",
+                //     order: 0,
+                //     link: "",
+                //     is_active: 0,
+                //     image: null,
+                // });
             })
             .catch((error) => {});
     };

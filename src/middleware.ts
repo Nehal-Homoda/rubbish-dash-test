@@ -4,7 +4,7 @@ import Negotiator from "negotiator";
 import { NextRequest, NextResponse } from "next/server";
 
 let locales = ["en", "ar"];
-let defaultLocale = "en";
+let defaultLocale = "ar";
 function getLocale(request: NextRequest) {
   let userLocale = request.cookies.get("lang");
   if (userLocale) return userLocale.value;
