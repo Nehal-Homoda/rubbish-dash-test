@@ -38,7 +38,7 @@ export const apiCall = {
             },
         });
     },
-    put: async (endpoint: string, id?: number, init?: RequestInit) => {
+    put: async (endpoint: string, id?: number | string, init?: RequestInit) => {
         const hasId = id != undefined ? true : false;
         const url = `${BASE_URL}${decodeURIComponent(endpoint)}${
             hasId ? "/" + id : ""

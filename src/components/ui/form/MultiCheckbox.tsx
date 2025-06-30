@@ -6,7 +6,7 @@ import {
     MenuItems,
     Transition,
 } from "@headlessui/react";
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 
 type Props = {
     value: string[];
@@ -38,6 +38,7 @@ export default function MultiCheckbox({
     onChange,
 }: Props) {
     const [selected, setSelected] = useState<any[]>(value || []);
+    const [displayedValue, setDisplayedValue] = useState("");
 
     const checkedHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { value, checked } = e.target;
@@ -52,6 +53,25 @@ export default function MultiCheckbox({
         onChange(arr);
     };
 
+    useEffect(() => {
+        console.log("in value", value)
+        if (!value || !value.length) {
+            setDisplayedValue(placeholder);
+            return;
+        }
+
+
+        if (itemValue && itemName) {
+            const data = [...items].filter((item) => value.includes(item[itemValue].toString()));
+
+            if (data.length) {
+                setDisplayedValue(data.map(d => d[itemName]).join(', '));
+            }
+            return;
+        }
+
+        setDisplayedValue(value.join(', '));
+    }, [value]);
 
     return (
         <>
@@ -83,16 +103,7 @@ export default function MultiCheckbox({
                                     </div>
                                 )}
                                 <div className="px-2 truncate">
-                                    {!!value?.length ? (
-                                        <span className="">
-                                            {" "}
-                                            {value.join(", ")}{" "}
-                                        </span>
-                                    ) : (
-                                        <span className="text-sm text-gray-400">
-                                            {placeholder}
-                                        </span>
-                                    )}
+                                    {displayedValue}
                                 </div>
                             </div>
                         </div>
