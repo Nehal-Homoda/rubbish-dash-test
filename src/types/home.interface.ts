@@ -1,0 +1,27 @@
+import { Collector } from "./collectors.interface";
+
+export interface Statistics {
+    no_of_subscriptions: number;
+    no_of_none_subscriptions: number;
+    completed_visited: number;
+    not_collected_visited: number;
+    [key: string]: number;
+}
+export interface HomeCollector {
+  notes_visit: any[]
+  collectors: Collector[]
+}
+
+export interface HomePayment {
+  payments: Payment[]
+}
+
+export interface Payment {
+  id: number
+  total_price: number
+  status: string
+  user_id: number
+  user_name: string
+  payment_method_image: string
+  created_at: string
+}
