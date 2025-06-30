@@ -2,72 +2,232 @@
 "use client";
 // import ChartDemo from "@/components/ui/UIChart";
 import UIDashCard from "@/components/ui/UIDashCard";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLangAndDictionary } from "@/utils/lang";
+import { collectorsHomeService, paymentsHomeService, statisticsHomeService } from "@/services/sharedService";
+import { HomeCollector, HomePayment, Statistics } from "@/types/home.interface";
+import { Collector } from "@/types/regions.interface";
+import paymentImg from "@/assets/images/payment-img.png"
+import Link from "next/link";
+import { Payment } from "@/types/payment.interface";
 
 
 export default function Home() {
-  const [activeBtn, setActiveBtn] = useState<"month" | "year">("month");
-  const [chartData, setChartData] = useState<number[]>([8, 6, 10, 4]);
-  const [chartLabels, setChartLabels] = useState<string[]>([
-    "شقق",
-    "وحدات سكنية",
-    "مطاعم",
-    "محلات تجارية",
+  const [statistics, setStatistics] = useState([
+    { title: 'عدد الزيارات ', subtitle: 'المكتملة', slug: 'completed_visited' },
+    { title: 'عدد  المستخدمين ', subtitle: 'الغير مشتركين', slug: 'no_of_none_subscriptions' },
+    { title: 'عدد المستخدمين ', subtitle: 'المشتركين', slug: 'no_of_subscriptions' },
+    { title: ' عدد الزيارات ', subtitle: 'الغير مكتملة', slug: 'not_collected_visited' },
+
   ]);
-  const { lang, dict } = useLangAndDictionary();
+
+  const [userStatistics, setUserStatistics] = useState<Statistics | null>(null)
+  const [collectors, setCollectors] = useState<HomeCollector | null>(null)
+  const [payment, setPayment] = useState<HomePayment | null>(null)
+
+
+  const fetchStatistics = () => {
+
+    statisticsHomeService().then((response) => {
+      setUserStatistics(response.data)
+      console.log('user static', userStatistics)
+
+    })
+      .catch(error => {
+
+      })
+
+
+  }
+  const fetchCollectors = () => {
+    collectorsHomeService().then((response) => {
+
+      setCollectors(response.data)
+      console.log(response.data)
+    })
+  }
+  const fetchPayments = () => {
+    paymentsHomeService().then((response) => {
+      console.log(response.data)
+      setPayment(response.data)
+    })
+  }
+
+  const statusColor = (name: string) => {
+    if (name === "rejected")
+      return "bg-red-100 text-red-600 px-5 py-1 rounded-lg";
+    if (name === "accepted") return "bg-[#31D00012] text-[#009414] px-5 py-1 rounded-lg  ";
+    if (name === "pending")
+      return "bg-[#FBBC0512] text-[#FBBC05] px-5 py-1 rounded-lg ";
+  };
+
+  useEffect(() => {
+    fetchStatistics()
+    fetchCollectors()
+    fetchPayments()
+  }, [])
+
 
   return (
     <>
       <div className="home-page">
 
+        <div className="py-20 container">
 
 
-        <div className="w-1/2">
-          {/* <UIDashCard>
-            <div className="flex items-center gap-4 mb-10">
-              <button
-                onClick={() => {
-                  setActiveBtn("year");
-                  setChartData([8, 6, 10, 4]);
-                  setChartLabels([
-                    "شقق",
-                    "وحدات سكنية",
-                    "مطاعم",
-                    "محلات تجارية",
-                  ]);
-                }}
-                className={
-                  activeBtn == "year"
-                    ? `h-8 px-2 rounded-xl bg-surface-light-800 text-surface text-sm font-medium`
-                    : "text-foreground/50 text-sm font-medium"
-                }
-              >
-                {dict.year_stats}
-              </button>
-              <button
-                onClick={() => {
-                  setActiveBtn("month");
-                  setChartData([6, 10, 4, 8]);
-                  setChartLabels([
-                    "شقق",
-                    "وحدات سكنية",
-                    "مطاعم",
-                    "محلات تجارية",
-                  ]);
-                }}
-                className={
-                  activeBtn == "month"
-                    ? `h-8 px-2 rounded-xl bg-surface-light-800 text-surface text-sm font-medium`
-                    : "text-foreground/50 text-sm font-medium"
-                }
-              >
-                {dict.month_stats}
-              </button>
+
+          <div className="mb-10">
+            <div className="bg-[#00000009] p-5 rounded-3xl">
+              <div className="grid lg:grid-cols-2  grid-cols-1   gap-5">
+                {statistics.map((item, index) => (
+                  <div key={index} className="flex justify-between rounded-3xl bg-background  p-7 w-full">
+
+                    <div className="text-[#ADAAAA]">
+
+                      <div className="mb-3">
+                        {item.title}
+                      </div>
+                      <div className="font-bold text-[#38433B]">
+                        {item.subtitle}
+                      </div>
+                    </div>
+
+
+                    <div className=" text-[#38433B] text-2xl font-bold">
+                      {userStatistics && <span> {userStatistics[item.slug]}</span>}
+                    </div>
+
+
+                  </div>
+
+
+
+                ))}
+
+              </div>
             </div>
-            <ChartDemo labels={chartLabels} myData={chartData} />
-          </UIDashCard> */}
+          </div>
+
+          <div className="mb-10">
+            <div className="bg-[#00000009] p-5 rounded-3xl">
+              <div className="rounded-2xl bg-background  p-8 w-full ">
+                <h4 className="font-bold mb-5 text-xl">الملاحظات</h4>
+                {collectors && collectors.notes_visit.map((item, index) => (
+                  <div className="py-5">
+                    <div className="title flex justify-between">
+                      <div className="font-bold text-[#38433B] text-lg mb-1">
+                        {item.user_name}
+                      </div>
+                      <div className=" text-[#009414] mb-1 text-base">
+                        {item.created_at}
+                      </div>
+                    </div>
+                    <p className="text-[#ADAAAA] mb-1">{item.address}</p>
+                    <div className="bg-[#00000009]  rounded-lg py-2 mb-1 px-3">
+
+                      <span className="text-[#38433B]">ملاحظة :  </span>
+                      <span className="text-[#ADAAAA] ms-2">{item.user_note}</span>
+
+                    </div>
+
+
+
+                  </div>
+                ))}
+
+
+              </div>
+
+            </div>
+          </div>
+
+
+          <div className="mb-10">
+            <div className="bg-[#00000009] p-5 rounded-3xl">
+
+              <div className="lg:grid grid-cols-2  rounded-2xl  bg-background p-8 w-full ">
+
+
+
+                <div>
+
+                  <div className="flex justify-between mb-3">
+                    <div>
+                      <h4 className="font-bold mb-5 text-xl">المدفوعات</h4>
+                    </div>
+                    <div>
+                      <button className="border-none outline-none ">
+                        <a className="text-[#009414]" href="/payments">عرض المزيد</a>
+                        <span className="mdi mdi-chevron-left text-[#009414] ms-5 text-xl"></span>
+                      </button>
+                    </div>
+
+                  </div>
+
+                  {payment && payment.payments.map((item, index) => (
+                    <div className="bg-[#00000009] rounded-3xl px-5 py-2 mb-4">
+
+
+                      <div key={index} className="flex justify-between py-5">
+                        <div className="flex  gap-4">
+
+
+                          <div>
+                            <div className="w-10 h-10 rounded-full ">
+                              <img className="w-full h-full object-contain" src={item.payment_method_image} alt="" />
+                            </div>
+                          </div>
+
+
+
+                          <div className="">
+                            <p className="mb-1 font-bold text-[#38433B] text-lg">{item.user_name}</p>
+                            <p className="text-[#009414] font-bold mb-1">{item.total_price}</p>
+                            <p className="text-[#ADAAAA]">{item.created_at}</p>
+                          </div>
+
+                        </div>
+                        <div>
+
+                        <div className={statusColor(item.status)}>
+                          {item.status}
+
+                        </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  ))}
+
+                </div>
+
+
+
+
+                <div className="lg:flex hidden justify-center items-center">
+                  <div className="w-full aspect-[3/1.8]">
+                    <img className="w-full h-full object-contain" src={paymentImg.src} alt="" />
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+
+          </div>
+
+
+
+
+
+
+
         </div>
+
+
+
+
       </div>
     </>
   );
