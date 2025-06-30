@@ -2,7 +2,7 @@ import { responseErrorServiceHandler } from "@/utils/shared";
 import { apiCall } from "./apiCall";
 import { User } from "@/types/auth.interface";
 import { ResponseData } from "@/types/shared";
-import { HomeCollector, HomePayment, Statistics } from "@/types/home.interface";
+import { ChartData, chartData, HomeCollector, HomePayment, Statistics } from "@/types/home.interface";
 import { Collector } from "@/types/collectors.interface";
 
 let token = "Bearer 160|9eiDkr7DC2EryTIiZbQbO5CoJoxE7X88IPHqcNGs7f3d3254";
@@ -110,6 +110,26 @@ export const paymentsHomeService = async () => {
             await responseErrorServiceHandler(response, "statistics");
         }
         const data = (await response.json()) as ResponseData<HomePayment>;
+        console.log("response data =>>>>", data);
+        return data;
+    } catch (error: any) {
+        throw new Error(error.message);
+    }
+};
+
+
+export const chartStatisticsHomeService = async () => {
+    try {
+        const response = await apiCall.get(`/admins/home/section-three`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+        });
+        if (!response.ok) {
+            await responseErrorServiceHandler(response, "statistics");
+        }
+        const data = (await response.json()) as ResponseData<ChartData>;
         console.log("response data =>>>>", data);
         return data;
     } catch (error: any) {
