@@ -8,20 +8,38 @@ export interface Statistics {
     [key: string]: number;
 }
 export interface HomeCollector {
-  notes_visit: any[]
-  collectors: Collector[]
+    notes_visit: any[];
+    collectors: Collector[];
 }
 
 export interface HomePayment {
-  payments: Payment[]
+    payments: Payment[];
 }
 
 export interface Payment {
-  id: number
-  total_price: number
-  status: string
-  user_id: number
-  user_name: string
-  payment_method_image: string
-  created_at: string
+    id: number;
+    total_price: number;
+    status: string;
+    user_id: number;
+    user_name: string;
+    payment_method_image: string;
+    created_at: string;
+}
+
+export interface ChartData {
+    statsCategory: StatsCategory[];
+    statsPackage: StatsPackage[];
+}
+
+export interface StatsCategory {
+    category: string;
+    no_of_subscriptions: number;
+    month: number;
+    year: number;
+}
+
+export interface StatsPackage {
+    package: string;
+    no_of_subscriptions: number;
+    category_id: number;
 }

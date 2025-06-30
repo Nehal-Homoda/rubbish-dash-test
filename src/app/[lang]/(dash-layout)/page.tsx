@@ -1,18 +1,63 @@
 
 "use client";
 // import ChartDemo from "@/components/ui/UIChart";
-import UIDashCard from "@/components/ui/UIDashCard";
-import { useEffect, useState } from "react";
-import { useLangAndDictionary } from "@/utils/lang";
-import { collectorsHomeService, paymentsHomeService, statisticsHomeService } from "@/services/sharedService";
-import { HomeCollector, HomePayment, Statistics } from "@/types/home.interface";
-import { Collector } from "@/types/regions.interface";
+import React, { useEffect, useState } from "react";
+import { chartStatisticsHomeService, collectorsHomeService, paymentsHomeService, statisticsHomeService } from "@/services/sharedService";
+import { ChartData, HomeCollector, HomePayment, Statistics } from "@/types/home.interface";
 import paymentImg from "@/assets/images/payment-img.png"
-import Link from "next/link";
-import { Payment } from "@/types/payment.interface";
+import ApexCharts from "apexcharts";
+import ReactApexChart from "react-apexcharts";
 
 
 export default function Home() {
+
+  const [seriesBar, setSeriesBar] = useState([{
+    name: 'الشهر',
+    data: [44, 55, 57, 56]
+  }, {
+    name: 'عدد الاشتراكات',
+    data: [76, 85, 101, 98]
+  },])
+  const [optionsBar, setOptionsBar] = useState({
+      chart: {
+        type: 'bar',
+        height: 350
+      },
+      plotOptions: {
+        bar: {
+          horizontal: false,
+          columnWidth: '55%',
+          borderRadius: 5,
+          borderRadiusApplication: 'end'
+        },
+      },
+      dataLabels: {
+        enabled: false
+      },
+      stroke: {
+        show: true,
+        width: 2,
+        colors: ['transparent']
+      },
+      xaxis: {
+        categories: [],
+      },
+      // yaxis: {
+      //   title: {
+      //     text: '$ (thousands)'
+      //   }
+      // },
+      fill: {
+        opacity: 1
+      },
+      // tooltip: {
+      //   y: {
+      //     formatter: function (val) {
+      //       return "$ " + val + " thousands"
+      //     }
+      //   }
+      // }
+    })
   const [statistics, setStatistics] = useState([
     { title: 'عدد الزيارات ', subtitle: 'المكتملة', slug: 'completed_visited' },
     { title: 'عدد  المستخدمين ', subtitle: 'الغير مشتركين', slug: 'no_of_none_subscriptions' },
@@ -24,6 +69,18 @@ export default function Home() {
   const [userStatistics, setUserStatistics] = useState<Statistics | null>(null)
   const [collectors, setCollectors] = useState<HomeCollector | null>(null)
   const [payment, setPayment] = useState<HomePayment | null>(null)
+  const [chartData, setChartData] = useState<ChartData | null>(null)
+  const [categoryName, setCatergoryName] = useState<string[]>([])
+
+
+
+  const statusColor = (name: string) => {
+    if (name === "rejected")
+      return "bg-red-100 text-red-600 px-5 py-1 rounded-lg";
+    if (name === "accepted") return "bg-[#31D00012] text-[#009414] px-5 py-1 rounded-lg  ";
+    if (name === "pending")
+      return "bg-[#FBBC0512] text-[#FBBC05] px-5 py-1 rounded-lg ";
+  };
 
 
   const fetchStatistics = () => {
@@ -53,19 +110,44 @@ export default function Home() {
     })
   }
 
-  const statusColor = (name: string) => {
-    if (name === "rejected")
-      return "bg-red-100 text-red-600 px-5 py-1 rounded-lg";
-    if (name === "accepted") return "bg-[#31D00012] text-[#009414] px-5 py-1 rounded-lg  ";
-    if (name === "pending")
-      return "bg-[#FBBC0512] text-[#FBBC05] px-5 py-1 rounded-lg ";
-  };
+  const fetchChartStatistics = () => {
+    chartStatisticsHomeService().then((response) => {
+      setChartData(response.data)
+      const x = response.data.statsCategory.map((item, index) => {
+        return item.category
+      })
+      console.log('x is', x)
+      setCatergoryName(x)
+      setOptionsBar(prev => ({...prev, ['xaxis'] : {
+        ...prev.xaxis,
+        ['categories']: x
+      }}));
+
+
+
+    })
+  }
+
+
 
   useEffect(() => {
     fetchStatistics()
     fetchCollectors()
     fetchPayments()
+    fetchChartStatistics()
   }, [])
+
+
+
+
+  useEffect(() => {
+
+  }, [categoryName])
+
+
+
+
+
 
 
   return (
@@ -143,6 +225,27 @@ export default function Home() {
 
 
           <div className="mb-10">
+            <div className="grid grid-cols-2">
+              <div className="bg-[#00000009] p-5 rounded-3xl">
+
+
+                <div className="rounded-2xl bg-background  p-8 w-full ">
+                  {/* <div id="chart"></div> */}
+                  <ReactApexChart options={optionsBar} series={seriesBar} type="bar" height={350} />
+                </div>
+
+
+
+              </div>
+              <div>
+
+              </div>
+            </div>
+
+          </div>
+
+
+          <div className="mb-10">
             <div className="bg-[#00000009] p-5 rounded-3xl">
 
               <div className="lg:grid grid-cols-2  rounded-2xl  bg-background p-8 w-full ">
@@ -189,10 +292,10 @@ export default function Home() {
                         </div>
                         <div>
 
-                        <div className={statusColor(item.status)}>
-                          {item.status}
+                          <div className={statusColor(item.status)}>
+                            {item.status}
 
-                        </div>
+                          </div>
                         </div>
                       </div>
 
