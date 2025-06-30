@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/stores/store";
 import { login } from "@/stores/authSlice";
+import { successDialog } from "@/utils/shared";
 
 export default function AuthLoginPage() {
     const dispatch = useDispatch<AppDispatch>()
@@ -35,6 +36,7 @@ export default function AuthLoginPage() {
         // fd.append('phone', formData.phone)
 
         loginService(fd).then((response) => {
+            successDialog(true)
             router.push("/");
             console.log("login", response);
             dispatch(login(response))
