@@ -1,3 +1,12 @@
+/**
+ * thank you Nehal for your effort, you done the job as well as it could be it is great job, really amazing. ✨👏
+ * ----------------------------------------------------------------------------------------
+ * @@ [some notes] @@
+ * 1- you should remove container because we already have our custom layout wrap
+ * 2- first section must be 4 parts in large screen (4 > 2 > 1)
+ * 3- payments section some retouches on sizes (padding, marginst) i think it too big 
+ * 4- some retouches on sizes (padding, marginst) i think it too big for all sections
+ */
 
 "use client";
 // import ChartDemo from "@/components/ui/UIChart";
@@ -152,9 +161,9 @@ export default function Home() {
 
   return (
     <>
-      <div className="home-page">
+      <div className="home-page py-20">
 
-        <div className="py-20 container">
+        {/* <div className="py-20 container"> */}
 
 
 
@@ -326,7 +335,7 @@ export default function Home() {
 
 
 
-        </div>
+        {/* </div> */}
 
 
 
