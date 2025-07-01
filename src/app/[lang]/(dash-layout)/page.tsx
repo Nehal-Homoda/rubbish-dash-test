@@ -288,7 +288,7 @@ export default function Home() {
                 </div>
 
                 {payment && payment.payments.map((item, index) => (
-                  <div key={index} className="bg-[#00000009] rounded-3xl px-5 py-2 mb-4">
+                  <div key={index} className="bg-[#00000009] rounded-3xl px-2 py-1 mb-4">
 
 
                     <div key={index} className="flex justify-between py-5">
