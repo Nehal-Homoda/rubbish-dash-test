@@ -1,12 +1,3 @@
-/**
- * thank you Nehal for your effort, you done the job as well as it could be it is great job, really amazing. ✨👏
- * ----------------------------------------------------------------------------------------
- * @@ [some notes] @@
- * 1- you should remove container because we already have our custom layout wrap
- * 2- first section must be 4 parts in large screen (4 > 2 > 1)
- * 3- payments section some retouches on sizes (padding, marginst) i think it too big 
- * 4- some retouches on sizes (padding, marginst) i think it too big for all sections
- */
 
 "use client";
 // import ChartDemo from "@/components/ui/UIChart";
@@ -14,59 +5,60 @@ import React, { useEffect, useState } from "react";
 import { chartStatisticsHomeService, collectorsHomeService, paymentsHomeService, statisticsHomeService } from "@/services/sharedService";
 import { ChartData, HomeCollector, HomePayment, Statistics } from "@/types/home.interface";
 import paymentImg from "@/assets/images/payment-img.png"
-import ApexCharts from "apexcharts";
-import ReactApexChart from "react-apexcharts";
+import dynamic from 'next/dynamic';
 
+// ✅ Dynamically import chart component only on client side
+const ReactApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 export default function Home() {
 
   const [seriesBar, setSeriesBar] = useState([{
     name: 'الشهر',
-    data: [44, 55, 57, 56]
+    data: []
   }, {
     name: 'عدد الاشتراكات',
-    data: [76, 85, 101, 98]
+    data: []
   },])
   const [optionsBar, setOptionsBar] = useState({
-      chart: {
-        type: 'bar',
-        height: 350
+    chart: {
+      type: 'bar',
+      height: 350
+    },
+    plotOptions: {
+      bar: {
+        horizontal: false,
+        columnWidth: '55%',
+        borderRadius: 5,
+        borderRadiusApplication: 'end'
       },
-      plotOptions: {
-        bar: {
-          horizontal: false,
-          columnWidth: '55%',
-          borderRadius: 5,
-          borderRadiusApplication: 'end'
-        },
-      },
-      dataLabels: {
-        enabled: false
-      },
-      stroke: {
-        show: true,
-        width: 2,
-        colors: ['transparent']
-      },
-      xaxis: {
-        categories: [],
-      },
-      // yaxis: {
-      //   title: {
-      //     text: '$ (thousands)'
-      //   }
-      // },
-      fill: {
-        opacity: 1
-      },
-      // tooltip: {
-      //   y: {
-      //     formatter: function (val) {
-      //       return "$ " + val + " thousands"
-      //     }
-      //   }
-      // }
-    })
+    },
+    dataLabels: {
+      enabled: false
+    },
+    stroke: {
+      show: true,
+      width: 2,
+      colors: ['transparent']
+    },
+    xaxis: {
+      categories: [],
+    },
+    // yaxis: {
+    //   title: {
+    //     text: '$ (thousands)'
+    //   }
+    // },
+    fill: {
+      opacity: 1
+    },
+    // tooltip: {
+    //   y: {
+    //     formatter: function (val) {
+    //       return "$ " + val + " thousands"
+    //     }
+    //   }
+    // }
+  })
   const [statistics, setStatistics] = useState([
     { title: 'عدد الزيارات ', subtitle: 'المكتملة', slug: 'completed_visited' },
     { title: 'عدد  المستخدمين ', subtitle: 'الغير مشتركين', slug: 'no_of_none_subscriptions' },
@@ -80,6 +72,7 @@ export default function Home() {
   const [payment, setPayment] = useState<HomePayment | null>(null)
   const [chartData, setChartData] = useState<ChartData | null>(null)
   const [categoryName, setCatergoryName] = useState<string[]>([])
+
 
 
 
@@ -122,15 +115,31 @@ export default function Home() {
   const fetchChartStatistics = () => {
     chartStatisticsHomeService().then((response) => {
       setChartData(response.data)
-      const x = response.data.statsCategory.map((item, index) => {
+      const name = response.data.statsCategory.map((item, index) => {
         return item.category
       })
-      console.log('x is', x)
-      setCatergoryName(x)
-      setOptionsBar(prev => ({...prev, ['xaxis'] : {
-        ...prev.xaxis,
-        ['categories']: x
-      }}));
+      const month = response.data.statsCategory.map((item, index) => {
+        return item.month
+      })
+      const no_subscription = response.data.statsCategory.map((item, index) => {
+        return item.no_of_subscriptions
+      })
+      console.log('x is', name)
+
+      setOptionsBar(prev => ({
+        ...prev, ['xaxis']: {
+          ...prev.xaxis,
+          ['categories']: name
+        }
+      }));
+      setSeriesBar([{
+        name: 'الشهر',
+        data: month
+      }, {
+        name: 'عدد الاشتراكات',
+        data: no_subscription
+      }])
+
 
 
 
@@ -161,9 +170,9 @@ export default function Home() {
 
   return (
     <>
-      <div className="home-page py-20">
+      <div className="home-page">
 
-        {/* <div className="py-20 container"> */}
+        <div className="py-20 container">
 
 
 
@@ -236,19 +245,12 @@ export default function Home() {
           <div className="mb-10">
             <div className="grid grid-cols-2">
               <div className="bg-[#00000009] p-5 rounded-3xl">
-
-
                 <div className="rounded-2xl bg-background  p-8 w-full ">
                   {/* <div id="chart"></div> */}
                   <ReactApexChart options={optionsBar} series={seriesBar} type="bar" height={350} />
                 </div>
-
-
-
               </div>
-              <div>
 
-              </div>
             </div>
 
           </div>
@@ -335,7 +337,7 @@ export default function Home() {
 
 
 
-        {/* </div> */}
+        </div>
 
 
 
