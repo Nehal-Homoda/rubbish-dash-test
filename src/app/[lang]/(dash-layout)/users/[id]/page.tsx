@@ -7,6 +7,7 @@ import { getUserByIdService } from '@/services/userService'
 import { User, Users } from '@/types/auth.interface'
 import { AppUser } from '@/types/user.interface'
 import React, { useEffect, useState } from 'react'
+import header_bg_img from "@/assets/images/bg/profile-header-bg.jpg";
 
 // type Props = {
 //   params: { id: number }
@@ -34,7 +35,7 @@ export default function page({ params }: { params: Promise<{ id: number }> }) {
     { name: 'الاشتراك', type: "subscription" },
     { name: 'المدفوعات', type: "payment" }
   ]
-//@ts-ignore
+  //@ts-ignore
   const handleChangeBtnType = (item) => {
     setType(item)
   }
@@ -54,17 +55,28 @@ export default function page({ params }: { params: Promise<{ id: number }> }) {
       <div className='container py-20'>
 
 
+        <div
+          className="profile-header relative w-full  bg-cover overflow-hidden rounded-2xl "
+          style={{
+            background: `url(${header_bg_img.src}) no-repeat center center`,
+          }}
+        >
 
-        <div className='bg-[#009414F0]  rounded-xl px-6 py-8 text-white'>
-          <div className='mb-5'>
-            <h4 className='mb-1 font-bold '>{user?.name}</h4>
-            <p >{user?.subscription_name ? user?.subscription_name : '**********'}</p>
+
+          <div className=' rounded-xl  text-white  bg-surface/90 py-8 px-7'>
+            <div className='mb-10'>
+              <h4 className='mb-1 font-bold '>{user?.name}</h4>
+              <p >{user?.subscription_name ? user?.subscription_name : '**********'}</p>
+            </div>
+            <div className='flex items-center gap-4'>
+              {btnTabs.map((item, index) => (
+                <button key={index} onClick={() => handleChangeBtnType(item.type)} className={`relative ${type == item.type ? 'before:absolute  before:w-full before:h-[0.5] before:-bottom-3 before:bg-white ' : ''}`}>{item.name}</button>
+              ))}
+            </div>
           </div>
-          <div className='flex items-center gap-4'>
-            {btnTabs.map((item, index) => (
-              <button key={index} onClick={() => handleChangeBtnType(item.type)} className={`relative ${type == item.type ? 'before:absolute  before:w-full before:h-[0.5] before:-bottom-3 before:bg-white ' : ''}`}>{item.name}</button>
-            ))}
-          </div>
+
+
+
         </div>
 
 
@@ -74,7 +86,7 @@ export default function page({ params }: { params: Promise<{ id: number }> }) {
           {type == 'personal-data' && user && <PersonalData user={user} />}
           {type == 'subscription' && user && <Subscription user={user} />}
           {type == 'payment' && user && <Payment user={user} />}
-         
+
         </div>
 
 
