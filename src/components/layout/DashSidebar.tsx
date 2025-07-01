@@ -121,7 +121,8 @@ export default function DashSidebar({isOpen, toggleSidebarHandler}: Props) {
       isOpen
           ? "flex"
           : "md:translate-x-0 " +
-            (params.lang === "ar" ? "translate-x-full" : "-translate-x-full")
+            "translate-x-full"
+            // (params.lang === "ar" ? "translate-x-full" : "-translate-x-full")
   }
   `}
         >
