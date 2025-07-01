@@ -28,6 +28,7 @@ export default function Home() {
     name: 'عدد الاشتراكات',
     data: []
   },])
+
   const [optionsBar, setOptionsBar] = useState<ApexOptions>({
     chart: {
       type: 'bar',
@@ -68,6 +69,53 @@ export default function Home() {
     //   }
     // }
   })
+  const [optionsBarPackage, setOptionsBarPackage] = useState<ApexOptions>({
+    chart: {
+      type: 'bubble',
+      height: 350
+    },
+    plotOptions: {
+      bubble: {
+        zScaling: true,
+        minBubbleRadius: 10,
+        maxBubbleRadius: 30,
+      }
+      // bar: {
+      //   horizontal: false,
+      //   columnWidth: '55%',
+      //   borderRadius: 5,
+      //   borderRadiusApplication: 'end'
+      // },
+    },
+    dataLabels: {
+      enabled: false
+    },
+    stroke: {
+      show: true,
+      width: 2,
+      colors: ['transparent']
+    },
+    xaxis: {
+      categories: [],
+    },
+    // yaxis: {
+    //   title: {
+    //     text: '$ (thousands)'
+    //   }
+    // },
+    fill: {
+      opacity: 1
+    },
+    // tooltip: {
+    //   y: {
+    //     formatter: function (val) {
+    //       return "$ " + val + " thousands"
+    //     }
+    //   }
+    // }
+  })
+
+
   const [statistics, setStatistics] = useState([
     { title: 'عدد الزيارات ', subtitle: 'المكتملة', slug: 'completed_visited' },
     { title: 'عدد  المستخدمين ', subtitle: 'الغير مشتركين', slug: 'no_of_none_subscriptions' },
@@ -133,6 +181,9 @@ export default function Home() {
       const no_subscription = response.data.statsCategory.map((item, index) => {
         return item.no_of_subscriptions
       })
+      const packageName = response.data.statsPackage.map((item, index) => {
+        return item.package
+      })
       console.log('x is', name)
 
       setOptionsBar(prev => ({
@@ -149,6 +200,13 @@ export default function Home() {
         data: no_subscription
       }])
 
+
+      setOptionsBarPackage(prev => ({
+        ...prev, ['xaxis']: {
+          ...prev.xaxis,
+          ['categories']: packageName
+        }
+      }));
 
 
 
@@ -252,11 +310,19 @@ export default function Home() {
 
 
         <div className="mb-10">
-          <div className="grid grid-cols-2">
+          <div className="grid grid-cols-2 gap-5" >
             <div className="bg-[#00000009] p-3 rounded-3xl">
               <div className="rounded-2xl bg-background  p-5 w-full ">
                 {/* <div id="chart"></div> */}
                 <ReactApexChart options={optionsBar} series={seriesBar} type="bar" height={350} />
+              </div>
+            </div>
+
+
+            <div className="bg-[#00000009] p-3 rounded-3xl">
+              <div className="rounded-2xl bg-background  p-5 w-full ">
+                {/* <div id="chart"></div> */}
+                <ReactApexChart options={optionsBarPackage} series={seriesBar} type="bubble" height={350} />
               </div>
             </div>
 
