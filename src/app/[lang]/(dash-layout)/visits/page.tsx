@@ -215,7 +215,7 @@ export default function rubbush_collectors() {
 
     return (
         <>
-            <div className="py-2">
+            <div className="py-20">
                 <BaseDataTable
                     headItems={headerArr}
                     onPageChange={setPage}
