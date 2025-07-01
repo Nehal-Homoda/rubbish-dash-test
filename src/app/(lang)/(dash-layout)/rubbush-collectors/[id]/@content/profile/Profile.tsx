@@ -13,7 +13,7 @@ import { successDialog } from "@/utils/shared";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
-export default function page() {
+export default function Profile() {
     const { id } = useParams<{ id: string }>();
     const [collector, setCollector] = useState<Collector | null>(null);
     const [distrects, setDistrects] = useState<District[]>([]);

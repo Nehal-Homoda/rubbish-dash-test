@@ -38,13 +38,14 @@ export default function DashSidebar({isOpen, toggleSidebarHandler}: Props) {
         {
             icon: " mdi-account-multiple-outline",
             name: "users",
+            path: Routes.users,
             iconType: "mdi",
 
-            subLinks: [
-                // { name: "all", path: Routes.users },
-                { name: "users", path: Routes.users },
-                { name: "deleted", path: Routes.deletedUsers },
-            ],
+            // subLinks: [
+            //     // { name: "all", path: Routes.users },
+            //     { name: "users", path: Routes.users },
+            //     { name: "deleted", path: Routes.deletedUsers },
+            // ],
         },
         {
             icon: "mdi-format-list-checkbox",
@@ -56,7 +57,6 @@ export default function DashSidebar({isOpen, toggleSidebarHandler}: Props) {
             icon: "mdi-dolly",
             name: "rubbush_collectors",
             path: Routes.rubbushCollectors,
-
             iconType: "mdi",
         },
         {

@@ -6,8 +6,12 @@ import { useEffect, useState } from "react";
 type Lang = "en" | "ar";
 export const useLangAndDictionary = () => {
     const { lang } = useParams<{ lang: Lang }>();
-    const currentLang: Lang = lang === "ar" ? "ar" : "en";
+    // const currentLang: Lang = lang === "ar" ? "ar" : "en";
+    const currentLang = "ar";
     const [dict, setDictionary] = useState<Record<string, string>>({});
+
+
+
     useEffect(() => {
         getDictionary(currentLang).then((result) => {
             setDictionary(result);

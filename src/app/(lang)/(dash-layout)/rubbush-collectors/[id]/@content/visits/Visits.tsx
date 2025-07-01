@@ -11,8 +11,8 @@ import {
     getVisitsService,
     updateVisitsService,
 } from "@/services/visitService";
-
-export default function rubbush_collectors() {
+export const dynamic = "force-dynamic";
+export default function Visits() {
     const [dataList, setDataList] = useState<Visit[]>([]);
     const headerArr = [
         { text: "ID", name: "id" },

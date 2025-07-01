@@ -26,7 +26,7 @@ export const getUserService = async (query?: string) => {
         throw new Error(error.message);
     }
 };
-export const getUserByIdService = async (id:number) => {
+export const getUserByIdService = async (id:number| string) => {
     try {
         const response = await apiCall.get(
             `/admins/users/${id}`,
