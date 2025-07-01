@@ -2,6 +2,7 @@ import { responseErrorServiceHandler } from "@/utils/shared";
 import { apiCall } from "./apiCall";
 import { ResponseData } from "@/types/shared";
 import { Payment } from "@/types/payment.interface";
+import { Payment_methods } from "@/types/paymentMethod.interface";
 
 let token = "Bearer 160|9eiDkr7DC2EryTIiZbQbO5CoJoxE7X88IPHqcNGs7f3d3254";
 
@@ -87,7 +88,7 @@ export const deletePaymentMethodService = async (id: number) => {
         throw new Error(error.message);
     }
 };
-export const updatePaymentMethodService = async (id: number, item) => {
+export const updatePaymentMethodService = async (id: number, item:Payment_methods) => {
     try {
         const response = await apiCall.put("/admins/payment_methods", id, {
             body: JSON.stringify(item),
@@ -100,7 +101,7 @@ export const updatePaymentMethodService = async (id: number, item) => {
             await responseErrorServiceHandler(response, "update Payment");
         }
         const data = await response.json();
-        console.log("response data =>>>>", data);
+        console.log("response data =>>>>", data) ;
         return data;
     } catch (error: any) {
         throw new Error(error.message);
