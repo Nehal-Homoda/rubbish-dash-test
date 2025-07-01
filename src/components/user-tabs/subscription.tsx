@@ -23,6 +23,11 @@ import { updateUserService } from '@/services/userService';
 type Props = {
   user: AppUser
 }
+interface DistrictItem {
+  available_days: string[];
+  available_times: string[];
+
+}
 
 interface UserFormData {
 
@@ -100,7 +105,7 @@ export default function subscription({ user }: Props) {
     districtListService().then((response) => {
       setDistrict(response.data);
 
-      response.data.map((item, index) => {
+      response.data.map((item:DistrictItem, index:number) => {
         setDistrictDays(item.available_days);
         setDistrictTime(item.available_times);
       });
@@ -131,28 +136,28 @@ export default function subscription({ user }: Props) {
     })
   }
 
-  const takeUploadedImg = (img) => {
-    console.log(img)
+  // const takeUploadedImg = (img) => {
+  //   console.log(img)
 
-  }
+  // }
 
 
-  const takeValue = (e, name) => {
-    console.log(e.target.value);
-    setFormData((prev) => ({
-      ...prev,
-      [name]: e.target.value,
-    }));
-  };
+  // const takeValue = (e, name) => {
+  //   console.log(e.target.value);
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     [name]: e.target.value,
+  //   }));
+  // };
 
-  const handleCheckSubscription = (value) => {
-    console.log(value)
-    // setSwitch1(true)
-    setFormData((prev => ({
-      ...prev,
-      ["has_subscription"]: value
-    })))
-  }
+  // const handleCheckSubscription = (value) => {
+  //   console.log(value)
+  //   // setSwitch1(true)
+  //   setFormData((prev => ({
+  //     ...prev,
+  //     ["has_subscription"]: value
+  //   })))
+  // }
 
 
   const updateUser = () => {
@@ -177,22 +182,22 @@ export default function subscription({ user }: Props) {
 
 
 
-  const handleSelectedRadio = (selected) => {
-    setFormData((prev) => {
-      const updatedPayment = {
-        ...prev.payment,
-        payment_method: { ...selected },
-      };
+  // const handleSelectedRadio = (selected) => {
+  //   setFormData((prev) => {
+  //     const updatedPayment = {
+  //       ...prev.payment,
+  //       payment_method: { ...selected },
+  //     };
 
-      return {
-        ...prev,
-        payment: updatedPayment,
-      };
-    })
+  //     return {
+  //       ...prev,
+  //       payment: updatedPayment,
+  //     };
+  //   })
 
-    console.log('dd', selected)
+  //   console.log('dd', selected)
 
-  }
+  // }
 
   useEffect(() => {
 
@@ -266,10 +271,10 @@ export default function subscription({ user }: Props) {
 
 
           <div className="py-14 ">
-            <ToggleSwitch  disabled
+            <ToggleSwitch disabled
               checked={formData.has_subscription}
               label="مشترك"
-              onChange={() => {}}
+              onChange={() => { }}
             />
           </div>
 
