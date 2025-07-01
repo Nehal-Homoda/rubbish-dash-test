@@ -92,8 +92,8 @@ export default function Home() {
     plotOptions: {
       bubble: {
         zScaling: true,
-        minBubbleRadius: 10,
-        maxBubbleRadius: 30,
+        minBubbleRadius: 20,
+        maxBubbleRadius: 20,
       }
       // bar: {
       //   horizontal: false,
@@ -111,6 +111,8 @@ export default function Home() {
       colors: ['transparent']
     },
     xaxis: {
+      type: 'numeric',
+    
       categories: [],
     },
     // yaxis: {
@@ -207,7 +209,7 @@ export default function Home() {
       const bubbleSeries = response.data.statsPackage.map((item) => ({
         x: item.package,
         y: item.no_of_subscriptions,
-        z: 10,
+        z: 2,
       }));
       console.log('x is', name)
 
