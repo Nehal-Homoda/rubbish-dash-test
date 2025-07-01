@@ -3,22 +3,26 @@ import {
     showCollectorService,
 } from "@/services/collectorsService";
 import { Collector } from "@/types/collectors.interface";
-import { useParams, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import header_bg_img from "@/assets/images/bg/profile-header-bg.jpg";
 import Link from "next/link";
 import { useLocalePath } from "@/utils/lang";
+import { getQueryParam } from "@/utils/shared";
 
 
 
 export default function CollectorHeader() {
-    const { id } = useParams<{ id: string }>();
+    const id = () => {
+            return getQueryParam('id') || '';
+        };
     const [collector, setCollector] = useState<Collector | null>(null);
     const localePath = useLocalePath();
     const pathname = usePathname();
 
     const fetchCollector = async () => {
-        showCollectorService(id)
+        
+        showCollectorService(id())
             .then((response) => {
                 setCollector(response.data);
             })
@@ -43,9 +47,9 @@ export default function CollectorHeader() {
                             {collector?.name ?? "****"}
                         </h5>
                         <p className="">
-                            {collector?.districts
+                            {collector && collector.districts.length ? collector.districts
                                 .map((item) => item.name)
-                                .join(" | ") ?? "***"}
+                                .join(" | ") : "***"}
                         </p>
                     </div>
                     <div className="flex flex-col-reverse lg:flex-row gap-5 items-center lg:items-end justify-between mt-20">
@@ -54,13 +58,13 @@ export default function CollectorHeader() {
                                 className={` text-nowrap flex-grow-0 flex-shrink-0 underline-offset-[0.75rem] ${
                                     pathname ==
                                     localePath(
-                                        `/rubbush-collectors/${collector?.id}/profile`
+                                        `/rubbush-collectors/details/profile?id=${collector?.id}`
                                     )
                                         ? "underline"
                                         : ""
                                 }`}
                                 href={localePath(
-                                    `/rubbush-collectors/${collector?.id}/profile`
+                                    `/rubbush-collectors/details/profile?id=${collector?.id}`
                                 )}
                             >
                                 الملف الشخصي
@@ -69,13 +73,13 @@ export default function CollectorHeader() {
                                 className={` text-nowrap flex-grow-0 flex-shrink-0  underline-offset-[0.75rem] ${
                                     pathname ==
                                     localePath(
-                                        `/rubbush-collectors/${collector?.id}/visits`
+                                        `/rubbush-collectors/details/visits?id=${collector?.id}`
                                     )
                                         ? "underline"
                                         : ""
                                 }`}
                                 href={localePath(
-                                    `/rubbush-collectors/${collector?.id}/visits`
+                                    `/rubbush-collectors/details/visits?id=${collector?.id}`
                                 )}
                             >
                                 الزيارات

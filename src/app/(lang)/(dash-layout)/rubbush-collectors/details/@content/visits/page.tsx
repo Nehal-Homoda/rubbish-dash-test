@@ -11,8 +11,9 @@ import {
     getVisitsService,
     updateVisitsService,
 } from "@/services/visitService";
-export const dynamic = "force-dynamic";
-export default function Visits() {
+
+
+export default function page() {
     const [dataList, setDataList] = useState<Visit[]>([]);
     const headerArr = [
         { text: "ID", name: "id" },

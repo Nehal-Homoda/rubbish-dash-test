@@ -407,7 +407,7 @@ export default function rubbush_collectors() {
 
                   {/* <span onClick={() => router.push(`/users/${item.id}`)} className="mdi mdi-eye-outline cursor-pointer"></span> */}
 
-                  <div className="w-4 h-4 cursor-pointer" onClick={() => router.push(`/users/${item.id}`)}>
+                  <div className="w-4 h-4 cursor-pointer" onClick={() => router.push(`/users/details?id=${item.id}`)}>
                     <img className="w-full h-full object-contain" src={eyeImg.src} alt="" />
                   </div>
                 </div>

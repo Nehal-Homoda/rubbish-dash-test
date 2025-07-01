@@ -185,3 +185,16 @@ export const successDialog = (open: boolean) => {
     window.dialog = open;
     window.dispatchEvent(new Event("dialog-toggle"));
 };
+
+
+
+
+
+export const getQueryParam = (paramName: string) => {
+    if (typeof window === "undefined") return null;
+
+    const param = new URLSearchParams(window.location.search)
+
+
+    return param.get(paramName) || null
+}

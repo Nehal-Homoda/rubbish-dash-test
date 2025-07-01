@@ -9,12 +9,14 @@ import {
 import { getDistrictService } from "@/services/districtService";
 import { Collector } from "@/types/collectors.interface";
 import { District } from "@/types/district.interface";
-import { successDialog } from "@/utils/shared";
+import { getQueryParam, successDialog } from "@/utils/shared";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
-export default function Profile() {
-    const { id } = useParams<{ id: string }>();
+export default function page() {
+    const id = () => {
+        return getQueryParam('id') || '';
+    };
     const [collector, setCollector] = useState<Collector | null>(null);
     const [distrects, setDistrects] = useState<District[]>([]);
     type UpdateFormDataType = {
@@ -43,7 +45,7 @@ export default function Profile() {
         console.log(e.target.name, e.target.value);
     };
     const fetchCollector = async () => {
-        showCollectorService(id)
+        showCollectorService(id())
             .then((response) => {
                 setCollector(response.data);
             })
@@ -67,7 +69,7 @@ export default function Profile() {
             ...form,
         });
 
-        updateCollectorService(id, body)
+        updateCollectorService(id(), body)
             .then((response) => {
                 setCollector(response.data);
                 successDialog(true);

@@ -405,7 +405,7 @@ export default function rubbush_collectors() {
                             </td>
                             <td className="">
                                 <div className="flex justify-center gap-3">
-                                    <button onClick={() => {router.push(localePath('/rubbush-collectors/' + item.id + '/profile'))}} className="bg-blue-100 p-1 px-2 rounded-lg">
+                                    <button onClick={() => {router.push(localePath('/rubbush-collectors/details/profile?id=' + item.id))}} className="bg-blue-100 p-1 px-2 rounded-lg">
                                         <span className="mdi mdi-eye text-blue-500"></span>
                                     </button>
                                     <UIDialogConfirm

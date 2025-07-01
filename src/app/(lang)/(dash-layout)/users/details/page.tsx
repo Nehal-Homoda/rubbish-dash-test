@@ -8,6 +8,7 @@ import { AppUser } from "@/types/user.interface";
 import React, { useEffect, useState } from "react";
 import header_bg_img from "@/assets/images/bg/profile-header-bg.jpg";
 import { useParams } from "next/navigation";
+import { getQueryParam } from "@/utils/shared";
 
 // type Props = {
 //   params: { id: number }
@@ -18,13 +19,15 @@ type Btn = {
     type: string;
 };
 
-export default function UsersPage() {
-    const { id } = useParams<{id: string}>();
+export default function page() {
+    const id = () => {
+        return getQueryParam("id") || "";
+    };
     const [user, setUser] = useState<AppUser | null>(null);
     const [selectedBtn, setSelectedBtn] = useState<Btn | null>(null);
     const [type, setType] = useState("personal-data");
     const fetchUserById = () => {
-        getUserByIdService(id).then((response) => {
+        getUserByIdService(id()).then((response) => {
             setUser(response.data);
         });
     };
