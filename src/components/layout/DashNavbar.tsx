@@ -2,8 +2,8 @@ import React from "react";
 import UIThemeToggleBtn from "@/components/ui/UIThemeToggleBtn";
 // import LangSwitcher from "../shared/LangSwitcher";
 import { useLangAndDictionary } from "@/utils/lang";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/stores/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/stores/store";
 import { logout } from "@/stores/authSlice";
 interface Props {
     isOpen: boolean;
@@ -11,6 +11,9 @@ interface Props {
 }
 export default function DashNavbar({ isOpen, openSidebar }: Props) {
     const { lang, dict } = useLangAndDictionary();
+    const title = useSelector(
+        (state: RootState) => state.authReducer.title
+    );
     const dispatch = useDispatch<AppDispatch>();
 
     const logoutHander = () => {
@@ -30,7 +33,7 @@ export default function DashNavbar({ isOpen, openSidebar }: Props) {
                             <span className="mdi mdi-menu text-2xl font-semibold text-foreground hover:text-surface transition-all"></span>
                         </button>
                         <div className="title font-bold text-lg">
-                            صباح الخير 👋
+                            {title}
                         </div>
                     </div>
                     <button onClick={logoutHander} className="cursor-pointer">

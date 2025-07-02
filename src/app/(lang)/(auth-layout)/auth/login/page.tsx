@@ -11,6 +11,7 @@ import { successDialog } from "@/utils/shared";
 
 export default function AuthLoginPage() {
     const dispatch = useDispatch<AppDispatch>()
+    
     const [formData, setFormData] = useState({
         email: "",
         password: "",
@@ -56,7 +57,7 @@ export default function AuthLoginPage() {
                             <h3 className="text-2xl font-bold">
                                 مرحباً بعودتك مرة اخري 👋
                             </h3>
-                            <p className="text-muted font-semibold">
+                            <p className="text-[#ADAAAA]">
                                 قم بإدخال بياناتك لتسجيل الدخول
                             </p>
                             <form

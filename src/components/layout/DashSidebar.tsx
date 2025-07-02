@@ -7,37 +7,49 @@ import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import Routes from "@/core/manager/route.manager";
 import { useLangAndDictionary } from "@/utils/lang";
+import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/stores/store";
+import { changeTitle } from "@/stores/authSlice";
 
 interface Props {
     isOpen: boolean;
     toggleSidebarHandler: () => void;
 }
 
-export default function DashSidebar({isOpen, toggleSidebarHandler}: Props) {
+export default function DashSidebar({ isOpen, toggleSidebarHandler }: Props) {
     // const [isOpen, setIsOpen] = useState(true);
     const { lang, dict } = useLangAndDictionary();
+    const router = useRouter()
+    const dispatch = useDispatch<AppDispatch>();
+
+
     const ListItems: ListItem[] = [
         {
             icon: "mdi-view-dashboard-outline",
             name: "home",
+            text: "الرئيسية",
             path: Routes.home,
             iconType: "mdi",
         },
         {
             icon: "mdi-layers-triple-outline",
             name: "services",
+            text: "الخدمات",
             path: Routes.services,
             iconType: "mdi",
         },
         {
             icon: "mdi-image-marker-outline",
             name: "regions",
+            text: "المناطق",
             path: Routes.regions,
             iconType: "mdi",
         },
         {
             icon: " mdi-account-multiple-outline",
             name: "users",
+            text: "المستخدمين",
             path: Routes.users,
             iconType: "mdi",
 
@@ -50,54 +62,63 @@ export default function DashSidebar({isOpen, toggleSidebarHandler}: Props) {
         {
             icon: "mdi-format-list-checkbox",
             name: "packages",
+            text: "الباقات",
             path: Routes.packages,
             iconType: "mdi",
         },
         {
             icon: "mdi-dolly",
             name: "rubbush_collectors",
+            text: "مجمعي القمامة",
             path: Routes.rubbushCollectors,
             iconType: "mdi",
         },
         {
             icon: "mdi-truck-outline",
             name: "visits",
+            text: "الزيارات",
             path: Routes.visits,
             iconType: "mdi",
         },
         {
             icon: "mdi-wallet-bifold-outline",
             name: "payments",
+            text: "المدفوعات",
             path: Routes.payments,
             iconType: "mdi",
         },
         {
             icon: "mdi-bell-outline",
             name: "notifications",
+            text: "الاشعارات",
             path: Routes.notifications,
             iconType: "mdi",
         },
         {
             icon: "mdi-calendar-text-outline",
             name: "instructions",
+            text: "التعليمات",
             path: Routes.instructions,
             iconType: "mdi",
         },
         {
             icon: "mdi-book-outline",
             name: "signs",
+            text: "الاشارات",
             path: Routes.signs,
             iconType: "mdi",
         },
         {
             icon: "mdi-headset",
             name: "support",
+            text: "الدعم",
             path: Routes.support,
             iconType: "mdi",
         },
         {
             icon: "mdi-cog-outline",
             name: "settings",
+            text: "الاعدادات",
             path: Routes.settings,
             iconType: "mdi",
         },
@@ -112,18 +133,23 @@ export default function DashSidebar({isOpen, toggleSidebarHandler}: Props) {
     const cleanPathname = pathname.replace(langPrefix, "") || "/";
 
     const openSidebar = () => {
-      toggleSidebarHandler()
+        toggleSidebarHandler()
     };
+    const handleOnClick = (item) => {
+        dispatch(changeTitle(item.text))
+        router.push(`${langPrefix}${item.path}`)
+
+
+    }
     return (
         <div
             className={`side-bar z-50 bg-surface text-white/85 fixed top-0 md:flex duration-300 flex-col h-full
-  ${
-      isOpen
-          ? "flex"
-          : "md:translate-x-0 " +
-            "translate-x-full"
-            // (params.lang === "ar" ? "translate-x-full" : "-translate-x-full")
-  }
+  ${isOpen
+                    ? "flex"
+                    : "md:translate-x-0 " +
+                    "translate-x-full"
+                // (params.lang === "ar" ? "translate-x-full" : "-translate-x-full")
+                }
   `}
         >
             <span
@@ -145,52 +171,50 @@ export default function DashSidebar({isOpen, toggleSidebarHandler}: Props) {
             <div className="list-items pr-5 pl-6 pt-5 overflow-y-auto flex-1 custom-scroll">
                 {ListItems.map((item, index) => (
                     <div key={index}>
-                        <Link
-                            href={`${langPrefix}${item.path}`}
-                            className={`relative flex items-center justify-between capitalize cursor-pointer text-lg hover:bg-white/10 rounded-2xl mb-2 w-60 h-12 transition-all px-4 ${
-                                cleanPathname === item.path
-                                    ? `bg-white/10 before:content-[''] before:absolute before:bg-white before:h-[85%] before:w-[6px] before:rounded-md ${
-                                          params.lang === "en"
-                                              ? "before:-left-4"
-                                              : "before:-right-3"
-                                      }`
+                        <button onClick={() => handleOnClick(item)}>
+                            <Link
+                                href={''}
+                                className={`relative flex items-center justify-between capitalize cursor-pointer text-lg hover:bg-white/10 rounded-2xl mb-2 w-60 h-12 transition-all px-4 ${cleanPathname === item.path
+                                    ? `bg-white/10 before:content-[''] before:absolute before:bg-white before:h-[85%] before:w-[6px] before:rounded-md ${params.lang === "en"
+                                        ? "before:-left-4"
+                                        : "before:-right-3"
+                                    }`
                                     : ""
-                            }`}
-                            onClick={(e) => {
-                                if (item.subLinks) e.preventDefault();
-                                toggleDropDown(index);
-                            }}
-                        >
-                            <div className="flex items-center">
-                                {item.icon && item.iconType === "mdi" ? (
-                                    <span
-                                        className={`mdi ${item.icon}  me-2 text-2xl`}
-                                    ></span>
-                                ) : null}
-                                {item.icon && item.iconType === "fa" ? (
-                                    <i
-                                        className={`fa ${item.icon}  me-2 text-2xl`}
-                                    ></i>
-                                ) : null}
+                                    }`}
+                                onClick={(e) => {
+                                    if (item.subLinks) e.preventDefault();
+                                    toggleDropDown(index);
+                                }}
+                            >
+                                <div className="flex items-center">
+                                    {item.icon && item.iconType === "mdi" ? (
+                                        <span
+                                            className={`mdi ${item.icon}  me-2 text-2xl`}
+                                        ></span>
+                                    ) : null}
+                                    {item.icon && item.iconType === "fa" ? (
+                                        <i
+                                            className={`fa ${item.icon}  me-2 text-2xl`}
+                                        ></i>
+                                    ) : null}
 
-                                <span>{dict[item.name] || item.name}</span>
-                            </div>
-                            {item.subLinks && (
-                                <span
-                                    className={`mdi mdi-chevron-down transition-all duration-200 ${
-                                        dropdownIndex === index
+                                    <span>{dict[item.name] || item.name}</span>
+                                </div>
+                                {item.subLinks && (
+                                    <span
+                                        className={`mdi mdi-chevron-down transition-all duration-200 ${dropdownIndex === index
                                             ? "-rotate-180"
                                             : "rotate-0"
-                                    }`}
-                                ></span>
-                            )}
-                        </Link>
+                                            }`}
+                                    ></span>
+                                )}
+                            </Link>
+                        </button>
                         <div
-                            className={`drop-down flex  flex-col justify-between pr-5 pt-1 pb-3 text-sm overflow-hidden transition-all duration-500 gap-1 ${
-                                dropdownIndex === index
-                                    ? "max-h-[500px]"
-                                    : "max-h-0 pointer-events-none "
-                            }`}
+                            className={`drop-down flex  flex-col justify-between pr-5 pt-1 pb-3 text-sm overflow-hidden transition-all duration-500 gap-1 ${dropdownIndex === index
+                                ? "max-h-[500px]"
+                                : "max-h-0 pointer-events-none "
+                                }`}
                         >
                             {item.subLinks?.map((dropKey, index) => (
                                 <Link
