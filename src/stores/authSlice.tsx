@@ -7,6 +7,7 @@ interface InitialState {
     token: null | string;
     isLoggedIn: boolean;
     isEnter: boolean;
+    title: null | string;
 }
 
 const initialState: InitialState = {
@@ -14,6 +15,7 @@ const initialState: InitialState = {
     token: null,
     isLoggedIn: false,
     isEnter: false,
+    title: '  صباح الخير 👋'
 };
 
 export const authSlice = createSlice({
@@ -56,8 +58,11 @@ export const authSlice = createSlice({
                 state.isEnter = true;
             }
         },
+        changeTitle: (state, action: PayloadAction<string>) => {
+            state.title = action.payload
+        }
     },
 });
 
-export const { login, logout, enter } = authSlice.actions;
+export const { login, logout, enter,changeTitle } = authSlice.actions;
 export default authSlice.reducer;

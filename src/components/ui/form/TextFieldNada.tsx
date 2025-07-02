@@ -27,12 +27,12 @@ export default function TextFieldNada({
   appendIcon,
   eyeOpen,
   eyeClosed,
-  errorMessage="",
-  required=true,
-  iconType="mdi",
+  errorMessage = "",
+  required = true,
+  iconType = "mdi",
   handleChange,
 }: Props) {
-    
+
   const [inputType, setInputType] = useState(type);
 
   const togglePasswordVisibility = () => {
@@ -81,28 +81,24 @@ export default function TextFieldNada({
               {inputType === "text" ? (
                 iconType === "fa" ? (
                   <i
-                    className={`${
-                      eyeOpen || "fa-regular fa-eye"
-                    } text-2xl text-foreground/45`}
+                    className={`${eyeOpen || "fa-regular fa-eye"
+                      } text-2xl text-foreground/45`}
                   />
                 ) : (
                   <span
-                    className={`${
-                      eyeOpen || "mdi mdi-eye-outline"
-                    } text-2xl text-foreground/45`}
+                    className={`${eyeOpen || "mdi mdi-eye-outline"
+                      } text-2xl text-foreground/45`}
                   />
                 )
               ) : iconType === "fa" ? (
                 <i
-                  className={`${
-                    eyeClosed || "fa-regular fa-eye-slash"
-                  } text-2xl text-foreground/45`}
+                  className={`${eyeClosed || "fa-regular fa-eye-slash"
+                    } text-2xl text-foreground/45`}
                 />
               ) : (
                 <span
-                  className={`${
-                    eyeClosed || "mdi mdi-eye-off-outline"
-                  } text-2xl text-foreground/45`}
+                  className={`${eyeClosed || "mdi mdi-eye-off-outline"
+                    } text-2xl text-foreground/45`}
                 />
               )}
             </div>
@@ -125,9 +121,11 @@ export default function TextFieldNada({
 
       {errorMessage && (
         <div className="err-msg mt-2 text-red-600 font-semibold ps-2">
-           {errorMessage}
+          {errorMessage}
         </div>
       )}
     </>
   );
 }
+
+
