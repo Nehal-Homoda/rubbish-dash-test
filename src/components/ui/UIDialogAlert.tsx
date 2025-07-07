@@ -8,10 +8,14 @@ import {
 } from "@headlessui/react";
 import React, { Fragment, useEffect, useState } from "react";
 import alertImg from "@/assets/images/alert.png";
-type Props = {};
+import { usePathname } from "next/navigation";
+type Props = {
 
-export default function UIDialogAlert({}: Props) {
+};
+
+export default function UIDialogAlert({ }: Props) {
     const [isOpen, setIsOpen] = useState(true);
+    const pathname = usePathname()
 
     const updateDialogFromWindow = () => {
         if (typeof window !== "undefined") {
@@ -37,11 +41,11 @@ export default function UIDialogAlert({}: Props) {
         window.dialog = false;
     };
 
-    const openModal = () => {
-        setIsOpen(true);
-        //@ts-ignore
-        window.dialog = true;
-    };
+    // const openModal = () => {
+    //     setIsOpen(true);
+    //     //@ts-ignore
+    //     window.dialog = true;
+    // };
 
     return (
         <>
@@ -93,7 +97,7 @@ export default function UIDialogAlert({}: Props) {
                                         </div>
 
                                         <p className="font-bold">
-                                            لقد تمت العملية بنجاح
+                                            {pathname == '/' ? "تم تسجيل الدخول بنجاح" : "لقد تمت العملية بنجاح"}
                                         </p>
                                     </div>
 

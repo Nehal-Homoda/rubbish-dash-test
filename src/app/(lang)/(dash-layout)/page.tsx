@@ -112,7 +112,7 @@ export default function Home() {
     },
     xaxis: {
       type: 'numeric',
-    
+
       categories: [],
     },
     // yaxis: {
@@ -148,15 +148,32 @@ export default function Home() {
   const [categoryName, setCatergoryName] = useState<string[]>([])
 
 
+  const paymentList = [
+    "rejected",
+    "accepted",
+    "pending"
+  ]
 
-
-  const statusColor = (name: string) => {
+  const payment_status = (name: string) => {
     if (name === "rejected")
-      return "bg-red-100 text-red-600 px-5 py-1 rounded-lg";
-    if (name === "accepted") return "bg-[#31D00012] text-[#009414] px-5 py-1 rounded-lg  ";
+      return {
+        style: "bg-red-100 text-red-600 px-5 py-1 rounded-lg",
+        text: 'مرفوض'
+
+      }
+    if (name === "accepted")
+      return {
+        style: "bg-[#31D00012] text-[#009414] px-5 py-1 rounded-lg",
+        text: 'مقبول'
+      }
+
     if (name === "pending")
-      return "bg-[#FBBC0512] text-[#FBBC05] px-5 py-1 rounded-lg ";
+      return {
+        style: "bg-[#FBBC0512] text-[#FBBC05] px-5 py-1 rounded-lg ",
+        text: 'معلق'
+      }
   };
+
 
 
   const fetchStatistics = () => {
@@ -411,8 +428,8 @@ export default function Home() {
                       </div>
                       <div>
 
-                        <div className={statusColor(item.status)}>
-                          {item.status}
+                        <div className={payment_status(item.status)?.style}>
+                          {payment_status(item.status)?.text}
 
                         </div>
                       </div>

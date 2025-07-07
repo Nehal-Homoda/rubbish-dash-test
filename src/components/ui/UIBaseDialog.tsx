@@ -15,6 +15,7 @@ type Props = {
     confirmHandler: () => void;
     confirmText: string;
     hideConfirmBtn?: boolean;
+    heightStyle?:string
 };
 
 export default function UIBaseDialog({
@@ -25,6 +26,7 @@ export default function UIBaseDialog({
     form,
     confirmHandler,
     hideConfirmBtn = false,
+    heightStyle
 }: Props) {
     let [isOpen, setIsOpen] = useState(false);
 
@@ -71,7 +73,7 @@ export default function UIBaseDialog({
                                 leaveFrom="opacity-100 scale-100"
                                 leaveTo="opacity-0 scale-95"
                             >
-                                <DialogPanel className="w-full max-w-[750px] transform rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                                <DialogPanel className={`w-full max-w-[750px] ${heightStyle} transform rounded-2xl bg-white  p-6 text-left align-middle shadow-xl transition-all`}>
                                     <DialogTitle
                                         as="h3"
                                         className="relative text-lg font-bold leading-6 text-center text-gray-900 "

@@ -11,7 +11,7 @@ import { successDialog } from "@/utils/shared";
 
 export default function AuthLoginPage() {
     const dispatch = useDispatch<AppDispatch>()
-    
+
     const [formData, setFormData] = useState({
         email: "",
         password: "",
@@ -43,17 +43,17 @@ export default function AuthLoginPage() {
             dispatch(login(response))
 
         })
-        .catch(error => {
+            .catch(error => {
 
-        })
+            })
     };
 
     return (
         <>
             <div className="w-full min-h-screen pt-20">
-                <div className="container">
-                    <div className="grid md:grid-cols-2 gap-20">
-                        <div className="col-span-1 pt-28">
+                <div className=" ">
+                    <div className="grid md:grid-cols-2">
+                        <div className="col-span-1 ms-56 pt-36">
                             <h3 className="text-2xl font-bold">
                                 مرحباً بعودتك مرة اخري 👋
                             </h3>
@@ -119,10 +119,10 @@ export default function AuthLoginPage() {
                                 </button>
                             </form>
                         </div>
-                        <div className="col-span-1">
+                        <div className="col-span-1 ps-44">
                             <div className="w-full h-full">
                                 <img
-                                    className="w-full h-full object-cover"
+                                    className="w-full h-full "
                                     src={logoImg.src}
                                     alt=""
                                 />
