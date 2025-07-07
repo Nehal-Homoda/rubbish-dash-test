@@ -370,7 +370,7 @@ export default function rubbush_collectors() {
                                     <UIBaseDialog
                                         title="تعديل منطقه"
                                         confirmHandler={() => {}}
-                                        confirmText="اضافة"
+                                        confirmText="حفظ"
                                         form="update-form"
                                         btn={
                                             <button

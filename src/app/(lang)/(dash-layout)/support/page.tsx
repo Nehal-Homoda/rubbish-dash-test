@@ -8,11 +8,12 @@ import SelectInput from "@/components/ui/form/SelectInput";
 import { successDialog } from "@/utils/shared";
 import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
 import FileInputImg from "@/components/ui/form/FileInputImg";
-import { Ticket } from "@/types/tickets.interface";
+import { AdminTicket, Message, Ticket } from "@/types/tickets.interface";
 import {
-    addTicketService,
+    addTicketMessage,
     deleteTicketService,
     getTicketsService,
+    showTicketMessagesService,
     updateTicketService,
 } from "@/services/ticketsServices";
 
@@ -35,6 +36,8 @@ export default function rubbush_collectors() {
     const [selectedDataItem, setSelectedDataItem] = useState<Ticket | null>(
         null
     );
+    const [adminTicket, setAdminTicket] = useState<AdminTicket | null>(null)
+
     type FormDataType = {
         title_ar: string;
         content: string;
@@ -48,6 +51,11 @@ export default function rubbush_collectors() {
         title_ar: "",
         content: "",
     });
+    const [message, setMessage] = useState<string>('')
+    const [isSent, setIsSent] = useState<boolean>(false)
+    const [messages, setMessages] = useState<Message[]>([])
+    const [userArr, setUserArr] = useState([])
+
 
     const fetchDataList = ({
         search = "",
@@ -62,9 +70,9 @@ export default function rubbush_collectors() {
             setDataList(response.data);
             setTotalPages(response.meta.last_page);
         })
-        .catch(() => {
-            
-        })
+            .catch(() => {
+
+            })
     };
     const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         fetchDataList({ search: e.target.value });
@@ -90,7 +98,7 @@ export default function rubbush_collectors() {
 
                 console.log(response);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     const deleteSubmit = (item: Ticket, selectedIndex: number) => {
@@ -101,94 +109,130 @@ export default function rubbush_collectors() {
                 setDataList(updatedArr);
                 successDialog(true);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
-    const updateDataItem = (item: Ticket) => {
-        setSelectedDataItem(item);
-        // setUpdateFormData({
-        //     title_ar: item.title,
-        //     title_en: item.title,
-        //     order: item.order,
-        //     link: item.link,
-        //     is_active: item.is_active ? 1 : 0,
-        //     image: item.image,
-        // });
-    };
+    // const updateDataItem = (item: Ticket) => {
+    //     setSelectedDataItem(item);
+    //     // setUpdateFormData({
+    //     //     title_ar: item.title,
+    //     //     title_en: item.title,
+    //     //     order: item.order,
+    //     //     link: item.link,
+    //     //     is_active: item.is_active ? 1 : 0,
+    //     //     image: item.image,
+    //     // });
+    // };
 
-    const updateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    // const updateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    //     e.preventDefault();
 
-        if (!selectedDataItem) return;
+    //     if (!selectedDataItem) return;
 
-        const body = JSON.stringify({
-            ...updateFormData,
-        });
+    //     const body = JSON.stringify({
+    //         ...updateFormData,
+    //     });
 
-        updateTicketService(selectedDataItem.id, body)
-            .then((response) => {
-                fetchDataList();
-                successDialog(true);
-            })
-            .catch((error) => {});
-    };
+    //     updateTicketService(selectedDataItem.id, body)
+    //         .then((response) => {
+    //             fetchDataList();
+    //             successDialog(true);
+    //         })
+    //         .catch((error) => {});
+    // };
 
-    const addFormChangeHander = (
-        e: React.ChangeEvent<HTMLInputElement>,
-        index?: number
-    ) => {
-        setFormData((prev) => ({
-            ...prev,
-            [e.target.name]: e.target.value,
-        }));
+    // const addFormChangeHander = (
+    //     e: React.ChangeEvent<HTMLInputElement>,
+    //     index?: number
+    // ) => {
+    //     setFormData((prev) => ({
+    //         ...prev,
+    //         [e.target.name]: e.target.value,
+    //     }));
 
-        console.log(e.target.name, e.target.value);
-    };
-    const updateFormChangeHander = (
-        e: React.ChangeEvent<HTMLInputElement>,
-        index?: number
-    ) => {
-        setUpdateFormData((prev) => ({
-            ...prev,
-            [e.target.name]: e.target.value,
-        }));
+    //     console.log(e.target.name, e.target.value);
+    // };
+    // const updateFormChangeHander = (
+    //     e: React.ChangeEvent<HTMLInputElement>,
+    //     index?: number
+    // ) => {
+    //     setUpdateFormData((prev) => ({
+    //         ...prev,
+    //         [e.target.name]: e.target.value,
+    //     }));
 
-        console.log(e.target.name, e.target.value);
-    };
+    //     console.log(e.target.name, e.target.value);
+    // };
 
-    const createSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    // const createSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    //     e.preventDefault();
 
-        const fd = new FormData();
-        // fd.append("title_ar", formData.title_ar);
-        // fd.append("title_en", formData.title_en);
-        // fd.append("order", formData.order.toString());
-        // fd.append("link", formData.link);
-        // fd.append("is_active", formData.is_active.toString());
-        // if (formData.image) {
-        //     fd.append("image", formData.image);
-        // }
+    //     const fd = new FormData();
+    //     // fd.append("title_ar", formData.title_ar);
+    //     // fd.append("title_en", formData.title_en);
+    //     // fd.append("order", formData.order.toString());
+    //     // fd.append("link", formData.link);
+    //     // fd.append("is_active", formData.is_active.toString());
+    //     // if (formData.image) {
+    //     //     fd.append("image", formData.image);
+    //     // }
 
-        addTicketService(fd)
-            .then((response) => {
-                fetchDataList();
-                //@ts-ignore
-                successDialog(true);
-                // setFormData({
-                //     title_ar: "",
-                //     title_en: "",
-                //     order: 0,
-                //     link: "",
-                //     is_active: 0,
-                //     image: null,
-                // });
-            })
-            .catch((error) => {});
-    };
+    //     addTicketService(fd)
+    //         .then((response) => {
+    //             fetchDataList();
+    //             //@ts-ignore
+    //             successDialog(true);
+    //             // setFormData({
+    //             //     title_ar: "",
+    //             //     title_en: "",
+    //             //     order: 0,
+    //             //     link: "",
+    //             //     is_active: 0,
+    //             //     image: null,
+    //             // });
+    //         })
+    //         .catch((error) => {});
+    // };
+
 
     const tableHeadActionsSlot = () => {
         return (
             <>
+
+
+
+                <UIBaseDialog
+                    title="بدء محادثة "
+                    confirmHandler={() => { }}
+                    confirmText="اضافة"
+                    form="update-form"
+                    btn={
+                        <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
+                            <button className="bg-[#0094140D] p-1 rounded-lg">
+                                بدء محادثة
+                            </button>
+                        </div>
+                    }
+                >
+                    <form onSubmit={undefined} id="update-form">
+                        <div className="space-y-7">
+                            <TextFieldNada
+                                name="name_ar"
+                                type="text"
+                                handleChange={undefined}
+                                value={undefined}
+                                label=" اسم المنطقة ( عربي ) "
+                                placeholder=" اسم المنطقة  "
+                            ></TextFieldNada>
+
+
+                        </div>
+                    </form>
+                </UIBaseDialog>
+
+
+
+
                 <UIPrimaryDropdown
                     items={statusList}
                     itemName="name"
@@ -199,12 +243,57 @@ export default function rubbush_collectors() {
                 >
                     الحالة
                 </UIPrimaryDropdown>
+
+
             </>
         );
     };
     useEffect(() => {
         fetchDataList();
     }, [page]); // runs every time `page` changes
+
+    const handleChangeValue = (e) => {
+        setMessage(e.target.value)
+    }
+
+
+    const handleSelectedTicket = (item) => {
+
+        setAdminTicket(item)
+
+        showTicketMessagesService(item.id).then((response) => {
+            console.log(response)
+
+
+            setMessages(response.data.messages)
+
+        })
+    }
+
+
+
+
+
+    const handleSendMsg = () => {
+        setMessagesArr([])
+        if (!adminTicket) return
+        const body = JSON.stringify({
+            content: message
+        })
+        addTicketMessage(adminTicket.id, body).then((response) => {
+            setIsSent(true)
+            setMessage('')
+            setMessagesArr(response.data.messages)
+
+        })
+    }
+
+
+    // useEffect(() => {
+
+
+    // }, [])
+
 
     return (
         <>
@@ -230,7 +319,7 @@ export default function rubbush_collectors() {
                                     itemName="name"
                                     itemValue="is_active"
                                     btnColorTailwindClass={
-                                        item.status == "open"
+                                        item.status == "closed"
                                             ? "bg-red-100 text-red-600 hover:bg-text-red-200"
                                             : undefined
                                     }
@@ -256,129 +345,80 @@ export default function rubbush_collectors() {
                                             <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
                                         </button>
                                     </UIDialogConfirm>
-                                    {/* <UIBaseDialog
-                                        title="تعديل الالاشاد"
-                                        confirmHandler={() => {}}
-                                        confirmText="اضافة"
+
+
+
+                                    <UIBaseDialog heightStyle="h-[900px]"
+                                        title="بدء محادثة"
+                                        confirmHandler={() => { handleSendMsg() }}
+                                        confirmText="ارسال"
                                         form="update-form"
                                         btn={
-                                            <button
-                                                onClick={() => {
-                                                    updateDataItem(item);
-                                                }}
-                                                className="bg-[#0094140D] p-1 rounded-lg"
-                                            >
-                                                <span className="mdi mdi-folder-edit-outline text-[#009414]"></span>
-                                            </button>
+                                            <div onClick={() => handleSelectedTicket(item)} className="bg-[#009414] py-1 px-3 rounded-xl text-center  text-white  cursor-pointer">
+                                                <span className="mdi mdi-chat-processing-outline"></span>
+                                            </div>
                                         }
                                     >
-                                        <form
-                                            onSubmit={updateSubmit}
-                                            id="update-form"
-                                        >
-                                            <div className="space-y-7">
-                                                <div className="w-full flex justify-center mb-20">
-                                                    <FileInputImg
-                                                        state="edit"
-                                                        fileUrl={item.image}
-                                                        onFileChange={(arg) => {
-                                                            setUpdateFormData(
-                                                                (prev) => ({
-                                                                    ...prev,
-                                                                    ["image"]:
-                                                                        arg?.file64 ??
-                                                                        null,
-                                                                })
-                                                            );
-                                                        }}
-                                                    ></FileInputImg>
+                                        <div className="flex flex-col justify-between h-full ">
+
+                                            <div className="" >
+                                                <div className="text-right px-4 py-5">
+                                                    <span className="font-bold">{adminTicket?.created_by.name}</span>
                                                 </div>
-                                                <TextFieldNada
-                                                    name="title_ar"
-                                                    type="text"
-                                                    prependIcon="mdi mdi-notebook-edit-outline"
-                                                    iconType="mdi"
-                                                    handleChange={
-                                                        updateFormChangeHander
-                                                    }
-                                                    value={
-                                                        updateFormData.title_ar
-                                                    }
-                                                    label=" النص ( عربي ) "
-                                                    placeholder=" ادخل نص اللافتة بالغة العربية  "
-                                                ></TextFieldNada>
+                                                <div className="flex justify-between items-center gap-1">
+                                                    <div className="bg-gray-100 w-full h-0.5 mt-3">
 
-                                                <TextFieldNada
-                                                    name="title_en"
-                                                    type="text"
-                                                    prependIcon="mdi mdi-notebook-edit-outline"
-                                                    iconType="mdi"
-                                                    handleChange={
-                                                        updateFormChangeHander
-                                                    }
-                                                    value={
-                                                        updateFormData.title_en
-                                                    }
-                                                    label=" النص ( انجليزي ) "
-                                                    placeholder=" ادخل نص اللافتة بالغة الانجليزية  "
-                                                ></TextFieldNada>
+                                                    </div>
+                                                    <span className="">اليوم</span>
+                                                    <div className="bg-gray-100 w-full h-0.5 mt-3">
 
-                                                <TextFieldNada
-                                                    name="link"
-                                                    type="text"
-                                                    prependIcon="mdi mdi-notebook-edit-outline"
-                                                    iconType="mdi"
-                                                    handleChange={
-                                                        updateFormChangeHander
-                                                    }
-                                                    value={updateFormData.link}
-                                                    label=" الرابط"
-                                                    placeholder=" ادخل الرابط الخاص باللافتة  "
-                                                ></TextFieldNada>
+                                                    </div>
+                                                    <div>
 
-                                                <TextFieldNada
-                                                    name="order"
-                                                    type="number"
-                                                    prependIcon="mdi mdi-swap-vertical"
-                                                    iconType="mdi"
-                                                    handleChange={
-                                                        updateFormChangeHander
-                                                    }
-                                                    value={updateFormData.order}
-                                                    label=" الترتيب"
-                                                    placeholder=" ادخل رقم ترتيب النص في العرض "
-                                                ></TextFieldNada>
+                                                    </div>
 
-                                                <SelectInput
-                                                    value={
-                                                        updateFormData.is_active
-                                                    }
-                                                    items={statusList}
-                                                    itemName="name"
-                                                    itemValue="is_active"
-                                                    label="الحالة"
-                                                    placeholder="لختر الحالة"
-                                                    name="is_active"
-                                                    required={true}
-                                                    onChange={(value) => {
-                                                        setUpdateFormData(
-                                                            (prev) => ({
-                                                                ...prev,
-                                                                ["is_active"]:
-                                                                    value,
-                                                            })
-                                                        );
-                                                    }}
-                                                ></SelectInput>
+                                                </div>
                                             </div>
-                                        </form>
-                                    </UIBaseDialog> */}
+
+
+                                            <div className="h-[500px] overflow-y-auto px-4 mt-3">
+
+                                                {messages.map((item, index) => (
+                                                    item.sender.type.includes('Admin') ?
+                                                        <div className=" text-right bg-red-600">
+                                                            {item.content}
+                                                        </div> :
+
+                                                        <div className="text-left bg-green-600">
+                                                            {item.content}
+                                                        </div>
+                                                ))}
+
+
+                                            </div>
+
+
+                                            <div className="">
+                                                <div className="p-4   bg-white">
+                                                    <input value={message} onChange={(e) => handleChangeValue(e)} className="w-full border rounded px-3 py-2" type="text" placeholder="اكتب رسالتك هنا" />
+                                                </div>
+                                            </div>
+
+
+
+
+
+
+                                        </div>
+                                    </UIBaseDialog>
+
+
                                 </div>
                             </td>
                         </tr>
                     ))}
-                </BaseDataTable>
-            </div>
+                </BaseDataTable >
+            </div >
         </>
     );
 }

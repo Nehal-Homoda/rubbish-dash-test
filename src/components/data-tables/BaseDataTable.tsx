@@ -110,7 +110,7 @@ export default function ({
                           ></span> */}
                                                     {/* <span onClick={() => handleSort(item, 'desc')} className="mdi mdi-menu-down m-0 p-0  "></span> */}
 
-                                                    <div
+                                                    {/* <div
                                                         onClick={() => {}}
                                                         className={`arrow-img-wrap w-2 h-2  ${
                                                             !isUpActive
@@ -138,7 +138,7 @@ export default function ({
                                                             src={arrowImage.src}
                                                             alt=""
                                                         />
-                                                    </div>
+                                                    </div> */}
                                                 </div>
                                                 <span className="cursor-pointer">
                                                     {item.text}
