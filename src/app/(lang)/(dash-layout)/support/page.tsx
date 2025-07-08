@@ -143,7 +143,7 @@ export default function rubbush_collectors() {
     }
 
 
-    const handleSelectedTicket = (item:AdminTicket) => {
+    const handleSelectedTicket = (item) => {
 
         setAdminTicket(item)
 
@@ -199,7 +199,15 @@ export default function rubbush_collectors() {
     }, [adminTicket])
 
 
-   
+    const updateDataItem = (item) => {
+
+    }
+    const updateSubmit = () => {
+
+    }
+    const updateFormChangeHander = () => {
+
+    }
 
 
 
@@ -313,7 +321,7 @@ export default function rubbush_collectors() {
                                         confirmText="ارسال"
                                         form="update-form"
                                         btn={
-                                            <div onClick={() => handleSelectedTicket} className="bg-[#009414] py-1 px-3 rounded-xl text-center  text-white  cursor-pointer">
+                                            <div onClick={() => handleSelectedTicket(item)} className="bg-[#009414] py-1 px-3 rounded-xl text-center  text-white  cursor-pointer">
                                                 <span className="mdi mdi-chat-processing-outline"></span>
                                             </div>
                                         }
