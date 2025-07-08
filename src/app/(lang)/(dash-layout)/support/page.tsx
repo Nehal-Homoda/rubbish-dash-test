@@ -143,7 +143,7 @@ export default function rubbush_collectors() {
     }
 
 
-    const handleSelectedTicket = (item) => {
+    const handleSelectedTicket = (item: any) => {
 
         setAdminTicket(item)
 
@@ -199,7 +199,7 @@ export default function rubbush_collectors() {
     }, [adminTicket])
 
 
-    const updateDataItem = (item) => {
+    const updateDataItem = (item: any) => {
 
     }
     const updateSubmit = () => {
