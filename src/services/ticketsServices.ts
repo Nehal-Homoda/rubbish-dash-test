@@ -82,7 +82,7 @@ export const updateTicketService = async (id: number, body: string) => {
         throw new Error(error.message);
     }
 };
-export const addTicketMessage = async (id: number, body: string) => {
+export const addTicketMessageService = async (id: number, body: string) => {
     try {
         const response = await apiCall.post(
             `/admins/tickets/${id}/add-message`,

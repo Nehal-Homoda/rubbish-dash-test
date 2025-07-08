@@ -18,6 +18,9 @@ import MultiCheckbox from "@/components/ui/form/MultiCheckbox";
 import SelectInput from "@/components/ui/form/SelectInput";
 import { successDialog } from "@/utils/shared";
 import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
+import { getCollectorsService } from "@/services/collectorsService";
+// import { Collector } from "@/types/regions.interface";
+import { Collector } from "@/types/collectors.interface"
 
 export default function rubbush_collectors() {
     const [dataList, setDataList] = useState<District[]>([]);
@@ -47,11 +50,16 @@ export default function rubbush_collectors() {
     const [selectedDataItem, setSelectedDataItem] = useState<District | null>(
         null
     );
+
+    const [collectors, setCollectors] = useState<Collector[]>([])
+
+
     type FormDataType = {
         name_ar: string;
         name_en: string;
         order: number;
         is_active: number;
+        collector_id: string[];
         available_days: string[];
         available_times: string[];
     };
@@ -60,6 +68,7 @@ export default function rubbush_collectors() {
         name_en: "",
         order: 0,
         is_active: 0,
+        collector_id: [],
         available_days: [],
         available_times: [],
     });
@@ -69,6 +78,7 @@ export default function rubbush_collectors() {
         name_en: "",
         order: 0,
         is_active: 0,
+        collector_id: [],
         available_days: [],
         available_times: [],
     });
@@ -90,11 +100,17 @@ export default function rubbush_collectors() {
 
         getDistrictService(query)
             .then((response) => {
+
                 setDataList(response.data);
                 setTotalPages(response.meta.last_page);
+                response.data.map((item) => {
+                    setDistrictTime(item.available_times)
+                })
             })
-            .catch(() => {});
+            .catch(() => { });
     };
+
+
     const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         fetchDataList({ search: e.target.value });
     };
@@ -119,7 +135,7 @@ export default function rubbush_collectors() {
 
                 console.log(response);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     const deleteSubmit = (item: District, selectedIndex: number) => {
@@ -130,7 +146,7 @@ export default function rubbush_collectors() {
                 setDataList(updatedArr);
                 successDialog(true);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     const updateDataItem = (item: District) => {
@@ -139,6 +155,7 @@ export default function rubbush_collectors() {
             name_ar: item.name_ar,
             name_en: item.name_en,
             order: item.order,
+            collector_id: item.collector.map((item) => item.id.toString()),
             is_active: item.is_active ? 1 : 0,
             available_days: item.available_days,
             available_times: item.available_times,
@@ -153,13 +170,14 @@ export default function rubbush_collectors() {
         const body = JSON.stringify({
             ...updateFormData,
         });
+        console.log('update form', updateFormData)
 
         updateDistrictService(selectedDataItem.id, body)
             .then((response) => {
                 fetchDataList();
                 successDialog(true);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     const addFormChangeHander = (
@@ -195,7 +213,7 @@ export default function rubbush_collectors() {
         formData.available_days.forEach((day, index) =>
             fd.append(`available_days[${index}]`, day)
         );
-        formData.available_days.forEach((time, index) =>
+        formData.available_times.forEach((time, index) =>
             fd.append(`available_times[${index}]`, time)
         );
         fd.append("is_active", formData.is_active.toString());
@@ -214,7 +232,7 @@ export default function rubbush_collectors() {
                     available_times: [],
                 });
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     const tableHeadActionsSlot = () => {
@@ -222,7 +240,7 @@ export default function rubbush_collectors() {
             <>
                 <UIBaseDialog
                     title="اضافة منطقه"
-                    confirmHandler={() => {}}
+                    confirmHandler={() => { }}
                     confirmText="اضافة"
                     form="update-form"
                     btn={
@@ -314,8 +332,20 @@ export default function rubbush_collectors() {
             </>
         );
     };
+
+
+    const fetchCollectors = () => {
+        getCollectorsService().then((response) => {
+            // console.log('collectors are', response)
+            setCollectors(response.data)
+
+
+        })
+    }
+
     useEffect(() => {
         fetchDataList();
+        fetchCollectors()
     }, [page]); // runs every time `page` changes
 
     return (
@@ -369,7 +399,7 @@ export default function rubbush_collectors() {
                                     </UIDialogConfirm>
                                     <UIBaseDialog
                                         title="تعديل منطقه"
-                                        confirmHandler={() => {}}
+                                        confirmHandler={() => { }}
                                         confirmText="حفظ"
                                         form="update-form"
                                         btn={
@@ -413,6 +443,56 @@ export default function rubbush_collectors() {
                                                     label=" اسم المنطقة ( انجليزي ) "
                                                     placeholder=" اسم المنطقة  "
                                                 ></TextFieldNada>
+
+
+
+                                                {/* <SelectInput
+                                                    value={
+                                                        updateFormData.collector_id
+                                                    }
+                                                    items={collectors}
+                                                    itemName="name"
+                                                    itemValue="id"
+                                                    label="جامع القمامة"
+                                                    placeholder="اختر جامع القمامة"
+                                                    name="collector_id"
+                                                    required={true}
+                                                    onChange={(value) => {
+                                                        setUpdateFormData(
+                                                            (prev) => ({
+                                                                ...prev,
+                                                                ["collector_id"]:
+                                                                    value,
+                                                            })
+                                                        );
+                                                    }}
+                                                ></SelectInput> */}
+
+
+
+                                                <MultiCheckbox
+                                                    items={collectors}
+                                                    itemName="name"
+                                                    itemValue="id"
+                                                    value={updateFormData.collector_id}
+                                                    label="جامع القمامة"
+                                                    required={true}
+                                                    name="collector_id"
+                                                    placeholder="اختر جامع القمامة"
+                                                    // prependIcon="mdi mdi-calendar-month-outline"
+                                                    iconType="mdi"
+                                                    onChange={(
+                                                        value
+                                                    ) => {
+                                                        setUpdateFormData(
+                                                            (prev) => ({
+                                                                ...prev,
+                                                                ["collector_id"]:
+                                                                    value,
+                                                            })
+                                                        );
+                                                    }}
+                                                ></MultiCheckbox>
 
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                                     <div className="col-span-1">

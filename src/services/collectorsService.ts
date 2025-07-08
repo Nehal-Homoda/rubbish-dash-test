@@ -18,7 +18,7 @@ export const getCollectorsService = async (query?: string) => {
         if (!response.ok) {
             await responseErrorServiceHandler(response, "collectors");
         }
-        const data = (await response.json()) as ResponseData<Collector[]>;
+        const data = (await response.json()) as ResponseData<Collector[]> ;
         console.log("response data =>>>>", data);
         return data;
     } catch (error: any) {
