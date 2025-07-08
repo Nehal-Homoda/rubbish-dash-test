@@ -228,6 +228,7 @@ export default function rubbush_collectors() {
                     name_en: "",
                     order: 0,
                     is_active: 0,
+                    collector_id: [],
                     available_days: [],
                     available_times: [],
                 });
