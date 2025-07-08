@@ -135,7 +135,7 @@ export default function DashSidebar({ isOpen, toggleSidebarHandler }: Props) {
     const openSidebar = () => {
         toggleSidebarHandler()
     };
-    const handleOnClick = (item:ListItem) => {
+    const handleOnClick = (item: ListItem) => {
         dispatch(changeTitle(item.text))
         router.push(`${langPrefix}${item.path}`)
 
