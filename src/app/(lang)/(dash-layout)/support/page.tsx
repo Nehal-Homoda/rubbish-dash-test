@@ -7,10 +7,10 @@ import UIBaseDialog from "@/components/ui/UIBaseDialog";
 import SelectInput from "@/components/ui/form/SelectInput";
 import { successDialog } from "@/utils/shared";
 import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
-import FileInputImg from "@/components/ui/form/FileInputImg";
 import { AdminTicket, Message, Ticket } from "@/types/tickets.interface";
+import editImg from '@/assets/images/icons/edit.png'
 import {
-    addTicketMessage,
+    addTicketMessageService,
     deleteTicketService,
     getTicketsService,
     showTicketMessagesService,
@@ -51,10 +51,10 @@ export default function rubbush_collectors() {
         title_ar: "",
         content: "",
     });
-    const [message, setMessage] = useState<string>('')
+    const [inputMessage, setInputMessage] = useState<string>('')
     const [isSent, setIsSent] = useState<boolean>(false)
     const [messages, setMessages] = useState<Message[]>([])
-    const [userArr, setUserArr] = useState([])
+    const [adminMessage, setAdminMessage] = useState<string>('')
 
 
     const fetchDataList = ({
@@ -112,125 +112,11 @@ export default function rubbush_collectors() {
             .catch((error) => { });
     };
 
-    // const updateDataItem = (item: Ticket) => {
-    //     setSelectedDataItem(item);
-    //     // setUpdateFormData({
-    //     //     title_ar: item.title,
-    //     //     title_en: item.title,
-    //     //     order: item.order,
-    //     //     link: item.link,
-    //     //     is_active: item.is_active ? 1 : 0,
-    //     //     image: item.image,
-    //     // });
-    // };
-
-    // const updateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    //     e.preventDefault();
-
-    //     if (!selectedDataItem) return;
-
-    //     const body = JSON.stringify({
-    //         ...updateFormData,
-    //     });
-
-    //     updateTicketService(selectedDataItem.id, body)
-    //         .then((response) => {
-    //             fetchDataList();
-    //             successDialog(true);
-    //         })
-    //         .catch((error) => {});
-    // };
-
-    // const addFormChangeHander = (
-    //     e: React.ChangeEvent<HTMLInputElement>,
-    //     index?: number
-    // ) => {
-    //     setFormData((prev) => ({
-    //         ...prev,
-    //         [e.target.name]: e.target.value,
-    //     }));
-
-    //     console.log(e.target.name, e.target.value);
-    // };
-    // const updateFormChangeHander = (
-    //     e: React.ChangeEvent<HTMLInputElement>,
-    //     index?: number
-    // ) => {
-    //     setUpdateFormData((prev) => ({
-    //         ...prev,
-    //         [e.target.name]: e.target.value,
-    //     }));
-
-    //     console.log(e.target.name, e.target.value);
-    // };
-
-    // const createSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    //     e.preventDefault();
-
-    //     const fd = new FormData();
-    //     // fd.append("title_ar", formData.title_ar);
-    //     // fd.append("title_en", formData.title_en);
-    //     // fd.append("order", formData.order.toString());
-    //     // fd.append("link", formData.link);
-    //     // fd.append("is_active", formData.is_active.toString());
-    //     // if (formData.image) {
-    //     //     fd.append("image", formData.image);
-    //     // }
-
-    //     addTicketService(fd)
-    //         .then((response) => {
-    //             fetchDataList();
-    //             //@ts-ignore
-    //             successDialog(true);
-    //             // setFormData({
-    //             //     title_ar: "",
-    //             //     title_en: "",
-    //             //     order: 0,
-    //             //     link: "",
-    //             //     is_active: 0,
-    //             //     image: null,
-    //             // });
-    //         })
-    //         .catch((error) => {});
-    // };
 
 
     const tableHeadActionsSlot = () => {
         return (
             <>
-
-
-
-                <UIBaseDialog
-                    title="بدء محادثة "
-                    confirmHandler={() => { }}
-                    confirmText="اضافة"
-                    form="update-form"
-                    btn={
-                        <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
-                            <button className="bg-[#0094140D] p-1 rounded-lg">
-                                بدء محادثة
-                            </button>
-                        </div>
-                    }
-                >
-                    <form onSubmit={undefined} id="update-form">
-                        <div className="space-y-7">
-                            <TextFieldNada
-                                name="name_ar"
-                                type="text"
-                                handleChange={undefined}
-                                value={undefined}
-                                label=" اسم المنطقة ( عربي ) "
-                                placeholder=" اسم المنطقة  "
-                            ></TextFieldNada>
-
-
-                        </div>
-                    </form>
-                </UIBaseDialog>
-
-
 
 
                 <UIPrimaryDropdown
@@ -253,7 +139,7 @@ export default function rubbush_collectors() {
     }, [page]); // runs every time `page` changes
 
     const handleChangeValue = (e) => {
-        setMessage(e.target.value)
+        setInputMessage(e.target.value)
     }
 
 
@@ -275,24 +161,54 @@ export default function rubbush_collectors() {
 
 
     const handleSendMsg = () => {
-        setMessagesArr([])
+
         if (!adminTicket) return
         const body = JSON.stringify({
-            content: message
+            content: inputMessage
         })
-        addTicketMessage(adminTicket.id, body).then((response) => {
+        addTicketMessageService(adminTicket.id, body).then((response) => {
+            console.log(response)
             setIsSent(true)
-            setMessage('')
-            setMessagesArr(response.data.messages)
+            setAdminMessage(inputMessage)
+            setInputMessage('')
+
 
         })
     }
 
 
-    // useEffect(() => {
 
 
-    // }, [])
+    useEffect(() => {
+        if (!adminTicket) return
+        const messageInterval = setInterval(() => {
+
+            showTicketMessagesService(adminTicket.id).then((response) => {
+                console.log('new new ')
+                setMessages(response.data.messages)
+
+
+            })
+
+        }, 3000);
+
+        return () => {
+            clearInterval(messageInterval);
+        };
+
+    }, [adminTicket])
+
+
+    const updateDataItem = (item) => {
+
+    }
+    const updateSubmit = () => {
+
+    }
+    const updateFormChangeHander = () => {
+
+    }
+
 
 
     return (
@@ -335,16 +251,67 @@ export default function rubbush_collectors() {
                             <td className="">
                                 <div className="flex gap-3">
                                     <UIDialogConfirm
+                                    deleteAction={true}
                                         danger
-                                        title="هل انت متأكد من حذف العنصر"
+                                        title="حذف تذكرة"
                                         confirmHandler={() => {
                                             deleteSubmit(item, index);
                                         }}
                                     >
-                                        <button className="bg-[#F9285A0A] p-1 rounded-lg">
+
+
+                                        <button className="bg-[#F9285A0A] p-1 rounded-lg w-4 h-4">
                                             <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
                                         </button>
                                     </UIDialogConfirm>
+
+
+
+
+
+                                    {/* <UIBaseDialog
+                                        title="تعديل تذكرة"
+                                        confirmHandler={() => { }}
+                                        confirmText="حفظ"
+                                        form="update-form"
+                                        btn={
+                                            <button
+                                                onClick={() => {
+                                                    updateDataItem(item);
+                                                }}
+                                                className="bg-[#0094140D] p-1 rounded-lg"
+                                            >
+                                                <div className="w-4 h-4">
+                                                    <img className="w-full h-full object-contain" src={editImg.src} alt="" />
+                                                </div>
+                                            </button>
+                                        }
+                                    >
+                                        <form
+                                            onSubmit={updateSubmit}
+                                            id="update-form"
+                                        >
+                                            <div className="space-y-7">
+                                                <TextFieldNada
+                                                    name="name_ar"
+                                                    type="text"
+                                                    handleChange={
+                                                        updateFormChangeHander
+                                                    }
+                                                    value={
+                                                        undefined
+                                                    }
+                                                    label=" اسم المنطقة ( عربي ) "
+                                                    placeholder=" اسم المنطقة  "
+                                                ></TextFieldNada>
+
+
+
+
+
+                                            </div>
+                                        </form>
+                                    </UIBaseDialog> */}
 
 
 
@@ -363,7 +330,7 @@ export default function rubbush_collectors() {
 
                                             <div className="" >
                                                 <div className="text-right px-4 py-5">
-                                                    <span className="font-bold">{adminTicket?.created_by.name}</span>
+                                                    <span className="font-bold">{adminTicket && adminTicket.created_by.name}</span>
                                                 </div>
                                                 <div className="flex justify-between items-center gap-1">
                                                     <div className="bg-gray-100 w-full h-0.5 mt-3">
@@ -385,14 +352,15 @@ export default function rubbush_collectors() {
 
                                                 {messages.map((item, index) => (
                                                     item.sender.type.includes('Admin') ?
-                                                        <div className=" text-right bg-red-600">
+                                                        <div className=" bg-[#009414] text-white text-right mb-4  px-3 py-4 rounded-lg">
                                                             {item.content}
                                                         </div> :
 
-                                                        <div className="text-left bg-green-600">
+                                                        <div className="text-left text-[#38433bf6] bg-[#ADAAAA1F] mb-4 px-3 py-4  rounded-lg ">
                                                             {item.content}
                                                         </div>
                                                 ))}
+
 
 
                                             </div>
@@ -400,7 +368,7 @@ export default function rubbush_collectors() {
 
                                             <div className="">
                                                 <div className="p-4   bg-white">
-                                                    <input value={message} onChange={(e) => handleChangeValue(e)} className="w-full border rounded px-3 py-2" type="text" placeholder="اكتب رسالتك هنا" />
+                                                    <input value={inputMessage} onChange={(e) => handleChangeValue(e)} className="w-full border rounded px-3 py-2" type="text" placeholder="اكتب رسالتك هنا" />
                                                 </div>
                                             </div>
 
@@ -411,6 +379,8 @@ export default function rubbush_collectors() {
 
                                         </div>
                                     </UIBaseDialog>
+
+
 
 
                                 </div>

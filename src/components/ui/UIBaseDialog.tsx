@@ -73,12 +73,12 @@ export default function UIBaseDialog({
                                 leaveFrom="opacity-100 scale-100"
                                 leaveTo="opacity-0 scale-95"
                             >
-                                <DialogPanel className={`w-full max-w-[750px] ${heightStyle} transform rounded-2xl bg-white  p-6 text-left align-middle shadow-xl transition-all`}>
+                                <DialogPanel className={`w-full max-w-[750px] ${heightStyle} transform rounded-2xl bg-white  p-10 text-left align-middle shadow-xl transition-all`}>
                                     <DialogTitle
                                         as="h3"
                                         className="relative text-lg font-bold leading-6 text-center text-gray-900 "
                                     >
-                                        <div className="w-24 h-1 rounded-2xl mb-5 bg-gray-300 mx-auto"></div>
+                                        {/* <div className="w-24 h-1 rounded-2xl mb-5 bg-gray-300 mx-auto"></div> */}
                                         {title}
                                         <button
                                             onClick={closeModal}

@@ -78,7 +78,7 @@ export default function MultiCheckbox({
             <Menu as="div" className="w-full relative inline-block">
                 <div className="w-full">
                     <MenuButton
-                        className={`w-full w-fullfocus:outline-none outline-none border-none `}
+                        className={`w-full  focus:outline-none outline-none border-none `}
                     >
                         <div className="w-full relative p-1.5 border border-surface-light-700 rounded-2xl">
                             <div className="label flex items-center gap-1 absolute -top-4 start-4 bg-background w-fit px-3 text-sm font-semibold">
@@ -87,7 +87,7 @@ export default function MultiCheckbox({
                                     <span className="text-red-600">*</span>
                                 )}
                             </div>
-                            <div className="card h-8 flex justify-content-center items-center">
+                            <div className="card h-8 realtive flex  items-center">
                                 {prependIcon && (
                                     <div className="mt-1">
                                         {iconType === "mdi" && (
@@ -105,8 +105,14 @@ export default function MultiCheckbox({
                                 <div className="px-2 truncate">
                                     {displayedValue}
                                 </div>
+
+                                <div className="absolute left-3">
+                                    <span className="mdi mdi-chevron-down"></span>
+                                </div>
                             </div>
+
                         </div>
+
                     </MenuButton>
                 </div>
                 <Transition

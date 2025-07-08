@@ -69,7 +69,7 @@ export default function DashSidebar({ isOpen, toggleSidebarHandler }: Props) {
         {
             icon: "mdi-dolly",
             name: "rubbush_collectors",
-            text: "مجمعي القمامة",
+            text: "جامعي القمامة",
             path: Routes.rubbushCollectors,
             iconType: "mdi",
         },
