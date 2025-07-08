@@ -138,12 +138,12 @@ export default function rubbush_collectors() {
         fetchDataList();
     }, [page]); // runs every time `page` changes
 
-    const handleChangeValue = (e) => {
+    const handleChangeValue = (e:React.ChangeEvent<HTMLInputElement>) => {
         setInputMessage(e.target.value)
     }
 
 
-    const handleSelectedTicket = (item) => {
+    const handleSelectedTicket = (item:AdminTicket) => {
 
         setAdminTicket(item)
 
@@ -199,15 +199,7 @@ export default function rubbush_collectors() {
     }, [adminTicket])
 
 
-    const updateDataItem = (item) => {
-
-    }
-    const updateSubmit = () => {
-
-    }
-    const updateFormChangeHander = () => {
-
-    }
+   
 
 
 
@@ -321,7 +313,7 @@ export default function rubbush_collectors() {
                                         confirmText="ارسال"
                                         form="update-form"
                                         btn={
-                                            <div onClick={() => handleSelectedTicket(item)} className="bg-[#009414] py-1 px-3 rounded-xl text-center  text-white  cursor-pointer">
+                                            <div onClick={() => handleSelectedTicket} className="bg-[#009414] py-1 px-3 rounded-xl text-center  text-white  cursor-pointer">
                                                 <span className="mdi mdi-chat-processing-outline"></span>
                                             </div>
                                         }
