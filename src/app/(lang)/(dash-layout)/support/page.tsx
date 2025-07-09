@@ -23,6 +23,7 @@ export default function rubbush_collectors() {
         { text: "ID", name: "id" },
         { text: " الاسم", name: "name_ar" },
         { text: "الموضوع", name: "is_active" },
+        { text: "النوع", name: "is_active" },
         { text: "الحالة", name: "is_active" },
         { text: "تاريخ الانشاء", name: "is_active" },
         { text: "الاجراءات", name: "image" },
@@ -143,7 +144,7 @@ export default function rubbush_collectors() {
     }
 
 
-    const handleSelectedTicket = (item) => {
+    const handleSelectedTicket = (item: any) => {
 
         setAdminTicket(item)
 
@@ -199,7 +200,7 @@ export default function rubbush_collectors() {
     }, [adminTicket])
 
 
-    const updateDataItem = (item) => {
+    const updateDataItem = (item: any) => {
 
     }
     const updateSubmit = () => {
@@ -208,6 +209,13 @@ export default function rubbush_collectors() {
     const updateFormChangeHander = () => {
 
     }
+    const itemType = (item: Ticket) => {
+        
+        if(item.created_by.type.includes('Collector')) return 'جامع قمامة'
+        if(item.created_by.type.includes('User')) return 'مستخدم'
+        
+        return '-'
+    }   
 
 
 
@@ -228,6 +236,7 @@ export default function rubbush_collectors() {
                                 {item.created_by.name}
                             </td>
                             <td className="py-2 px-4">{item.subject}</td>
+                            <td className="py-2 px-4  text-nowrap">{itemType(item)}</td>
 
                             <td className="py-2 px-4">
                                 <UIPrimaryDropdown

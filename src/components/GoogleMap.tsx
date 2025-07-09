@@ -8,6 +8,7 @@ import gmapStyle from '@/assets/gmap-style/gmapStyle.json'
 import { title } from "process";
 const { Loader } = gmaps;
 interface MarkerData {
+    //@ts-ignore
     position: google.maps.LatLngLiteral;
     icon: string;
 }
@@ -21,7 +22,7 @@ const markersData: MarkerData[] = [
 
 export default function GoogleMap() {
     const mapRef = useRef<HTMLDivElement | null>(null);
-
+//@ts-ignore
     const [center, setCenter] = useState<google.maps.LatLngLiteral>({
         lat: 0,
         lng: 0,
@@ -57,6 +58,7 @@ export default function GoogleMap() {
 
 
     const initializeGoogleMap = async (
+        //@ts-ignore
         centerPosition: google.maps.LatLngLiteral,
         collectors: Collector[]
     ) => {
@@ -70,10 +72,11 @@ export default function GoogleMap() {
 
         loader.load().then(() => {
             if (!mapRef.current) return;
-
+//@ts-ignore
             const mapOptions: google.maps.MapOptions = {
-                zoom: 8,
+                zoom: 14,
                 center: centerPosition,
+                //@ts-ignore
                 mapTypeId: google.maps.MapTypeId.ROADMAP,
                 zoomControl: false,
                 mapTypeControl: false,
@@ -84,11 +87,12 @@ export default function GoogleMap() {
                 styles: gmapStyle
             };
             console.log('options', mapOptions)
-
+//@ts-ignore
             const map = new google.maps.Map(mapRef.current, mapOptions);
 
             console.log('collector issssssssssss', collectors)
             collectors.forEach((data) => {
+                //@ts-ignore
                 const marker = new google.maps.Marker({
                     position: { lat: Number(data.current_lat), lng: Number(data.current_lng) },
                     map,
@@ -108,6 +112,7 @@ export default function GoogleMap() {
 
 
                 marker.addListener("click", () => {
+                    //@ts-ignore
                     const infoWindow = new google.maps.InfoWindow();
                     // infoWindow.setContent(marker.getTitle()); // getTitle() retrieves the 'title' you set
                     // infoWindow.open(map, marker);
@@ -119,7 +124,7 @@ export default function GoogleMap() {
                     if (selectedCollector) {
                         infoWindow.setContent(`
                             
-                            <div class="text-white w-full h-full bg-[#009414]">
+                            <div class="text-white w-full h-full px-3 bg-[#009414]">
                              ${selectedCollector.name}
                             </div>
 
@@ -135,7 +140,6 @@ export default function GoogleMap() {
 
     return (
         <div className="w-full h-full rounded-3xl overflow-hidden">
-
             <div id="get-location-map" ref={mapRef} className="w-full h-full"></div>
         </div>
     );

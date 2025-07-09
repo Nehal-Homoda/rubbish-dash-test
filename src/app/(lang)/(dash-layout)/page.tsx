@@ -331,13 +331,17 @@ export default function Home() {
           <div className="bg-[#00000009]  p-4 rounded-3xl">
             <div className="grid grid-cols-2 gap-5">
 
-              <div className="col-span-1  rounded-2xl bg-background  p-7 pb-24 w-full">
+              <div className="lg:col-span-1 col-span-2  rounded-2xl bg-background  p-7 w-full">
                 <h4 className="font-bold mb-5 text-lg">الخريطة</h4>
-                <GoogleMap></GoogleMap>
+                <div className="aspect-[3/3]">
+                  <GoogleMap></GoogleMap>
+                </div>
               </div>
 
-              <div className="col-span-1 rounded-2xl bg-background  p-5 w-full ">
+              <div className="lg:col-span-1 col-span-2 rounded-2xl bg-background  p-7 w-full ">
                 <h4 className="font-bold mb-5 text-lg">الملاحظات</h4>
+                <div className="aspect-[3/3] overflow-auto">
+
                 {collectors && collectors.notes_visit.map((item, index) => (
                   <div key={index} className="py-5">
                     <div className="title flex justify-between">
@@ -360,10 +364,8 @@ export default function Home() {
 
                   </div>
                 ))}
-
-
+                </div>
               </div>
-
             </div>
 
           </div>
