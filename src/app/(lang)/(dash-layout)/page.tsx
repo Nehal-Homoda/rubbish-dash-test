@@ -7,6 +7,7 @@ import { ChartData, HomeCollector, HomePayment, Statistics } from "@/types/home.
 import paymentImg from "@/assets/images/payment-img.png"
 import dynamic from 'next/dynamic';
 import { ApexOptions } from "apexcharts";
+import GoogleMap from "@/components/GoogleMap";
 
 // ✅ Dynamically import chart component only on client side
 const ReactApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
@@ -291,6 +292,7 @@ export default function Home() {
 
         {/* <div className="py-20 container"> */}
 
+<GoogleMap></GoogleMap>
 
 
         <div className="mb-10">
