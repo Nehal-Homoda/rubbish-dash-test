@@ -292,7 +292,7 @@ export default function Home() {
 
         {/* <div className="py-20 container"> */}
 
-<GoogleMap></GoogleMap>
+
 
 
         <div className="mb-10">
@@ -328,32 +328,41 @@ export default function Home() {
         </div>
 
         <div className="mb-10">
-          <div className="bg-[#00000009] p-3 rounded-3xl">
-            <div className="rounded-2xl bg-background  p-5 w-full ">
-              <h4 className="font-bold mb-5 text-lg">الملاحظات</h4>
-              {collectors && collectors.notes_visit.map((item, index) => (
-                <div key={index} className="py-5">
-                  <div className="title flex justify-between">
-                    <div className="font-bold text-[#38433B] text-lg mb-1">
-                      {item.user_name}
+          <div className="bg-[#00000009]  p-4 rounded-3xl">
+            <div className="grid grid-cols-2 gap-5">
+
+              <div className="col-span-1  rounded-2xl bg-background  p-7 pb-24 w-full">
+                <h4 className="font-bold mb-5 text-lg">الخريطة</h4>
+                <GoogleMap></GoogleMap>
+              </div>
+
+              <div className="col-span-1 rounded-2xl bg-background  p-5 w-full ">
+                <h4 className="font-bold mb-5 text-lg">الملاحظات</h4>
+                {collectors && collectors.notes_visit.map((item, index) => (
+                  <div key={index} className="py-5">
+                    <div className="title flex justify-between">
+                      <div className="font-bold text-[#38433B] text-lg mb-1">
+                        {item.user_name}
+                      </div>
+                      <div className=" text-[#009414] mb-1 text-base">
+                        {item.created_at}
+                      </div>
                     </div>
-                    <div className=" text-[#009414] mb-1 text-base">
-                      {item.created_at}
+                    <p className="text-[#ADAAAA] mb-1">{item.address}</p>
+                    <div className="bg-[#00000009]  rounded-lg py-2 mb-1 px-3">
+
+                      <span className="text-[#38433B]">ملاحظة :  </span>
+                      <span className="text-[#ADAAAA] ms-2">{item.user_note}</span>
+
                     </div>
-                  </div>
-                  <p className="text-[#ADAAAA] mb-1">{item.address}</p>
-                  <div className="bg-[#00000009]  rounded-lg py-2 mb-1 px-3">
 
-                    <span className="text-[#38433B]">ملاحظة :  </span>
-                    <span className="text-[#ADAAAA] ms-2">{item.user_note}</span>
+
 
                   </div>
+                ))}
 
 
-
-                </div>
-              ))}
-
+              </div>
 
             </div>
 

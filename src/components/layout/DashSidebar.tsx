@@ -104,7 +104,7 @@ export default function DashSidebar({ isOpen, toggleSidebarHandler }: Props) {
         {
             icon: "mdi-book-outline",
             name: "signs",
-            text: "الاشارات",
+            text: "اللافتات",
             path: Routes.signs,
             iconType: "mdi",
         },
