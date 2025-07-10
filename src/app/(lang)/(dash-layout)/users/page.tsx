@@ -61,7 +61,7 @@ export default function rubbush_collectors() {
     name: "",
     phone: "",
     is_active: 0,
-    
+
   };
   const [formData, setFormData] = useState<FormDataType>({
     name: "",
@@ -154,7 +154,7 @@ export default function rubbush_collectors() {
     });
   };
 
-   const updateFormChangeHander = (
+  const updateFormChangeHander = (
     e: React.ChangeEvent<HTMLInputElement>,
     index?: number
   ) => {
@@ -184,9 +184,9 @@ export default function rubbush_collectors() {
       .catch((error) => { });
   };
 
-  
 
- 
+
+
 
 
   const tableHeadActionsSlot = () => {
@@ -319,7 +319,11 @@ export default function rubbush_collectors() {
 
                     </button>
                   </UIDialogConfirm>
-                  <UIBaseDialog
+
+
+
+
+                  {/* <UIBaseDialog
                     title="تعديل مستخدم"
                     confirmHandler={() => { }}
                     confirmText="اضافة"
@@ -332,7 +336,6 @@ export default function rubbush_collectors() {
                         }}
                         className="bg-[#0094140D] p-1 rounded-lg"
                       >
-                        {/* <span className="mdi mdi-folder-edit-outline text-[#009414]"></span> */}
                         <div className="w-4 h-4">
                           <img className="w-full h-full object-contain" src={editImg.src} alt="" />
                         </div>
@@ -402,14 +405,16 @@ export default function rubbush_collectors() {
                         ></SelectInput>
                       </div>
                     </form>
-                  </UIBaseDialog>
+                  </UIBaseDialog> */}
 
 
-                  {/* <span onClick={() => router.push(`/users/${item.id}`)} className="mdi mdi-eye-outline cursor-pointer"></span> */}
+
 
                   <div className="w-4 h-4 cursor-pointer" onClick={() => router.push(`/users/details?id=${item.id}`)}>
-                    <img className="w-full h-full object-contain" src={eyeImg.src} alt="" />
+                    <img className="w-full h-full object-contain" src={editImg.src} alt="" />
                   </div>
+
+
                 </div>
               </td>
             </tr>

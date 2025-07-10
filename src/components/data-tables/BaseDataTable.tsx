@@ -51,7 +51,7 @@ export default function ({
                         <form className="w-full ">
                             {showSearch && (
                                 <div className="relative">
-                                    <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                                    {/* <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                                         <svg
                                             className="w-4 h-4 text-gray-500 dark:text-gray-400"
                                             aria-hidden="true"
@@ -67,7 +67,7 @@ export default function ({
                                                 d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
                                             />
                                         </svg>
-                                    </div>
+                                    </div> */}
                                     <input
                                         value={searchInput}
                                         onChange={searchChangeHandler}
@@ -83,9 +83,9 @@ export default function ({
 
                         <div className="flex justify-end items-center gap-2 flex-shrink-0 flex-grow-0">
                             {headerActionsSlot}
-                            <div className="bg-[#0094140D] cursor-pointer   py-2 text-center rounded-xl px-5 flex items-center justify-content-center ">
+                            {/* <div className="bg-[#0094140D] cursor-pointer   py-2 text-center rounded-xl px-5 flex items-center justify-content-center ">
                                 <i className="mdi mdi-tray-arrow-down text-[#009414] text-xl"></i>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
 
