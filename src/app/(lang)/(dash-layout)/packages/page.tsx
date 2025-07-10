@@ -139,8 +139,8 @@ export default function rubbush_collectors() {
     const updateDataItem = (item: PackageOffer) => {
         setSelectedDataItem(item);
         setUpdateFormData({
-            name_ar: item.name,
-            name_en: item.name,
+            name_ar: item.name_ar,
+            name_en: item.name_ar,
             order: item.order ? item.order : 0,
             is_active: item.is_active ? 1 : 0,
             category_id: "",
