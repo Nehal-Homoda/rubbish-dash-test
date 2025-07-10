@@ -50,43 +50,42 @@ export default function AuthLoginPage() {
 
     return (
         <>
-            <div className="w-full min-h-screen pt-20">
-                <div className=" ">
-                    <div className="grid md:grid-cols-2">
-                        <div className="col-span-1 ms-56 pt-36">
-                            <h3 className="text-2xl font-bold">
-                                مرحباً بعودتك مرة اخري 👋
-                            </h3>
-                            <p className="text-[#ADAAAA]">
-                                قم بإدخال بياناتك لتسجيل الدخول
-                            </p>
-                            <form
-                                onSubmit={handleLoginSubmit}
-                                className="pt-20"
-                            >
-                                <div className="input-wrap mb-14">
-                                    <TextFieldNada
-                                        errorMessage={formDataError.email}
-                                        label="البريد الالكتروني"
-                                        name="email"
-                                        type="email"
-                                        placeholder="ادخل البريد الالكتروني"
-                                        value={formData.email}
-                                        handleChange={inputChangeHandler}
-                                    ></TextFieldNada>
-                                </div>
-                                <div className="input-wrap mb-14">
-                                    <TextFieldNada
-                                        errorMessage={formDataError.password}
-                                        label="الرقم السري"
-                                        name="password"
-                                        type="password"
-                                        placeholder="الرقم السري"
-                                        value={formData.password}
-                                        handleChange={inputChangeHandler}
-                                    ></TextFieldNada>
-                                </div>
-                                {/* <div className="input-wrap mb-14">
+            <div className="w-full h-screen overflow-hidden  pt-20 ">
+                <div className="grid md:grid-cols-2">
+                    <div className="col-span-1 ms-56 pt-36">
+                        <h3 className="text-2xl font-bold">
+                            مرحباً بعودتك مرة اخري 👋
+                        </h3>
+                        <p className="text-[#ADAAAA]">
+                            قم بإدخال بياناتك لتسجيل الدخول
+                        </p>
+                        <form
+                            onSubmit={handleLoginSubmit}
+                            className="pt-20"
+                        >
+                            <div className="input-wrap mb-14">
+                                <TextFieldNada
+                                    errorMessage={formDataError.email}
+                                    label="البريد الالكتروني"
+                                    name="email"
+                                    type="email"
+                                    placeholder="ادخل البريد الالكتروني"
+                                    value={formData.email}
+                                    handleChange={inputChangeHandler}
+                                ></TextFieldNada>
+                            </div>
+                            <div className="input-wrap mb-14">
+                                <TextFieldNada
+                                    errorMessage={formDataError.password}
+                                    label="الرقم السري"
+                                    name="password"
+                                    type="password"
+                                    placeholder="الرقم السري"
+                                    value={formData.password}
+                                    handleChange={inputChangeHandler}
+                                ></TextFieldNada>
+                            </div>
+                            {/* <div className="input-wrap mb-14">
                                     <TextFieldNada
                                         errorMessage={formDataError.phone}
                                         label="رقم الموبايل"
@@ -98,7 +97,7 @@ export default function AuthLoginPage() {
                                     ></TextFieldNada>
                                 </div> */}
 
-                                {/* <div className="input-wrap">
+                            {/* <div className="input-wrap">
                                     <TextFieldNada
                                         errorMessage={formDateError.password}
                                         label="كلمة المرور"
@@ -110,23 +109,22 @@ export default function AuthLoginPage() {
                                     ></TextFieldNada>
                                 </div> */}
 
-                                {/* <div className="mt-1 mb-12 text-end">
+                            {/* <div className="mt-1 mb-12 text-end">
                                     <Link className="text-surface underline" href={'/auth/reset-password'}>نسيت كلمة المرور؟</Link>
                                 </div> */}
 
-                                <button className="base-btn block w-full">
-                                    سجل الدخول
-                                </button>
-                            </form>
-                        </div>
-                        <div className="col-span-1 ps-44">
-                            <div className="w-full h-full">
-                                <img
-                                    className="w-full h-full "
-                                    src={logoImg.src}
-                                    alt=""
-                                />
-                            </div>
+                            <button className="base-btn block w-full">
+                                سجل الدخول
+                            </button>
+                        </form>
+                    </div>
+                    <div className="col-span-1 ps-44 ">
+                        <div className="w-full h-full ">
+                            <img
+                                className="w-full h-full object-contain"
+                                src={logoImg.src}
+                                alt=""
+                            />
                         </div>
                     </div>
                 </div>

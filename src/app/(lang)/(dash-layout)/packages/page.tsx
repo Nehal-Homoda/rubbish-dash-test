@@ -94,9 +94,9 @@ export default function rubbush_collectors() {
             setDataList(response.data);
             setTotalPages(response.meta.last_page);
         })
-        .catch(() => {
-            
-        })
+            .catch(() => {
+
+            })
     };
     const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         fetchDataList({ search: e.target.value });
@@ -122,7 +122,7 @@ export default function rubbush_collectors() {
 
                 console.log(response);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     const deleteSubmit = (item: PackageOffer, selectedIndex: number) => {
@@ -133,7 +133,7 @@ export default function rubbush_collectors() {
                 setDataList(updatedArr);
                 successDialog(true);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     const updateDataItem = (item: PackageOffer) => {
@@ -165,7 +165,7 @@ export default function rubbush_collectors() {
                 fetchDataList();
                 successDialog(true);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     const addFormChangeHander = (
@@ -175,9 +175,11 @@ export default function rubbush_collectors() {
         setFormData((prev) => ({
             ...prev,
             [e.target.name]: e.target.value,
+
         }));
 
         console.log(e.target.name, e.target.value);
+
     };
     const updateFormChangeHander = (
         e: React.ChangeEvent<HTMLInputElement>,
@@ -216,7 +218,7 @@ export default function rubbush_collectors() {
                     days_count: 0,
                 });
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     const tableHeadActionsSlot = () => {
@@ -243,8 +245,8 @@ export default function rubbush_collectors() {
                     الحالة
                 </UIPrimaryDropdown>
                 <UIBaseDialog
-                    title="اضافة منطقه"
-                    confirmHandler={() => {}}
+                    title="اضافة باقة"
+                    confirmHandler={() => { }}
                     confirmText="اضافة"
                     form="update-form"
                     btn={
@@ -340,7 +342,7 @@ export default function rubbush_collectors() {
             .then((response) => {
                 setCategories(response.data);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
     useEffect(() => {
         fetchDataList();
@@ -360,8 +362,7 @@ export default function rubbush_collectors() {
                     {dataList.map((item, index) => (
                         <tr key={index}>
                             <td className="py-2 px-4">{item.id}</td>
-
-                            <td className="py-2 px-4">{item.name}</td>
+                            <td className="py-2 px-4">{item.name_ar}</td>
                             <td className="py-2 px-4">{item.category}</td>
                             <td className="py-2 px-4">{item.price_per_unit}</td>
                             <td className="py-2 px-4">{item.days_count}</td>
@@ -401,7 +402,7 @@ export default function rubbush_collectors() {
                                     </UIDialogConfirm>
                                     <UIBaseDialog
                                         title="تعديل منطقه"
-                                        confirmHandler={() => {}}
+                                        confirmHandler={() => { }}
                                         confirmText="اضافة"
                                         form="update-form"
                                         btn={

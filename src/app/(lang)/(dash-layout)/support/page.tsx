@@ -200,15 +200,15 @@ export default function rubbush_collectors() {
     }, [adminTicket])
 
 
-    const updateDataItem = (item: any) => {
+    // const updateDataItem = (item: any) => {
 
-    }
-    const updateSubmit = () => {
+    // }
+    // const updateSubmit = () => {
 
-    }
-    const updateFormChangeHander = () => {
+    // }
+    // const updateFormChangeHander = () => {
 
-    }
+    // }
     const itemType = (item: Ticket) => {
         
         if(item.created_by.type.includes('Collector')) return 'جامع قمامة'
@@ -361,7 +361,7 @@ export default function rubbush_collectors() {
 
                                                 {messages.map((item, index) => (
                                                     item.sender.type.includes('Admin') ?
-                                                        <div className=" bg-[#009414] text-white text-right mb-4  px-3 py-4 rounded-lg">
+                                                        <div className=" bg-[#009414]  text-white text-right mb-4  px-3 py-4 rounded-lg">
                                                             {item.content}
                                                         </div> :
 
