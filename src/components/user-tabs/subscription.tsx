@@ -183,22 +183,22 @@ export default function subscription({ user }: Props) {
 
 
 
-  // const handleSelectedRadio = (selected) => {
-  //   setFormData((prev) => {
-  //     const updatedPayment = {
-  //       ...prev.payment,
-  //       payment_method: { ...selected },
-  //     };
+  const handleSelectedRadio = (selected) => {
+    setFormData((prev) => {
+      const updatedPayment = {
+        ...prev.payment,
+        payment_method: { ...selected },
+      };
 
-  //     return {
-  //       ...prev,
-  //       payment: updatedPayment,
-  //     };
-  //   })
+      return {
+        ...prev,
+        payment: updatedPayment,
+      };
+    })
 
-  //   console.log('dd', selected)
+    console.log('dd', selected)
 
-  // }
+  }
 
   useEffect(() => {
 
@@ -376,7 +376,7 @@ export default function subscription({ user }: Props) {
 
 
               <div className='col-span-12'>
-                <RadioGroup value={formData.payment.payment_method}  >
+                <RadioGroup onChange={handleSelectedRadio} value={formData.payment.payment_method}  >
                   <RadioGroup.Label className="sr-only">Server size</RadioGroup.Label>
                   <div className="grid grid-cols-2 gap-10">
                     {paymentMethodList.map((item) => (
