@@ -170,13 +170,13 @@ export default function DashSidebar({ isOpen, toggleSidebarHandler }: Props) {
                 <p className="font-semibold text-lg">rubbish</p>
             </div>
             <hr className="border-white/20" />
-            <div className="list-items pr-5 pl-6 pt-5 overflow-y-auto flex-1 custom-scroll">
+            <div className="list-items pr-5 pl-3 pt-5 overflow-y-auto flex-1 custom-scroll">
                 {ListItems.map((item, index) => (
                     <div key={index}>
                         <button onClick={() => handleOnClick(item)}>
                             <Link
                                 href={''}
-                                className={`relative flex items-center justify-between capitalize cursor-pointer text-lg hover:bg-white/10 rounded-2xl mb-2 w-60 h-12 transition-all px-4 ${cleanPathname === item.path
+                                className={`relative flex items-center justify-between capitalize cursor-pointer text-base hover:bg-white/10 rounded-2xl mb-2 w-52 h-12 transition-all px-4 ${cleanPathname === item.path
                                     ? `bg-white/10 before:content-[''] before:absolute before:bg-white before:h-[85%] before:w-[6px] before:rounded-md ${params.lang === "en"
                                         ? "before:-left-4"
                                         : "before:-right-3"

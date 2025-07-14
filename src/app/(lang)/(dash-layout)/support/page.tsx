@@ -8,277 +8,238 @@ import SelectInput from "@/components/ui/form/SelectInput";
 import { successDialog } from "@/utils/shared";
 import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
 import { AdminTicket, Message, Ticket } from "@/types/tickets.interface";
-import editImg from '@/assets/images/icons/edit.png'
+import editImg from "@/assets/images/icons/edit.png";
 import {
-    addTicketMessageService,
-    deleteTicketService,
-    getTicketsService,
-    showTicketMessagesService,
-    updateTicketService,
+  addTicketMessageService,
+  deleteTicketService,
+  getTicketsService,
+  showTicketMessagesService,
+  updateTicketService,
 } from "@/services/ticketsServices";
+import { useRouter } from "next/navigation";
 
 export default function rubbush_collectors() {
-    const [dataList, setDataList] = useState<Ticket[]>([]);
-    const headerArr = [
-        { text: "ID", name: "id" },
-        { text: " الاسم", name: "name_ar" },
-        { text: "الموضوع", name: "is_active" },
-        { text: "النوع", name: "is_active" },
-        { text: "الحالة", name: "is_active" },
-        { text: "تاريخ الانشاء", name: "is_active" },
-        { text: "الاجراءات", name: "image" },
-    ];
-    const statusList = [
-        { is_active: "open", name: "مفتوحة" },
-        { is_active: "closed", name: "مغلقة" },
-    ];
-    const [totalPages, setTotalPages] = useState(1);
-    const [page, setPage] = useState(1);
-    const [selectedDataItem, setSelectedDataItem] = useState<Ticket | null>(
-        null
-    );
-    const [adminTicket, setAdminTicket] = useState<AdminTicket | null>(null)
+  const [dataList, setDataList] = useState<Ticket[]>([]);
+  const router = useRouter();
+  const headerArr = [
+    { text: "ID", name: "id" },
+    { text: " الاسم", name: "name_ar" },
+    { text: "الموضوع", name: "is_active" },
+    { text: "النوع", name: "is_active" },
+    { text: "الحالة", name: "is_active" },
+    { text: "تاريخ الانشاء", name: "is_active" },
+    { text: "الاجراءات", name: "image" },
+  ];
+  const statusList = [
+    { is_active: "open", name: "مفتوحة" },
+    { is_active: "closed", name: "مغلقة" },
+  ];
+  const [totalPages, setTotalPages] = useState(1);
+  const [page, setPage] = useState(1);
+  const [selectedDataItem, setSelectedDataItem] = useState<Ticket | null>(null);
+  const [adminTicket, setAdminTicket] = useState<AdminTicket | null>(null);
 
-    type FormDataType = {
-        title_ar: string;
-        content: string;
-    };
-    const [formData, setFormData] = useState<FormDataType>({
-        title_ar: "",
-        content: "",
+  type FormDataType = {
+    title_ar: string;
+    content: string;
+  };
+  const [formData, setFormData] = useState<FormDataType>({
+    title_ar: "",
+    content: "",
+  });
+
+  const [updateFormData, setUpdateFormData] = useState<FormDataType>({
+    title_ar: "",
+    content: "",
+  });
+  const [inputMessage, setInputMessage] = useState<string>("");
+  const [isSent, setIsSent] = useState<boolean>(false);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [adminMessage, setAdminMessage] = useState<string>("");
+
+  const fetchDataList = ({
+    search = "",
+    status = undefined,
+  }: { search?: string; status?: string | undefined } = {}) => {
+    const isActive = status != undefined ? "&status=" + status : "";
+    const hasSearch = search ? "&search=" + search : "";
+
+    const query = `?page=${page}${hasSearch}${isActive}`;
+
+    getTicketsService(query)
+      .then((response) => {
+        setDataList(response.data);
+        setTotalPages(response.meta.last_page);
+      })
+      .catch(() => {});
+  };
+  const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    fetchDataList({ search: e.target.value });
+  };
+
+  const updateDataItemActive = (value: any, index: number) => {
+    const service = dataList.find((item, i) => {
+      return index == i;
     });
 
-    const [updateFormData, setUpdateFormData] = useState<FormDataType>({
-        title_ar: "",
-        content: "",
+    if (!service) return;
+
+    const body = JSON.stringify({
+      status: value,
     });
-    const [inputMessage, setInputMessage] = useState<string>('')
-    const [isSent, setIsSent] = useState<boolean>(false)
-    const [messages, setMessages] = useState<Message[]>([])
-    const [adminMessage, setAdminMessage] = useState<string>('')
 
+    updateTicketService(service.id, body)
+      .then((response) => {
+        const arr = [...dataList];
+        arr[index].status = value;
 
-    const fetchDataList = ({
-        search = "",
-        status = undefined,
-    }: { search?: string; status?: string | undefined } = {}) => {
-        const isActive = status != undefined ? "&status=" + status : "";
-        const hasSearch = search ? "&search=" + search : "";
+        setDataList(arr);
 
-        const query = `?page=${page}${hasSearch}${isActive}`;
+        console.log(response);
+      })
+      .catch((error) => {});
+  };
 
-        getTicketsService(query).then((response) => {
-            setDataList(response.data);
-            setTotalPages(response.meta.last_page);
-        })
-            .catch(() => {
+  const deleteSubmit = (item: Ticket, selectedIndex: number) => {
+    deleteTicketService(item.id)
+      .then((response) => {
+        const updatedArr = [...dataList];
+        updatedArr.splice(selectedIndex, 1);
+        setDataList(updatedArr);
+        successDialog(true);
+      })
+      .catch((error) => {});
+  };
 
-            })
-    };
-    const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-        fetchDataList({ search: e.target.value });
-    };
-
-    const updateDataItemActive = (value: any, index: number) => {
-        const service = dataList.find((item, i) => {
-            return index == i;
-        });
-
-        if (!service) return;
-
-        const body = JSON.stringify({
-            status: value,
-        });
-
-        updateTicketService(service.id, body)
-            .then((response) => {
-                const arr = [...dataList];
-                arr[index].status = value;
-
-                setDataList(arr);
-
-                console.log(response);
-            })
-            .catch((error) => { });
-    };
-
-    const deleteSubmit = (item: Ticket, selectedIndex: number) => {
-        deleteTicketService(item.id)
-            .then((response) => {
-                const updatedArr = [...dataList];
-                updatedArr.splice(selectedIndex, 1);
-                setDataList(updatedArr);
-                successDialog(true);
-            })
-            .catch((error) => { });
-    };
-
-
-
-    const tableHeadActionsSlot = () => {
-        return (
-            <>
-
-
-                <UIPrimaryDropdown
-                    items={statusList}
-                    itemName="name"
-                    itemValue="is_active"
-                    onSelected={(value) => {
-                        fetchDataList({ status: value });
-                    }}
-                >
-                    الحالة
-                </UIPrimaryDropdown>
-
-
-            </>
-        );
-    };
-    useEffect(() => {
-        fetchDataList();
-    }, [page]); // runs every time `page` changes
-
-    const handleChangeValue = (e:React.ChangeEvent<HTMLInputElement>) => {
-        setInputMessage(e.target.value)
-    }
-
-
-    const handleSelectedTicket = (item: any) => {
-
-        setAdminTicket(item)
-
-        showTicketMessagesService(item.id).then((response) => {
-            console.log(response)
-
-
-            setMessages(response.data.messages)
-
-        })
-    }
-
-
-
-
-
-    const handleSendMsg = () => {
-
-        if (!adminTicket) return
-        const body = JSON.stringify({
-            content: inputMessage
-        })
-        addTicketMessageService(adminTicket.id, body).then((response) => {
-            console.log(response)
-            setIsSent(true)
-            setAdminMessage(inputMessage)
-            setInputMessage('')
-
-
-        })
-    }
-
-
-
-
-    useEffect(() => {
-        if (!adminTicket) return
-        const messageInterval = setInterval(() => {
-
-            showTicketMessagesService(adminTicket.id).then((response) => {
-                console.log('new new ')
-                setMessages(response.data.messages)
-
-
-            })
-
-        }, 3000);
-
-        return () => {
-            clearInterval(messageInterval);
-        };
-
-    }, [adminTicket])
-
-
-    // const updateDataItem = (item: any) => {
-
-    // }
-    // const updateSubmit = () => {
-
-    // }
-    // const updateFormChangeHander = () => {
-
-    // }
-    const itemType = (item: Ticket) => {
-        
-        if(item.created_by.type.includes('Collector')) return 'جامع قمامة'
-        if(item.created_by.type.includes('User')) return 'مستخدم'
-        
-        return '-'
-    }   
-
-
-
+  const tableHeadActionsSlot = () => {
     return (
-        <>
-            <div className="py-20">
-                <BaseDataTable
-                    headItems={headerArr}
-                    onPageChange={setPage}
-                    totalPages={totalPages}
-                    onSearchChange={tableSearchHandler}
-                    headerActionsSlot={tableHeadActionsSlot()}
+      <>
+        <UIPrimaryDropdown
+          items={statusList}
+          itemName="name"
+          itemValue="is_active"
+          onSelected={(value) => {
+            fetchDataList({ status: value });
+          }}
+        >
+          الحالة
+        </UIPrimaryDropdown>
+      </>
+    );
+  };
+  useEffect(() => {
+    fetchDataList();
+  }, [page]); // runs every time `page` changes
+
+  const handleChangeValue = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputMessage(e.target.value);
+  };
+
+  const handleSelectedTicket = (item: any) => {
+    setAdminTicket(item);
+
+    showTicketMessagesService(item.id).then((response) => {
+      console.log(response);
+
+      setMessages(response.data.messages);
+    });
+  };
+
+  const handleSendMsg = () => {
+    if (!adminTicket) return;
+    const body = JSON.stringify({
+      content: inputMessage,
+    });
+    addTicketMessageService(adminTicket.id, body).then((response) => {
+      console.log(response);
+      setIsSent(true);
+      setAdminMessage(inputMessage);
+      setInputMessage("");
+    });
+  };
+
+  useEffect(() => {
+    if (!adminTicket) return;
+    const messageInterval = setInterval(() => {
+      showTicketMessagesService(adminTicket.id).then((response) => {
+        console.log("new new ");
+        setMessages(response.data.messages);
+      });
+    }, 3000);
+
+    return () => {
+      clearInterval(messageInterval);
+    };
+  }, [adminTicket]);
+
+  // const updateDataItem = (item: any) => {
+
+  // }
+  // const updateSubmit = () => {
+
+  // }
+  // const updateFormChangeHander = () => {
+
+  // }
+  const itemType = (item: Ticket) => {
+    if (item.created_by.type.includes("Collector")) return "جامع قمامة";
+    if (item.created_by.type.includes("User")) return "مستخدم";
+
+    return "-";
+  };
+
+  return (
+    <>
+      <div className="py-20">
+        <BaseDataTable
+          headItems={headerArr}
+          onPageChange={setPage}
+          totalPages={totalPages}
+          onSearchChange={tableSearchHandler}
+          headerActionsSlot={tableHeadActionsSlot()}
+        >
+          {dataList.map((item, index) => (
+            <tr key={index}>
+              <td className="py-2 px-4">{item.id}</td>
+              <td className="py-2 px-4">{item.created_by.name}</td>
+              <td className="py-2 px-4">{item.subject}</td>
+              <td className="py-2 px-4  text-nowrap">{itemType(item)}</td>
+
+              <td className="py-2 px-4">
+                <UIPrimaryDropdown
+                  tiny={true}
+                  itemName="name"
+                  itemValue="is_active"
+                  btnColorTailwindClass={
+                    item.status == "closed"
+                      ? "bg-red-100 text-red-600 hover:bg-text-red-200"
+                      : undefined
+                  }
+                  onSelected={(value) => {
+                    updateDataItemActive(value, index);
+                  }}
+                  items={statusList}
                 >
-                    {dataList.map((item, index) => (
-                        <tr key={index}>
-                            <td className="py-2 px-4">{item.id}</td>
-                            <td className="py-2 px-4">
-                                {item.created_by.name}
-                            </td>
-                            <td className="py-2 px-4">{item.subject}</td>
-                            <td className="py-2 px-4  text-nowrap">{itemType(item)}</td>
+                  {item.status == "open" ? "مفتوحة" : "مغلقة"}
+                </UIPrimaryDropdown>
+              </td>
+              <td className="py-2 px-4">{item.created_at}</td>
+              <td className="">
+                <div className="flex gap-3">
+                  <UIDialogConfirm
+                    deleteAction={true}
+                    danger
+                    title="حذف تذكرة"
+                    confirmHandler={() => {
+                      deleteSubmit(item, index);
+                    }}
+                  >
+                    <button className="bg-[#F9285A0A] p-1 rounded-lg w-4 h-4">
+                      <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
+                    </button>
+                  </UIDialogConfirm>
 
-                            <td className="py-2 px-4">
-                                <UIPrimaryDropdown
-                                    tiny={true}
-                                    itemName="name"
-                                    itemValue="is_active"
-                                    btnColorTailwindClass={
-                                        item.status == "closed"
-                                            ? "bg-red-100 text-red-600 hover:bg-text-red-200"
-                                            : undefined
-                                    }
-                                    onSelected={(value) => {
-                                        updateDataItemActive(value, index);
-                                    }}
-                                    items={statusList}
-                                >
-                                    {item.status == "open" ? "مفتوحة" : "مغلقة"}
-                                </UIPrimaryDropdown>
-                            </td>
-                            <td className="py-2 px-4">{item.created_at}</td>
-                            <td className="">
-                                <div className="flex gap-3">
-                                    <UIDialogConfirm
-                                    deleteAction={true}
-                                        danger
-                                        title="حذف تذكرة"
-                                        confirmHandler={() => {
-                                            deleteSubmit(item, index);
-                                        }}
-                                    >
-
-
-                                        <button className="bg-[#F9285A0A] p-1 rounded-lg w-4 h-4">
-                                            <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
-                                        </button>
-                                    </UIDialogConfirm>
-
-
-
-
-
-                                    {/* <UIBaseDialog
+                  {/* <UIBaseDialog
                                         title="تعديل تذكرة"
                                         confirmHandler={() => { }}
                                         confirmText="حفظ"
@@ -322,9 +283,7 @@ export default function rubbush_collectors() {
                                         </form>
                                     </UIBaseDialog> */}
 
-
-
-                                    <UIBaseDialog heightStyle="h-[900px]"
+                  {/* <UIBaseDialog heightStyle="h-[900px]"
                                         title="بدء محادثة"
                                         confirmHandler={() => { handleSendMsg() }}
                                         confirmText="ارسال"
@@ -387,17 +346,20 @@ export default function rubbush_collectors() {
 
 
                                         </div>
-                                    </UIBaseDialog>
+                                    </UIBaseDialog> */}
 
-
-
-
-                                </div>
-                            </td>
-                        </tr>
-                    ))}
-                </BaseDataTable >
-            </div >
-        </>
-    );
+                  <div
+                    onClick={() => router.push(`/support/startChat?id=${item.id}`)}
+                    className="bg-[#009414] py-1 px-3 rounded-xl text-center  text-white  cursor-pointer"
+                  >
+                    <span className="mdi mdi-chat-processing-outline"></span>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </BaseDataTable>
+      </div>
+    </>
+  );
 }

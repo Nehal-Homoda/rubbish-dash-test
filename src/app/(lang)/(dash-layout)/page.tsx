@@ -345,15 +345,15 @@ export default function Home() {
                 {collectors && collectors.notes_visit.map((item, index) => (
                   <div key={index} className="py-5">
                     <div className="title flex justify-between">
-                      <div className="font-bold text-[#38433B] text-lg mb-1">
+                      <div className="font-bold text-[#38433B] text-base mb-1">
                         {item.user_name}
                       </div>
-                      <div className=" text-[#009414] mb-1 text-base">
+                      <div className=" text-[#009414] mb-1 text-sm">
                         {item.created_at}
                       </div>
                     </div>
-                    <p className="text-[#ADAAAA] mb-1">{item.address}</p>
-                    <div className="bg-[#00000009]  rounded-lg py-2 mb-1 px-3">
+                    <p className="text-[#ADAAAA] mb-1 text-sm">{item.address}</p>
+                    <div className="bg-[#00000009] text-sm  rounded-lg py-2 mb-1 px-3">
 
                       <span className="text-[#38433B]">ملاحظة :  </span>
                       <span className="text-[#ADAAAA] ms-2">{item.user_note}</span>
