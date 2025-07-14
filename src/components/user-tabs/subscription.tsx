@@ -149,13 +149,13 @@ export default function subscription({ user }: Props) {
     // }
 
     const updateUser = () => {
-        const body = JSON.stringify({
-            subscription_name: formData.subscription_name,
-            has_subscription: formData.has_subscription,
-        });
-        updateUserService(user.id, body).then((response) => {
-            console.log(response);
-        });
+        // const body = JSON.stringify({
+        //     subscription_name: formData.subscription_name,
+        //     has_subscription: formData.has_subscription,
+        // });
+        // updateUserService(user.id, body).then((response) => {
+        //     console.log(response);
+        // });
     };
 
     useEffect(() => {
@@ -170,6 +170,7 @@ export default function subscription({ user }: Props) {
     const handleSelectedRadio = (selected) => {
         setFormData((prev) => {
             const updatedPayment = {
+                //@ts-ignore
                 ...prev.payment,
                 payment_method: { ...selected },
             };

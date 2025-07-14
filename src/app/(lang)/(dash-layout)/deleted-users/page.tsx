@@ -57,7 +57,9 @@ export default function page() {
       //   setDistrictTime(item.available_times);
       // });
       // setTotalPages(response.meta.last_page);
-    });
+    }).catch(() => {
+      
+    })
   };
 
 

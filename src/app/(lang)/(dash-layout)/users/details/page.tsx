@@ -30,8 +30,12 @@ export default function page() {
     const [showAddSubscription, setShowAddSubscription] = useState(false);
     const fetchUserById = () => {
         getUserByIdService(id()).then((response) => {
+            //@ts-ignore
             setUser(response.data);
-        });
+        })
+        .catch(() => {
+
+        })
     };
     const btnTabs = [
         { name: "الملف الشخصي", type: "personal-data" },

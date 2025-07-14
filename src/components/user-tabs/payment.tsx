@@ -69,6 +69,7 @@ export default function rubbush_collectors({ user }: Props) {
 
         getPaymentsService(query)
             .then((response) => {
+                //@ts-ignore
                 setDataList(response.data);
             })
             .catch(() => {});
