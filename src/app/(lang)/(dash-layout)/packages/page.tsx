@@ -401,7 +401,7 @@ export default function rubbush_collectors() {
                                         </button>
                                     </UIDialogConfirm>
                                     <UIBaseDialog
-                                        title="تعديل منطقه"
+                                        title="تعديل باقة"
                                         confirmHandler={() => { }}
                                         confirmText="اضافة"
                                         form="update-form"
