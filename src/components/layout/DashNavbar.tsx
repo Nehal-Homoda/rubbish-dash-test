@@ -5,21 +5,26 @@ import { useLangAndDictionary } from "@/utils/lang";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/stores/store";
 import { logout } from "@/stores/authSlice";
+    import Cookies from "js-cookie";
+
 interface Props {
     isOpen: boolean;
     openSidebar: () => void;
 }
 export default function DashNavbar({ isOpen, openSidebar }: Props) {
     const { lang, dict } = useLangAndDictionary();
-    const title = useSelector(
-        (state: RootState) => state.authReducer.title
-    );
+    // const title = useSelector(
+    //     (state: RootState) => state.authReducer.title
+    // );
     const dispatch = useDispatch<AppDispatch>();
 
     const logoutHander = () => {
         dispatch(logout())
         window.location.reload()
     };
+
+    const storedTitle = Cookies.get("title");
+    const title = storedTitle ? JSON.parse(storedTitle) : null;
 
     return (
         <>

@@ -60,6 +60,7 @@ export const authSlice = createSlice({
         },
         changeTitle: (state, action: PayloadAction<string>) => {
             state.title = action.payload
+             Cookies.set("title", JSON.stringify(state.title));
         }
     },
 });

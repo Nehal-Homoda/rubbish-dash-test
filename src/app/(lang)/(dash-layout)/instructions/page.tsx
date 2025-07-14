@@ -5,7 +5,7 @@ import BaseDataTable from "@/components/data-tables/BaseDataTable";
 import UIPrimaryDropdown from "@/components/ui/UIPrimaryDropdown";
 import UIBaseDialog from "@/components/ui/UIBaseDialog";
 import SelectInput from "@/components/ui/form/SelectInput";
-import { successDialog } from "@/utils/shared";
+import { successDialog, validateAllInputs } from "@/utils/shared";
 import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
 
 import FileInputImg from "@/components/ui/form/FileInputImg";
@@ -16,6 +16,25 @@ import {
     getGuidelinesService,
     updateGuidelineService,
 } from "@/services/guidelinesServices";
+import * as Yup from "yup"
+
+
+interface FormDataInputs {
+    title_ar: string;
+    title_en: string;
+    is_active: number;
+    order: number;
+    image: File | null | string;
+}
+interface FormDataInputErrors {
+    title_ar: string;
+    title_en: string;
+    is_active: string;
+    order: string;
+    image: string;
+}
+
+
 
 export default function rubbush_collectors() {
     const [dataList, setDataList] = useState<Guideline[]>([]);
@@ -51,6 +70,21 @@ export default function rubbush_collectors() {
         image: null,
     });
 
+    const formSchema = Yup.object().shape({
+        title_ar: Yup.string().required(),
+        title_en: Yup.string().required(),
+        image: Yup.string().required()
+    });
+    const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
+        title_ar: "",
+        title_en: "",
+        order: "",
+        is_active: "",
+        image: "",
+    });
+    const [errorMsg, setErrorMsg] = useState("");
+
+
     const [updateFormData, setUpdateFormData] = useState<FormDataType>({
         title_ar: "",
         title_en: "",
@@ -78,9 +112,9 @@ export default function rubbush_collectors() {
             setDataList(response.data);
             setTotalPages(response.meta.last_page);
         })
-        .catch(() => {
-            
-        })
+            .catch(() => {
+
+            })
     };
     const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         fetchDataList({ search: e.target.value });
@@ -106,7 +140,7 @@ export default function rubbush_collectors() {
 
                 console.log(response);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     const deleteSubmit = (item: Guideline, selectedIndex: number) => {
@@ -117,7 +151,7 @@ export default function rubbush_collectors() {
                 setDataList(updatedArr);
                 successDialog(true);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     const updateDataItem = (item: Guideline) => {
@@ -145,7 +179,7 @@ export default function rubbush_collectors() {
                 fetchDataList();
                 successDialog(true);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     const addFormChangeHander = (
@@ -171,8 +205,18 @@ export default function rubbush_collectors() {
         console.log(e.target.name, e.target.value);
     };
 
-    const createSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const createSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        const validateResult = await validateAllInputs<FormDataInputs>(
+            formSchema,
+            formData
+        );
+        console.log('validate', validateResult)
+        if (!validateResult) return
+        setFormErrors({ ...validateResult.outputResult });
+        console.log('form error', formErrors)
+        if (validateResult.isInvalid) return;
 
         const fd = new FormData();
         fd.append("title_ar", formData.title_ar);
@@ -196,7 +240,9 @@ export default function rubbush_collectors() {
                     image: null,
                 });
             })
-            .catch((error) => {});
+            .catch((error) => {
+                setErrorMsg(error.message)
+            });
     };
 
     const tableHeadActionsSlot = () => {
@@ -214,7 +260,7 @@ export default function rubbush_collectors() {
                 </UIPrimaryDropdown>
                 <UIBaseDialog
                     title="اضافة ارشاد"
-                    confirmHandler={() => {}}
+                    confirmHandler={() => { }}
                     confirmText="اضافة"
                     form="update-form"
                     btn={
@@ -226,9 +272,17 @@ export default function rubbush_collectors() {
                     }
                 >
                     <form onSubmit={createSubmit} id="update-form">
+
+                        {errorMsg && (
+                            <div className="mb-5">
+                                <span className="text-red-800"> {errorMsg}</span>
+
+                            </div>
+                        )}
                         <div className="space-y-7">
                             <div className="w-full flex justify-center mb-20">
                                 <FileInputImg
+                                errorMessage={formErrors.image}
                                     state="edit"
                                     onFileChange={(arg) => {
                                         setFormData((prev) => ({
@@ -239,6 +293,7 @@ export default function rubbush_collectors() {
                                 ></FileInputImg>
                             </div>
                             <TextFieldNada
+                                errorMessage={formErrors.title_ar || ''}
                                 name="title_ar"
                                 type="text"
                                 prependIcon="mdi mdi-notebook-edit-outline"
@@ -250,6 +305,7 @@ export default function rubbush_collectors() {
                             ></TextFieldNada>
 
                             <TextFieldNada
+                                errorMessage={formErrors.title_en || ''}
                                 name="title_en"
                                 type="text"
                                 prependIcon="mdi mdi-notebook-edit-outline"
@@ -261,6 +317,7 @@ export default function rubbush_collectors() {
                             ></TextFieldNada>
 
                             <TextFieldNada
+                                errorMessage={formErrors.order || ''}
                                 name="order"
                                 type="number"
                                 prependIcon="mdi mdi-swap-vertical"
@@ -272,6 +329,7 @@ export default function rubbush_collectors() {
                             ></TextFieldNada>
 
                             <SelectInput
+                                errorMessage={formErrors.is_active}
                                 value={formData.is_active}
                                 items={statusList}
                                 itemName="name"
@@ -355,7 +413,7 @@ export default function rubbush_collectors() {
                                     </UIDialogConfirm>
                                     <UIBaseDialog
                                         title="تعديل الالاشاد"
-                                        confirmHandler={() => {}}
+                                        confirmHandler={() => { }}
                                         confirmText="اضافة"
                                         form="update-form"
                                         btn={

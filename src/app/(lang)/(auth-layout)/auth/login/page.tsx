@@ -7,7 +7,19 @@ import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/stores/store";
 import { login } from "@/stores/authSlice";
-import { successDialog } from "@/utils/shared";
+import { successDialog, validateAllInputs, validateInput } from "@/utils/shared";
+import * as Yup from "yup";
+
+
+
+interface FormDataInputs {
+    email: string;
+    password: string;
+}
+interface FormDataInputErrors {
+    email: string | null;
+    password: string | null;
+}
 
 export default function AuthLoginPage() {
     const dispatch = useDispatch<AppDispatch>()
@@ -16,21 +28,48 @@ export default function AuthLoginPage() {
         email: "",
         password: "",
     });
-    const [formDataError, setFormDataError] = useState({
+    // const [formDataError, setFormDataError] = useState({
+    //     email: "",
+    //     password: "",
+    // });
+    const router = useRouter();
+
+    const formSchema = Yup.object().shape({
+        email: Yup.string().required().email(),
+        password: Yup.string().required().min(6),
+    });
+
+    const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
         email: "",
         password: "",
     });
-    const router = useRouter();
+    const [errorMsg, setErrorMsg] = useState("");
 
-    const inputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+
+    const inputChangeHandler = async (e: React.ChangeEvent<HTMLInputElement>, inputName: keyof FormDataInputs) => {
+
+        const value = e.target.value
         setFormData((prev) => ({
             ...prev,
             [e.target.name]: e.target.value,
         }));
+        const message = await validateInput(formSchema, inputName, value);
+        setFormErrors((prev) => ({
+            ...prev,
+            [inputName]: message ? message : "",
+        }));
+        console.log('message', message)
     };
 
-    const handleLoginSubmit = (e: any) => {
+    const handleLoginSubmit = async (e: any) => {
         e.preventDefault();
+        const validateResult = await validateAllInputs<FormDataInputs>(
+            formSchema,
+            formData
+        );
+        if (!validateResult) return;
+        setFormErrors({ ...validateResult.outputResult });
+        if (validateResult.isInvalid) return;
         const fd = new FormData();
         fd.append("email", formData.email);
         fd.append("password", formData.password);
@@ -44,15 +83,15 @@ export default function AuthLoginPage() {
 
         })
             .catch(error => {
-
+                setErrorMsg(error?.message);
             })
     };
 
     return (
         <>
             <div className="w-full h-screen overflow-hidden  pt-20 ">
-                <div className="grid md:grid-cols-2">
-                    <div className="col-span-1 ms-56 pt-36">
+                <div className="lg:grid grid-cols-2 gap-8">
+                    <div className="lg:col-span-1 col-span-2  lg:pt-36 pt-40  lg:px-24 px-12 ">
                         <h3 className="text-2xl font-bold">
                             مرحباً بعودتك مرة اخري 👋
                         </h3>
@@ -63,26 +102,33 @@ export default function AuthLoginPage() {
                             onSubmit={handleLoginSubmit}
                             className="pt-20"
                         >
+                            {errorMsg && (
+                                <div className="mb-5">
+                                    <span className="text-red-800"> {errorMsg}</span>
+
+                                </div>
+                            )}
+
                             <div className="input-wrap mb-14">
                                 <TextFieldNada
-                                    errorMessage={formDataError.email}
+                                    errorMessage={formErrors.email || ""}
                                     label="البريد الالكتروني"
                                     name="email"
                                     type="email"
                                     placeholder="ادخل البريد الالكتروني"
                                     value={formData.email}
-                                    handleChange={inputChangeHandler}
+                                    handleChange={(e) => inputChangeHandler(e, 'email')}
                                 ></TextFieldNada>
                             </div>
                             <div className="input-wrap mb-14">
                                 <TextFieldNada
-                                    errorMessage={formDataError.password}
+                                    errorMessage={formErrors.password || ""}
                                     label="الرقم السري"
                                     name="password"
                                     type="password"
                                     placeholder="الرقم السري"
                                     value={formData.password}
-                                    handleChange={inputChangeHandler}
+                                    handleChange={(e) => inputChangeHandler(e, 'password')}
                                 ></TextFieldNada>
                             </div>
                             {/* <div className="input-wrap mb-14">
@@ -118,7 +164,7 @@ export default function AuthLoginPage() {
                             </button>
                         </form>
                     </div>
-                    <div className="col-span-1 ps-44 ">
+                    <div className="  lg:col-span-1 lg:block hidden ">
                         <div className="w-full h-full ">
                             <img
                                 className="w-full h-full object-contain"

@@ -16,11 +16,35 @@ import UIPrimaryDropdown from "@/components/ui/UIPrimaryDropdown";
 import UIBaseDialog from "@/components/ui/UIBaseDialog";
 import MultiCheckbox from "@/components/ui/form/MultiCheckbox";
 import SelectInput from "@/components/ui/form/SelectInput";
-import { successDialog } from "@/utils/shared";
+import { successDialog, validateAllInputs } from "@/utils/shared";
 import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
 import { getCollectorsService } from "@/services/collectorsService";
 // import { Collector } from "@/types/regions.interface";
 import { Collector } from "@/types/collectors.interface"
+import * as Yup from "yup"
+
+interface FormDataInputs {
+    name_ar: string;
+    name_en: string;
+    available_days: string[] | string;
+    available_times: string[] | string;
+}
+interface FormDataInputErrors {
+    name_ar: string | null;
+    name_en: string | null
+    available_days: string;
+    available_times: string;
+}
+type FormDataType = {
+    name_ar: string;
+    name_en: string;
+    order: number;
+    is_active: number;
+    collector_id: string[];
+    available_days: string[];
+    available_times: string[];
+};
+
 
 export default function rubbush_collectors() {
     const [dataList, setDataList] = useState<District[]>([]);
@@ -53,16 +77,24 @@ export default function rubbush_collectors() {
 
     const [collectors, setCollectors] = useState<Collector[]>([])
 
+    const formSchema = Yup.object().shape({
+        name_ar: Yup.string().required(),
+        name_en: Yup.string().required(),
+        available_days: Yup.array().of(Yup.string()).min(1, "Select at least one day")
+            .required("Available days are required"),
+        available_times: Yup.array().of(Yup.string()).min(1, "Select at least one time")
+            .required("Available times are required"),
+    });
+    const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
+        name_ar: "",
+        name_en: "",
+        available_days: '',
+        available_times: ''
+    });
+    const [errorMsg, setErrorMsg] = useState("");
 
-    type FormDataType = {
-        name_ar: string;
-        name_en: string;
-        order: number;
-        is_active: number;
-        collector_id: string[];
-        available_days: string[];
-        available_times: string[];
-    };
+
+
     const [formData, setFormData] = useState<FormDataType>({
         name_ar: "",
         name_en: "",
@@ -82,6 +114,8 @@ export default function rubbush_collectors() {
         available_days: [],
         available_times: [],
     });
+
+
 
     const fetchDataList = ({
         search = "",
@@ -203,8 +237,18 @@ export default function rubbush_collectors() {
         console.log(e.target.name, e.target.value);
     };
 
-    const createSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const createSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        const validateResult = await validateAllInputs<FormDataInputs>(
+            formSchema,
+            formData
+        );
+        console.log('validate', validateResult)
+        if (!validateResult) return
+        setFormErrors({ ...validateResult.outputResult });
+        console.log('form error', formErrors)
+        if (validateResult.isInvalid) return;
 
         const fd = new FormData();
         fd.append("name_ar", formData.name_ar);
@@ -233,7 +277,10 @@ export default function rubbush_collectors() {
                     available_times: [],
                 });
             })
-            .catch((error) => { });
+            .catch((error) => {
+                setErrorMsg(error?.message)
+                console.log('error message is', errorMsg)
+            });
     };
 
     const tableHeadActionsSlot = () => {
@@ -253,17 +300,26 @@ export default function rubbush_collectors() {
                     }
                 >
                     <form onSubmit={createSubmit} id="update-form">
+                        {errorMsg && (
+                            <div className="mb-5">
+                                <span className="text-red-800"> {errorMsg}</span>
+
+                            </div>
+                        )}
                         <div className="space-y-7">
                             <TextFieldNada
+                                errorMessage={formErrors.name_ar || ''}
                                 name="name_ar"
                                 type="text"
                                 handleChange={addFormChangeHander}
                                 value={formData.name_ar}
                                 label=" اسم المنطقة ( عربي ) "
                                 placeholder=" اسم المنطقة  "
+                                required
                             ></TextFieldNada>
 
                             <TextFieldNada
+                                errorMessage={formErrors.name_en || ''}
                                 name="name_en"
                                 type="text"
                                 handleChange={addFormChangeHander}
@@ -275,6 +331,7 @@ export default function rubbush_collectors() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div className="col-span-1">
                                     <MultiCheckbox
+                                        errorMessage={formErrors.available_days}
                                         items={districtDays}
                                         value={formData.available_days}
                                         label="اليوم"
@@ -293,6 +350,7 @@ export default function rubbush_collectors() {
                                 </div>
                                 <div className="col-span-1">
                                     <MultiCheckbox
+                                        errorMessage={formErrors.available_times}
                                         items={districtTime}
                                         value={formData.available_times}
                                         label="الوقت"
