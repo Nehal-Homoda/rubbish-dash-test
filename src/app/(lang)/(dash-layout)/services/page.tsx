@@ -210,7 +210,7 @@ export default function rubbush_collectors() {
         return (
             <>
                 <UIPrimaryDropdown
-                    items={statusList}
+                    items={[{ is_active: undefined, name: "الكل" }, ...statusList]}
                     itemName="name"
                     itemValue="is_active"
                     onSelected={(value) => {
@@ -335,7 +335,7 @@ export default function rubbush_collectors() {
                                 </UIPrimaryDropdown>
                             </td>
                             <td className="">
-                                <div className="flex justify-center gap-3">
+                                <div className="flex  gap-3">
                                     <UIDialogConfirm
                                         danger
                                         title="هل انت متأكد من حذف العنصر"
@@ -348,9 +348,9 @@ export default function rubbush_collectors() {
                                         </button>
                                     </UIDialogConfirm>
                                     <UIBaseDialog
-                                        title="تعديل منطقه"
+                                        title="تعديل خدمة"
                                         confirmHandler={() => {}}
-                                        confirmText="اضافة"
+                                        confirmText="تعديل"
                                         form="update-form"
                                         btn={
                                             <button

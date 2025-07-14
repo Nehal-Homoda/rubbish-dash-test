@@ -248,7 +248,7 @@ export default function rubbush_collectors() {
         return (
             <>
                 <UIPrimaryDropdown
-                    items={statusList}
+                    items={[{ is_active: undefined, name: "الكل" }, ...statusList]}
                     itemName="name"
                     itemValue="is_active"
                     onSelected={(value) => {
@@ -258,7 +258,7 @@ export default function rubbush_collectors() {
                     الحالة
                 </UIPrimaryDropdown>
                 <UIPrimaryDropdown
-                    items={distrects}
+                    items={[{ id: undefined, name_ar: "الكل" }, ...distrects]}
                     itemName="name_ar"
                     itemValue="id"
                     onSelected={(value) => {
@@ -404,7 +404,7 @@ export default function rubbush_collectors() {
                                 </UIPrimaryDropdown>
                             </td>
                             <td className="">
-                                <div className="flex justify-center gap-3">
+                                <div className="flex  gap-3">
                                     <button onClick={() => {router.push(localePath('/rubbush-collectors/details/profile?id=' + item.id))}} className="bg-blue-100 p-1 px-2 rounded-lg">
                                         <span className="mdi mdi-eye text-blue-500"></span>
                                     </button>
@@ -419,7 +419,7 @@ export default function rubbush_collectors() {
                                             <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
                                         </button>
                                     </UIDialogConfirm>
-                                    <UIBaseDialog
+                                    {/* <UIBaseDialog
                                         title="تعديل منطقه"
                                         confirmHandler={() => {}}
                                         confirmText="اضافة"
@@ -514,7 +514,7 @@ export default function rubbush_collectors() {
                                                 ></MultiCheckbox>
                                             </div>
                                         </form>
-                                    </UIBaseDialog>
+                                    </UIBaseDialog> */}
                                 </div>
                             </td>
                         </tr>

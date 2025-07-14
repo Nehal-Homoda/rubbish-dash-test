@@ -179,7 +179,7 @@ export default function rubbush_collectors() {
         return (
             <>
                 <UIPrimaryDropdown
-                    items={categories}
+                    items={[{ id: undefined, name_ar: "الكل" }, ...categories]}
                     itemName="name_ar"
                     itemValue="id"
                     onSelected={(value) => {
@@ -189,7 +189,7 @@ export default function rubbush_collectors() {
                     نوع الخدمة
                 </UIPrimaryDropdown>
                 <UIPrimaryDropdown
-                    items={statusList}
+                    items={[{ is_active: undefined, name: "الكل" }, ...statusList]}
                     itemName="name"
                     itemValue="is_active"
                     onSelected={(value) => {

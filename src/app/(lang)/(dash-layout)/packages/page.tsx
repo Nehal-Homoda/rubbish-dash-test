@@ -138,12 +138,15 @@ export default function rubbush_collectors() {
 
     const updateDataItem = (item: PackageOffer) => {
         setSelectedDataItem(item);
+
+        const ca = categories.find(cate => cate.name_ar === item.category);
+
         setUpdateFormData({
             name_ar: item.name_ar,
             name_en: item.name_ar,
             order: item.order ? item.order : 0,
             is_active: item.is_active ? 1 : 0,
-            category_id: "",
+            category_id: ca?.id ?? '',
             days_count: item.days_count ? parseInt(item.days_count) : "",
             price_per_unit: item.price_per_unit
                 ? parseInt(item.price_per_unit)
@@ -225,7 +228,7 @@ export default function rubbush_collectors() {
         return (
             <>
                 <UIPrimaryDropdown
-                    items={categories}
+                    items={[{ id: undefined, name_ar: "الكل" }, ...categories]}
                     itemName="name_ar"
                     itemValue="id"
                     onSelected={(value) => {
@@ -235,7 +238,7 @@ export default function rubbush_collectors() {
                     نوع الخدمة
                 </UIPrimaryDropdown>
                 <UIPrimaryDropdown
-                    items={statusList}
+                    items={[{ is_active: undefined, name: "الكل" }, ...statusList]}
                     itemName="name"
                     itemValue="is_active"
                     onSelected={(value) => {
@@ -388,7 +391,7 @@ export default function rubbush_collectors() {
                                 </UIPrimaryDropdown>
                             </td>
                             <td className="">
-                                <div className=" flex justify-center gap-3">
+                                <div className=" flex gap-3">
                                     <UIDialogConfirm
                                         danger
                                         title="هل انت متأكد من حذف العنصر"

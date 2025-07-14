@@ -19,6 +19,7 @@ type Props = {
     prependIcon?: string;
     errorMessage?: string;
     required?: boolean;
+    disbaled?: boolean;
     iconType?: "mdi" | "fa";
     onChange: (value: any[]) => void;
 };
@@ -34,6 +35,7 @@ export default function MultiCheckbox({
     prependIcon,
     errorMessage,
     required,
+    disbaled= false,
     iconType,
     onChange,
 }: Props) {
@@ -79,7 +81,7 @@ export default function MultiCheckbox({
             <div className="">
                 <Menu as="div" className="w-full relative inline-block">
                     <div className="w-full">
-                        <MenuButton
+                        <MenuButton disabled={disbaled}
                             className={`w-full  focus:outline-none outline-none border-none `}
                         >
                             <div className="w-full relative p-1.5 border border-surface-light-700 rounded-2xl">

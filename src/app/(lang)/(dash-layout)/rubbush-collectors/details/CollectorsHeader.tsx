@@ -58,7 +58,7 @@ export default function CollectorHeader() {
                                 className={` text-nowrap flex-grow-0 flex-shrink-0 underline-offset-[0.75rem] ${
                                     pathname ==
                                     localePath(
-                                        `/rubbush-collectors/details/profile?id=${collector?.id}`
+                                        `/rubbush-collectors/details/profile`
                                     )
                                         ? "underline"
                                         : ""
@@ -73,7 +73,7 @@ export default function CollectorHeader() {
                                 className={` text-nowrap flex-grow-0 flex-shrink-0  underline-offset-[0.75rem] ${
                                     pathname ==
                                     localePath(
-                                        `/rubbush-collectors/details/visits?id=${collector?.id}`
+                                        `/rubbush-collectors/details/visits`
                                     )
                                         ? "underline"
                                         : ""

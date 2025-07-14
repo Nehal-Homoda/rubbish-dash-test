@@ -9,6 +9,7 @@ interface FileInputProps {
     title?: string;
     fileUrl?: string;
     state: "edit" | "add" | "addToTable";
+    disabled?: boolean;
     onFileChange: (args?: { file?: File | null; file64?: string | null }) => void;
     handleRemoveImage?: () => void;
 }
@@ -18,6 +19,7 @@ export default function FileInput({
     title,
     fileUrl,
     state = "add",
+    disabled = false,
     onFileChange,
     handleRemoveImage = () => {},
 }: FileInputProps) {
@@ -92,6 +94,7 @@ export default function FileInput({
                     onChange={handleFileChange}
                     accept="image/*,application/pdf"
                     title={fileName}
+                    readOnly={disabled}
                 />
 
                 <div

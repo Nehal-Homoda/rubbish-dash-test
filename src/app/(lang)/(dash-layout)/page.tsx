@@ -8,6 +8,7 @@ import paymentImg from "@/assets/images/payment-img.png"
 import dynamic from 'next/dynamic';
 import { ApexOptions } from "apexcharts";
 import GoogleMap from "@/components/GoogleMap";
+import Link from "next/link";
 
 // ✅ Dynamically import chart component only on client side
 const ReactApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
@@ -136,9 +137,9 @@ export default function Home() {
 
   const [statistics, setStatistics] = useState([
     { title: 'عدد الزيارات ', subtitle: 'المكتملة', slug: 'completed_visited' },
-    { title: 'عدد  المستخدمين ', subtitle: 'الغير مشتركين', slug: 'no_of_none_subscriptions' },
-    { title: 'عدد المستخدمين ', subtitle: 'المشتركين', slug: 'no_of_subscriptions' },
     { title: ' عدد الزيارات ', subtitle: 'الغير مكتملة', slug: 'not_collected_visited' },
+    { title: 'عدد المستخدمين ', subtitle: 'المشتركين', slug: 'no_of_subscriptions' },
+    { title: 'عدد  المستخدمين ', subtitle: 'الغير مشتركين', slug: 'no_of_none_subscriptions' },
 
   ]);
 
@@ -409,7 +410,7 @@ export default function Home() {
                   </div>
                   <div>
                     <button className="border-none outline-none ">
-                      <a className="text-[#009414]" href="/payments">عرض المزيد</a>
+                      <Link className="text-[#009414]" href="/payments">عرض المزيد</Link>
                       <span className="mdi mdi-chevron-left text-[#009414] ms-5 text-xl"></span>
                     </button>
                   </div>

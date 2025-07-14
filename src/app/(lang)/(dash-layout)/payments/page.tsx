@@ -17,19 +17,21 @@ import {
     getPaymentsService,
     updatePaymentService,
 } from "@/services/paymentsService";
+import { updateSubscriptionStatusService } from "@/services/subscriptionService";
 
 export default function rubbush_collectors() {
     const [dataList, setDataList] = useState<Payment[]>([]);
     const headerArr = [
         { text: "ID", name: "id" },
         { text: " اسم المستخدم", name: "name_ar" },
-        { text: " رقم الاستلام", name: "name_ar" },
+        { text: " عدد الوحدات", name: "name_ar" },
         { text: " السعر الكلي", name: "name_ar" },
         { text: " تاريخ الدفع", name: "name_ar" },
         { text: "الحالة", name: "is_active" },
-        { text: " اسم طريقة الدفع", name: "name_ar" },
+        { text: " اسم الباقة", name: "name_ar" },
         { text: "طريقة الدفع", name: "is_active" },
         { text: "صورة التحويل", name: "image" },
+        { text: "الاجراءات", name: "image" },
     ];
     const statusList = [
         { is_active: "pending", name: "قيد الانتظار" },
@@ -79,19 +81,19 @@ export default function rubbush_collectors() {
 
         const query = `?page=${page}${hasSearch}${isActive}`;
 
-        getPaymentsService(query).then((response) => {
-            setDataList(response.data);
-            setTotalPages(response.meta.last_page);
-        })
-        .catch(() => {
-            
-        })
+        getPaymentsService(query)
+            .then((response) => {
+                //@ts-ignore
+                setDataList(response.data);
+                setTotalPages(response.meta.last_page);
+            })
+            .catch(() => {});
     };
     const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         fetchDataList({ search: e.target.value });
     };
 
-    const updateDataItemActive = (value: any, index: number) => {
+    const updateDataItemActive = (value: any, index: number, item: Payment) => {
         const service = dataList.find((item, i) => {
             return index == i;
         });
@@ -109,8 +111,25 @@ export default function rubbush_collectors() {
 
                 setDataList(arr);
 
-                console.log(response);
+                console.log(value);
+
+                if (value === "accepted") {
+                    setSubscriptionStatus(item, "accept");
+                }
+                if (value === "rejected") {
+                    setSubscriptionStatus(item, "reject");
+                }
             })
+            .catch((error) => {});
+    };
+    const setSubscriptionStatus = (
+        payment: Payment,
+        status: "reject" | "accept"
+    ) => {
+        if (!payment.subscription?.id) return;
+
+        updateSubscriptionStatusService(payment.subscription.id, status)
+            .then((response) => {})
             .catch((error) => {});
     };
 
@@ -223,7 +242,10 @@ export default function rubbush_collectors() {
         return (
             <>
                 <UIPrimaryDropdown
-                    items={statusList}
+                    items={[
+                        { is_active: undefined, name: "الكل" },
+                        ...statusList,
+                    ]}
                     itemName="name"
                     itemValue="is_active"
                     onSelected={(value) => {
@@ -345,7 +367,7 @@ export default function rubbush_collectors() {
                             <td className="py-2 px-4">{item.id}</td>
                             <td className="py-2 px-4">{item.user_name}</td>
                             <td className="py-2 px-4">
-                                {item.receiving_number}
+                                {item.subscription?.units ?? "-"}
                             </td>
                             <td className="py-2 px-4">{item.total_price}</td>
                             <td className="py-2 px-4">{item.created_at}</td>
@@ -358,13 +380,20 @@ export default function rubbush_collectors() {
                                         item.status
                                     )}
                                     onSelected={(value) => {
-                                        updateDataItemActive(value, index);
+                                        updateDataItemActive(
+                                            value,
+                                            index,
+                                            item
+                                        );
                                     }}
                                     items={statusList}
                                 >
                                     {statusDropdownName(item.status)}
                                 </UIPrimaryDropdown>
                             </td>
+                            {/* <td className="py-2 px-4">
+                                {item.subscription?.package.name ?? '-'}
+                            </td> */}
                             <td className="py-2 px-4">
                                 {item.payment_method?.name_ar ?? "-"}
                             </td>
@@ -377,9 +406,18 @@ export default function rubbush_collectors() {
                                     />
                                 </div>
                             </td>
+                            <td className="py-2 px-4">
+                                <div className="w-10 h-10 overflow-hidden">
+                                    <img
+                                        src={item.payment_verification}
+                                        alt=""
+                                        className="w-full h-full object-contain"
+                                    />
+                                </div>
+                            </td>
 
                             <td className="">
-                                <div className="flex justify-center gap-3">
+                                <div className="flex  gap-3">
                                     <UIDialogConfirm
                                         danger
                                         title="هل انت متأكد من حذف العنصر"
@@ -391,9 +429,15 @@ export default function rubbush_collectors() {
                                             <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
                                         </button>
                                     </UIDialogConfirm>
-                                    <button className="bg-green-100 p-1 px-2 rounded-lg">
-                                        <span className="mdi mdi-download text-green-600"></span>
-                                    </button>
+                                    {!!item.payment_verification && (
+                                        <a
+                                            href={item.payment_verification}
+                                            target="_blank"
+                                            className="bg-green-100 p-1 px-2 rounded-lg"
+                                        >
+                                            <span className="mdi mdi-download text-green-600"></span>
+                                        </a>
+                                    )}
                                 </div>
                             </td>
                         </tr>

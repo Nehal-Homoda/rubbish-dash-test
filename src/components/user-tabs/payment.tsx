@@ -18,11 +18,11 @@ import {
     updatePaymentService,
 } from "@/services/paymentsService";
 import { AppUser } from "@/types/user.interface";
-
+import { Users } from "@/types/auth.interface";
 
 type Props = {
-    user: AppUser
-}
+    user: Users;
+};
 
 export default function rubbush_collectors({ user }: Props) {
     const [dataList, setDataList] = useState<Payment[]>([]);
@@ -65,24 +65,14 @@ export default function rubbush_collectors({ user }: Props) {
         const isActive = is_active ? "&status=" + is_active : "";
         const hasSearch = search ? "&search=" + search : "";
 
-        const query = `?page=${page}${hasSearch}${isActive}`;
+        const query = `?page=${page}${hasSearch}${isActive}&user_id=${user.id}`;
 
-        getPaymentsService(query).then((response) => {
-            // setDataList(response.data);
-            console.log(response.data)
-            const userPayment = response.data.filter((item, index) => {
-                return item.user_id == user.id
+        getPaymentsService(query)
+            .then((response) => {
+                setDataList(response.data);
             })
-            setDataList(userPayment)
-           console.log('data is ',dataList)
-            // setTotalPages(response.meta.last_page);
-        })
-            .catch(() => {
-
-            })
+            .catch(() => {});
     };
-
-
 
     const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         fetchDataList({ search: e.target.value });
@@ -108,7 +98,7 @@ export default function rubbush_collectors({ user }: Props) {
 
                 console.log(response);
             })
-            .catch((error) => { });
+            .catch((error) => {});
     };
 
     const deleteSubmit = (item: Payment, selectedIndex: number) => {
@@ -119,10 +109,8 @@ export default function rubbush_collectors({ user }: Props) {
                 setDataList(updatedArr);
                 successDialog(true);
             })
-            .catch((error) => { });
+            .catch((error) => {});
     };
-
-
 
     const statusDropdownColor = (name: string) => {
         if (name === "rejected")
@@ -136,12 +124,7 @@ export default function rubbush_collectors({ user }: Props) {
     };
 
     const tableHeadActionsSlot = () => {
-        return (
-            <>
-
-
-            </>
-        );
+        return <></>;
     };
     useEffect(() => {
         fetchDataList();
@@ -208,9 +191,9 @@ export default function rubbush_collectors({ user }: Props) {
                                             <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
                                         </button>
                                     </UIDialogConfirm>
-                                    <button className="bg-green-100 p-1 px-2 rounded-lg">
+                                    {/* <button className="bg-green-100 p-1 px-2 rounded-lg">
                                         <span className="mdi mdi-download text-green-600"></span>
-                                    </button>
+                                    </button> */}
                                 </div>
                             </td>
                         </tr>

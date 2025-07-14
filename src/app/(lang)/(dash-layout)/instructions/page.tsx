@@ -249,7 +249,7 @@ export default function rubbush_collectors() {
         return (
             <>
                 <UIPrimaryDropdown
-                    items={statusList}
+                    items={[{ is_active: undefined, name: "الكل" }, ...statusList]}
                     itemName="name"
                     itemValue="is_active"
                     onSelected={(value) => {

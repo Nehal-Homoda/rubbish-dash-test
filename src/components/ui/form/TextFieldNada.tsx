@@ -1,4 +1,5 @@
 "use client";
+import moment from "moment";
 import { useState } from "react";
 
 type Props = {
@@ -14,6 +15,7 @@ type Props = {
     errorMessage?: string;
     required?: boolean;
     iconType?: "mdi" | "fa";
+    disabled?: boolean;
     handleChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
@@ -30,9 +32,11 @@ export default function TextFieldNada({
     errorMessage = "",
     required = true,
     iconType = "mdi",
+    disabled= false,
     handleChange,
 }: Props) {
     const [inputType, setInputType] = useState(type);
+    const startDate = moment().format('YYYY-MM-DD');
 
     const togglePasswordVisibility = () => {
         setInputType((prev) => (prev === "password" ? "text" : "password"));
@@ -72,6 +76,8 @@ export default function TextFieldNada({
                                 type={inputType}
                                 placeholder={placeholder}
                                 className="outline-none bg-transparent w-full"
+                                min={type === 'date' ? startDate : undefined}
+                                readOnly={disabled}
                             />
                         </div>
 

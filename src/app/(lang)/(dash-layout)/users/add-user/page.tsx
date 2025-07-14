@@ -38,11 +38,11 @@ export default function page() {
     const [districtDays, setDistrictDays] = useState<string[]>([]);
     const [districtTime, setDistrictTime] = useState<string[]>([]);
     const [packageItem, setPackageItem] = useState<PackageOffer | null>(null);
-
+    const [errorMessage, setErrorMessage] = useState("");
     const [paymentMethodList, setPaymentMethodList] = useState<
         Payment_methods[]
     >([]);
-    const [selected, setSelected] = useState(paymentMethodList[0]);
+    const [selected, setSelected] = useState<null | Payment_methods>(null);
 
     const router = useRouter();
 
@@ -76,44 +76,47 @@ export default function page() {
             setDistrict(response.data);
             //@ts-ignore
 
-            setDistrictDays([
-                "friday",
-                "tuesday",
-                "thursday",
-                "wednesday",
-                "monday",
-                "saturday",
-                "sunday",
-            ]);
+            setDistrictDays([]);
             setDistrictTime([]);
         });
     };
     //@ts-ignore
     const handleAddUserSubmit = (e) => {
         e.preventDefault();
+        setErrorMessage("");
+        const t = formData.time_from.split("-");
         const fd = new FormData();
+
         fd.append("name", formData.name);
         fd.append("phone", formData.phone);
         fd.append("password", formData.password);
+        if (switch1) {
+            fd.append("district_id", formData.district_id);
+            fd.append("category_id", formData.category_id);
+            fd.append("start_date", formData.start_date);
+            fd.append("address_title", formData.address_title);
+            fd.append("time_from", t[0]);
+            fd.append("time_to", t[1]);
+            //@ts-ignore
+            fd.append("has_subscription", formData.has_subscription);
+            //@ts-ignore
+            fd.append("units", formData.units);
+            fd.append("package_id", formData.package_id);
+            fd.append("payment_method_id", formData.payment_method_id);
+            fd.append("address_lat", "34.1531");
+            fd.append("address_lng", "34.1531");
+            formData.days.forEach((day, index) =>
+                fd.append(`days[${index}]`, day)
+            );
+        }
 
-        fd.append("district_id", formData.district_id);
-        fd.append("category_id", formData.category_id);
-        fd.append("time_from", formData.time_from);
-        fd.append("time_to", formData.time_to);
-        fd.append("address_title", formData.address_title);
-        //@ts-ignore
-        fd.append("has_subscription", formData.has_subscription);
-        //@ts-ignore
-        fd.append("units", formData.units);
-        fd.append("package_id", formData.package_id);
-        fd.append("payment_method_id", formData.payment_method_id);
-        fd.append("address_lat", "34.1531");
-        fd.append("address_lng", "34.1531");
-        formData.days.forEach((day, index) => fd.append(`days[${index}]`, day));
-
-        addUserService(fd).then((response) => {
-            router.push("/users");
-        });
+        addUserService(fd)
+            .then((response) => {
+                router.push("/users");
+            })
+            .catch((error) => {
+                setErrorMessage(error.message);
+            });
     };
 
     const fetchPackages = () => {
@@ -139,15 +142,15 @@ export default function page() {
     const [formData, setFormData] = useState({
         name: "",
         phone: "",
-        password: "",
+        password: "default-password",
         district_id: "",
         has_subscription: 0,
         package_id: "",
 
         payment_method_id: "",
         days: [],
+        start_date: "",
         time_from: "",
-        time_to: "",
         units: 1,
         category_id: "",
         payment_verification: "",
@@ -194,6 +197,7 @@ export default function page() {
 
     //@ts-ignore
     const handleSelecteditem = (item) => {
+        console.log("itemssssss", item);
         setSelected(item);
         setFormData((prev) => ({
             ...prev,
@@ -217,7 +221,8 @@ export default function page() {
             );
 
             if (ca) {
-                setDistrictDays(ca.available_times);
+                setDistrictDays(ca.available_days);
+                setDistrictTime(ca.available_times);
             }
         }
     }, [formData]);
@@ -229,6 +234,11 @@ export default function page() {
                     <div className="mb-14">
                         <p className="font-bold">اضافة مستخدم جديد</p>
                     </div>
+                    {!!errorMessage && (
+                        <p className="text-sm text-red-500 mb-10">
+                            {errorMessage}
+                        </p>
+                    )}
 
                     <form onSubmit={handleAddUserSubmit} className="">
                         <div className="grid grid-cols-12 space-y-5 gap-7">
@@ -374,7 +384,7 @@ export default function page() {
                                         ></TextFieldNada>
                                     </div>
 
-                                    <div className="col-span-12">
+                                    <div className="col-span-6">
                                         <TextFieldNada
                                             name="price"
                                             type="number"
@@ -384,6 +394,18 @@ export default function page() {
                                             value={totalPrice.toString()}
                                             label="السعر الكلي "
                                             placeholder="  السعر الكلي "
+                                        ></TextFieldNada>
+                                    </div>
+                                    <div className="col-span-6">
+                                        <TextFieldNada
+                                            name="start_date"
+                                            type="date"
+                                            handleChange={(e) =>
+                                                takeValue(e, "start_date")
+                                            }
+                                            value={formData.start_date}
+                                            label="تاريخ البدأ "
+                                            placeholder="  السعر الكلي *"
                                         ></TextFieldNada>
                                     </div>
 
@@ -407,47 +429,19 @@ export default function page() {
                                         ></MultiCheckbox>
                                     </div>
                                     <div className="col-span-6">
-                                        <MultiCheckbox
-                                            items={districtDays}
-                                            value={formData.days}
-                                            label="الوقت"
-                                            required={true}
-                                            name="available_days"
+                                        <SelectInput
+                                            items={districtTime}
                                             placeholder="اختر الوقت"
-                                            prependIcon="mdi mdi-calendar-month-outline"
-                                            iconType="mdi"
+                                            name=""
+                                            value={formData.time_from}
+                                            label=" الوقت"
                                             onChange={(value) => {
-                                                //@ts-ignore
                                                 setFormData((prev) => ({
                                                     ...prev,
-                                                    ["days"]: value,
+                                                    ["time_from"]: value,
                                                 }));
                                             }}
-                                        ></MultiCheckbox>
-                                    </div>
-                                    <div className="col-span-6">
-                                        <TextFieldNada
-                                            name="time_from"
-                                            type="date"
-                                            handleChange={(e) =>
-                                                takeValue(e, "time_from")
-                                            }
-                                            value={formData.time_from}
-                                            label="من "
-                                            placeholder="  السعر الكلي *"
-                                        ></TextFieldNada>
-                                    </div>
-                                    <div className="col-span-6">
-                                        <TextFieldNada
-                                            name="time_to"
-                                            type="date"
-                                            handleChange={(e) =>
-                                                takeValue(e, "time_to")
-                                            }
-                                            value={formData.time_to}
-                                            label="الي "
-                                            placeholder="  السعر الكلي *"
-                                        ></TextFieldNada>
+                                        ></SelectInput>
                                     </div>
 
                                     <div className="col-span-12">
@@ -457,14 +451,11 @@ export default function page() {
                                                 handleSelecteditem(e)
                                             }
                                         >
-                                            <RadioGroup.Label className="sr-only">
-                                                Server size
-                                            </RadioGroup.Label>
                                             <div className="grid grid-cols-2 gap-7">
                                                 {paymentMethodList.map(
-                                                    (item) => (
+                                                    (item, index) => (
                                                         <RadioGroup.Option
-                                                            key={item.name_ar}
+                                                            key={index}
                                                             value={item}
                                                             className={({
                                                                 active,
@@ -544,15 +535,12 @@ export default function page() {
                             </div>
                         )}
 
-                        <div className="mx-auto w-[50%] py-5 flex gap-4">
+                        <div className="mx-auto w-[50%] py-5 flex justify-center">
                             <button
                                 type="submit"
-                                className="bg-[#009414] rounded-xl px-3 py-2 text-white w-full"
+                                className="bg-[#009414] rounded-xl px-3 py-4 text-white min-w-[225px] "
                             >
                                 اضافة
-                            </button>
-                            <button className="bg-[#00941412] text-[#009414] w-full rounded-xl px-3 py-2">
-                                الغاء
                             </button>
                         </div>
                     </form>

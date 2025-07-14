@@ -20,9 +20,8 @@ interface Props {
 export default function DashSidebar({ isOpen, toggleSidebarHandler }: Props) {
     // const [isOpen, setIsOpen] = useState(true);
     const { lang, dict } = useLangAndDictionary();
-    const router = useRouter()
+    const router = useRouter();
     const dispatch = useDispatch<AppDispatch>();
-
 
     const ListItems: ListItem[] = [
         {
@@ -133,25 +132,20 @@ export default function DashSidebar({ isOpen, toggleSidebarHandler }: Props) {
     const cleanPathname = pathname.replace(langPrefix, "") || "/";
 
     const openSidebar = () => {
-        toggleSidebarHandler()
+        toggleSidebarHandler();
     };
 
-    const handleOnClick = (item:ListItem) => {
-
-        dispatch(changeTitle(item.text))
-        router.push(`${langPrefix}${item.path}`)
-
-
-    }
+    const handleOnClick = (item: ListItem) => {
+        dispatch(changeTitle(item.text));
+        router.push(`${langPrefix}${item.path}`);
+    };
     return (
         <div
             className={`side-bar z-50 bg-surface text-white/85 fixed top-0 md:flex duration-300 flex-col h-full
-  ${isOpen
-                    ? "flex"
-                    : "md:translate-x-0 " +
-                    "translate-x-full"
-                // (params.lang === "ar" ? "translate-x-full" : "-translate-x-full")
-                }
+  ${
+      isOpen ? "flex" : "md:translate-x-0 " + "translate-x-full"
+      // (params.lang === "ar" ? "translate-x-full" : "-translate-x-full")
+  }
   `}
         >
             <span
@@ -167,7 +161,10 @@ export default function DashSidebar({ isOpen, toggleSidebarHandler }: Props) {
                         className="size-5 object-contain"
                     />
                 </div>
-                <p className="font-semibold text-lg">rubbish</p>
+                <div className="">
+                    <p className="leading-5 font-semibold text-lg">rubbish</p>
+                    <p className="leading-5 font-semibold text-lg">جامعي القمامة</p>
+                </div>
             </div>
             <hr className="border-white/20" />
             <div className="list-items pr-5 pl-3 pt-5 overflow-y-auto flex-1 custom-scroll">
@@ -175,14 +172,16 @@ export default function DashSidebar({ isOpen, toggleSidebarHandler }: Props) {
                     <div key={index}>
                         <button onClick={() => handleOnClick(item)}>
                             <Link
-                                href={''}
-                                className={`relative flex items-center justify-between capitalize cursor-pointer text-base hover:bg-white/10 rounded-2xl mb-2 w-52 h-12 transition-all px-4 ${cleanPathname === item.path
-                                    ? `bg-white/10 before:content-[''] before:absolute before:bg-white before:h-[85%] before:w-[6px] before:rounded-md ${params.lang === "en"
-                                        ? "before:-left-4"
-                                        : "before:-right-3"
-                                    }`
-                                    : ""
-                                    }`}
+                                href={""}
+                                className={`relative flex items-center justify-between capitalize cursor-pointer text-base hover:bg-white/10 rounded-2xl mb-2 w-52 h-12 transition-all px-4 ${
+                                    cleanPathname === item.path
+                                        ? `bg-white/10 before:content-[''] before:absolute before:bg-white before:h-[85%] before:w-[6px] before:rounded-md ${
+                                              params.lang === "en"
+                                                  ? "before:-left-4"
+                                                  : "before:-right-3"
+                                          }`
+                                        : ""
+                                }`}
                                 onClick={(e) => {
                                     if (item.subLinks) e.preventDefault();
                                     toggleDropDown(index);
@@ -204,19 +203,21 @@ export default function DashSidebar({ isOpen, toggleSidebarHandler }: Props) {
                                 </div>
                                 {item.subLinks && (
                                     <span
-                                        className={`mdi mdi-chevron-down transition-all duration-200 ${dropdownIndex === index
-                                            ? "-rotate-180"
-                                            : "rotate-0"
-                                            }`}
+                                        className={`mdi mdi-chevron-down transition-all duration-200 ${
+                                            dropdownIndex === index
+                                                ? "-rotate-180"
+                                                : "rotate-0"
+                                        }`}
                                     ></span>
                                 )}
                             </Link>
                         </button>
                         <div
-                            className={`drop-down flex  flex-col justify-between pr-5 pt-1 pb-3 text-sm overflow-hidden transition-all duration-500 gap-1 ${dropdownIndex === index
-                                ? "max-h-[500px]"
-                                : "max-h-0 pointer-events-none "
-                                }`}
+                            className={`drop-down flex  flex-col justify-between pr-5 pt-1 pb-3 text-sm overflow-hidden transition-all duration-500 gap-1 ${
+                                dropdownIndex === index
+                                    ? "max-h-[500px]"
+                                    : "max-h-0 pointer-events-none "
+                            }`}
                         >
                             {item.subLinks?.map((dropKey, index) => (
                                 <Link

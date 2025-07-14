@@ -1,3 +1,4 @@
+import { Subscription2 } from "./auth.interface";
 
 export interface Payment {
     id: number;
@@ -9,6 +10,7 @@ export interface Payment {
     user_name: string;
     payment_method: PaymentMethod;
     created_at: string;
+    subscription: Subscription2 | null;
 }
 
 

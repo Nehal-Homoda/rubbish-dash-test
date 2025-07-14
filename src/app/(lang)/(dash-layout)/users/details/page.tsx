@@ -9,6 +9,7 @@ import React, { useEffect, useState } from "react";
 import header_bg_img from "@/assets/images/bg/profile-header-bg.jpg";
 import { useParams } from "next/navigation";
 import { getQueryParam } from "@/utils/shared";
+import AddNewSubscription from "@/components/user-tabs/AddNewSubscription";
 
 // type Props = {
 //   params: { id: number }
@@ -23,9 +24,10 @@ export default function page() {
     const id = () => {
         return getQueryParam("id") || "";
     };
-    const [user, setUser] = useState<AppUser | null>(null);
+    const [user, setUser] = useState<Users | null>(null);
     const [selectedBtn, setSelectedBtn] = useState<Btn | null>(null);
     const [type, setType] = useState("personal-data");
+    const [showAddSubscription, setShowAddSubscription] = useState(false);
     const fetchUserById = () => {
         getUserByIdService(id()).then((response) => {
             setUser(response.data);
@@ -40,6 +42,7 @@ export default function page() {
     const handleChangeBtnType = (item) => {
         setType(item);
     };
+    
 
     useEffect(() => {
         if (selectedBtn) {
@@ -62,9 +65,10 @@ export default function page() {
                         <div className="mb-10">
                             <h4 className="mb-1 font-bold ">{user?.name}</h4>
                             <p>
-                                {user?.subscription_name
-                                    ? user?.subscription_name
-                                    : "**********"}
+                                {!!user &&
+                                    (user.subscription_name
+                                        ? user?.subscription_name
+                                        : "غير مشترك")}
                             </p>
                         </div>
                         <div className="flex items-center gap-4">
@@ -91,8 +95,25 @@ export default function page() {
                     {type == "personal-data" && user && (
                         <PersonalData user={user} />
                     )}
+
                     {type == "subscription" && user && (
+                        // 
+                        !user.has_subscription ? <>
+                            <div className="py-5 text-end">
+                                <button onClick={() => {setShowAddSubscription(true)}} className="delete-subscription-btn text-nowrap  px-7 py-2 bg-surface-light-800 hover:bg-surface-light-700 ring-1 ring-surface duration-150 text-surface rounded-md">
+                                    <span className="">
+                                        اضافة اشتراك
+                                    </span>
+                                    <span className="mdi mdi-plus ms-2"></span>
+                                </button>
+                            </div>
+                            {
+                                showAddSubscription && <AddNewSubscription getNewUser={(value) => {setUser(value)}} user={user} />
+                            }
+                            
+                        </> : <>
                         <Subscription user={user} />
+                        </>
                     )}
                     {type == "payment" && user && <Payment user={user} />}
                 </div>
