@@ -1,4 +1,6 @@
-import React from "react";
+"use client"
+
+import React, { useEffect, useState } from "react";
 import UIThemeToggleBtn from "@/components/ui/UIThemeToggleBtn";
 // import LangSwitcher from "../shared/LangSwitcher";
 import { useLangAndDictionary } from "@/utils/lang";
@@ -17,14 +19,19 @@ export default function DashNavbar({ isOpen, openSidebar }: Props) {
     //     (state: RootState) => state.authReducer.title
     // );
     const dispatch = useDispatch<AppDispatch>();
+    const [title, setTitle] = useState('')
 
     const logoutHander = () => {
         dispatch(logout())
         window.location.reload()
     };
 
-    const storedTitle = Cookies.get("title");
-    const title = storedTitle ? JSON.parse(storedTitle) : null;
+
+    useEffect(() => {
+        const storedTitle = Cookies.get("title");
+
+        setTitle(storedTitle ? JSON.parse(storedTitle) : null)
+    }, [])
 
     return (
         <>

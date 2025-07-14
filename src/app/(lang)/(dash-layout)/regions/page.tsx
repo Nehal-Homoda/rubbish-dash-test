@@ -20,8 +20,8 @@ import { successDialog, validateAllInputs } from "@/utils/shared";
 import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
 import { getCollectorsService } from "@/services/collectorsService";
 // import { Collector } from "@/types/regions.interface";
-import { Collector } from "@/types/collectors.interface"
-import * as Yup from "yup"
+import { Collector } from "@/types/collectors.interface";
+import * as Yup from "yup";
 
 interface FormDataInputs {
     name_ar: string;
@@ -31,7 +31,7 @@ interface FormDataInputs {
 }
 interface FormDataInputErrors {
     name_ar: string | null;
-    name_en: string | null
+    name_en: string | null;
     available_days: string;
     available_times: string;
 }
@@ -45,6 +45,10 @@ type FormDataType = {
     available_times: string[];
 };
 
+type FromToTimeType = {
+    from: string;
+    to: string;
+};
 
 export default function rubbush_collectors() {
     const [dataList, setDataList] = useState<District[]>([]);
@@ -70,30 +74,42 @@ export default function rubbush_collectors() {
         "saturday",
         "sunday",
     ]);
+    const [dynamicFromToTime, setDynamicFromToTime] = useState<
+        FromToTimeType[]
+    >([{ from: "", to: "" }]);
+    const [dynamicFromToTimeUpdate, setDynamicFromToTimeUpdate] = useState<
+        FromToTimeType[]
+    >([]);
+
     const [districtTime, setDistrictTime] = useState<string[]>([]);
     const [selectedDataItem, setSelectedDataItem] = useState<District | null>(
         null
     );
 
-    const [collectors, setCollectors] = useState<Collector[]>([])
+    const [collectors, setCollectors] = useState<Collector[]>([]);
+
+    const [timefrom, setTimefrom] = useState("");
+    const [timeto, setTimeto] = useState("");
 
     const formSchema = Yup.object().shape({
         name_ar: Yup.string().required(),
         name_en: Yup.string().required(),
-        available_days: Yup.array().of(Yup.string()).min(1, "Select at least one day")
+        available_days: Yup.array()
+            .of(Yup.string())
+            .min(1, "Select at least one day")
             .required("Available days are required"),
-        available_times: Yup.array().of(Yup.string()).min(1, "Select at least one time")
+        available_times: Yup.array()
+            .of(Yup.string())
+            .min(1, "Select at least one time")
             .required("Available times are required"),
     });
     const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
         name_ar: "",
         name_en: "",
-        available_days: '',
-        available_times: ''
+        available_days: "",
+        available_times: "",
     });
     const [errorMsg, setErrorMsg] = useState("");
-
-
 
     const [formData, setFormData] = useState<FormDataType>({
         name_ar: "",
@@ -115,8 +131,41 @@ export default function rubbush_collectors() {
         available_times: [],
     });
 
+    const addDynamicTime = () => {
+        setDynamicFromToTime((prev) => {
+            const ar = [...prev];
+            ar.push({ from: "", to: "" });
 
+            return [...ar];
+        });
+    };
+    const removeDynamicTime = (index: number) => {
+        setDynamicFromToTime((prev) => {
+            const ar = [...prev];
+            ar.splice(index, 1);
 
+            return [...ar];
+        });
+    };
+    const addDynamicTimeUpdate = () => {
+        setDynamicFromToTimeUpdate((prev) => {
+            const ar = [...prev];
+            ar.push({ from: "", to: "" });
+
+            return [...ar];
+        });
+    };
+    const removeDynamicTimeUpdate = (index: number) => {
+
+        if (index == 0) return;
+
+        setDynamicFromToTimeUpdate((prev) => {
+            const ar = [...prev];
+            ar.splice(index, 1);
+
+            return [...ar];
+        });
+    };
     const fetchDataList = ({
         search = "",
         is_active = undefined,
@@ -134,16 +183,14 @@ export default function rubbush_collectors() {
 
         getDistrictService(query)
             .then((response) => {
-
                 setDataList(response.data);
                 setTotalPages(response.meta.last_page);
                 response.data.map((item) => {
-                    setDistrictTime(item.available_times)
-                })
+                    setDistrictTime(item.available_times);
+                });
             })
-            .catch(() => { });
+            .catch(() => {});
     };
-
 
     const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         fetchDataList({ search: e.target.value });
@@ -169,7 +216,7 @@ export default function rubbush_collectors() {
 
                 console.log(response);
             })
-            .catch((error) => { });
+            .catch((error) => {});
     };
 
     const deleteSubmit = (item: District, selectedIndex: number) => {
@@ -180,11 +227,12 @@ export default function rubbush_collectors() {
                 setDataList(updatedArr);
                 successDialog(true);
             })
-            .catch((error) => { });
+            .catch((error) => {});
     };
 
     const updateDataItem = (item: District) => {
         setSelectedDataItem(item);
+        setDynamicFromToTimeUpdate([])
         setUpdateFormData({
             name_ar: item.name_ar,
             name_en: item.name_en,
@@ -193,6 +241,18 @@ export default function rubbush_collectors() {
             is_active: item.is_active ? 1 : 0,
             available_days: item.available_days,
             available_times: item.available_times,
+        });
+
+        const ar = item.available_times.map((item) => {
+            const x = item.split("-");
+
+            return { from: x[0], to: x[1] };
+        });
+
+        setDynamicFromToTimeUpdate((prev) => {
+            const stored = [...prev];
+
+            return [...stored, ...ar];
         });
     };
 
@@ -204,14 +264,14 @@ export default function rubbush_collectors() {
         const body = JSON.stringify({
             ...updateFormData,
         });
-        console.log('update form', updateFormData)
+        console.log("update form", updateFormData);
 
         updateDistrictService(selectedDataItem.id, body)
             .then((response) => {
                 fetchDataList();
                 successDialog(true);
             })
-            .catch((error) => { });
+            .catch((error) => {});
     };
 
     const addFormChangeHander = (
@@ -244,10 +304,10 @@ export default function rubbush_collectors() {
             formSchema,
             formData
         );
-        console.log('validate', validateResult)
-        if (!validateResult) return
+        console.log("validate", validateResult);
+        if (!validateResult) return;
         setFormErrors({ ...validateResult.outputResult });
-        console.log('form error', formErrors)
+        console.log("form error", formErrors);
         if (validateResult.isInvalid) return;
 
         const fd = new FormData();
@@ -276,10 +336,11 @@ export default function rubbush_collectors() {
                     available_days: [],
                     available_times: [],
                 });
+                setDynamicFromToTime([{ from: "", to: "" }]);
             })
             .catch((error) => {
-                setErrorMsg(error?.message)
-                console.log('error message is', errorMsg)
+                setErrorMsg(error?.message);
+                console.log("error message is", errorMsg);
             });
     };
 
@@ -288,7 +349,7 @@ export default function rubbush_collectors() {
             <>
                 <UIBaseDialog
                     title="اضافة منطقه"
-                    confirmHandler={() => { }}
+                    confirmHandler={() => {}}
                     confirmText="اضافة"
                     form="update-form"
                     btn={
@@ -300,15 +361,17 @@ export default function rubbush_collectors() {
                     }
                 >
                     <form onSubmit={createSubmit} id="update-form">
-                        {errorMsg && (
+                        {/* {errorMsg && (
                             <div className="mb-5">
-                                <span className="text-red-800"> {errorMsg}</span>
-
+                                <span className="text-red-800">
+                                    {" "}
+                                    {errorMsg}
+                                </span>
                             </div>
-                        )}
+                        )} */}
                         <div className="space-y-7">
                             <TextFieldNada
-                                errorMessage={formErrors.name_ar || ''}
+                                errorMessage={formErrors.name_ar || ""}
                                 name="name_ar"
                                 type="text"
                                 handleChange={addFormChangeHander}
@@ -319,7 +382,7 @@ export default function rubbush_collectors() {
                             ></TextFieldNada>
 
                             <TextFieldNada
-                                errorMessage={formErrors.name_en || ''}
+                                errorMessage={formErrors.name_en || ""}
                                 name="name_en"
                                 type="text"
                                 handleChange={addFormChangeHander}
@@ -327,47 +390,6 @@ export default function rubbush_collectors() {
                                 label=" اسم المنطقة ( انجليزي ) "
                                 placeholder=" اسم المنطقة  "
                             ></TextFieldNada>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <div className="col-span-1">
-                                    <MultiCheckbox
-                                        errorMessage={formErrors.available_days}
-                                        items={districtDays}
-                                        value={formData.available_days}
-                                        label="اليوم"
-                                        required={true}
-                                        name="available_days"
-                                        placeholder="اختر اليوم"
-                                        prependIcon="mdi mdi-calendar-month-outline"
-                                        iconType="mdi"
-                                        onChange={(value) => {
-                                            setFormData((prev) => ({
-                                                ...prev,
-                                                ["available_days"]: value,
-                                            }));
-                                        }}
-                                    ></MultiCheckbox>
-                                </div>
-                                <div className="col-span-1">
-                                    <MultiCheckbox
-                                        errorMessage={formErrors.available_times}
-                                        items={districtTime}
-                                        value={formData.available_times}
-                                        label="الوقت"
-                                        required={true}
-                                        name="available_times"
-                                        placeholder="اختر الوقت"
-                                        prependIcon="mdi mdi-calendar-month-outline"
-                                        iconType="mdi"
-                                        onChange={(value) => {
-                                            setFormData((prev) => ({
-                                                ...prev,
-                                                ["available_times"]: value,
-                                            }));
-                                        }}
-                                    ></MultiCheckbox>
-                                </div>
-                            </div>
 
                             <SelectInput
                                 value={formData.is_active}
@@ -385,6 +407,108 @@ export default function rubbush_collectors() {
                                     }));
                                 }}
                             ></SelectInput>
+                            <MultiCheckbox
+                                errorMessage={formErrors.available_days}
+                                items={districtDays}
+                                value={formData.available_days}
+                                label="اليوم"
+                                required={true}
+                                name="available_days"
+                                placeholder="اختر اليوم"
+                                prependIcon="mdi mdi-calendar-month-outline"
+                                iconType="mdi"
+                                onChange={(value) => {
+                                    setFormData((prev) => ({
+                                        ...prev,
+                                        ["available_days"]: value,
+                                    }));
+                                }}
+                            ></MultiCheckbox>
+
+                            {dynamicFromToTime.map((item, index) => (
+                                <div
+                                    key={index}
+                                    className="time_from_to grid grid-cols-11 gap-2 items-center"
+                                >
+                                    <div className="col-span-5">
+                                        <TextFieldNada
+                                            name="price"
+                                            type="time"
+                                            handleChange={
+                                                (e) => {
+                                                    setDynamicFromToTime(
+                                                        (prev) => {
+                                                            const ar = [
+                                                                ...prev,
+                                                            ];
+
+                                                            ar[index].from =
+                                                                e.target.value;
+
+                                                            return ar;
+                                                        }
+                                                    );
+                                                }
+                                                // takeValue(e, "time_to")
+                                            }
+                                            value={
+                                                dynamicFromToTime[index].from
+                                            }
+                                            label="الي "
+                                            placeholder="  السعر الكلي *"
+                                        ></TextFieldNada>
+                                    </div>
+                                    <div className="col-span-5">
+                                        <TextFieldNada
+                                            name="price"
+                                            type="time"
+                                            handleChange={
+                                                (e) => {
+                                                    setDynamicFromToTime(
+                                                        (prev) => {
+                                                            const ar = [
+                                                                ...prev,
+                                                            ];
+
+                                                            ar[index].to =
+                                                                e.target.value;
+
+                                                            return ar;
+                                                        }
+                                                    );
+                                                }
+                                                // takeValue(e, "time_to")
+                                            }
+                                            value={dynamicFromToTime[index].to}
+                                            label="الي "
+                                            placeholder="  السعر الكلي *"
+                                        ></TextFieldNada>
+                                    </div>
+                                    <div className="col-span-1">
+                                        {index > 0 ? (
+                                            <button
+                                                type="button"
+                                                className="w-10 h-10 rounded-md bg-red-500 text-white"
+                                                onClick={() => {
+                                                    removeDynamicTime(index);
+                                                }}
+                                            >
+                                                <span className="mdi mdi-minus"></span>
+                                            </button>
+                                        ) : (
+                                            <button
+                                                onClick={() => {
+                                                    addDynamicTime();
+                                                }}
+                                                type="button"
+                                                className="w-10 h-10 rounded-md bg-surface text-white"
+                                            >
+                                                <span className="mdi mdi-plus"></span>
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </form>
                 </UIBaseDialog>
@@ -392,21 +516,33 @@ export default function rubbush_collectors() {
         );
     };
 
-
     const fetchCollectors = () => {
         getCollectorsService().then((response) => {
             // console.log('collectors are', response)
-            setCollectors(response.data)
-
-
-        })
-    }
+            setCollectors(response.data);
+        });
+    };
 
     useEffect(() => {
         fetchDataList();
-        fetchCollectors()
+        fetchCollectors();
     }, [page]); // runs every time `page` changes
 
+    useEffect(() => {
+        console.log(dynamicFromToTime);
+        const ar = dynamicFromToTime.map((item) => `${item.from}-${item.to}`);
+        setFormData((prev) => ({
+            ...prev,
+            ["available_times"]: ar,
+        }));
+    }, [dynamicFromToTime]);
+    useEffect(() => {
+        const ar = dynamicFromToTimeUpdate.map((item) => `${item.from}-${item.to}`);
+        setUpdateFormData((prev) => ({
+            ...prev,
+            ["available_times"]: ar,
+        }));
+    }, [dynamicFromToTimeUpdate]);
     return (
         <>
             <div className="py-20">
@@ -458,7 +594,7 @@ export default function rubbush_collectors() {
                                     </UIDialogConfirm>
                                     <UIBaseDialog
                                         title="تعديل منطقه"
-                                        confirmHandler={() => { }}
+                                        confirmHandler={() => {}}
                                         confirmText="حفظ"
                                         form="update-form"
                                         btn={
@@ -503,8 +639,6 @@ export default function rubbush_collectors() {
                                                     placeholder=" اسم المنطقة  "
                                                 ></TextFieldNada>
 
-
-
                                                 {/* <SelectInput
                                                     value={
                                                         updateFormData.collector_id
@@ -527,85 +661,6 @@ export default function rubbush_collectors() {
                                                     }}
                                                 ></SelectInput> */}
 
-
-
-                                                <MultiCheckbox
-                                                    items={collectors}
-                                                    itemName="name"
-                                                    itemValue="id"
-                                                    value={updateFormData.collector_id}
-                                                    label="جامع القمامة"
-                                                    required={true}
-                                                    name="collector_id"
-                                                    placeholder="اختر جامع القمامة"
-                                                    // prependIcon="mdi mdi-calendar-month-outline"
-                                                    iconType="mdi"
-                                                    onChange={(
-                                                        value
-                                                    ) => {
-                                                        setUpdateFormData(
-                                                            (prev) => ({
-                                                                ...prev,
-                                                                ["collector_id"]:
-                                                                    value,
-                                                            })
-                                                        );
-                                                    }}
-                                                ></MultiCheckbox>
-
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                                    <div className="col-span-1">
-                                                        <MultiCheckbox
-                                                            items={districtDays}
-                                                            value={
-                                                                updateFormData.available_days
-                                                            }
-                                                            label="اليوم"
-                                                            required={true}
-                                                            name="available_days"
-                                                            placeholder="اختر اليوم"
-                                                            prependIcon="mdi mdi-calendar-month-outline"
-                                                            iconType="mdi"
-                                                            onChange={(
-                                                                value
-                                                            ) => {
-                                                                setUpdateFormData(
-                                                                    (prev) => ({
-                                                                        ...prev,
-                                                                        ["available_days"]:
-                                                                            value,
-                                                                    })
-                                                                );
-                                                            }}
-                                                        ></MultiCheckbox>
-                                                    </div>
-                                                    <div className="col-span-1">
-                                                        <MultiCheckbox
-                                                            items={districtTime}
-                                                            value={
-                                                                updateFormData.available_times
-                                                            }
-                                                            label="الوقت"
-                                                            required={true}
-                                                            name="available_times"
-                                                            placeholder="اختر الوقت"
-                                                            prependIcon="mdi mdi-calendar-month-outline"
-                                                            iconType="mdi"
-                                                            onChange={(
-                                                                value
-                                                            ) => {
-                                                                setUpdateFormData(
-                                                                    (prev) => ({
-                                                                        ...prev,
-                                                                        ["available_times"]:
-                                                                            value,
-                                                                    })
-                                                                );
-                                                            }}
-                                                        ></MultiCheckbox>
-                                                    </div>
-                                                </div>
-
                                                 <SelectInput
                                                     value={
                                                         updateFormData.is_active
@@ -627,6 +682,156 @@ export default function rubbush_collectors() {
                                                         );
                                                     }}
                                                 ></SelectInput>
+
+                                                <MultiCheckbox
+                                                    items={collectors}
+                                                    itemName="name"
+                                                    itemValue="id"
+                                                    value={
+                                                        updateFormData.collector_id
+                                                    }
+                                                    label="جامع القمامة"
+                                                    required={true}
+                                                    name="collector_id"
+                                                    placeholder="اختر جامع القمامة"
+                                                    // prependIcon="mdi mdi-calendar-month-outline"
+                                                    iconType="mdi"
+                                                    onChange={(value) => {
+                                                        setUpdateFormData(
+                                                            (prev) => ({
+                                                                ...prev,
+                                                                ["collector_id"]:
+                                                                    value,
+                                                            })
+                                                        );
+                                                    }}
+                                                ></MultiCheckbox>
+                                                <MultiCheckbox
+                                                    items={districtDays}
+                                                    value={
+                                                        updateFormData.available_days
+                                                    }
+                                                    label="اليوم"
+                                                    required={true}
+                                                    name="available_days"
+                                                    placeholder="اختر اليوم"
+                                                    prependIcon="mdi mdi-calendar-month-outline"
+                                                    iconType="mdi"
+                                                    onChange={(value) => {
+                                                        setUpdateFormData(
+                                                            (prev) => ({
+                                                                ...prev,
+                                                                ["available_days"]:
+                                                                    value,
+                                                            })
+                                                        );
+                                                    }}
+                                                ></MultiCheckbox>
+
+                                                {dynamicFromToTimeUpdate.map(
+                                                    (item, index) => (
+                                                        <div
+                                                            key={index}
+                                                            className="time_from_to grid grid-cols-11 gap-2 items-center"
+                                                        >
+                                                            <div className="col-span-5">
+                                                                <TextFieldNada
+                                                                    name="price"
+                                                                    type="time"
+                                                                    handleChange={
+                                                                        (e) => {
+                                                                            setDynamicFromToTimeUpdate(
+                                                                                (
+                                                                                    prev
+                                                                                ) => {
+                                                                                    const ar =
+                                                                                        [
+                                                                                            ...prev,
+                                                                                        ];
+
+                                                                                    ar[
+                                                                                        index
+                                                                                    ].from =
+                                                                                        e.target.value;
+
+                                                                                    return ar;
+                                                                                }
+                                                                            );
+                                                                        }
+                                                                        // takeValue(e, "time_to")
+                                                                    }
+                                                                    value={
+                                                                        dynamicFromToTimeUpdate[
+                                                                            index
+                                                                        ].from
+                                                                    }
+                                                                    label="الي "
+                                                                    placeholder="  السعر الكلي *"
+                                                                ></TextFieldNada>
+                                                            </div>
+                                                            <div className="col-span-5">
+                                                                <TextFieldNada
+                                                                    name="price"
+                                                                    type="time"
+                                                                    handleChange={
+                                                                        (e) => {
+                                                                            setDynamicFromToTimeUpdate(
+                                                                                (
+                                                                                    prev
+                                                                                ) => {
+                                                                                    const ar =
+                                                                                        [
+                                                                                            ...prev,
+                                                                                        ];
+
+                                                                                    ar[
+                                                                                        index
+                                                                                    ].to =
+                                                                                        e.target.value;
+
+                                                                                    return ar;
+                                                                                }
+                                                                            );
+                                                                        }
+                                                                        // takeValue(e, "time_to")
+                                                                    }
+                                                                    value={
+                                                                        dynamicFromToTimeUpdate[
+                                                                            index
+                                                                        ].to
+                                                                    }
+                                                                    label="الي "
+                                                                    placeholder="  السعر الكلي *"
+                                                                ></TextFieldNada>
+                                                            </div>
+                                                            <div className="col-span-1">
+                                                                {index > 0 ? (
+                                                                    <button
+                                                                        type="button"
+                                                                        className="w-10 h-10 rounded-md bg-red-500 text-white"
+                                                                        onClick={() => {
+                                                                            removeDynamicTimeUpdate(
+                                                                                index
+                                                                            );
+                                                                        }}
+                                                                    >
+                                                                        <span className="mdi mdi-minus"></span>
+                                                                    </button>
+                                                                ) : (
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            addDynamicTimeUpdate();
+                                                                        }}
+                                                                        type="button"
+                                                                        className="w-10 h-10 rounded-md bg-surface text-white"
+                                                                    >
+                                                                        <span className="mdi mdi-plus"></span>
+                                                                    </button>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    )
+                                                )}
                                             </div>
                                         </form>
                                     </UIBaseDialog>
