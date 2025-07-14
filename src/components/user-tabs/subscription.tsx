@@ -105,7 +105,7 @@ export default function subscription({ user }: Props) {
     districtListService().then((response) => {
       setDistrict(response.data);
 
-      response.data.map((item:DistrictItem, index:number) => {
+      response.data.map((item: DistrictItem, index: number) => {
         setDistrictDays(item.available_days);
         setDistrictTime(item.available_times);
       });
@@ -142,13 +142,13 @@ export default function subscription({ user }: Props) {
   // }
 
 
-  // const takeValue = (e, name) => {
-  //   console.log(e.target.value);
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     [name]: e.target.value,
-  //   }));
-  // };
+  const takeValue = (e, name) => {
+    console.log(e.target.value);
+    setFormData((prev) => ({
+      ...prev,
+      [name]: e.target.value,
+    }));
+  };
 
   // const handleCheckSubscription = (value) => {
   //   console.log(value)
@@ -170,6 +170,7 @@ export default function subscription({ user }: Props) {
       console.log(response)
     })
   }
+
 
 
   useEffect(() => {
@@ -283,7 +284,18 @@ export default function subscription({ user }: Props) {
             <>
 
               <div className="col-span-12">
-                {<SelectInput onChange={() => { }} items={categoryList} placeholder="ادخل نوع الخدمة" name="" itemName="name_ar" itemValue="id" value={formData.subscription.category.id} label=" نوع الخدمة"
+                {<SelectInput onChange={(item) => setFormData((prev) => ({
+                  ...prev,
+                  subscription: {
+                    ...prev.subscription,
+                    category: {
+                      ...prev.subscription.category,
+                      id: item
+                    }
+                  }
+                }))}
+
+                  items={categoryList} placeholder="ادخل نوع الخدمة" name="" itemName="name_ar" itemValue="id" value={formData.subscription.category.id} label=" نوع الخدمة"
 
 
 
@@ -294,7 +306,21 @@ export default function subscription({ user }: Props) {
 
 
               <div className="col-span-6">
-                <SelectInput onChange={() => { }} items={packagesList} placeholder="ادخل نوع الباقه" name="" itemName="name_ar" itemValue="id" value={formData.subscription.package.id} label=" نوع الباقة"
+                <SelectInput onChange={(item) => {
+                  console.log('item id',item)
+                  setFormData((prev) => ({
+                    ...prev,
+                    subscription: {
+                      ...prev.subscription,
+                      package: {
+                        ...prev.subscription.package,
+                        id: item
+                      }
+
+                    }
+
+                  }))
+                }} items={packagesList} placeholder="ادخل نوع الباقه"  name="" itemName="name_ar" itemValue="id" value={formData.subscription.package.id} label=" نوع الباقة"
                 >
                 </SelectInput>
               </div>
@@ -305,7 +331,7 @@ export default function subscription({ user }: Props) {
                 <TextFieldNada
                   name="price"
                   type="number"
-                  // handleChange={(e) => takeValue(e, "units")}
+                  handleChange={(e) => takeValue(e, "units")}
                   value={formData.subscription.package.price_per_unit}
                   label=" سعر الباقة *"
                   placeholder="  سعر الباقة *"
@@ -317,7 +343,7 @@ export default function subscription({ user }: Props) {
                 <TextFieldNada
                   name="units"
                   type="number"
-                  // handleChange={(e) => takeValue(e, "units")}
+                  handleChange={(e) => takeValue(e, "units")}
                   value={formData.subscription.units}
                   label=" عدد الوحدات *"
                   placeholder=" عدد الوحدات *"
@@ -327,7 +353,18 @@ export default function subscription({ user }: Props) {
 
               <div className="col-span-6">
 
-                <SelectInput onChange={() => { }} placeholder="ادخل اسم المنطقة" name="name_ar" itemName="name_ar" itemValue="id" value={formData.subscription.district.id} items={district} label="اسم المنطقة"
+                <SelectInput onChange={(item) => { setFormData((prev)=>({
+                  ...prev,
+                  subscription:{
+                    ...prev.subscription,
+                    district:{
+                      ...prev.subscription.district,
+                      id:item
+                    }
+                    
+                  }
+
+                }))}} placeholder="ادخل اسم المنطقة" name="name_ar" itemName="name_ar" itemValue="id" value={formData.subscription.district.id} items={district} label="اسم المنطقة"
                 >
 
                 </SelectInput>
