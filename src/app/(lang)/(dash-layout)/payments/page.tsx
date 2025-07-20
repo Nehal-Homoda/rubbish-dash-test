@@ -18,9 +18,16 @@ import {
     updatePaymentService,
 } from "@/services/paymentsService";
 import { updateSubscriptionStatusService } from "@/services/subscriptionService";
+import { getPaymentMethodService } from "@/services/paymentMethodService";
+import { Payment_methods } from "@/types/paymentMethod.interface";
+import { paymentMethodListService } from "@/services/sharedService";
+import FileInputImg from "@/components/ui/form/FileInputImg";
 
 export default function rubbush_collectors() {
     const [dataList, setDataList] = useState<Payment[]>([]);
+    const [paymentMethodList, setPaymentMethodList] = useState<
+        Payment_methods[]
+    >([]);
     const headerArr = [
         { text: "ID", name: "id" },
         { text: " اسم المستخدم", name: "name_ar" },
@@ -28,7 +35,7 @@ export default function rubbush_collectors() {
         { text: " السعر الكلي", name: "name_ar" },
         { text: " تاريخ الدفع", name: "name_ar" },
         { text: "الحالة", name: "is_active" },
-        { text: " اسم الباقة", name: "name_ar" },
+        // { text: " اسم الباقة", name: "name_ar" },
         { text: "طريقة الدفع", name: "is_active" },
         { text: "صورة التحويل", name: "image" },
         { text: "الاجراءات", name: "image" },
@@ -38,6 +45,15 @@ export default function rubbush_collectors() {
         { is_active: "accepted", name: "مقبولة" },
         { is_active: "rejected", name: "مرفوضة" },
     ];
+
+
+    const status = [
+
+        { status: "pending", name: "قيد الانتظار" },
+        { status: "accepted", name: "مقبولة" },
+        { status: "rejected", name: "مرفوضة" },
+
+    ]
     const [totalPages, setTotalPages] = useState(1);
     const [page, setPage] = useState(1);
     const [districtDays, setDistrictDays] = useState<string[]>([]);
@@ -45,6 +61,11 @@ export default function rubbush_collectors() {
     const [selectedDataItem, setSelectedDataItem] = useState<Payment | null>(
         null
     );
+
+    const [isOpenImg, setIsOpenImg] = useState(false)
+    const [selectedImg, setSelectedImg] = useState('')
+
+
     type FormDataType = {
         name_ar: string;
         name_en: string;
@@ -62,14 +83,22 @@ export default function rubbush_collectors() {
         available_times: [],
     });
 
-    const [updateFormData, setUpdateFormData] = useState<FormDataType>({
-        name_ar: "",
-        name_en: "",
-        order: 0,
-        is_active: 0,
-        available_days: [],
-        available_times: [],
+    const [updateFormData, setUpdateFormData] = useState({
+        status: "",
+        total_price: "",
+        receiving_number: "",
+        payment_method_id: 0,
+        // user_id: 0,
+        payment_verification: ""
     });
+
+
+    const fetchPaymentMethodList = () => {
+        paymentMethodListService().then((response) => {
+            console.log('payment list', response)
+            setPaymentMethodList(response.data);
+        });
+    };
 
     const fetchDataList = ({
         search = "",
@@ -87,7 +116,7 @@ export default function rubbush_collectors() {
                 setDataList(response.data);
                 setTotalPages(response.meta.last_page);
             })
-            .catch(() => {});
+            .catch(() => { });
     };
     const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         fetchDataList({ search: e.target.value });
@@ -120,7 +149,7 @@ export default function rubbush_collectors() {
                     setSubscriptionStatus(item, "reject");
                 }
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
     const setSubscriptionStatus = (
         payment: Payment,
@@ -129,8 +158,8 @@ export default function rubbush_collectors() {
         if (!payment.subscription?.id) return;
 
         updateSubscriptionStatusService(payment.subscription.id, status)
-            .then((response) => {})
-            .catch((error) => {});
+            .then((response) => { })
+            .catch((error) => { });
     };
 
     const deleteSubmit = (item: Payment, selectedIndex: number) => {
@@ -141,19 +170,24 @@ export default function rubbush_collectors() {
                 setDataList(updatedArr);
                 successDialog(true);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     const updateDataItem = (item: Payment) => {
-        // setSelectedDataItem(item);
-        // setUpdateFormData({
-        //     name_ar: item.name_ar,
-        //     name_en: item.name_en,
-        //     order: item.order,
-        //     is_active: item.is_active ? 1 : 0,
-        //     available_days: item.available_days,
-        //     available_times: item.available_times,
-        // });
+        setSelectedDataItem(item);
+        // console.log('payment recieved number', item.receiving_number)
+
+        setUpdateFormData({
+            status: item.status,
+            total_price: item.total_price.toString(),
+            receiving_number: item.receiving_number,
+            payment_method_id: item.payment_method.id,
+            user_id: item.user_id,
+            //@ts-ignore
+            payment_verification: item.payment_verification
+
+
+        });
     };
 
     const updateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -170,7 +204,11 @@ export default function rubbush_collectors() {
                 fetchDataList();
                 successDialog(true);
             })
-            .catch((error) => {});
+            .catch((error) => {
+
+
+
+            });
     };
 
     const addFormChangeHander = (
@@ -225,7 +263,7 @@ export default function rubbush_collectors() {
                     available_times: [],
                 });
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
     const statusDropdownColor = (name: string) => {
         if (name === "rejected")
@@ -237,6 +275,20 @@ export default function rubbush_collectors() {
     const statusDropdownName = (name: string) => {
         return statusList.find((item) => item.is_active === name)?.name ?? "";
     };
+
+    const handleOpenImage = (e: any) => {
+        // console.log('image is', e.target.src)
+        setSelectedImg(e.target.src)
+        setIsOpenImg(true)
+
+
+
+
+    }
+
+    useEffect(() => {
+        fetchPaymentMethodList()
+    }, [])
 
     const tableHeadActionsSlot = () => {
         return (
@@ -254,97 +306,7 @@ export default function rubbush_collectors() {
                 >
                     الحالة
                 </UIPrimaryDropdown>
-                {/* <UIBaseDialog
-                    title="اضافة منطقه"
-                    confirmHandler={() => {}}
-                    confirmText="اضافة"
-                    form="update-form"
-                    btn={
-                        <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
-                            <button className="bg-[#0094140D] p-1 rounded-lg">
-                                اضافة منطقة
-                            </button>
-                        </div>
-                    }
-                >
-                    <form onSubmit={createSubmit} id="update-form">
-                        <div className="space-y-7">
-                            <TextFieldNada
-                                name="name_ar"
-                                type="text"
-                                handleChange={addFormChangeHander}
-                                value={formData.name_ar}
-                                label=" اسم المنطقة ( عربي ) "
-                                placeholder=" اسم المنطقة  "
-                            ></TextFieldNada>
 
-                            <TextFieldNada
-                                name="name_en"
-                                type="text"
-                                handleChange={addFormChangeHander}
-                                value={formData.name_en}
-                                label=" اسم المنطقة ( انجليزي ) "
-                                placeholder=" اسم المنطقة  "
-                            ></TextFieldNada>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <div className="col-span-1">
-                                    <MultiCheckbox
-                                        items={districtDays}
-                                        value={formData.available_days}
-                                        label="اليوم"
-                                        required={true}
-                                        name="available_days"
-                                        placeholder="اختر اليوم"
-                                        prependIcon="mdi mdi-calendar-month-outline"
-                                        iconType="mdi"
-                                        onChange={(value) => {
-                                            setFormData((prev) => ({
-                                                ...prev,
-                                                ["available_days"]: value,
-                                            }));
-                                        }}
-                                    ></MultiCheckbox>
-                                </div>
-                                <div className="col-span-1">
-                                    <MultiCheckbox
-                                        items={districtTime}
-                                        value={formData.available_times}
-                                        label="الوقت"
-                                        required={true}
-                                        name="available_times"
-                                        placeholder="اختر الوقت"
-                                        prependIcon="mdi mdi-calendar-month-outline"
-                                        iconType="mdi"
-                                        onChange={(value) => {
-                                            setFormData((prev) => ({
-                                                ...prev,
-                                                ["available_times"]: value,
-                                            }));
-                                        }}
-                                    ></MultiCheckbox>
-                                </div>
-                            </div>
-
-                            <SelectInput
-                                value={formData.is_active}
-                                items={statusList}
-                                itemName="name"
-                                itemValue="is_active"
-                                label="الحالة"
-                                placeholder="لختر الحالة"
-                                name="is_active"
-                                required={true}
-                                onChange={(value) => {
-                                    setFormData((prev) => ({
-                                        ...prev,
-                                        ["is_active"]: value,
-                                    }));
-                                }}
-                            ></SelectInput>
-                        </div>
-                    </form>
-                </UIBaseDialog> */}
             </>
         );
     };
@@ -354,7 +316,7 @@ export default function rubbush_collectors() {
 
     return (
         <>
-            <div className="py-20">
+            <div className="py-20 relative ">
                 <BaseDataTable
                     headItems={headerArr}
                     onPageChange={setPage}
@@ -394,24 +356,24 @@ export default function rubbush_collectors() {
                             {/* <td className="py-2 px-4">
                                 {item.subscription?.package.name ?? '-'}
                             </td> */}
-                            <td className="py-2 px-4">
+                            {/* <td className="py-2 px-4">
                                 {item.payment_method?.name_ar ?? "-"}
-                            </td>
+                            </td> */}
                             <td className="py-2 px-4">
-                                <div className="w-10 h-10 overflow-hidden">
+                                <div className="w-10 h-10 overflow-hidden ">
                                     <img
                                         src={item.payment_method.image}
                                         alt=""
-                                        className="w-full h-full object-contain"
+                                        className="w-full h-full object-contain "
                                     />
                                 </div>
                             </td>
-                            <td className="py-2 px-4">
-                                <div className="w-10 h-10 overflow-hidden">
-                                    <img
+                            <td className="py-2 px-4" >
+                                <div className="w-10 h-10 overflow-hidden cursor-pointer">
+                                    <img onClick={(item) => handleOpenImage(item)}
                                         src={item.payment_verification}
                                         alt=""
-                                        className="w-full h-full object-contain"
+                                        className="w-full h-full object-contain cursor-pointer"
                                     />
                                 </div>
                             </td>
@@ -429,7 +391,133 @@ export default function rubbush_collectors() {
                                             <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
                                         </button>
                                     </UIDialogConfirm>
-                                    {!!item.payment_verification && (
+
+
+
+
+                                    <UIBaseDialog
+                                        title="تعديل المدفوعات"
+                                        confirmHandler={() => { }}
+                                        confirmText="تعديل"
+                                        form="update-form"
+                                        btn={
+                                            <button
+                                                onClick={() => {
+                                                    updateDataItem(item);
+                                                }}
+                                                className="bg-[#0094140D] p-1 rounded-lg"
+                                            >
+                                                <span className="mdi mdi-folder-edit-outline text-[#009414]"></span>
+                                            </button>
+                                        }
+                                    >
+                                        <form
+                                            onSubmit={updateSubmit}
+                                            id="update-form"
+                                        >
+                                            <div className="space-y-7">
+                                                <div className="w-full flex justify-center mb-20">
+
+
+
+                                                    <FileInputImg
+                                                        state="edit"
+                                                        fileUrl={item.payment_verification}
+                                                        onFileChange={(arg) => {
+                                                            setUpdateFormData(
+                                                                (prev) => ({
+                                                                    ...prev,
+                                                                    ["payment_verification"]:
+                                                                        arg?.file64 ??
+                                                                        null,
+                                                                })
+                                                            );
+                                                        }}
+                                                    ></FileInputImg>
+                                                </div>
+
+
+
+                                                <TextFieldNada
+                                                    name="total_price"
+                                                    type="number"
+                                                    prependIcon="mdi mdi-notebook-edit-outline"
+                                                    iconType="mdi"
+                                                    handleChange={
+                                                        updateFormChangeHander
+                                                    }
+                                                    value={
+                                                        updateFormData.total_price
+                                                    }
+                                                    label="السعر الكلي "
+                                                    placeholder="ادخل السعر الكلي  "
+                                                ></TextFieldNada>
+
+
+
+
+
+
+
+                                                <SelectInput
+                                                    value={
+                                                        updateFormData.status
+                                                    }
+                                                    items={statusList}
+                                                    itemName="name"
+                                                    itemValue="is_active"
+                                                    label="الحالة"
+                                                    placeholder="لختر الحالة"
+                                                    name="is_active"
+                                                    required={true}
+                                                    onChange={(value) => {
+                                                        setUpdateFormData(
+                                                            (prev) => ({
+                                                                ...prev,
+                                                                ["status"]:
+                                                                    value,
+                                                            })
+                                                        );
+                                                    }}
+                                                ></SelectInput>
+
+
+
+
+                                                <SelectInput
+                                                    value={
+                                                        updateFormData.payment_method_id
+                                                    }
+                                                    items={paymentMethodList}
+                                                    itemName="name_ar"
+                                                    itemValue="id"
+                                                    label="طريقة الدفع"
+                                                    placeholder=""
+                                                    name="is_active"
+                                                    required={true}
+                                                    onChange={(value) => {
+                                                        setUpdateFormData(
+                                                            (prev) => ({
+                                                                ...prev,
+                                                                ["payment_method_id"]:
+                                                                    value,
+                                                            })
+                                                        );
+                                                    }}
+                                                ></SelectInput>
+
+
+                                            </div>
+                                        </form>
+                                    </UIBaseDialog>
+
+
+
+
+
+
+
+                                    {/* {!!item.payment_verification && (
                                         <a
                                             href={item.payment_verification}
                                             target="_blank"
@@ -437,13 +525,36 @@ export default function rubbush_collectors() {
                                         >
                                             <span className="mdi mdi-download text-green-600"></span>
                                         </a>
-                                    )}
+                                    )} */}
                                 </div>
                             </td>
                         </tr>
                     ))}
                 </BaseDataTable>
+
+
+                {isOpenImg &&
+
+                    <div className="bg-black/30 w-full h-full py-44  fixed top-0 left-0  ">
+
+                        <img className="w-full h-full object-contain" src={selectedImg} alt="" />
+
+                        <div className="bg-red-800 ">
+                            <span className="mdi mdi-close text-3xl text-white "></span>
+                        </div>
+
+
+                    </div>
+
+
+                }
+
+
+
             </div>
+
+
+
         </>
     );
 }
