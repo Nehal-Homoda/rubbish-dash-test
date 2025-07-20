@@ -378,7 +378,7 @@ export default function page() {
                                             handleChange={(e) =>
                                                 takeValue(e, "units")
                                             }
-                                            value={formData.units.toString()}
+                                            value={formData.units}
                                             label=" عدد الوحدات "
                                             placeholder=" عدد الوحدات "
                                         ></TextFieldNada>
@@ -461,10 +461,9 @@ export default function page() {
                                                                 active,
                                                                 checked,
                                                             }) =>
-                                                                `${
-                                                                    active
-                                                                        ? "ring-2 ring-white/60 ring-offset-2 ring-offset-sky-300"
-                                                                        : ""
+                                                                `${active
+                                                                    ? "ring-2 ring-white/60 ring-offset-2 ring-offset-sky-300"
+                                                                    : ""
                                                                 }
                   ${checked ? "border border-[#009414] " : ""}
                     relative flex cursor-pointer  rounded-lg px-5 py-4 ring-1 ring-gray-100 focus:outline-none  col-span-1`
@@ -480,11 +479,10 @@ export default function page() {
                                                                             <div className="text-sm">
                                                                                 <RadioGroup.Label
                                                                                     as="div"
-                                                                                    className={`font-medium  ${
-                                                                                        checked
+                                                                                    className={`font-medium  ${checked
                                                                                             ? "text-gray-900"
                                                                                             : "text-gray-900"
-                                                                                    }`}
+                                                                                        }`}
                                                                                 >
                                                                                     <div className="flex items-center gap-4">
                                                                                         <div className="w-10 h-10 rounded-full">

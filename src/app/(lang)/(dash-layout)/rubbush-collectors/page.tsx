@@ -6,11 +6,12 @@ import UIPrimaryDropdown from "@/components/ui/UIPrimaryDropdown";
 import UIBaseDialog from "@/components/ui/UIBaseDialog";
 import MultiCheckbox from "@/components/ui/form/MultiCheckbox";
 import SelectInput from "@/components/ui/form/SelectInput";
-import { successDialog } from "@/utils/shared";
+import { successDialog, validateAllInputs } from "@/utils/shared";
 import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
 import FileInputImg from "@/components/ui/form/FileInputImg";
 import { useRouter } from "next/navigation";
 import { Collector } from "@/types/collectors.interface";
+import * as Yup from "yup"
 import {
     addCollectorService,
     deleteCollectorService,
@@ -21,10 +22,28 @@ import { getDistrictService } from "@/services/districtService";
 import { District } from "@/types/district.interface";
 import { useLocalePath } from "@/utils/lang";
 
+
+
+interface FormDataInputErrors {
+    name: string | null,
+    phone: string,
+    password: string,
+    district_id: string,
+    image: string | null,
+}
+
+
+interface FormDataInputs {
+    name: string | null,
+    phone: string,
+    password: string,
+    district_id: string[],
+    image: string | null,
+}
 export default function rubbush_collectors() {
     const [dataList, setDataList] = useState<Collector[]>([]);
     const [distrects, setDistrects] = useState<District[]>([]);
-    
+
     const headerArr = [
         { text: "ID", name: "id" },
         { text: " الصورة", name: "image" },
@@ -76,6 +95,27 @@ export default function rubbush_collectors() {
         district_id: [],
         image: null,
     });
+    const formSchema = Yup.object().shape({
+        name: Yup.string().required(),
+        phone: Yup.number().required(),
+        password: Yup.number().required(),
+        district_id: Yup.array()
+            .of(Yup.string())
+            .min(1, "Select at least one district")
+            .required("Available districts are required"),
+        image: Yup.string().required(),
+
+    })
+    const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
+        name: "",
+        phone: "",
+        password: "",
+        district_id: "",
+        image: ""
+    });
+
+
+    const [errorMsg, setErrorMsg] = useState("");
 
     const fetchDataList = ({
         search = "",
@@ -133,7 +173,7 @@ export default function rubbush_collectors() {
 
                 console.log(response);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     const deleteSubmit = (item: Collector, selectedIndex: number) => {
@@ -144,43 +184,9 @@ export default function rubbush_collectors() {
                 setDataList(updatedArr);
                 successDialog(true);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
-    const updateDataItem = (item: Collector) => {
-        setSelectedDataItem(item);
-        setUpdateFormData({
-            name: item.name,
-            phone: item.phone,
-            district_id: item.districts.map((dist) => dist.id.toString()),
-            image: item.image || null,
-            password: '',
-        });
-    };
-
-    const updateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-
-        if (!selectedDataItem) return;
-
-        const form = {...updateFormData}
-
-        if (!form.password) {
-            //@ts-ignore
-            delete form.password
-        }
-
-        const body = JSON.stringify({
-            ...form,
-        });
-
-        updateCollectorService(selectedDataItem.id, body)
-            .then((response) => {
-                fetchDataList();
-                successDialog(true);
-            })
-            .catch((error) => {});
-    };
 
     const addFormChangeHander = (
         e: React.ChangeEvent<HTMLInputElement>,
@@ -193,20 +199,69 @@ export default function rubbush_collectors() {
 
         console.log(e.target.name, e.target.value);
     };
-    const updateFormChangeHander = (
-        e: React.ChangeEvent<HTMLInputElement>,
-        index?: number
-    ) => {
-        setUpdateFormData((prev) => ({
-            ...prev,
-            [e.target.name]: e.target.value,
-        }));
 
-        console.log(e.target.name, e.target.value);
-    };
+    // const updateDataItem = (item: Collector) => {
+    //     setSelectedDataItem(item);
+    //     setUpdateFormData({
+    //         name: item.name,
+    //         phone: item.phone,
+    //         district_id: item.districts.map((dist) => dist.id.toString()),
+    //         image: item.image || null,
+    //         password: '',
+    //     });
+    // };
 
-    const createSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    // const updateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    //     e.preventDefault();
+
+    //     if (!selectedDataItem) return;
+
+    //     const form = { ...updateFormData }
+
+    //     if (!form.password) {
+    //         //@ts-ignore
+    //         delete form.password
+    //     }
+
+    //     const body = JSON.stringify({
+    //         ...form,
+    //     });
+
+    //     updateCollectorService(selectedDataItem.id, body)
+    //         .then((response) => {
+    //             fetchDataList();
+    //             successDialog(true);
+    //         })
+    //         .catch((error) => { });
+    // };
+
+
+    // const updateFormChangeHander = (
+    //     e: React.ChangeEvent<HTMLInputElement>,
+    //     index?: number
+    // ) => {
+    //     setUpdateFormData((prev) => ({
+    //         ...prev,
+    //         [e.target.name]: e.target.value,
+    //     }));
+
+    //     console.log(e.target.name, e.target.value);
+    // };
+
+    const createSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+
+        const validateResult = await validateAllInputs<FormDataType>(
+            formSchema,
+            formData
+        );
+        console.log("validate", validateResult);
+        if (!validateResult) return;
+        //@ts-ignore
+        setFormErrors({ ...validateResult.outputResult });
+        console.log("form error", formErrors);
+        if (validateResult.isInvalid) return;
 
         const fd = new FormData();
         fd.append("name", formData.name);
@@ -234,14 +289,19 @@ export default function rubbush_collectors() {
                     image: null,
                 });
             })
-            .catch((error) => {});
+            .catch((error) => {
+                setErrorMsg(error?.message);
+                console.log("error message is", errorMsg);
+
+
+            });
     };
     const fetchDistrects = () => {
         getDistrictService()
             .then((response) => {
                 setDistrects(response.data);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     const tableHeadActionsSlot = () => {
@@ -269,7 +329,7 @@ export default function rubbush_collectors() {
                 </UIPrimaryDropdown>
                 <UIBaseDialog
                     title="اضافة جامع القمامة"
-                    confirmHandler={() => {}}
+                    confirmHandler={() => { }}
                     confirmText="اضافة"
                     form="update-form"
                     btn={
@@ -281,6 +341,14 @@ export default function rubbush_collectors() {
                     }
                 >
                     <form onSubmit={createSubmit} id="update-form">
+                        {errorMsg && (
+                            <div className="mb-5">
+                                <span className="text-red-800">
+                                    {" "}
+                                    {errorMsg}
+                                </span>
+                            </div>
+                        )}
                         <div className="space-y-7">
                             <div className="w-full flex justify-center mb-20">
                                 <FileInputImg
@@ -291,6 +359,8 @@ export default function rubbush_collectors() {
                                             ["image"]: arg?.file ?? null,
                                         }));
                                     }}
+
+                                    errorMessage={formErrors.image || ""}
                                 ></FileInputImg>
                             </div>
                             <TextFieldNada
@@ -300,6 +370,7 @@ export default function rubbush_collectors() {
                                 value={formData.name}
                                 label=" اسم  "
                                 placeholder=" اسم الجامع القمامة  "
+                                errorMessage={formErrors.name || ""}
                             ></TextFieldNada>
                             <TextFieldNada
                                 name="phone"
@@ -308,6 +379,7 @@ export default function rubbush_collectors() {
                                 value={formData.phone}
                                 label=" رقم الموبايل "
                                 placeholder=" رقم موبايل الجامع القمامة  "
+                                errorMessage={formErrors.phone}
                             ></TextFieldNada>
                             <TextFieldNada
                                 name="password"
@@ -316,6 +388,7 @@ export default function rubbush_collectors() {
                                 value={formData.password}
                                 label=" كلمة المرور"
                                 placeholder=" ادخل كلمة المرور "
+                                errorMessage={formErrors.password}
                             ></TextFieldNada>
                             <MultiCheckbox
                                 items={distrects}
@@ -332,6 +405,7 @@ export default function rubbush_collectors() {
                                 name="district_id"
                                 required
                                 value={formData.district_id}
+                                errorMessage={formErrors.district_id}
                             ></MultiCheckbox>
                         </div>
                     </form>
@@ -374,8 +448,8 @@ export default function rubbush_collectors() {
                             <td className="py-2 px-4">
                                 {!!item.districts && item.districts.length
                                     ? item.districts
-                                          .map((dist) => dist.name)
-                                          .join(" | ")
+                                        .map((dist) => dist.name)
+                                        .join(" | ")
                                     : "-"}
                             </td>
                             <td className="py-2 px-4">
@@ -405,7 +479,7 @@ export default function rubbush_collectors() {
                             </td>
                             <td className="">
                                 <div className="flex  gap-3">
-                                    <button onClick={() => {router.push(localePath('/rubbush-collectors/details/profile?id=' + item.id))}} className="bg-blue-100 p-1 px-2 rounded-lg">
+                                    <button onClick={() => { router.push(localePath('/rubbush-collectors/details/profile?id=' + item.id)) }} className="bg-blue-100 p-1 px-2 rounded-lg">
                                         <span className="mdi mdi-eye text-blue-500"></span>
                                     </button>
                                     <UIDialogConfirm
