@@ -82,7 +82,7 @@ export default function rubbush_collectors() {
             category_id != undefined ? "&category_id=" + category_id : "";
         const hasSearch = search ? "&search=" + search : "";
 
-        const query = `?page=${page}${hasSearch}${statusParam}${category}`;
+        const query = `?${hasSearch}${statusParam}${category}`;
 
         getVisitsService(query).then((response) => {
             setDataList(response.data);

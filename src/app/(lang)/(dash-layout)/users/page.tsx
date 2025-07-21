@@ -37,7 +37,7 @@ export default function rubbush_collectors() {
     { text: "رقم الموبيل", name: "phone" },
     { text: " الاشتراك", name: "has_subscription" },
     { text: "نوع الاشتراك", name: "subscription_name" },
-    { text: "الصورة الشخصية", name: "image" },
+    // { text: "الصورة الشخصية", name: "image" },
     { text: "الحالة", name: "is_active" },
     { text: "ميعاد التجديد", name: "renewal_date" },
     { text: "الاجراءات", name: "" },
@@ -95,7 +95,7 @@ export default function rubbush_collectors() {
         : "";
     const hasSearch = search ? "&search=" + search : "";
 
-    const query = `?page=${page}${hasSearch}${isActive}${isSubscribe}`;
+    const query = `?${hasSearch}${isActive}${isSubscribe}`;
 
     getUserService(query).then((response) => {
       //@ts-ignore
@@ -108,6 +108,7 @@ export default function rubbush_collectors() {
     });
   };
   const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(e.target.value)
     fetchDataList({ search: e.target.value });
   };
 
@@ -145,44 +146,44 @@ export default function rubbush_collectors() {
       .catch((error) => { });
   };
 
-  const updateUserItem = (item: Users) => {
-    setSelectedDataItem(item);
-    setUpdateFormData({
-      name: item.name,
-      phone: item.phone,
-      is_active: item.is_active ? 1 : 0,
-    });
-  };
+  // const updateUserItem = (item: Users) => {
+  //   setSelectedDataItem(item);
+  //   setUpdateFormData({
+  //     name: item.name,
+  //     phone: item.phone,
+  //     is_active: item.is_active ? 1 : 0,
+  //   });
+  // };
 
-  const updateFormChangeHander = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    index?: number
-  ) => {
-    setUpdateFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+  // const updateFormChangeHander = (
+  //   e: React.ChangeEvent<HTMLInputElement>,
+  //   index?: number
+  // ) => {
+  //   setUpdateFormData((prev) => ({
+  //     ...prev,
+  //     [e.target.name]: e.target.value,
+  //   }));
 
-    console.log(e.target.name, e.target.value);
-  };
+  //   console.log(e.target.name, e.target.value);
+  // };
 
-  const updateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  // const updateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
 
-    if (!selectedDataItem) return;
+  //   if (!selectedDataItem) return;
 
-    const body = JSON.stringify({
-      ...updateFormData,
-    });
+  //   const body = JSON.stringify({
+  //     ...updateFormData,
+  //   });
 
-    updateUserService(selectedDataItem.id, body)
-      .then((response) => {
-        console.log('yesssss updated')
-        fetchDataList();
-        successDialog(true);
-      })
-      .catch((error) => { });
-  };
+  //   updateUserService(selectedDataItem.id, body)
+  //     .then((response) => {
+  //       console.log('yesssss updated')
+  //       fetchDataList();
+  //       successDialog(true);
+  //     })
+  //     .catch((error) => { });
+  // };
 
 
 
@@ -260,7 +261,7 @@ export default function rubbush_collectors() {
               </td>
 
               <td className="py-2 px-4">{item.subscription_name}</td>
-              <td className="py-2 px-4">
+              {/* <td className="py-2 px-4">
                 <div className=" w-7 h-7 rounded-full overflow-hidden">
                   <img
                     className="w-full h-full object-contain"
@@ -268,7 +269,7 @@ export default function rubbush_collectors() {
                     alt=""
                   />
                 </div>
-              </td>
+              </td> */}
 
 
 

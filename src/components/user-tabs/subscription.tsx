@@ -33,7 +33,7 @@ interface DistrictItem {
     available_times: string[];
 }
 
-interface UserFormData {}
+interface UserFormData { }
 export default function subscription({ user }: Props) {
     const [formData, setFormData] = useState({
         district_id: "",
@@ -114,7 +114,7 @@ export default function subscription({ user }: Props) {
                 setPaymentMethodList(response.data);
                 console.log("hshshhshs", response.data);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     // const takeUploadedImg = (img) => {
@@ -136,7 +136,7 @@ export default function subscription({ user }: Props) {
             .then((response) => {
                 window.location.reload();
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     // const handleCheckSubscription = (value) => {
@@ -165,6 +165,29 @@ export default function subscription({ user }: Props) {
 
         fetchPaymentMethodList();
     }, []);
+
+
+    const getDays = (day: string[]) => {
+        const x = day.map((item, index) => {
+
+            if (item == 'saturday')
+                return 'السبت'
+            if (item == "sunday")
+                return 'الاحد'
+            if (item == "monday")
+                return 'الاتنين'
+            if (item == "tuesday")
+                return 'الثلاثاء'
+            if (item == 'wednesday')
+                return 'الاربعاء'
+            if (item == 'thursday')
+                return 'الخميس'
+            if (item == 'friday')
+                return 'الجمعه'
+        })
+        return x
+
+    }
 
     //@ts-ignore
     const handleSelectedRadio = (selected) => {
@@ -200,7 +223,7 @@ export default function subscription({ user }: Props) {
                 package_id: user.subscription.package.id.toString(),
                 payment_method_id: user.payment.payment_method.id.toString(),
                 //@ts-ignore
-                days: user.subscription.days,
+                days: getDays(user.subscription.days),
                 renew_date: reDate,
                 totalPrice: user.payment.total_price.toString(),
                 price_per_unit:
@@ -320,7 +343,7 @@ export default function subscription({ user }: Props) {
                                             value={formData.package_id}
                                             label=" نوع الباقة"
                                             disabled
-                                            onChange={(value) => {}}
+                                            onChange={(value) => { }}
                                         ></SelectInput>
                                     </div>
 
@@ -369,7 +392,7 @@ export default function subscription({ user }: Props) {
                                         <TextFieldNada
                                             type="text"
                                             name="start_date"
-                                            handleChange={(e) => {}}
+                                            handleChange={(e) => { }}
                                             value={formData.start_date}
                                             label="تاريخ البدأ "
                                             placeholder="  السعر الكلي *"
@@ -430,7 +453,7 @@ export default function subscription({ user }: Props) {
                                     <div className="col-span-12">
                                         <RadioGroup
                                             value={selected}
-                                            onChange={(e) => {}}
+                                            onChange={(e) => { }}
                                         >
                                             <div className="grid grid-cols-2 gap-7">
                                                 {paymentMethodList.map(
@@ -442,10 +465,9 @@ export default function subscription({ user }: Props) {
                                                                 active,
                                                                 checked,
                                                             }) =>
-                                                                `${
-                                                                    active
-                                                                        ? "ring-2 ring-white/60 ring-offset-2 ring-offset-sky-300"
-                                                                        : ""
+                                                                `${active
+                                                                    ? "ring-2 ring-white/60 ring-offset-2 ring-offset-sky-300"
+                                                                    : ""
                                                                 }
                           ${checked ? "border border-[#009414] " : ""}
                             relative flex cursor-pointer  rounded-lg px-5 py-4 ring-1 ring-gray-100 focus:outline-none  col-span-1`
@@ -461,11 +483,10 @@ export default function subscription({ user }: Props) {
                                                                             <div className="text-sm">
                                                                                 <RadioGroup.Label
                                                                                     as="div"
-                                                                                    className={`font-medium  ${
-                                                                                        checked
-                                                                                            ? "text-gray-900"
-                                                                                            : "text-gray-900"
-                                                                                    }`}
+                                                                                    className={`font-medium  ${checked
+                                                                                        ? "text-gray-900"
+                                                                                        : "text-gray-900"
+                                                                                        }`}
                                                                                 >
                                                                                     <div className="flex items-center gap-4">
                                                                                         <div className="w-10 h-10 rounded-full">

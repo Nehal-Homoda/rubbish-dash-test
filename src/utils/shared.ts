@@ -154,12 +154,10 @@ export const responseErrorServiceHandler = async (
     response: Response,
     serviceMessage: string
 ) => {
-    console.log(response.status)
-     if (response.status === 401) {
-        
-        throw new Error('unauthorized')
+    console.log(response.status);
+    if (response.status === 401) {
+        throw new Error("unauthorized");
     }
-
 
     const contentType = response.headers.get("content-type");
 
@@ -186,38 +184,46 @@ export const successDialog = (open: boolean) => {
     window.dispatchEvent(new Event("dialog-toggle"));
 };
 
-
-
-
-
 export const getQueryParam = (paramName: string) => {
     if (typeof window === "undefined") return null;
 
-    const param = new URLSearchParams(window.location.search)
+    const param = new URLSearchParams(window.location.search);
 
-
-    return param.get(paramName) || null
-}
-
+    return param.get(paramName) || null;
+};
 
 export async function convertUrlToBase64(url: string): Promise<string> {
-  if (typeof window === "undefined") {
-    throw new Error("convertUrlToBase64 can only be run on the client side");
-  }
+    if (typeof window === "undefined") {
+        throw new Error(
+            "convertUrlToBase64 can only be run on the client side"
+        );
+    }
 
-  const response = await fetch(url);
-  const blob = await response.blob();
+    const response = await fetch(url);
+    const blob = await response.blob();
 
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
 
-    reader.onloadend = () => {
-      if (reader.result) resolve(reader.result.toString());
-      else reject(new Error("Failed to convert image to base64"));
-    };
+        reader.onloadend = () => {
+            if (reader.result) resolve(reader.result.toString());
+            else reject(new Error("Failed to convert image to base64"));
+        };
 
-    reader.onerror = () => reject(new Error("FileReader failed"));
+        reader.onerror = () => reject(new Error("FileReader failed"));
 
-    reader.readAsDataURL(blob);
-  });
+        reader.readAsDataURL(blob);
+    });
+}
+
+export async function imageUrlToBase64(url: string): Promise<string> {
+    const response = await fetch(url);
+    const blob = await response.blob();
+
+    return new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+    });
 }

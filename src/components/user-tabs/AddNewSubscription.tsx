@@ -27,11 +27,54 @@ import { Payment_methods } from "@/types/paymentMethod.interface";
 import { RadioGroup } from "@headlessui/react";
 import { Users } from "@/types/auth.interface";
 import { addSubscriptionService } from "@/services/subscriptionService";
+import * as Yup from 'yup'
+import { validateAllInputs } from "@/utils/shared";
 
 type Props = {
     user: Users;
     getNewUser: (user: Users) => void
 };
+
+interface FormDataInputErrors {
+    district_id: string | null,
+    has_subscription: string,
+    package_id: string | null,
+    payment_method_id: string | null,
+    days: string,
+    start_date: string | null,
+    time_from: string | null,
+    units: string | null,
+    category_id: string | null,
+    payment_verification: string | null,
+    address_title: string | null,
+    // name: string | null,
+    // phone: string | null,
+    // password: string | null,
+    // address_lat: string,
+    // address_lng: string,
+    // address_details: string,
+}
+
+interface FormDataInputs {
+    address_title: string | null,
+    district_id: string | null,
+    has_subscription: number,
+    package_id: string | null,
+    payment_method_id: string | null,
+    days: string[],
+    start_date: string | null,
+    time_from: string | null,
+    units: number,
+    category_id: string | null,
+    payment_verification: string | null,
+    // name: string | null,
+    // phone: string | null,
+    // password: string | null,
+    // address_lat: string,
+    // address_lng: string,
+    // address_details: string,
+
+}
 
 export default function AddNewSubscription({ user, getNewUser }: Props) {
     const [district, setDistrict] = useState<Region[]>([]);
@@ -53,6 +96,19 @@ export default function AddNewSubscription({ user, getNewUser }: Props) {
 
     const router = useRouter();
 
+    const [errorMsg, setErrorMsg] = useState("");
+
+    const [districtAvailableDays, setDistrictAvailableDays] = useState([
+        { title: 'السبت ', slug: 'saturday' },
+        { title: ' الاحد', slug: 'sunday' },
+        { title: 'الاتنين ', slug: 'monday' },
+        { title: 'الثلاثاء ', slug: 'tuesday' },
+        { title: 'الاربعاء ', slug: 'wednesday' },
+        { title: 'الخميس ', slug: 'thursday' },
+        { title: 'الجمعه ', slug: 'friday' },
+
+    ]);
+
     //@ts-ignore
     const takeValue = (e, name) => {
         console.log(e.target.value);
@@ -72,11 +128,52 @@ export default function AddNewSubscription({ user, getNewUser }: Props) {
         }
     };
 
-    //   const form = {
-    //     name: "",
-    //     phone: "",
-    //     password: "",
-    //   };
+
+    const formSchema = Yup.object().shape({
+        district_id: Yup.string().required(),
+        has_subscription: Yup.number().required(),
+        package_id: Yup.string().required(),
+        payment_method_id: Yup.string().required(),
+        days: Yup.array()
+            .of(Yup.string())
+            .min(1, "Select at least one day")
+            .required("Available days are required"),
+        units: Yup.number().required(),
+        category_id: Yup.number().required(),
+        payment_verification: Yup.string().required(),
+        address_title: Yup.string().required(),
+
+        // name: Yup.string().required(),
+        // phone: Yup.number().required(),
+        // password: Yup.string().required(),
+        // start_date: "",
+        // time_from: "",
+        // address_lat: Yup.string().required(),
+        // address_lng: Yup.string().required(),
+        // address_details: Yup.string().required(),
+    });
+
+
+    const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
+        district_id: "",
+        has_subscription: "",
+        package_id: "",
+        payment_method_id: "",
+        days: "",
+        start_date: "",
+        time_from: "",
+        units: "",
+        category_id: "",
+        payment_verification: "",
+        address_title: "",
+        // name: "",
+        // phone: "",
+        // password: "",
+        // address_lat: "",
+        // address_lng: "",
+        // address_details: "",
+    });
+
 
     const fetchDistrict = () => {
         districtListService().then((response) => {
@@ -88,10 +185,20 @@ export default function AddNewSubscription({ user, getNewUser }: Props) {
         });
     };
     //@ts-ignore
-    const handleAddUserSubmit = (e) => {
+    const handleAddUserSubmit = async (e) => {
         e.preventDefault();
         if (!user) return;
         setErrorMessage("");
+        const validateResult = await validateAllInputs<FormDataInputs>(
+            formSchema,
+            formData
+        );
+        console.log("validate", validateResult);
+        if (!validateResult) return;
+        setFormErrors({ ...validateResult.outputResult });
+        console.log("form error", formErrors);
+        if (validateResult.isInvalid) return;
+
         const t = formData.time_from.split("-");
         const fd = new FormData();
         fd.append("user_id", user.id.toString());
@@ -116,11 +223,12 @@ export default function AddNewSubscription({ user, getNewUser }: Props) {
         addSubscriptionService(fd)
             .then((response) => {
                 // router.push("/users");
-                   window.location.reload();
+                window.location.reload();
                 getNewUser(response.data)
             })
             .catch((error) => {
                 setErrorMessage(error.message);
+                console.log('error msg', error.message)
             });
     };
 
@@ -240,9 +348,18 @@ export default function AddNewSubscription({ user, getNewUser }: Props) {
     return (
         <>
             <form onSubmit={handleAddUserSubmit} className="">
+                {errorMessage && (
+                    <div className="mb-5">
+                        <span className="text-red-800">
+                            {" "}
+                            {errorMessage}
+                        </span>
+                    </div>
+                )}
                 <div className="grid grid-cols-12 gap-7 mt-14">
                     <div className="col-span-6">
                         <SelectInput
+                            errorMessage={formErrors.district_id || ''}
                             placeholder="ادخل اسم المنطقة"
                             name="name_ar"
                             itemName="name_ar"
@@ -263,6 +380,7 @@ export default function AddNewSubscription({ user, getNewUser }: Props) {
 
                     <div className="col-span-6">
                         <TextFieldNada
+                            errorMessage={formErrors.address_title || ''}
                             name="address"
                             type="text"
                             handleChange={(e) => takeValue(e, "address_title")}
@@ -274,6 +392,7 @@ export default function AddNewSubscription({ user, getNewUser }: Props) {
 
                     <div className="col-span-6">
                         <SelectInput
+                            errorMessage={formErrors.category_id || ''}
                             items={categoryList}
                             placeholder="ادخل نوع الخدمة"
                             name=""
@@ -290,8 +409,11 @@ export default function AddNewSubscription({ user, getNewUser }: Props) {
                         ></SelectInput>
                     </div>
 
+
+
                     <div className="col-span-6">
                         <SelectInput
+                            errorMessage={formErrors.package_id || ''}
                             items={packagesList}
                             placeholder="ادخل نوع الباقه"
                             name=""
@@ -305,6 +427,7 @@ export default function AddNewSubscription({ user, getNewUser }: Props) {
 
                     <div className="col-span-6">
                         <TextFieldNada
+
                             name="price"
                             type="number"
                             handleChange={(e) => takeValue(e, "units")}
@@ -316,6 +439,7 @@ export default function AddNewSubscription({ user, getNewUser }: Props) {
 
                     <div className="col-span-6">
                         <TextFieldNada
+                            errorMessage={formErrors.units || ''}
                             name="units"
                             type="number"
                             handleChange={(e) => takeValue(e, "units")}
@@ -327,6 +451,7 @@ export default function AddNewSubscription({ user, getNewUser }: Props) {
 
                     <div className="col-span-6">
                         <TextFieldNada
+
                             name="price"
                             type="number"
                             handleChange={(e) => takeValue(e, "price")}
@@ -337,6 +462,7 @@ export default function AddNewSubscription({ user, getNewUser }: Props) {
                     </div>
                     <div className="col-span-6">
                         <TextFieldNada
+                            errorMessage={formErrors.start_date || ''}
                             name="start_date"
                             type="date"
                             handleChange={(e) => takeValue(e, "start_date")}
@@ -348,9 +474,12 @@ export default function AddNewSubscription({ user, getNewUser }: Props) {
 
                     <div className="col-span-6">
                         <MultiCheckbox
-                            items={districtDays}
+                            errorMessage={formErrors.days}
+                            items={districtAvailableDays}
                             value={formData.days}
                             label="اليوم"
+                            itemName="title"
+                            itemValue="slug"
                             required={true}
                             name="available_days"
                             placeholder="اختر اليوم"
@@ -367,6 +496,8 @@ export default function AddNewSubscription({ user, getNewUser }: Props) {
                     </div>
                     <div className="col-span-6">
                         <SelectInput
+                            errorMessage={formErrors.time_from || ''}
+
                             items={districtTime}
                             placeholder="اختر الوقت"
                             name=""
@@ -392,10 +523,9 @@ export default function AddNewSubscription({ user, getNewUser }: Props) {
                                         key={index}
                                         value={item}
                                         className={({ active, checked }) =>
-                                            `${
-                                                active
-                                                    ? "ring-2 ring-white/60 ring-offset-2 ring-offset-sky-300"
-                                                    : ""
+                                            `${active
+                                                ? "ring-2 ring-white/60 ring-offset-2 ring-offset-sky-300"
+                                                : ""
                                             }
                           ${checked ? "border border-[#009414] " : ""}
                             relative flex cursor-pointer  rounded-lg px-5 py-4 ring-1 ring-gray-100 focus:outline-none  col-span-1`
@@ -408,11 +538,10 @@ export default function AddNewSubscription({ user, getNewUser }: Props) {
                                                         <div className="text-sm">
                                                             <RadioGroup.Label
                                                                 as="div"
-                                                                className={`font-medium  ${
-                                                                    checked
-                                                                        ? "text-gray-900"
-                                                                        : "text-gray-900"
-                                                                }`}
+                                                                className={`font-medium  ${checked
+                                                                    ? "text-gray-900"
+                                                                    : "text-gray-900"
+                                                                    }`}
                                                             >
                                                                 <div className="flex items-center gap-4">
                                                                     <div className="w-10 h-10 rounded-full">
@@ -451,6 +580,7 @@ export default function AddNewSubscription({ user, getNewUser }: Props) {
 
                     <div className="col-span-6">
                         <FileInput
+                            errorMessage={formErrors.payment_verification || ''}
                             onFileChange={(img) => takeUploadedImg(img)}
                             state="add"
                             title="ارفاق صورة التحويل"

@@ -103,7 +103,7 @@ export default function rubbush_collectors() {
     const isActive = is_active ? "&status=" + is_active : "";
     const hasSearch = search ? "&search=" + search : "";
 
-    const query = `?page=${page}${hasSearch}${isActive}`;
+    const query = `?${hasSearch}${isActive}`;
 
     getPaymentsService(query)
       .then((response) => {
@@ -111,9 +111,10 @@ export default function rubbush_collectors() {
         setDataList(response.data);
         setTotalPages(response.meta.last_page);
       })
-      .catch(() => {});
+      .catch(() => { });
   };
   const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+
     fetchDataList({ search: e.target.value });
   };
 
@@ -127,34 +128,46 @@ export default function rubbush_collectors() {
     const body = JSON.stringify({
       status: value,
     });
+    if (value == "accepted") {
+      return
+      // setSubscriptionStatus(item, "accept");
+    }
+    if (value == "pending") {
+      setSubscriptionStatus(item, "pending");
+    }
+    if (value == "reject") {
+      return
+      // setSubscriptionStatus(item, "reject");
+    }
 
-    updatePaymentService(service.id, body)
-      .then((response) => {
-        const arr = [...dataList];
-        arr[index].status = value;
+    // updatePaymentService(service.id, body)
+    //   .then((response) => {
+    //     const arr = [...dataList];
+    //     arr[index].status = value;
 
-        setDataList(arr);
+    //     // setDataList(arr);
 
-        console.log(value);
+    //     // console.log(value);
 
-        if (value === "accepted") {
-          setSubscriptionStatus(item, "accept");
-        }
-        if (value === "rejected") {
-          setSubscriptionStatus(item, "reject");
-        }
-      })
-      .catch((error) => {});
+    //     // if (value === "accepted") {
+    //     //   setSubscriptionStatus(item, "accept");
+    //     // }
+    //     // if (value === "rejected") {
+    //     //   setSubscriptionStatus(item, "reject");
+    //     // }
+    //   })
+    //   .catch((error) => { });
+
   };
   const setSubscriptionStatus = (
     payment: Payment,
-    status: "reject" | "accept"
+    status: "reject" | "accept" | "pending"
   ) => {
     if (!payment.subscription?.id) return;
 
     updateSubscriptionStatusService(payment.subscription.id, status)
-      .then((response) => {})
-      .catch((error) => {});
+      .then((response) => { })
+      .catch((error) => { });
   };
 
   const deleteSubmit = (item: Payment, selectedIndex: number) => {
@@ -165,7 +178,7 @@ export default function rubbush_collectors() {
         setDataList(updatedArr);
         successDialog(true);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const updateDataItem = (item: Payment) => {
@@ -197,7 +210,7 @@ export default function rubbush_collectors() {
         fetchDataList();
         successDialog(true);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const addFormChangeHander = (
@@ -252,7 +265,7 @@ export default function rubbush_collectors() {
           available_times: [],
         });
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
   const statusDropdownColor = (name: string) => {
     if (name === "rejected")
@@ -368,7 +381,7 @@ export default function rubbush_collectors() {
 
                   <UIBaseDialog
                     title="تعديل المدفوعات"
-                    confirmHandler={() => {}}
+                    confirmHandler={() => { }}
                     confirmText="تعديل"
                     form="update-form"
                     btn={
@@ -389,6 +402,7 @@ export default function rubbush_collectors() {
                             state="edit"
                             fileUrl={item.payment_verification}
                             onFileChange={(arg) => {
+                              //@ts-ignore
                               setUpdateFormData((prev) => ({
                                 ...prev,
                                 ["payment_verification"]: arg?.file64 ?? null,
@@ -461,7 +475,7 @@ export default function rubbush_collectors() {
         </BaseDataTable>
 
         {isOpenImg && (
-          <div onClick={()=>setIsOpenImg(false)} className="fixed inset-0 bg-black/70 flex flex-col items-center justify-center py-10 z-50 ">
+          <div onClick={() => setIsOpenImg(false)} className="fixed inset-0 bg-black/70 flex flex-col items-center justify-center py-10 z-50 ">
             <div className="relative bg-transparent max-w-full max-h-full ">
               <img
                 className="w-full h-full object-contain"

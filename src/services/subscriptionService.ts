@@ -80,7 +80,7 @@ export const deleteSubscriptionService = async (id: number) => {
         throw new Error(error.message);
     }
 };
-export const updateSubscriptionStatusService = async (id: number, status: 'reject' | 'accept') => {
+export const updateSubscriptionStatusService = async (id: number, status: 'reject' | 'accept' | 'pending') => {
     try {
         const response = await apiCall.post(`/admins/subscriptions/${id}/${status}`, {
             headers: {

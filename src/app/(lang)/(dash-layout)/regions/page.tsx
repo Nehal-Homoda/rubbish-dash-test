@@ -189,7 +189,7 @@ export default function rubbush_collectors() {
                     setDistrictTime(item.available_times);
                 });
             })
-            .catch(() => {});
+            .catch(() => { });
     };
 
     const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -216,7 +216,7 @@ export default function rubbush_collectors() {
 
                 console.log(response);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     const deleteSubmit = (item: District, selectedIndex: number) => {
@@ -227,7 +227,7 @@ export default function rubbush_collectors() {
                 setDataList(updatedArr);
                 successDialog(true);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     const updateDataItem = (item: District) => {
@@ -271,7 +271,7 @@ export default function rubbush_collectors() {
                 fetchDataList();
                 successDialog(true);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     const addFormChangeHander = (
@@ -347,9 +347,9 @@ export default function rubbush_collectors() {
     const tableHeadActionsSlot = () => {
         return (
             <>
-                <UIBaseDialog
+                <UIBaseDialog confirmCloseHandler={resetForm}
                     title="اضافة منطقه"
-                    confirmHandler={() => {}}
+                    confirmHandler={() => { }}
                     confirmText="اضافة"
                     form="update-form"
                     btn={
@@ -543,6 +543,19 @@ export default function rubbush_collectors() {
             ["available_times"]: ar,
         }));
     }, [dynamicFromToTimeUpdate]);
+
+
+    const resetForm = () => {
+        setFormData({
+            name_ar: "",
+            name_en: "",
+            order: 0,
+            is_active: 0,
+            collector_id: [],
+            available_days: [],
+            available_times: [],
+        })
+    }
     return (
         <>
             <div className="py-20">
@@ -594,7 +607,7 @@ export default function rubbush_collectors() {
                                     </UIDialogConfirm>
                                     <UIBaseDialog
                                         title="تعديل منطقه"
-                                        confirmHandler={() => {}}
+                                        confirmHandler={() => { }}
                                         confirmText="حفظ"
                                         form="update-form"
                                         btn={
