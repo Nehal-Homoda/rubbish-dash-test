@@ -115,7 +115,8 @@ export default function AddNewSubscription({ user, getNewUser }: Props) {
 
         addSubscriptionService(fd)
             .then((response) => {
-                router.push("/users");
+                // router.push("/users");
+                   window.location.reload();
                 getNewUser(response.data)
             })
             .catch((error) => {

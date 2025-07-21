@@ -209,6 +209,16 @@ input {
     border-color: #009414;
 }
 
+/* override Tailwind's reset */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: auto;
+}
+input[type="number"] {
+  -moz-appearance: number-input;
+}
+
+
 @keyframes rotate {
     0% {
         transform: rotate(0deg);

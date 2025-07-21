@@ -200,6 +200,16 @@ export default function rubbush_collectors() {
         console.log(e.target.name, e.target.value);
     };
 
+    const resetForm=()=>{
+        setFormData({
+            name:"",
+            district_id:[],
+            image:"",
+            phone:"",
+            password:""
+        })
+    }
+
     // const updateDataItem = (item: Collector) => {
     //     setSelectedDataItem(item);
     //     setUpdateFormData({
@@ -327,7 +337,7 @@ export default function rubbush_collectors() {
                 >
                     المنطقة
                 </UIPrimaryDropdown>
-                <UIBaseDialog
+                <UIBaseDialog confirmCloseHandler={resetForm}
                     title="اضافة جامع القمامة"
                     confirmHandler={() => { }}
                     confirmText="اضافة"

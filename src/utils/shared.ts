@@ -198,3 +198,26 @@ export const getQueryParam = (paramName: string) => {
 
     return param.get(paramName) || null
 }
+
+
+export async function convertUrlToBase64(url: string): Promise<string> {
+  if (typeof window === "undefined") {
+    throw new Error("convertUrlToBase64 can only be run on the client side");
+  }
+
+  const response = await fetch(url);
+  const blob = await response.blob();
+
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      if (reader.result) resolve(reader.result.toString());
+      else reject(new Error("Failed to convert image to base64"));
+    };
+
+    reader.onerror = () => reject(new Error("FileReader failed"));
+
+    reader.readAsDataURL(blob);
+  });
+}

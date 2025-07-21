@@ -126,12 +126,12 @@ export default function rubbush_collectors() {
     const updateDataItem = (item: Banner) => {
         setSelectedDataItem(item);
         setUpdateFormData({
-            title_ar: item.title ?? '',
-            title_en: item.title ?? '',
-            order: item.order  ?? 0,
-            link: item.link  ?? '',
+            title_ar: item.title,
+            title_en: item.title,
+            order: item.order  ,
+            link: item.link  ,
             is_active: item.is_active ? 1 : 0,
-            image: item.image  ?? '',
+            image: item.image  ,
         });
     };
 
@@ -374,7 +374,7 @@ export default function rubbush_collectors() {
                                     <UIBaseDialog
                                         title="تعديل اللافتة"
                                         confirmHandler={() => {}}
-                                        confirmText="اضافة"
+                                        confirmText="تعديل"
                                         form="update-form"
                                         btn={
                                             <button

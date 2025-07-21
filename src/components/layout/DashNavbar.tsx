@@ -15,11 +15,11 @@ interface Props {
 }
 export default function DashNavbar({ isOpen, openSidebar }: Props) {
     const { lang, dict } = useLangAndDictionary();
-    // const title = useSelector(
-    //     (state: RootState) => state.authReducer.title
-    // );
+    const title = useSelector(
+        (state: RootState) => state.authReducer.title
+    );
     const dispatch = useDispatch<AppDispatch>();
-    const [title, setTitle] = useState('')
+    // const [title, setTitle] = useState('')
 
     const logoutHander = () => {
         dispatch(logout())
@@ -28,9 +28,9 @@ export default function DashNavbar({ isOpen, openSidebar }: Props) {
 
 
     useEffect(() => {
-        const storedTitle = Cookies.get("title");
+        // const storedTitle = Cookies.get("title");
 
-        setTitle(storedTitle ? JSON.parse(storedTitle) : null)
+        // setTitle(storedTitle ? JSON.parse(storedTitle) : null)
     }, [])
 
     return (

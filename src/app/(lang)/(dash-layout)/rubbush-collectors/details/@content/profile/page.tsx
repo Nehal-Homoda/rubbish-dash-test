@@ -71,6 +71,7 @@ export default function page() {
 
         updateCollectorService(id(), body)
             .then((response) => {
+                console.log('response issssssssssss',response)
                 setCollector(response.data);
                 successDialog(true);
             })
@@ -96,7 +97,7 @@ export default function page() {
         }
         setUpdateFormData({
             name: collector.name,
-            phone: collector.name,
+            phone: collector.phone,
             password: "",
             district_id: collector.districts.map((item) => item.id.toString()),
             image: collector.image || "",
@@ -139,7 +140,7 @@ export default function page() {
                     ></TextFieldNada>
                     <TextFieldNada
                         name="phone"
-                        type="text"
+                        type="number"
                         handleChange={updateFormChangeHander}
                         value={updateFormData.phone}
                         label=" رقم الموبايل "

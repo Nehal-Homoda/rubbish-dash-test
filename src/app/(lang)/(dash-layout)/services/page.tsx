@@ -206,6 +206,16 @@ export default function rubbush_collectors() {
             .catch((error) => {});
     };
 
+    const resetForm=()=>{
+        setFormData({
+            image:"",
+            is_active:0,
+            name_ar:"",
+            name_en:"",
+            order:0
+        })
+    }
+
     const tableHeadActionsSlot = () => {
         return (
             <>
@@ -219,7 +229,7 @@ export default function rubbush_collectors() {
                 >
                     الحالة
                 </UIPrimaryDropdown>
-                <UIBaseDialog
+                <UIBaseDialog confirmCloseHandler={resetForm}
                     title="اضافة خدمة"
                     confirmHandler={() => {}}
                     confirmText="اضافة"

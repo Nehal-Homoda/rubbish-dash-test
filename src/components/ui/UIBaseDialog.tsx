@@ -13,6 +13,7 @@ type Props = {
     title: string;
     form?: string;
     confirmHandler: () => void;
+    confirmCloseHandler?:()=>void;
     confirmText: string;
     hideConfirmBtn?: boolean;
     heightStyle?:string
@@ -25,6 +26,7 @@ export default function UIBaseDialog({
     confirmText,
     form,
     confirmHandler,
+    confirmCloseHandler,
     hideConfirmBtn = false,
     heightStyle
 }: Props) {
@@ -32,6 +34,10 @@ export default function UIBaseDialog({
 
     function closeModal() {
         setIsOpen(false);
+        if(confirmCloseHandler){
+
+            confirmCloseHandler()
+        }
     }
 
     function openModal() {

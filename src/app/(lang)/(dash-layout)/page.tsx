@@ -172,7 +172,7 @@ export default function Home() {
     if (name === "pending")
       return {
         style: "bg-[#FBBC0512] text-[#FBBC05] px-5 py-1 rounded-lg ",
-        text: 'معلق'
+        text: 'قيد الانتظار'
       }
   };
 
