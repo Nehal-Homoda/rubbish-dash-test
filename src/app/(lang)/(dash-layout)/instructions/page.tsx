@@ -106,7 +106,7 @@ export default function rubbush_collectors() {
                 : "";
         const hasSearch = search ? "&search=" + search : "";
 
-        const query = `?page=${page}${hasSearch}${isActive}`;
+        const query = `?${hasSearch}${isActive}`;
 
         getGuidelinesService(query).then((response) => {
             setDataList(response.data);
@@ -205,6 +205,16 @@ export default function rubbush_collectors() {
         console.log(e.target.name, e.target.value);
     };
 
+    const resetForm = () => {
+        setFormData({
+            title_ar: "",
+            title_en: "",
+            order: 0,
+            is_active: 0,
+            image: "",
+        })
+    }
+
     const createSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -258,7 +268,7 @@ export default function rubbush_collectors() {
                 >
                     الحالة
                 </UIPrimaryDropdown>
-                <UIBaseDialog
+                <UIBaseDialog confirmCloseHandler={resetForm}
                     title="اضافة ارشاد"
                     confirmHandler={() => { }}
                     confirmText="اضافة"
@@ -282,7 +292,7 @@ export default function rubbush_collectors() {
                         <div className="space-y-7">
                             <div className="w-full flex justify-center mb-20">
                                 <FileInputImg
-                                errorMessage={formErrors.image}
+                                    errorMessage={formErrors.image}
                                     state="edit"
                                     onFileChange={(arg) => {
                                         setFormData((prev) => ({
@@ -412,9 +422,9 @@ export default function rubbush_collectors() {
                                         </button>
                                     </UIDialogConfirm>
                                     <UIBaseDialog
-                                        title="تعديل الالاشاد"
+                                        title="تعديل الارشاد"
                                         confirmHandler={() => { }}
-                                        confirmText="اضافة"
+                                        confirmText="تعديل"
                                         form="update-form"
                                         btn={
                                             <button

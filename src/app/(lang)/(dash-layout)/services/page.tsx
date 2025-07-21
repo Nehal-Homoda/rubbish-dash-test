@@ -77,7 +77,7 @@ export default function rubbush_collectors() {
                 : "";
         const hasSearch = search ? "&search=" + search : "";
 
-        const query = `?page=${page}${hasSearch}${isActive}`;
+        const query = `?${hasSearch}${isActive}`;
 
         getCategoriesService(query).then((response) => {
             setDataList(response.data);

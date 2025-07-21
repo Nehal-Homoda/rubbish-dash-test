@@ -26,6 +26,7 @@ export const getVisitsService = async (query?: string) => {
         throw new Error(error.message);
     }
 };
+
 export const addVisitsService = async (form: FormData) => {
     try {
         const response = await apiCall.post(`/admins/visits`, {

@@ -64,14 +64,14 @@ export default function rubbush_collectors() {
     const isActive = status != undefined ? "&status=" + status : "";
     const hasSearch = search ? "&search=" + search : "";
 
-    const query = `?page=${page}${hasSearch}${isActive}`;
+    const query = `?${hasSearch}${isActive}`;
 
     getTicketsService(query)
       .then((response) => {
         setDataList(response.data);
         setTotalPages(response.meta.last_page);
       })
-      .catch(() => {});
+      .catch(() => { });
   };
   const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     fetchDataList({ search: e.target.value });
@@ -97,7 +97,7 @@ export default function rubbush_collectors() {
 
         console.log(response);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const deleteSubmit = (item: Ticket, selectedIndex: number) => {
@@ -108,7 +108,7 @@ export default function rubbush_collectors() {
         setDataList(updatedArr);
         successDialog(true);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const tableHeadActionsSlot = () => {

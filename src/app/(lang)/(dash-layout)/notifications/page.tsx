@@ -78,14 +78,14 @@ export default function rubbush_collectors() {
             : "";
         const hasSearch = search ? "&search=" + search : "";
 
-        const query = `?page=${page}${hasSearch}${isActive}`;
+        const query = `?${hasSearch}${isActive}`;
 
         getNotificationsService(query)
             .then((response) => {
                 setDataList(response.data);
                 setTotalPages(response.meta.last_page);
             })
-            .catch(() => {});
+            .catch(() => { });
     };
     const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         fetchDataList({ search: e.target.value });
@@ -99,7 +99,7 @@ export default function rubbush_collectors() {
                 setDataList(updatedArr);
                 successDialog(true);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     const updateDataItem = (item: Notification) => {
@@ -127,7 +127,7 @@ export default function rubbush_collectors() {
                 fetchDataList();
                 successDialog(true);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     const addFormChangeHander = (
@@ -183,7 +183,7 @@ export default function rubbush_collectors() {
                     target_audience: "",
                 });
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     const handleAudienceSearch = (value: string, audience: string) => {
@@ -206,7 +206,7 @@ export default function rubbush_collectors() {
             .then((response) => {
                 setUsersList(response.data);
             })
-            .catch(() => {});
+            .catch(() => { });
     };
     const fetchCollectorsList = ({
         search = "",
@@ -218,8 +218,18 @@ export default function rubbush_collectors() {
             .then((response) => {
                 setCollectorsList(response.data);
             })
-            .catch(() => {});
+            .catch(() => { });
     };
+
+    const resetForm = () => {
+        setFormData({
+            title_ar: "",
+            title_en: "",
+            body_ar: "",
+            body_en: "",
+            target_audience: "",
+        })
+    }
 
     const tableHeadActionsSlot = () => {
         return (
@@ -234,9 +244,9 @@ export default function rubbush_collectors() {
                 >
                     نوع الاشعار
                 </UIPrimaryDropdown>
-                <UIBaseDialog
+                <UIBaseDialog confirmCloseHandler={resetForm}
                     title="اضافة اشعار"
-                    confirmHandler={() => {}}
+                    confirmHandler={() => { }}
                     confirmText="اضافة"
                     form="update-form"
                     btn={

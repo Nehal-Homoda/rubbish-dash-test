@@ -75,15 +75,15 @@ export default function rubbush_collectors() {
                 : "";
         const hasSearch = search ? "&search=" + search : "";
 
-        const query = `?page=${page}${hasSearch}${isActive}`;
+        const query = `?${hasSearch}${isActive}`;
 
         getBannersService(query).then((response) => {
             setDataList(response.data);
             setTotalPages(response.meta.last_page);
         })
-        .catch(() => {
-            
-        })
+            .catch(() => {
+
+            })
     };
     const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         fetchDataList({ search: e.target.value });
@@ -109,7 +109,7 @@ export default function rubbush_collectors() {
 
                 console.log(response);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     const deleteSubmit = (item: Banner, selectedIndex: number) => {
@@ -120,7 +120,7 @@ export default function rubbush_collectors() {
                 setDataList(updatedArr);
                 successDialog(true);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     const updateDataItem = (item: Banner) => {
@@ -128,10 +128,10 @@ export default function rubbush_collectors() {
         setUpdateFormData({
             title_ar: item.title,
             title_en: item.title,
-            order: item.order  ,
-            link: item.link  ,
+            order: item.order,
+            link: item.link,
             is_active: item.is_active ? 1 : 0,
-            image: item.image  ,
+            image: item.image,
         });
     };
 
@@ -149,7 +149,7 @@ export default function rubbush_collectors() {
                 fetchDataList();
                 successDialog(true);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     const addFormChangeHander = (
@@ -202,7 +202,7 @@ export default function rubbush_collectors() {
                     image: null,
                 });
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     const tableHeadActionsSlot = () => {
@@ -219,8 +219,9 @@ export default function rubbush_collectors() {
                     الحالة
                 </UIPrimaryDropdown>
                 <UIBaseDialog
+                    confirmCloseHandler={resetForm}
                     title="اضافة لافتة"
-                    confirmHandler={() => {}}
+                    confirmHandler={() => { }}
                     confirmText="اضافة"
                     form="update-form"
                     btn={
@@ -310,6 +311,17 @@ export default function rubbush_collectors() {
             </>
         );
     };
+
+    const resetForm = () => {
+        setFormData({
+            title_ar: "",
+            title_en: "",
+            order: 0,
+            link: "",
+            is_active: 0,
+            image: "",
+        })
+    }
     useEffect(() => {
         fetchDataList();
     }, [page]); // runs every time `page` changes
@@ -372,8 +384,9 @@ export default function rubbush_collectors() {
                                         </button>
                                     </UIDialogConfirm>
                                     <UIBaseDialog
+
                                         title="تعديل اللافتة"
-                                        confirmHandler={() => {}}
+                                        confirmHandler={() => { }}
                                         confirmText="تعديل"
                                         form="update-form"
                                         btn={
@@ -393,7 +406,7 @@ export default function rubbush_collectors() {
                                         >
                                             <div className="space-y-7">
                                                 <div className="w-full flex justify-center mb-20">
-                                                    <FileInputImg
+                                                    {/* <FileInputImg
                                                         state="edit"
                                                         fileUrl={item.image}
                                                         onFileChange={(arg) => {
@@ -405,6 +418,16 @@ export default function rubbush_collectors() {
                                                                         null,
                                                                 })
                                                             );
+                                                        }}
+                                                    ></FileInputImg> */}
+                                                    <FileInputImg
+                                                        state="edit"
+                                                        fileUrl={item.image}
+                                                        onFileChange={(arg) => {
+                                                            setUpdateFormData((prev) => ({
+                                                                ...prev,
+                                                                ["image"]: arg?.file64 ?? null,
+                                                            }));
                                                         }}
                                                     ></FileInputImg>
                                                 </div>

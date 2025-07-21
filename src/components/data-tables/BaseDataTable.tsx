@@ -40,6 +40,7 @@ export default function ({
     };
     const searchChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchInput(e.target.value);
+       
         onSearchChange(e);
     };
     return (

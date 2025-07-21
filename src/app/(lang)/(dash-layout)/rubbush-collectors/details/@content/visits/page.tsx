@@ -3,11 +3,12 @@ import React, { useEffect, useState } from "react";
 import BaseDataTable from "@/components/data-tables/BaseDataTable";
 import UIPrimaryDropdown from "@/components/ui/UIPrimaryDropdown";
 import UIBaseDialog from "@/components/ui/UIBaseDialog";
-import { successDialog } from "@/utils/shared";
+import { getQueryParam, successDialog } from "@/utils/shared";
 import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
 import { Visit } from "@/types/visits.interface";
 import {
     deleteVisitsService,
+    
     getVisitsService,
     updateVisitsService,
 } from "@/services/visitService";
@@ -56,17 +57,30 @@ export default function page() {
         days_count: "",
     });
 
-    const fetchDataList = () => {
-        const hasSearch = "&search=" + "Hajar";
+    const fetchDataList = ({
+        search = "",
+        collector_id = ""
 
-        const query = `?page=${page}${hasSearch}`;
+
+    }: { search?: string; collector_id?: string } = {}) => {
+        const id = () => {
+            return getQueryParam('id') || '';
+        };
+        console.log(id())
+        getVisitsService().then((response) => {
+            console.log('response is', response)
+        })
+        const hasSearch = search ? "&search=" + search : "";
+        const collectorId = "&collector_id=" + id();
+        const query = `?page=${page}${hasSearch}${collectorId}`;
 
         getVisitsService(query)
             .then((response) => {
+                console.log('response is', response)
                 setDataList(response.data);
                 setTotalPages(response.meta.last_page);
             })
-            .catch(() => {});
+            .catch(() => { });
     };
     const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         // fetchDataList({ search: e.target.value });
@@ -92,7 +106,7 @@ export default function page() {
 
                 console.log(response);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     const deleteSubmit = (item: Visit, selectedIndex: number) => {
@@ -103,7 +117,7 @@ export default function page() {
                 setDataList(updatedArr);
                 successDialog(true);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     const updateDataItem = (item: Visit) => {
@@ -124,7 +138,7 @@ export default function page() {
                 fetchDataList();
                 successDialog(true);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     const updateFormChangeHander = (
@@ -211,7 +225,7 @@ export default function page() {
                                     <UIBaseDialog
                                         hideConfirmBtn
                                         title="تعديل منطقه"
-                                        confirmHandler={() => {}}
+                                        confirmHandler={() => { }}
                                         confirmText="اضافة"
                                         form="update-form"
                                         btn={

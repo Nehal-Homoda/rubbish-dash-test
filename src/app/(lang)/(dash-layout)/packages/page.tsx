@@ -89,14 +89,14 @@ export default function rubbush_collectors() {
       category_id != undefined ? "&category_id=" + category_id : "";
     const hasSearch = search ? "&search=" + search : "";
 
-    const query = `?page=${page}${hasSearch}${isActive}${category}`;
+    const query = `?${hasSearch}${isActive}${category}`;
 
     getPackagesService(query)
       .then((response) => {
         setDataList(response.data);
         setTotalPages(response.meta.last_page);
       })
-      .catch(() => {});
+      .catch(() => { });
   };
   const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     fetchDataList({ search: e.target.value });
@@ -122,7 +122,7 @@ export default function rubbush_collectors() {
 
         console.log(response);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const deleteSubmit = (item: PackageOffer, selectedIndex: number) => {
@@ -133,7 +133,7 @@ export default function rubbush_collectors() {
         setDataList(updatedArr);
         successDialog(true);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const updateDataItem = (item: PackageOffer) => {
@@ -166,7 +166,7 @@ export default function rubbush_collectors() {
         fetchDataList();
         successDialog(true);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const addFormChangeHander = (
@@ -217,7 +217,7 @@ export default function rubbush_collectors() {
           days_count: 0,
         });
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const tableHeadActionsSlot = () => {
@@ -243,9 +243,9 @@ export default function rubbush_collectors() {
         >
           الحالة
         </UIPrimaryDropdown>
-        <UIBaseDialog
+        <UIBaseDialog confirmCloseHandler={resetForm}
           title="اضافة باقة"
-          confirmHandler={() => {}}
+          confirmHandler={() => { }}
           confirmText="اضافة"
           form="update-form"
           btn={
@@ -341,8 +341,21 @@ export default function rubbush_collectors() {
       .then((response) => {
         setCategories(response.data);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
+
+
+  const resetForm = () => {
+    setFormData({
+      name_ar: "",
+      name_en: "",
+      category_id: "",
+      is_active: 0,
+      price_per_unit: "",
+      order: 0,
+      days_count: "",
+    })
+  }
   useEffect(() => {
     fetchDataList();
     fetchCategories();
@@ -399,7 +412,7 @@ export default function rubbush_collectors() {
                   </UIDialogConfirm>
                   <UIBaseDialog
                     title="تعديل باقة"
-                    confirmHandler={() => {}}
+                    confirmHandler={() => { }}
                     confirmText="تعديل"
                     form="update-form"
                     btn={

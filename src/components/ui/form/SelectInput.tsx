@@ -35,7 +35,7 @@ export default function SelectInput({
     prependIcon,
     errorMessage,
     required,
-    disabled= false,
+    disabled = false,
     iconType,
     onChange,
 }: Props) {
@@ -48,16 +48,16 @@ export default function SelectInput({
 
     useEffect(() => {
         if (itemName && itemValue) {
-            console.log('itemsss',items)
+            console.log('itemsss', items)
             const item = items.find((item) => {
-                console.log('item issss',item)
+                console.log('item issss', item)
                 return item[itemValue] == value
 
             });
 
             console.log("iteeeeee", item);
             console.log("iteeeeee value", value);
-            
+
 
             if (item) {
                 setSelected(item[itemName]);
@@ -65,91 +65,96 @@ export default function SelectInput({
         } else {
             setSelected(value);
         }
-    }, [value,items]);
+    }, [value, items]);
 
     return (
         <>
-            <Menu as="div" className="w-full relative inline-block">
-                <div className="w-full">
-                    <MenuButton disabled={disabled}
-                        className={`w-full w-fullfocus:outline-none outline-none border-none `}
-                    >
-                        <div className="w-full relative  p-1.5 border border-surface-light-700 rounded-2xl">
-                            <div className="label flex items-center gap-1 absolute -top-4 start-4 bg-background w-fit px-3  text-sm font-semibold">
-                                <label htmlFor={name}>{label}</label>
-                                {required && (
-                                    <span className="text-red-600">*</span>
-                                )}
-                            </div>
-                            <div className="card h-8 flex justify-between items-center">
-                                {prependIcon && (
-                                    <div className="mt-1">
-                                        {iconType === "mdi" && (
-                                            <span
-                                                className={`${prependIcon} text-2xl text-foreground/45`}
-                                            />
-                                        )}
-                                        {iconType === "fa" && (
-                                            <i
-                                                className={`${prependIcon} text-2xl text-foreground/45`}
-                                            />
-                                        )}
-                                    </div>
-                                )}
-                                <div className="px-2 truncate">
-                                    {!!selected ? (
-                                        <span className=""> {selected}</span>
-                                    ) : (
-                                        <span className="text-sm text-gray-400">
-                                            {placeholder}
-                                        </span>
+            <div>
+
+
+
+                <Menu as="div" className="w-full relative inline-block">
+                    <div className="w-full">
+                        <MenuButton disabled={disabled}
+                            className={`w-full w-fullfocus:outline-none outline-none border-none `}
+                        >
+                            <div className="w-full relative  p-1.5 border border-surface-light-700 rounded-2xl">
+                                <div className="label flex items-center gap-1 absolute -top-4 start-4 bg-background w-fit px-3  text-sm font-semibold">
+                                    <label htmlFor={name}>{label}</label>
+                                    {required && (
+                                        <span className="text-red-600">*</span>
                                     )}
                                 </div>
-
-                                <span className="mdi mdi-chevron-down text-2xl text-foreground/45"></span>
-                            </div>
-                        </div>
-                    </MenuButton>
-                </div>
-                <Transition
-                    as={Fragment}
-                    enter="transition ease-out duration-100"
-                    enterFrom="transform opacity-0 scale-95"
-                    enterTo="transform opacity-100 scale-100"
-                    leave="transition ease-in duration-75"
-                    leaveFrom="transform opacity-100 scale-100"
-                    leaveTo="transform opacity-0 scale-95"
-                >
-                    <MenuItems className="absolute z-50 w-full ltr:left-0 rtl:right-0 mt-2 origin-top-right divide-y rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
-                        <div className="px-1 py-1 ">
-                            {items.map((item, index) => (
-                                <MenuItem key={index}>
-                                    {({ active }) => (
-                                        <div
-                                            onClick={() => {
-                                                setItem(item);
-                                            }}
-                                            className={` ${
-                                                active
-                                                    ? "bg-surface-light-800 text-surface"
-                                                    : "text-gray-900"
-                                            } group w-full whitespace-nowrap text-start cursor-pointer rounded-md px-5 py-3 text-sm`}
-                                        >
-                                            {itemName ? item[itemName] : item}
+                                <div className="card h-8 flex justify-between items-center">
+                                    {prependIcon && (
+                                        <div className="mt-1">
+                                            {iconType === "mdi" && (
+                                                <span
+                                                    className={`${prependIcon} text-2xl text-foreground/45`}
+                                                />
+                                            )}
+                                            {iconType === "fa" && (
+                                                <i
+                                                    className={`${prependIcon} text-2xl text-foreground/45`}
+                                                />
+                                            )}
                                         </div>
                                     )}
-                                </MenuItem>
-                            ))}
-                        </div>
-                    </MenuItems>
-                </Transition>
-            </Menu>
+                                    <div className="px-2 truncate">
+                                        {!!selected ? (
+                                            <span className=""> {selected}</span>
+                                        ) : (
+                                            <span className="text-sm text-gray-400">
+                                                {placeholder}
+                                            </span>
+                                        )}
+                                    </div>
 
-            {errorMessage && (
-                <div className="err-msg mt-2 text-red-600 font-semibold ps-2">
-                    * {errorMessage}
-                </div>
-            )}
+                                    <span className="mdi mdi-chevron-down text-2xl text-foreground/45"></span>
+                                </div>
+                            </div>
+                        </MenuButton>
+                    </div>
+                    <Transition
+                        as={Fragment}
+                        enter="transition ease-out duration-100"
+                        enterFrom="transform opacity-0 scale-95"
+                        enterTo="transform opacity-100 scale-100"
+                        leave="transition ease-in duration-75"
+                        leaveFrom="transform opacity-100 scale-100"
+                        leaveTo="transform opacity-0 scale-95"
+                    >
+                        <MenuItems className="absolute z-50 w-full ltr:left-0 rtl:right-0 mt-2 origin-top-right divide-y rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
+                            <div className="px-1 py-1 ">
+                                {items.map((item, index) => (
+                                    <MenuItem key={index}>
+                                        {({ active }) => (
+                                            <div
+                                                onClick={() => {
+                                                    setItem(item);
+                                                }}
+                                                className={` ${active
+                                                    ? "bg-surface-light-800 text-surface"
+                                                    : "text-gray-900"
+                                                    } group w-full whitespace-nowrap text-start cursor-pointer rounded-md px-5 py-3 text-sm`}
+                                            >
+                                                {itemName ? item[itemName] : item}
+                                            </div>
+                                        )}
+                                    </MenuItem>
+                                ))}
+                            </div>
+                        </MenuItems>
+                    </Transition>
+                </Menu>
+
+
+                {errorMessage && (
+                    <div className="err-msg text-red-600 text-xs text-start font-semibold ps-2">
+                        * {errorMessage}
+                    </div>
+                )}
+            </div>
         </>
     );
 }
