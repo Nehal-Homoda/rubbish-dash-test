@@ -207,6 +207,8 @@ export default function page() {
         // console.log(e.target.value)
     };
 
+    const serviceTypeList = [{ id: 1, name: 'جمع' }, { id: 2, name: 'جمع وتدوير' }]
+
     useEffect(() => {
         fetchDistrict();
         fetchPaymentList();
@@ -226,6 +228,19 @@ export default function page() {
             }
         }
     }, [formData]);
+
+    const [districtAvailableDays, setDistrictAvailableDays] = useState([
+        { title: 'السبت ', slug: 'saturday' },
+        { title: ' الاحد', slug: 'sunday' },
+        { title: 'الاتنين ', slug: 'monday' },
+        { title: 'الثلاثاء ', slug: 'tuesday' },
+        { title: 'الاربعاء ', slug: 'wednesday' },
+        { title: 'الخميس ', slug: 'thursday' },
+        { title: 'الجمعه ', slug: 'friday' },
+
+    ]);
+
+
 
     return (
         <div>
@@ -353,6 +368,20 @@ export default function page() {
                                             }
                                         ></SelectInput>
                                     </div>
+                                    <div className="col-span-6">
+                                        <SelectInput
+                                            items={serviceTypeList}
+                                            placeholder="ادخل نوع الطلب"
+                                            name=""
+                                            itemName="name"
+                                            itemValue="id"
+                                            value={formData.package_id}
+                                            label=" نوع الطلب"
+                                            onChange={(value) =>
+                                                handleSelectPackage(value)
+                                            }
+                                        ></SelectInput>
+                                    </div>
 
                                     <div className="col-span-6">
                                         <TextFieldNada
@@ -411,11 +440,13 @@ export default function page() {
 
                                     <div className="col-span-6">
                                         <MultiCheckbox
-                                            items={districtDays}
+                                            items={districtAvailableDays}
                                             value={formData.days}
                                             label="اليوم"
                                             required={true}
                                             name="available_days"
+                                            itemName="title"
+                                            itemValue="slug"
                                             placeholder="اختر اليوم"
                                             prependIcon="mdi mdi-calendar-month-outline"
                                             iconType="mdi"
@@ -480,8 +511,8 @@ export default function page() {
                                                                                 <RadioGroup.Label
                                                                                     as="div"
                                                                                     className={`font-medium  ${checked
-                                                                                            ? "text-gray-900"
-                                                                                            : "text-gray-900"
+                                                                                        ? "text-gray-900"
+                                                                                        : "text-gray-900"
                                                                                         }`}
                                                                                 >
                                                                                     <div className="flex items-center gap-4">
