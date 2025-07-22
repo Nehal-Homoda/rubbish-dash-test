@@ -6,4 +6,6 @@ export interface Category {
   is_active: number;
   order: any;
   no_of_subscriptions: number;
+  has_recycle: number;
+  discount_rate_id: number;
 }
