@@ -29,7 +29,7 @@ export default function rubbush_collectors() {
     { text: " صورة الخدمة", name: "image" },
     { text: " اسم الخدمة", name: "name_ar" },
     { text: " عدد الاشتراكات", name: "no_of_subscriptions" },
-    { text: " قابل للتدوير", name: "has_recycle" },
+    { text: "اعادة تدوير", name: "has_recycle" },
     { text: "الحالة", name: "is_active" },
     { text: "الاجراءات", name: "image" },
   ];
@@ -44,14 +44,28 @@ export default function rubbush_collectors() {
   );
   const router = useRouter();
 
+  const [isRecycled, setIsRecycled] = useState(false)
+
   const [switch1, setSwitch1] = useState(false);
 
-  const handleCheckSubscription = () => {
+  const handleCheckSubscription = (value: boolean, name: string) => {
+
     setSwitch1(!switch1);
-    setUpdateFormData((prev) => ({
-      ...prev,
-      ["has_recycle"]: 1,
-    }));
+    if (name == 'add') {
+      setFormData((prev) => ({
+        ...prev,
+        ["has_recycle"]: value ? 1 :0,
+      }));
+    }
+
+
+    if (name == 'edit') {
+      setUpdateFormData((prev) => ({
+        ...prev,
+        ["has_recycle"]: value ? 1:0,
+      }));
+    }
+
   };
 
   type FormDataType = {
@@ -61,7 +75,7 @@ export default function rubbush_collectors() {
     is_active: number;
     image: File | null | string;
     has_recycle: number;
-    discount_rate_id: number;
+    discount_value_percentage: number;
   };
   const [formData, setFormData] = useState<FormDataType>({
     name_ar: "",
@@ -70,7 +84,7 @@ export default function rubbush_collectors() {
     is_active: 0,
     image: null,
     has_recycle: 0,
-    discount_rate_id: 0,
+    discount_value_percentage: 0,
   });
 
   const [updateFormData, setUpdateFormData] = useState<FormDataType>({
@@ -80,7 +94,7 @@ export default function rubbush_collectors() {
     is_active: 0,
     image: null,
     has_recycle: 0,
-    discount_rate_id: 0,
+    discount_value_percentage: 0,
   });
 
   const discountList = [
@@ -139,7 +153,7 @@ export default function rubbush_collectors() {
 
         console.log(response);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const deleteSubmit = (item: Category, selectedIndex: number) => {
@@ -150,7 +164,7 @@ export default function rubbush_collectors() {
         setDataList(updatedArr);
         successDialog(true);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const updateDataItem = (item: Category) => {
@@ -162,7 +176,7 @@ export default function rubbush_collectors() {
       is_active: item.is_active ? 1 : 0,
       image: item.image,
       has_recycle: item.has_recycle,
-      discount_rate_id: item.discount_rate_id,
+      discount_value_percentage: Number(item.discount_value_percentage),
     });
   };
 
@@ -180,7 +194,7 @@ export default function rubbush_collectors() {
         fetchDataList();
         successDialog(true);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const addFormChangeHander = (
@@ -214,8 +228,12 @@ export default function rubbush_collectors() {
     fd.append("name_en", formData.name_en);
     fd.append("order", formData.order.toString());
     fd.append("is_active", formData.is_active.toString());
+    fd.append("has_recycle", formData.has_recycle.toString())
     if (formData.image) {
       fd.append("image", formData.image);
+    }
+    if (formData.discount_value_percentage) {
+      fd.append("discount_value_percentage", formData.discount_value_percentage.toString());
     }
 
     addCategoryService(fd)
@@ -230,10 +248,10 @@ export default function rubbush_collectors() {
           is_active: 0,
           image: null,
           has_recycle: 0,
-          discount_rate_id: 0,
+          discount_value_percentage: 0,
         });
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const resetForm = () => {
@@ -244,7 +262,7 @@ export default function rubbush_collectors() {
       name_en: "",
       order: 0,
       has_recycle: 0,
-      discount_rate_id: 0,
+      discount_value_percentage: 0,
     });
   };
 
@@ -264,7 +282,7 @@ export default function rubbush_collectors() {
         <UIBaseDialog
           confirmCloseHandler={resetForm}
           title="اضافة خدمة"
-          confirmHandler={() => {}}
+          confirmHandler={() => { }}
           confirmText="اضافة"
           form="update-form"
           btn={
@@ -327,27 +345,28 @@ export default function rubbush_collectors() {
                 <ToggleSwitch
                   checked={switch1}
                   label="اعادة تدوير"
-                  onChange={handleCheckSubscription}
+                  onChange={(value) => handleCheckSubscription(value, 'add')}
                 />
               </div>
 
               {switch1 && (
-                <SelectInput
-                  placeholder="اختر نسبة الخصم"
-                  onChange={(value) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      ["discount_rate_id"]: value,
-                    }))
-                  }
-                  value={formData.discount_rate_id}
-                  name="discount"
-                  items={discountList}
-                  itemName="discount"
-                  itemValue="id"
-                  label="نسبة الخصم"
-                  prependIcon="mdi mdi-ticket-percent-outline"
-                ></SelectInput>
+                // <SelectInput
+                //   placeholder="اختر نسبة الخصم"
+                //   onChange={(value) =>
+                //     setFormData((prev) => ({
+                //       ...prev,
+                //       ["discount_rate_id"]: value,
+                //     }))
+                //   }
+                //   value={formData.discount_rate_id}
+                //   name="discount"
+                //   items={discountList}
+                //   itemName="discount"
+                //   itemValue="id"
+                //   label="نسبة الخصم"
+                //   prependIcon="mdi mdi-ticket-percent-outline"
+                // ></SelectInput>
+                <TextFieldNada handleChange={addFormChangeHander} name="discount_value_percentage" label="نسبة الخصم" placeholder="ادخل نسبة الخصم" type="number" value={formData.discount_value_percentage} />
               )}
             </div>
           </form>
@@ -386,6 +405,22 @@ export default function rubbush_collectors() {
               </td>
               <td className="py-2 px-4">{item.name_ar}</td>
               <td className="py-2 px-4">{item.no_of_subscriptions}</td>
+
+
+              <td className="py-2 px-4">
+                {item.has_recycle ?
+
+                  <div className="bg-[#009414] text-white rounded-full w-7 h-7 overflow-hidden flex justify-center items-center">
+                    <span className="mdi mdi-check"></span>
+                  </div>
+
+                  :
+                  <div className="bg-[#F9285A] text-white rounded-full w-7 h-7 overflow-hidden flex justify-center items-center">
+                    <span className="mdi mdi-close"></span>
+                  </div>
+                }
+              </td>
+
               <td className="py-2 px-4">
                 <UIPrimaryDropdown
                   tiny={true}
@@ -419,7 +454,7 @@ export default function rubbush_collectors() {
                   </UIDialogConfirm>
                   <UIBaseDialog
                     title="تعديل خدمة"
-                    confirmHandler={() => {}}
+                    confirmHandler={() => { }}
                     confirmText="تعديل"
                     form="update-form"
                     btn={
@@ -485,35 +520,40 @@ export default function rubbush_collectors() {
 
                         <div className="py-6 ">
                           <ToggleSwitch
-                            checked={switch1}
+                            checked={item.has_recycle ==1 ? true : false}
                             label="اعادة تدوير"
-                            onChange={handleCheckSubscription}
+                            onChange={(value) => handleCheckSubscription(value, 'edit')}
                           />
                         </div>
 
-                        {switch1 && (
-                          <SelectInput
-                            placeholder="اختر نسبة الخصم"
-                            onChange={(value) =>
-                              setUpdateFormData((prev) => ({
-                                ...prev,
-                                ["discount_rate_id"]: value,
-                              }))
-                            }
-                            value={updateFormData.discount_rate_id}
-                            name="discount"
-                            items={discountList}
-                            itemName="discount"
-                            itemValue="id"
-                            label="نسبة الخصم"
-                            prependIcon="mdi mdi-ticket-percent-outline"
-                          ></SelectInput>
+                        {item.has_recycle && (
+                          // <SelectInput
+                          //   placeholder="اختر نسبة الخصم"
+                          //   onChange={(value) =>
+                          //     setUpdateFormData((prev) => ({
+                          //       ...prev,
+                          //       ["discount_rate_id"]: value,
+                          //     }))
+                          //   }
+                          //   value={updateFormData.discount_rate_id}
+                          //   name="discount"
+                          //   items={discountList}
+                          //   itemName="discount"
+                          //   itemValue="id"
+                          //   label="نسبة الخصم"
+                          //   prependIcon="mdi mdi-ticket-percent-outline"
+                          // ></SelectInput>
+
+
+                          <TextFieldNada handleChange={updateFormChangeHander} name="discount_value_percentage" label="نسبة الخصم" placeholder="ادخل نسبة الخصم" type="number" value={updateFormData.discount_value_percentage} />
                         )}
                       </div>
                     </form>
                   </UIBaseDialog>
                 </div>
               </td>
+
+
             </tr>
           ))}
         </BaseDataTable>

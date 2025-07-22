@@ -7,5 +7,5 @@ export interface Category {
   order: any;
   no_of_subscriptions: number;
   has_recycle: number;
-  discount_rate_id: number;
+  discount_value_percentage: number;
 }

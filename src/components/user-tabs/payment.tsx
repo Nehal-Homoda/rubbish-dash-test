@@ -19,6 +19,15 @@ import {
 } from "@/services/paymentsService";
 import { AppUser } from "@/types/user.interface";
 import { Users } from "@/types/auth.interface";
+import ComboBoxNehal from "../ui/form/ComboBoxNehal";
+import { getCategoriesService } from "@/services/categoriesService";
+import { Category } from "@/types/categories.interface";
+import { PackageOffer } from "@/types/packagesOffer.interface";
+import { getPackageByIdService, getPackagesService } from "@/services/packagesOffersService";
+import { RadioGroup } from "@headlessui/react";
+import FileInput from "@/components/ui/form/FileInput";
+import { Payment_methods } from "@/types/paymentMethod.interface";
+import { paymentMethodListService } from "@/services/sharedService";
 
 type Props = {
   user: Users;
@@ -72,7 +81,7 @@ export default function rubbush_collectors({ user }: Props) {
         //@ts-ignore
         setDataList(response.data);
       })
-      .catch(() => {});
+      .catch(() => { });
   };
 
   const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,7 +108,7 @@ export default function rubbush_collectors({ user }: Props) {
 
         console.log(response);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const deleteSubmit = (item: Payment, selectedIndex: number) => {
@@ -110,7 +119,7 @@ export default function rubbush_collectors({ user }: Props) {
         setDataList(updatedArr);
         successDialog(true);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const statusDropdownColor = (name: string) => {
@@ -124,9 +133,137 @@ export default function rubbush_collectors({ user }: Props) {
     return statusList.find((item) => item.is_active === name)?.name ?? "";
   };
 
-  const resetForm=()=>{
+  const resetForm = () => {
 
   }
+  const [categoryList, setCategoryList] = useState<Category[]>([]);
+  const [packagesList, setpackagesList] = useState<PackageOffer[]>([]);
+  const [packageItem, setPackageItem] = useState<PackageOffer | null>(null);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [selectedPackage, setSelectedPackage] = useState<PackageOffer | null>(
+    null
+  );
+
+  const [selected, setSelected] = useState<null | Payment_methods>(null);
+
+  const [paymentMethodList, setPaymentMethodList] = useState<
+    Payment_methods[]
+  >([]);
+
+
+  // const handleSelctedValue = (selectedItem: any) => {
+  //   console.log('selected is', selectedItem)
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     ['user_id']: selectedItem.id
+
+  //   }))
+  // }
+
+  // const userList = [
+
+
+  //   { id: 1, name: 'maria' },
+  //   { id: 2, name: 'nehal' },
+  //   { id: 3, name: 'aliaa' },
+  // ]
+
+
+  const [formData, setFormData] = useState({
+
+    category_id: 0,
+    package_id: 0,
+    units: 1,
+
+
+  })
+
+  const fetchCategories = () => {
+    getCategoriesService().then((response) => {
+      setCategoryList(response.data);
+    });
+  };
+
+  const handleSelectPackage = (value) => {
+    setFormData((prev) => ({
+      ...prev,
+      ["package_id"]: value,
+    }));
+    getPackageByIdService(value).then((response) => {
+      setPackageItem(response.data);
+
+    });
+  };
+
+  const fetchPackages = () => {
+    getPackagesService().then((response) => {
+      console.log(response);
+      setpackagesList(response.data);
+    });
+  };
+
+
+  const fetchPaymentMethodList = () => {
+    paymentMethodListService().then((response) => {
+      setPaymentMethodList(response.data);
+    });
+  }
+
+  const handleAddPayment = () => {
+
+  }
+
+  const takeValue = (e, name) => {
+    console.log('name is', name)
+    console.log(e.target.value);
+    setFormData((prev) => ({
+      ...prev,
+      [name]: e.target.value,
+    }));
+    if (name == "units") {
+      if (packageItem) {
+        //@ts-ignore
+        setTotalPrice(selectedPackage.price_per_unit * formData.units);
+      }
+    }
+  };
+
+
+  const handleSelecteditem = (item) => {
+    console.log("itemssssss", item);
+    setSelected(item);
+    setFormData((prev) => ({
+      ...prev,
+      ["payment_method_id"]: item.id,
+    }));
+
+    // console.log(e.target.value)
+  };
+
+
+  const takeUploadedImg = (img) => {
+    console.log(img);
+  };
+
+
+  useEffect(() => {
+    fetchCategories()
+    fetchPackages()
+    fetchPaymentMethodList()
+  }, [])
+
+
+  useEffect(() => {
+    if (packageItem) {
+      setTotalPrice(Number(packageItem.price_per_unit) * formData.units);
+    }
+  }, [formData.units]);
+  useEffect(() => {
+    if (packageItem) {
+      setTotalPrice(Number(packageItem.price_per_unit) * formData.units);
+    }
+  }, [packageItem]);
+
 
   const tableHeadActionsSlot = () => {
     return (
@@ -134,7 +271,7 @@ export default function rubbush_collectors({ user }: Props) {
         <UIBaseDialog
           confirmCloseHandler={resetForm}
           title="اضافة دفع"
-          confirmHandler={() => {}}
+          confirmHandler={() => { }}
           confirmText="اضافة"
           form="update-form"
           btn={
@@ -144,7 +281,192 @@ export default function rubbush_collectors({ user }: Props) {
               </button>
             </div>
           }
-        ></UIBaseDialog>
+        >
+
+          <form onSubmit={handleAddPayment} className="">
+            <div className="grid grid-cols-12 space-y-5 gap-7">
+
+
+
+              <div className="col-span-12">
+                <SelectInput
+                  items={categoryList}
+                  placeholder="ادخل نوع الخدمة"
+                  name=""
+                  itemName="name_ar"
+                  itemValue="id"
+                  value={formData.category_id}
+                  label=" نوع الخدمة"
+                  onChange={(value) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      ["category_id"]: value,
+                    }))
+                  }
+                ></SelectInput>
+              </div>
+
+
+              <div className="col-span-12">
+                <SelectInput
+                  items={packagesList}
+                  placeholder="ادخل نوع الباقه"
+                  name="package_id"
+                  itemName="name_ar"
+                  itemValue="id"
+                  value={formData.package_id}
+                  label=" نوع الباقة"
+                  onChange={(value) =>
+                    handleSelectPackage(value)
+                  }
+                ></SelectInput>
+              </div>
+
+
+
+              <div className="col-span-6">
+                <TextFieldNada
+                  name="price"
+                  type="number"
+                  handleChange={(e) =>
+                    takeValue(e, "units")
+                  }
+                  value={
+                    packageItem
+                      ? packageItem.price_per_unit
+                      : 0
+                  }
+                  label=" سعر الباقة "
+                  placeholder="  سعر الباقة "
+                ></TextFieldNada>
+              </div>
+
+              <div className="col-span-6">
+                <TextFieldNada
+                  name="units"
+                  type="number"
+                  handleChange={(e) =>
+                    takeValue(e, "units")
+                  }
+                  value={formData.units}
+                  label=" عدد الوحدات "
+                  placeholder=" عدد الوحدات "
+                ></TextFieldNada>
+              </div>
+
+              <div className="col-span-6">
+                <TextFieldNada
+                  name="price"
+                  type="number"
+                  handleChange={(e) =>
+                    takeValue(e, "price")
+                  }
+                  value={totalPrice.toString()}
+                  label="السعر الكلي "
+                  placeholder="  السعر الكلي "
+                ></TextFieldNada>
+              </div>
+
+
+              <div className="col-span-12">
+                <RadioGroup
+                  value={selected}
+                  onChange={(e) =>
+                    handleSelecteditem(e)
+                  }
+                >
+                  <div className="grid grid-cols-2 gap-7">
+                    {paymentMethodList.map(
+                      (item, index) => (
+                        <RadioGroup.Option
+                          key={index}
+                          value={item}
+                          className={({
+                            active,
+                            checked,
+                          }) =>
+                            `${active
+                              ? "ring-2 ring-white/60 ring-offset-2 ring-offset-sky-300"
+                              : ""
+                            }
+                                ${checked ? "border border-[#009414] " : ""}
+                                  relative flex cursor-pointer  rounded-lg px-5 py-4 ring-1 ring-gray-100 focus:outline-none  col-span-1`
+                          }
+                        >
+                          {({
+                            active,
+                            checked,
+                          }) => (
+                            <>
+                              <div className="flex w-full items-center justify-between">
+                                <div className="flex items-center">
+                                  <div className="text-sm">
+                                    <RadioGroup.Label
+                                      as="div"
+                                      className={`font-medium  ${checked
+                                        ? "text-gray-900"
+                                        : "text-gray-900"
+                                        }`}
+                                    >
+                                      <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-full">
+                                          <img
+                                            className="w-full h-full object-contain"
+                                            src={
+                                              item.image
+                                            }
+                                            alt=""
+                                          />
+                                        </div>
+                                        {
+                                          item.name_ar
+                                        }
+                                      </div>
+                                    </RadioGroup.Label>
+                                  </div>
+                                </div>
+                                {checked ? (
+                                  <div className="before:absolute before:content-[''] before:w-3 before:h-3 before:rounded-full before:bg-[#009414]   shrink-0 w-4 h-4 rounded-full ring-1 ring-surface text-surface flex justify-center items-center text-xs">
+                                    {/* <CheckIcon className="h-6 w-6" /> */}
+                                  </div>
+                                ) : (
+                                  <div className="shrink-0 w-4 h-4 rounded-full ring-1 ring-surface text-surface flex justify-center items-center">
+                                    {/* <CheckIcon className="h-6 w-6" /> */}
+                                  </div>
+                                )}
+                              </div>
+                            </>
+                          )}
+                        </RadioGroup.Option>
+                      )
+                    )}
+                  </div>
+                </RadioGroup>
+              </div>
+
+              <div className="col-span-6">
+                <FileInput
+                  onFileChange={(img) =>
+                    takeUploadedImg(img)
+                  }
+                  state="add"
+                  title="ارفاق صورة التحويل"
+                />
+              </div>
+
+
+
+            </div>
+
+
+
+
+          </form >
+
+
+
+
+        </UIBaseDialog >
       </>
     );
   };
