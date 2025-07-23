@@ -454,7 +454,7 @@ export default function rubbush_collectors() {
                                             value={
                                                 dynamicFromToTime[index].from
                                             }
-                                            label="الي "
+                                            label="من "
                                             placeholder="  السعر الكلي *"
                                         ></TextFieldNada>
                                     </div>

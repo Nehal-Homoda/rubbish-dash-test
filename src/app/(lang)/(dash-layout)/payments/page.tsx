@@ -28,6 +28,10 @@ import { getCategoriesService } from "@/services/categoriesService";
 import { getPackageByIdService, getPackagesService } from "@/services/packagesOffersService";
 import { PackageOffer } from "@/types/packagesOffer.interface";
 import { RadioGroup } from "@headlessui/react";
+import ComboBoxNehal from "@/components/ui/form/ComboBoxNehal";
+import { User } from "@/types/auth.interface";
+import { getUserByIdService, getUserService } from "@/services/userService";
+import { AppUser } from "@/types/user.interface";
 
 export default function rubbush_collectors() {
   const [dataList, setDataList] = useState<Payment[]>([]);
@@ -37,11 +41,12 @@ export default function rubbush_collectors() {
   const headerArr = [
     { text: "ID", name: "id" },
     { text: " اسم المستخدم", name: "name_ar" },
+    { text: " اسم الباقة", name: "name_ar" },
     { text: " عدد الوحدات", name: "name_ar" },
+    { text: " تمت الاضافة بواسطة", name: "added_by" },
     { text: " السعر الكلي", name: "name_ar" },
     { text: " تاريخ الدفع", name: "name_ar" },
     { text: "الحالة", name: "is_active" },
-    // { text: " اسم الباقة", name: "name_ar" },
     { text: "طريقة الدفع", name: "is_active" },
     { text: "صورة التحويل", name: "image" },
     { text: "الاجراءات", name: "image" },
@@ -64,6 +69,9 @@ export default function rubbush_collectors() {
   const [selectedDataItem, setSelectedDataItem] = useState<Payment | null>(
     null
   );
+
+
+  const [userList, setUserList] = useState<AppUser[]>([])
 
 
   const [categoryList, setCategoryList] = useState<Category[]>([]);
@@ -94,9 +102,11 @@ export default function rubbush_collectors() {
     available_times: [],
   });
   const [addPaymentFormData, setAddPaymentFormData] = useState({
-    category_id: 0,
-    package_id: 0,
-    units: 1,
+    user_id: 0,
+    receiving_number: 0,
+    total_price: 0,
+    payment_method_id: 0,
+    payment_verification: ''
 
   })
   const [updateFormData, setUpdateFormData] = useState({
@@ -107,6 +117,8 @@ export default function rubbush_collectors() {
     // user_id: 0,
     payment_verification: "",
   });
+
+  const [userItem, setUserItem] = useState<AppUser | null>(null)
 
   const fetchPaymentMethodList = () => {
     paymentMethodListService().then((response) => {
@@ -141,7 +153,7 @@ export default function rubbush_collectors() {
     });
   };
 
-  const handleSelectPackage = (value) => {
+  const handleSelectPackage = (value: any) => {
     setAddPaymentFormData((prev) => ({
       ...prev,
       ["package_id"]: value,
@@ -155,10 +167,10 @@ export default function rubbush_collectors() {
 
 
 
-  const handleSelecteditem = (item) => {
+  const handleSelecteditem = (item: any) => {
     console.log("itemssssss", item);
     setSelected(item);
-    setFormData((prev) => ({
+    setAddPaymentFormData((prev) => ({
       ...prev,
       ["payment_method_id"]: item.id,
     }));
@@ -193,6 +205,10 @@ export default function rubbush_collectors() {
         setTotalPages(response.meta.last_page);
       })
       .catch(() => { });
+
+    getUserService().then((response) => {
+      setUserList(response.data)
+    })
   };
   const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
 
@@ -365,7 +381,7 @@ export default function rubbush_collectors() {
     setIsOpenImg(true);
   };
 
-  const takeValue = (e, name) => {
+  const takeValue = (e: any, name: any) => {
     console.log('name is', name)
     console.log(e.target.value);
     setUpdateFormData((prev) => ({
@@ -390,231 +406,65 @@ export default function rubbush_collectors() {
 
   }
 
-  const handleAddPayment = () => {
+  const handleAddPayment = async (e:any) => {
+    e.preventDefault()
+    console.log('hii')
+
+    const fd = new FormData()
+    fd.append('user_id', addPaymentFormData.user_id.toString())
+    fd.append('receiving_number', userItem ? userItem.phone : '')
+    fd.append('payment_method_id', addPaymentFormData.payment_method_id.toString())
+    //@ts-ignore
+    fd.append('total_price', userItem ? userItem.deserved_money_by_recycle : 0)
+    fd.append('payment_verification', addPaymentFormData.payment_verification)
+    await addPaymentService(fd).then((response) => {
+      successDialog(true)
+      console.log('response of payment is', response.data)
+    })
 
   }
-  const takeUploadedImg = () => {
+  const takeUploadedImg = (img: any) => {
+    console.log('img', img)
+    setAddPaymentFormData((prev) => ({
+      ...prev,
+      ['payment_verification']: img
+
+    }))
+
+  }
+
+
+  const handleSelectedUser = (selectedId: any) => {
+    setAddPaymentFormData((prev) => ({
+      ...prev,
+      ['user_id']: selectedId
+    }))
+
+    getUserByIdService(selectedId).then((response) => {
+      console.log('response is', response)
+      setUserItem(response.data)
+    })
 
   }
   useEffect(() => {
     fetchPaymentMethodList();
     fetchCategories()
     fetchPackages()
+
   }, [])
+
+  // useEffect(() => {
+  //   if (userItem) {
+  //     setTotalPrice(Number(userItem.deserved_money_by_recycle))
+  //   }
+
+
+
+  // }, [userItem])
 
   const tableHeadActionsSlot = () => {
     return (
       <>
-
-        <UIBaseDialog
-          confirmCloseHandler={resetForm}
-          title="اضافة رصيد"
-          confirmHandler={() => { }}
-          confirmText="اضافة"
-          form="update-form"
-          btn={
-            <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
-              <button className="bg-[#0094140D] p-1 rounded-lg">
-                اضافة رصيد
-              </button>
-            </div>
-          }
-        >
-          {/* <div>
-            <ComboBoxNehal label="اسم المستخدم" listItem={usersList} value={addPaymentFormData.user_id} itemName="name" itemValue="id" />
-
-          </div> */}
-
-          <div>
-            <form onSubmit={handleAddPayment} className="">
-              <div className="grid grid-cols-12 space-y-5 gap-7">
-
-
-                <div className="col-span-12">
-                  <SelectInput
-                    items={categoryList}
-                    placeholder="ادخل نوع الخدمة"
-                    name=""
-                    itemName="name_ar"
-                    itemValue="id"
-                    value={addPaymentFormData.category_id}
-                    label=" نوع الخدمة"
-                    onChange={(value) =>
-                      setAddPaymentFormData((prev) => ({
-                        ...prev,
-                        ["category_id"]: value,
-                      }))
-                    }
-                  ></SelectInput>
-                </div>
-
-
-                <div className="col-span-12">
-                  <SelectInput
-                    items={packagesList}
-                    placeholder="ادخل نوع الباقه"
-                    name="package_id"
-                    itemName="name_ar"
-                    itemValue="id"
-                    value={addPaymentFormData.package_id}
-                    label=" نوع الباقة"
-                    onChange={(value) =>
-                      handleSelectPackage(value)
-                    }
-                  ></SelectInput>
-                </div>
-
-
-
-                <div className="col-span-6">
-                  <TextFieldNada
-                    name="price"
-                    type="number"
-                    handleChange={(e) =>
-                      takeValue(e, "units")
-                    }
-                    value={
-                      packageItem
-                        ? packageItem.price_per_unit
-                        : 0
-                    }
-                    label=" سعر الباقة "
-                    placeholder="  سعر الباقة "
-                  ></TextFieldNada>
-                </div>
-
-                <div className="col-span-6">
-                  <TextFieldNada
-                    name="units"
-                    type="number"
-                    handleChange={(e) =>
-                      takeValue(e, "units")
-                    }
-                    value={addPaymentFormData.units}
-                    label=" عدد الوحدات "
-                    placeholder=" عدد الوحدات "
-                  ></TextFieldNada>
-                </div>
-
-                <div className="col-span-6">
-                  <TextFieldNada
-                    name="price"
-                    type="number"
-                    handleChange={(e) =>
-                      takeValue(e, "price")
-                    }
-                    value={totalPrice.toString()}
-                    label="السعر الكلي "
-                    placeholder="  السعر الكلي "
-                  ></TextFieldNada>
-                </div>
-
-
-                <div className="col-span-12">
-                  <RadioGroup
-                    value={selected}
-                    onChange={(e) =>
-                      handleSelecteditem(e)
-                    }
-                  >
-                    <div className="grid grid-cols-2 gap-7">
-                      {paymentMethodList.map(
-                        (item, index) => (
-                          <RadioGroup.Option
-                            key={index}
-                            value={item}
-                            className={({
-                              active,
-                              checked,
-                            }) =>
-                              `${active
-                                ? "ring-2 ring-white/60 ring-offset-2 ring-offset-sky-300"
-                                : ""
-                              }
-                                                ${checked ? "border border-[#009414] " : ""}
-                                                  relative flex cursor-pointer  rounded-lg px-5 py-4 ring-1 ring-gray-100 focus:outline-none  col-span-1`
-                            }
-                          >
-                            {({
-                              active,
-                              checked,
-                            }) => (
-                              <>
-                                <div className="flex w-full items-center justify-between">
-                                  <div className="flex items-center">
-                                    <div className="text-sm">
-                                      <RadioGroup.Label
-                                        as="div"
-                                        className={`font-medium  ${checked
-                                          ? "text-gray-900"
-                                          : "text-gray-900"
-                                          }`}
-                                      >
-                                        <div className="flex items-center gap-4">
-                                          <div className="w-10 h-10 rounded-full">
-                                            <img
-                                              className="w-full h-full object-contain"
-                                              src={
-                                                item.image
-                                              }
-                                              alt=""
-                                            />
-                                          </div>
-                                          {
-                                            item.name_ar
-                                          }
-                                        </div>
-                                      </RadioGroup.Label>
-                                    </div>
-                                  </div>
-                                  {checked ? (
-                                    <div className="before:absolute before:content-[''] before:w-3 before:h-3 before:rounded-full before:bg-[#009414]   shrink-0 w-4 h-4 rounded-full ring-1 ring-surface text-surface flex justify-center items-center text-xs">
-                                      {/* <CheckIcon className="h-6 w-6" /> */}
-                                    </div>
-                                  ) : (
-                                    <div className="shrink-0 w-4 h-4 rounded-full ring-1 ring-surface text-surface flex justify-center items-center">
-                                      {/* <CheckIcon className="h-6 w-6" /> */}
-                                    </div>
-                                  )}
-                                </div>
-                              </>
-                            )}
-                          </RadioGroup.Option>
-                        )
-                      )}
-                    </div>
-                  </RadioGroup>
-                </div>
-
-                <div className="col-span-6">
-                  <FileInput
-                    onFileChange={(img) =>
-                      takeUploadedImg(img)
-                    }
-                    state="add"
-                    title="ارفاق صورة التحويل"
-                  />
-                </div>
-
-
-
-
-
-
-
-              </div>
-
-
-
-
-            </form >
-          </div>
-
-
-
-        </UIBaseDialog>
-
-
 
         <UIBaseDialog
           confirmCloseHandler={resetForm}
@@ -631,88 +481,58 @@ export default function rubbush_collectors() {
           }
         >
           <div>
-            <form onSubmit={handleAddPayment} className="">
+            <form onSubmit={(e) => handleAddPayment(e)} id="update-form" className="">
               <div className="grid grid-cols-12 space-y-5 gap-7">
 
-
                 <div className="col-span-12">
-                  <SelectInput
-                    items={categoryList}
-                    placeholder="ادخل نوع الخدمة"
-                    name=""
-                    itemName="name_ar"
-                    itemValue="id"
-                    value={addPaymentFormData.category_id}
-                    label=" نوع الخدمة"
-                    onChange={(value) =>
-                      setAddPaymentFormData((prev) => ({
-                        ...prev,
-                        ["category_id"]: value,
-                      }))
-                    }
-                  ></SelectInput>
+                  <ComboBoxNehal onChange={(e) => handleSelectedUser(e)} listItem={userList} itemName="name" itemValue="id" value={(addPaymentFormData.user_id ?? "").toString()} label="اسم المستخدم" />
+
                 </div>
-
-
                 <div className="col-span-12">
-                  <SelectInput
-                    items={packagesList}
-                    placeholder="ادخل نوع الباقه"
-                    name="package_id"
-                    itemName="name_ar"
-                    itemValue="id"
-                    value={addPaymentFormData.package_id}
-                    label=" نوع الباقة"
-                    onChange={(value) =>
-                      handleSelectPackage(value)
+                  <TextFieldNada
+                    disabled
+                    name="receiving_number"
+                    type="number"
+                    handleChange={(e) =>
+                      takeValue(e, "receiving_number")
                     }
-                  ></SelectInput>
+                    value={userItem?.phone ?? ""}
+                    label="رقم الاستلام"
+                    placeholder="رقم الاستلام"
+                  ></TextFieldNada>
+                </div>
+
+
+                <div className="col-span-6">
+                  <TextFieldNada
+                    disabled
+                    name="deserved_money_by_recycle"
+                    type="number"
+                    handleChange={(e) =>
+                      takeValue(e, "deserved_money_by_recycle")
+                    }
+                    value={userItem?.deserved_money_by_recycle ?? 0}
+                    label="الرصيد "
+                    placeholder=" ادخل الرصيد"
+                  ></TextFieldNada>
                 </div>
 
 
 
                 <div className="col-span-6">
                   <TextFieldNada
-                    name="price"
+                    disabled
+                    name="all_recycle_weights"
                     type="number"
-                    handleChange={(e) =>
-                      takeValue(e, "units")
-                    }
-                    value={
-                      packageItem
-                        ? packageItem.price_per_unit
-                        : 0
-                    }
-                    label=" سعر الباقة "
-                    placeholder="  سعر الباقة "
+                    // handleChange={(e) =>
+                    //   takeValue(e, "units")
+                    // }
+                    value={userItem?.all_recycle_weights ?? 0}
+                    label="الوزن "
+                    placeholder=" ادخل الوزن"
                   ></TextFieldNada>
                 </div>
 
-                <div className="col-span-6">
-                  <TextFieldNada
-                    name="units"
-                    type="number"
-                    handleChange={(e) =>
-                      takeValue(e, "units")
-                    }
-                    value={addPaymentFormData.units}
-                    label=" عدد الوحدات "
-                    placeholder=" عدد الوحدات "
-                  ></TextFieldNada>
-                </div>
-
-                <div className="col-span-6">
-                  <TextFieldNada
-                    name="price"
-                    type="number"
-                    handleChange={(e) =>
-                      takeValue(e, "price")
-                    }
-                    value={totalPrice.toString()}
-                    label="السعر الكلي "
-                    placeholder="  السعر الكلي "
-                  ></TextFieldNada>
-                </div>
 
 
                 <div className="col-span-12">
@@ -839,16 +659,7 @@ export default function rubbush_collectors() {
 
 
 
-  useEffect(() => {
-    if (packageItem) {
-      setTotalPrice(Number(packageItem.price_per_unit) * addPaymentFormData.units);
-    }
-  }, [addPaymentFormData.units]);
-  useEffect(() => {
-    if (packageItem) {
-      setTotalPrice(Number(packageItem.price_per_unit) * addPaymentFormData.units);
-    }
-  }, [packageItem]);
+
   useEffect(() => {
     fetchDataList();
   }, [page]); // runs every time `page` changes
@@ -867,7 +678,9 @@ export default function rubbush_collectors() {
             <tr key={index}>
               <td className="py-2 px-4">{item.id}</td>
               <td className="py-2 px-4">{item.user_name}</td>
+              <td className="py-2 px-4">{item.subscription?.package.name}</td>
               <td className="py-2 px-4">{item.subscription?.units ?? "-"}</td>
+              <td className="py-2 px-4">{item.added_by == "user" ? 'مستخدم' : 'مسئول'}</td>
               <td className="py-2 px-4">{item.total_price}</td>
               <td className="py-2 px-4">{item.created_at}</td>
               <td className="py-2 px-4">

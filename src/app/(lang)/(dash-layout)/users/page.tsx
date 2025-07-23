@@ -95,7 +95,8 @@ export default function rubbush_collectors() {
         : "";
     const hasSearch = search ? "&search=" + search : "";
 
-    const query = `?${hasSearch}${isActive}${isSubscribe}`;
+    const query = `?${page}${hasSearch}${isActive}${isSubscribe}`;
+    
 
     getUserService(query).then((response) => {
       //@ts-ignore

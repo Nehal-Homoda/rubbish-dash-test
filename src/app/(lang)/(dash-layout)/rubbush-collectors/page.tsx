@@ -134,7 +134,7 @@ export default function rubbush_collectors() {
                     : "&is_active=" + 0
                 : "";
         const hasSearch = search ? "&search=" + search : "";
-        const hasDistrect = distrect_id ? "&distrect_id=" + distrect_id : "";
+        const hasDistrect = distrect_id ? "&district_id=" + distrect_id : "";
 
         const query = `?${hasSearch}${isActive}${hasDistrect}`;
 

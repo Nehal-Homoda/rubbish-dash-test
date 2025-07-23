@@ -38,7 +38,7 @@ export default function ComboBoxNehal({ listItem,
 
 
     }
-    const [selectedValue,setSelectedValue]=useState(listItem[0])
+    const [selectedValue,setSelectedValue]=useState()
 
     return (
         <>
@@ -46,10 +46,11 @@ export default function ComboBoxNehal({ listItem,
             <Combobox value={selectedValue} onChange={(item) => handleSelectedItem(item)} onClose={() => setQuery('')}>
                 <div className='relative'>
 
-                    <ComboboxInput className="max-w-full w-full relative  p-1.5 border border-surface-light-700 rounded-2xl"
+                    <ComboboxInput className="max-w-full w-full relative py-3 px-5 border border-surface-light-700 rounded-2xl"
                         aria-label="Assignee"
                         displayValue={(item) => {
                             if (!item) return '';
+                            // @ts-ignore
                             return itemName ? item[itemName] : item;
                         }}
                         onChange={(event) => setQuery(event.target.value)}
@@ -59,9 +60,9 @@ export default function ComboBoxNehal({ listItem,
                         <label>{label}</label>
                     </div>
 
-                    <ComboboxOptions className="border empty:invisible max-w-full cursor-pointer">
+                    <ComboboxOptions className="h-64 overflow-y-auto empty:invisible max-w-full px-5 py-3 cursor-pointer absolute z-50 w-full ltr:left-0 rtl:right-0 mt-2 origin-top-right divide-y rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
                         {filteredPeople.map((item, index) => (
-                            <ComboboxOption key={index} value={item} className="data-focus:bg-blue-100">
+                            <ComboboxOption key={index} value={item} className="data-focus:bg-blue-100 py-4">
                                 {itemName ? item[itemName] : item}
                             </ComboboxOption>
                         ))}
