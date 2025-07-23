@@ -1,7 +1,5 @@
-
-
 export interface AppUser {
-    id:number,
+    id: number;
     name: string;
     phone: string;
     is_active: boolean;
@@ -12,6 +10,8 @@ export interface AppUser {
     payment: any;
     subscription: Subscription;
     created_at: string;
+    deserved_money_by_recycle: number;
+    all_recycle_weights: number;
 }
 
 export interface Payment {
@@ -22,7 +22,7 @@ export interface Payment {
     status: string;
     user_id: number;
     user_name: string;
-    payment_method: null |PaymentMethod;
+    payment_method: null | PaymentMethod;
     created_at: string;
 }
 
@@ -76,7 +76,7 @@ export interface Address {
     id: number;
     title: string;
     detail: any;
-   
+
     created_at: string;
 }
 

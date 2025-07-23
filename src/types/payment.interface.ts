@@ -5,6 +5,7 @@ export interface Payment {
     total_price: number;
     payment_verification?: string;
     receiving_number: string;
+    added_by: string;
     status: string;
     user_id: number;
     user_name: string;
@@ -13,12 +14,11 @@ export interface Payment {
     subscription: Subscription2 | null;
 }
 
-
 export interface PaymentMethod {
-  id: number
-  name_en: string
-  name_ar: string
-  image: string
-  order?: number
-  is_active: boolean
+    id: number;
+    name_en: string;
+    name_ar: string;
+    image: string;
+    order?: number;
+    is_active: boolean;
 }

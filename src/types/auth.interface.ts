@@ -59,6 +59,8 @@ export interface Users {
     payment: Payment;
     subscription: Subscription2;
     created_at: string;
+    all_recycle_weights:number;
+    deserved_money_by_recycle:number;
 }
 
 export interface Payment {

@@ -33,20 +33,23 @@ export default function page() {
             //@ts-ignore
             setUser(response.data);
         })
-        .catch(() => {
+            .catch(() => {
 
-        })
+            })
     };
     const btnTabs = [
         { name: "الملف الشخصي", type: "personal-data" },
         { name: "الاشتراك", type: "subscription" },
         { name: "المدفوعات", type: "payment" },
     ];
+
+    const userRubbish = [{ title: 'الوزن', number: user?.all_recycle_weights }, { title: 'الكيلو', number: user?.deserved_money_by_recycle }]
+
     //@ts-ignore
     const handleChangeBtnType = (item) => {
         setType(item);
     };
-    
+
 
     useEffect(() => {
         if (selectedBtn) {
@@ -71,29 +74,53 @@ export default function page() {
                             <p>
                                 {!!user &&
                                     (user.subscription_name
-                                        ? user?.subscription_name
+                                        ? `مشترك / ${user?.subscription_name} `
                                         : "غير مشترك")}
                             </p>
                         </div>
-                        <div className="flex items-center gap-4">
-                            {btnTabs.map((item, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() =>
-                                        handleChangeBtnType(item.type)
-                                    }
-                                    className={`relative ${
-                                        type == item.type
+
+                        <div className="flex justify-between items-center ">
+
+                            <div className="flex items-center gap-4">
+                                {btnTabs.map((item, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() =>
+                                            handleChangeBtnType(item.type)
+                                        }
+                                        className={`relative ${type == item.type
                                             ? "before:absolute  before:w-full before:h-[0.5] before:-bottom-3 before:bg-white "
                                             : ""
-                                    }`}
-                                >
-                                    {item.name}
-                                </button>
-                            ))}
+                                            }`}
+                                    >
+                                        {item.name}
+                                    </button>
+                                ))}
+                            </div>
+
+
+                            <div className="flex justify-center gap-3">
+
+                                {userRubbish.map((item, index) => (
+
+                                    <div key={index} className="py-1  min-w-32 bg-[#FFFFFF24] rounded-lg text-center ">
+                                        <p>{item.title}</p>
+                                        <p className="font-semibold">{item.number} </p>
+
+                                    </div>
+
+                                ))}
+
+                               
+
+                            </div>
+
+
                         </div>
                     </div>
                 </div>
+
+
 
                 <div>
                     {type == "personal-data" && user && (
@@ -104,7 +131,7 @@ export default function page() {
                         // 
                         !user.has_subscription ? <>
                             <div className="py-5 text-end">
-                                <button onClick={() => {setShowAddSubscription(true)}} className="delete-subscription-btn text-nowrap  px-7 py-2 bg-surface-light-800 hover:bg-surface-light-700 ring-1 ring-surface duration-150 text-surface rounded-md">
+                                <button onClick={() => { setShowAddSubscription(true) }} className="delete-subscription-btn text-nowrap  px-7 py-2 bg-surface-light-800 hover:bg-surface-light-700 ring-1 ring-surface duration-150 text-surface rounded-md">
                                     <span className="">
                                         اضافة اشتراك
                                     </span>
@@ -112,11 +139,11 @@ export default function page() {
                                 </button>
                             </div>
                             {
-                                showAddSubscription && <AddNewSubscription getNewUser={(value) => {setUser(value)}} user={user} />
+                                showAddSubscription && <AddNewSubscription getNewUser={(value) => { setUser(value) }} user={user} />
                             }
-                            
+
                         </> : <>
-                        <Subscription user={user} />
+                            <Subscription user={user} />
                         </>
                     )}
                     {type == "payment" && user && <Payment user={user} />}

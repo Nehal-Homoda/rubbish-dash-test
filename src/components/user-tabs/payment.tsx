@@ -184,7 +184,7 @@ export default function rubbush_collectors({ user }: Props) {
     });
   };
 
-  const handleSelectPackage = (value) => {
+  const handleSelectPackage = (value: any) => {
     setFormData((prev) => ({
       ...prev,
       ["package_id"]: value,
@@ -213,7 +213,7 @@ export default function rubbush_collectors({ user }: Props) {
 
   }
 
-  const takeValue = (e, name) => {
+  const takeValue = (e: any, name: any) => {
     console.log('name is', name)
     console.log(e.target.value);
     setFormData((prev) => ({
@@ -229,7 +229,7 @@ export default function rubbush_collectors({ user }: Props) {
   };
 
 
-  const handleSelecteditem = (item) => {
+  const handleSelecteditem = (item: any) => {
     console.log("itemssssss", item);
     setSelected(item);
     setFormData((prev) => ({
@@ -241,7 +241,7 @@ export default function rubbush_collectors({ user }: Props) {
   };
 
 
-  const takeUploadedImg = (img) => {
+  const takeUploadedImg = (img: any) => {
     console.log(img);
   };
 

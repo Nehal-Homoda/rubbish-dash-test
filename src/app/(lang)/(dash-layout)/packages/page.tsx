@@ -15,7 +15,7 @@ import {
   updatePackageService,
 } from "@/services/packagesOffersService";
 import { PackageOffer } from "@/types/packagesOffer.interface";
-import { getCategoriesService } from "@/services/categoriesService";
+import { getCategoriesService, getCategoryByIdService } from "@/services/categoriesService";
 import { Category } from "@/types/categories.interface";
 
 export default function rubbush_collectors() {
@@ -40,6 +40,10 @@ export default function rubbush_collectors() {
   const [selectedDataItem, setSelectedDataItem] = useState<PackageOffer | null>(
     null
   );
+  const [categoryItem, setCategoryItem] = useState<Category | null>(null)
+  const [recyclePrice, setRecyclePrice] = useState(0)
+
+
   type FormDataType = {
     name_ar: string;
     name_en: string;
@@ -48,6 +52,7 @@ export default function rubbush_collectors() {
     price_per_unit: number | string;
     order: number;
     days_count: number | string;
+    recycle_price?: number | string
   };
   const [formData, setFormData] = useState<FormDataType>({
     name_ar: "",
@@ -57,6 +62,7 @@ export default function rubbush_collectors() {
     price_per_unit: "",
     order: 0,
     days_count: "",
+    recycle_price: ""
   });
 
   const [updateFormData, setUpdateFormData] = useState<FormDataType>({
@@ -173,10 +179,13 @@ export default function rubbush_collectors() {
     e: React.ChangeEvent<HTMLInputElement>,
     index?: number
   ) => {
+
+
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
+
 
     console.log(e.target.name, e.target.value);
   };
@@ -200,6 +209,7 @@ export default function rubbush_collectors() {
     for (const keyName in formData) {
       //@ts-ignore
       fd.append(keyName, formData[keyName]);
+
     }
 
     addPackageService(fd)
@@ -219,6 +229,23 @@ export default function rubbush_collectors() {
       })
       .catch((error) => { });
   };
+
+
+  const handleSelectedCategory = (value: any) => {
+    setFormData((prev) => ({
+      ...prev,
+      ["category_id"]: value,
+    }));
+    // const selected = categories.find((item, index) => {
+    //   return item.id == value
+    // })
+    // if (!selected) return
+    // setSelectedCategory(selected)
+
+    getCategoryByIdService(value).then((response) => {
+      setCategoryItem(response.data)
+    })
+  }
 
   const tableHeadActionsSlot = () => {
     return (
@@ -288,10 +315,11 @@ export default function rubbush_collectors() {
                     name="category_id"
                     required={true}
                     onChange={(value) => {
-                      setFormData((prev) => ({
-                        ...prev,
-                        ["category_id"]: value,
-                      }));
+                      // setFormData((prev) => ({
+                      //   ...prev,
+                      //   ["category_id"]: value,
+                      // }));
+                      handleSelectedCategory(value)
                     }}
                   ></SelectInput>
                 </div>
@@ -322,6 +350,20 @@ export default function rubbush_collectors() {
                 label=" سعر الوحدة"
                 placeholder=" ادخل سعر الوحدة "
               ></TextFieldNada>
+
+              {categoryItem && categoryItem.has_recycle &&
+                <TextFieldNada
+                  name="recycle_price"
+                  type="number"
+                  handleChange={addFormChangeHander}
+                  value={recyclePrice.toString()}
+                  label=" سعر الوحدة ( اعادة التدوير ) "
+                  placeholder=" ادخل سعر الوحدة ( اعادة التدوير )"
+
+                ></TextFieldNada>
+
+
+              }
               <TextFieldNada
                 name="days_count"
                 type="number"
@@ -356,6 +398,19 @@ export default function rubbush_collectors() {
       days_count: "",
     })
   }
+
+
+  useEffect(() => {
+    if (categoryItem) {
+      setRecyclePrice((Number(formData.price_per_unit) * (categoryItem.discount_value_percentage / 100)))
+    }
+  }, [categoryItem])
+  useEffect(() => {
+    if (categoryItem) {
+      setRecyclePrice((Number(formData.price_per_unit) * (categoryItem.discount_value_percentage / 100)))
+    }
+  }, [formData.price_per_unit])
+
   useEffect(() => {
     fetchDataList();
     fetchCategories();

@@ -28,7 +28,7 @@ import { RadioGroup } from "@headlessui/react";
 import { Users } from "@/types/auth.interface";
 import { addSubscriptionService } from "@/services/subscriptionService";
 import * as Yup from 'yup'
-import { validateAllInputs } from "@/utils/shared";
+import { successDialog, validateAllInputs } from "@/utils/shared";
 
 type Props = {
     user: Users;
@@ -223,6 +223,8 @@ export default function AddNewSubscription({ user, getNewUser }: Props) {
         addSubscriptionService(fd)
             .then((response) => {
                 // router.push("/users");
+                
+                successDialog(true)
                 window.location.reload();
                 getNewUser(response.data)
             })
