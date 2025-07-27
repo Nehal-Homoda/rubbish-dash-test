@@ -16,6 +16,7 @@ type Props = {
     required?: boolean;
     iconType?: "mdi" | "fa";
     disabled?: boolean;
+    isPrice?: boolean;
     handleChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
@@ -32,7 +33,8 @@ export default function TextFieldNada({
     errorMessage = "",
     required = true,
     iconType = "mdi",
-    disabled= false,
+    disabled = false,
+    isPrice = false,
     handleChange,
 }: Props) {
     const [inputType, setInputType] = useState(type);
@@ -79,6 +81,10 @@ export default function TextFieldNada({
                                 min={type === 'date' ? startDate : undefined}
                                 readOnly={disabled}
                             />
+
+                            {isPrice && <div className="px-4 h-full flex justify-center items-center absolute top-0 left-0  border-r ">
+                                جنيه
+                            </div>}
                         </div>
 
                         {type === "password" ? (
@@ -89,30 +95,26 @@ export default function TextFieldNada({
                                 {inputType === "text" ? (
                                     iconType === "fa" ? (
                                         <i
-                                            className={`${
-                                                eyeOpen || "fa-regular fa-eye"
-                                            } text-2xl text-foreground/45`}
+                                            className={`${eyeOpen || "fa-regular fa-eye"
+                                                } text-2xl text-foreground/45`}
                                         />
                                     ) : (
                                         <span
-                                            className={`${
-                                                eyeOpen || "mdi mdi-eye-outline"
-                                            } text-2xl text-foreground/45`}
+                                            className={`${eyeOpen || "mdi mdi-eye-outline"
+                                                } text-2xl text-foreground/45`}
                                         />
                                     )
                                 ) : iconType === "fa" ? (
                                     <i
-                                        className={`${
-                                            eyeClosed ||
+                                        className={`${eyeClosed ||
                                             "fa-regular fa-eye-slash"
-                                        } text-2xl text-foreground/45`}
+                                            } text-2xl text-foreground/45`}
                                     />
                                 ) : (
                                     <span
-                                        className={`${
-                                            eyeClosed ||
+                                        className={`${eyeClosed ||
                                             "mdi mdi-eye-off-outline"
-                                        } text-2xl text-foreground/45`}
+                                            } text-2xl text-foreground/45`}
                                     />
                                 )}
                             </div>
