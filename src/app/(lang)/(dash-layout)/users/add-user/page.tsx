@@ -64,15 +64,15 @@ export default function page() {
                 setTotalPrice(selectedPackage.price_per_unit * formData.units);
             }
         }
-        if (name == "start_date") {
-            if (packageItem && packageItem.name_ar == 'باقه 6 شهور') {
-                setFormData((prev) => ({
-                    ...prev,
-                    ['end_date']: moment(formData.start_date).add(30, 'days').format('YYYY-MM-DD')
-                }))
+        // if (name == "start_date") {
+        //     if (packageItem && packageItem.name_ar == 'باقه 6 شهور') {
+        //         setFormData((prev) => ({
+        //             ...prev,
+        //             ['end_date']: moment(formData.start_date).add(30, 'days').format('YYYY-MM-DD')
+        //         }))
 
-            }
-        }
+        //     }
+        // }
     };
 
     //   const form = {
