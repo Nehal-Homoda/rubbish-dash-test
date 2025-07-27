@@ -81,7 +81,8 @@ export default function rubbush_collectors() {
     search = "",
     is_active = undefined,
     is_subscription = undefined,
-  }: { search?: string; is_active?: boolean | undefined; is_subscription?: boolean | undefined; } = {}) => {
+    page = undefined
+  }: { search?: string; is_active?: boolean | undefined; is_subscription?: boolean | undefined; page?: number | undefined } = {}) => {
     console.log(is_active);
     const isActive = is_active != undefined ? is_active ? "&is_active=" + 1 : "&is_active=" + 0 : "";
 
@@ -95,8 +96,12 @@ export default function rubbush_collectors() {
         : "";
     const hasSearch = search ? "&search=" + search : "";
 
-    const query = `?${page}${hasSearch}${isActive}${isSubscribe}`;
-    
+    // const query = `?${page}${hasSearch}${isActive}${isSubscribe}`;
+    const hasPagination = page ? "page=" + page : ""
+
+
+    const query = hasPagination ? `?${hasPagination}` : `?${hasSearch}${isActive}${isSubscribe}`;
+
 
     getUserService(query).then((response) => {
       //@ts-ignore
@@ -234,7 +239,7 @@ export default function rubbush_collectors() {
     );
   };
   useEffect(() => {
-    fetchDataList();
+    fetchDataList({ page: page });
   }, [page]); // runs every time `page` changes
 
   return (
