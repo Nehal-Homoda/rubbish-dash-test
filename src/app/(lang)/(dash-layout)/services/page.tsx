@@ -116,7 +116,7 @@ export default function rubbush_collectors() {
         : "";
     const hasSearch = search ? "&search=" + search : "";
 
-    const query = `?${hasSearch}${isActive}`;
+    const query = `?page=${page}${hasSearch}${isActive}`;
 
     getCategoriesService(query)
       .then((response) => {

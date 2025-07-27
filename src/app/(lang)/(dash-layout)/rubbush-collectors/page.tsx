@@ -136,7 +136,7 @@ export default function rubbush_collectors() {
         const hasSearch = search ? "&search=" + search : "";
         const hasDistrect = distrect_id ? "&district_id=" + distrect_id : "";
 
-        const query = `?${hasSearch}${isActive}${hasDistrect}`;
+        const query = `?page=${page}${hasSearch}${isActive}${hasDistrect}`;
 
         getCollectorsService(query)
             .then((response) => {

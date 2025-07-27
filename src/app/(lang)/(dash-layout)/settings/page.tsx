@@ -16,12 +16,14 @@ export default function settings() {
         android_version: string;
         vodafone_cash_number: number;
         instapay_number: string;
+        recycle_price_by_kilo:number
     };
     const [formData, setFormData] = useState<FormDataType>({
         ios_version: "",
         android_version: "",
         vodafone_cash_number: 0,
         instapay_number: '',
+        recycle_price_by_kilo:0
     });
     const fetchSettingData = () => {
         getSettingService()
@@ -33,6 +35,7 @@ export default function settings() {
                     ios_version: response.data.ios_version,
                     vodafone_cash_number: parseInt(response.data.wallet_number),
                     instapay_number: response.data.instapay_number,
+                    recycle_price_by_kilo:response.data.recycle_price_by_kilo
                 });
             })
             .catch(() => {});
@@ -65,6 +68,7 @@ export default function settings() {
             ios_version: settingData?.ios_version ?? "",
             vodafone_cash_number: parseInt(settingData?.wallet_number ?? ""),
             instapay_number: settingData?.instapay_number ?? "",
+            recycle_price_by_kilo:settingData?.recycle_price_by_kilo ?? 0
         });
     };
 
@@ -114,6 +118,14 @@ export default function settings() {
                         value={formData.instapay_number}
                         label=" رقم انستاباي"
                         placeholder=" ادخل رقم انستاباي "
+                    ></TextFieldNada>
+                    <TextFieldNada
+                        name="recycle_price_by_kilo"
+                        type="number"
+                        handleChange={addFormChangeHander}
+                        value={formData.recycle_price_by_kilo}
+                        label="سعر الكليو"
+                        placeholder=""
                     ></TextFieldNada>
                     {/* <TextFieldNada
                         name="name_en"

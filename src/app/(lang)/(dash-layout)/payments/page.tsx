@@ -44,6 +44,7 @@ export default function rubbush_collectors() {
     { text: " اسم الباقة", name: "name_ar" },
     { text: " عدد الوحدات", name: "name_ar" },
     { text: " تمت الاضافة بواسطة", name: "added_by" },
+    { text: " نوع الدفع", name: "type" },
     { text: " السعر الكلي", name: "name_ar" },
     { text: " تاريخ الدفع", name: "name_ar" },
     { text: "الحالة", name: "is_active" },
@@ -196,7 +197,7 @@ export default function rubbush_collectors() {
     const isActive = is_active ? "&status=" + is_active : "";
     const hasSearch = search ? "&search=" + search : "";
 
-    const query = `?${hasSearch}${isActive}`;
+    const query = `?page=${page}${hasSearch}${isActive}`;
 
     getPaymentsService(query)
       .then((response) => {
@@ -427,7 +428,7 @@ export default function rubbush_collectors() {
     console.log('img', img)
     setAddPaymentFormData((prev) => ({
       ...prev,
-      ['payment_verification']: img
+      ['payment_verification']: img.file
 
     }))
 
@@ -681,6 +682,7 @@ export default function rubbush_collectors() {
               <td className="py-2 px-4">{item.subscription?.package.name}</td>
               <td className="py-2 px-4">{item.subscription?.units ?? "-"}</td>
               <td className="py-2 px-4">{item.added_by == "user" ? 'مستخدم' : 'مسئول'}</td>
+              <td className="py-2 px-4">{item.type}</td>
               <td className="py-2 px-4">{item.total_price}</td>
               <td className="py-2 px-4">{item.created_at}</td>
               <td className="py-2 px-4">

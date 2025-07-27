@@ -12,6 +12,7 @@ export interface Payment {
     payment_method: PaymentMethod;
     created_at: string;
     subscription: Subscription2 | null;
+    type:string;
 }
 
 export interface PaymentMethod {

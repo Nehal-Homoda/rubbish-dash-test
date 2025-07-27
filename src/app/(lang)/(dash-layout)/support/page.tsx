@@ -64,7 +64,7 @@ export default function rubbush_collectors() {
     const isActive = status != undefined ? "&status=" + status : "";
     const hasSearch = search ? "&search=" + search : "";
 
-    const query = `?${hasSearch}${isActive}`;
+    const query = `?page=${page}${hasSearch}${isActive}`;
 
     getTicketsService(query)
       .then((response) => {

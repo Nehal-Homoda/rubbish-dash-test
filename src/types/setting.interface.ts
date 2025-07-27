@@ -18,4 +18,5 @@ export interface Setting {
   youtube: string
   tiktok: string
   twitter: any
+  recycle_price_by_kilo:number
 }
