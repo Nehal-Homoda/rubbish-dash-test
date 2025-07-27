@@ -25,6 +25,7 @@ import { addUserService } from "@/services/userService";
 import { useRouter } from "next/navigation";
 import { Payment_methods } from "@/types/paymentMethod.interface";
 import { RadioGroup } from "@headlessui/react";
+import moment from "moment";
 
 export default function page() {
     const [district, setDistrict] = useState<Region[]>([]);
@@ -61,6 +62,15 @@ export default function page() {
                 // }))
                 //@ts-ignore
                 setTotalPrice(selectedPackage.price_per_unit * formData.units);
+            }
+        }
+        if (name == "start_date") {
+            if (packageItem && packageItem.name_ar == 'باقه 6 شهور') {
+                setFormData((prev) => ({
+                    ...prev,
+                    ['end_date']: moment(formData.start_date).add(30, 'days').format('YYYY-MM-DD')
+                }))
+
             }
         }
     };
@@ -150,6 +160,8 @@ export default function page() {
         payment_method_id: "",
         days: [],
         start_date: "",
+
+        end_date: "",
         time_from: "",
         units: 1,
         category_id: "",
@@ -175,6 +187,23 @@ export default function page() {
             setTotalPrice(Number(packageItem.price_per_unit) * formData.units);
         }
     }, [packageItem]);
+
+    useEffect(() => {
+        if (packageItem) {
+            setFormData((prev) => ({
+                ...prev,
+                ['end_date']: moment(formData.start_date).add(packageItem.days_count, 'days').format('YYYY-MM-DD')
+            }))
+        }
+    }, [packageItem])
+    useEffect(() => {
+        if (packageItem) {
+            setFormData((prev) => ({
+                ...prev,
+                ['end_date']: moment(formData.start_date).add(packageItem.days_count, 'days').format('YYYY-MM-DD')
+            }))
+        }
+    }, [formData.start_date])
 
     //@ts-ignore
     const handleSelectPackage = (value) => {
@@ -239,6 +268,10 @@ export default function page() {
         { title: 'الجمعه ', slug: 'friday' },
 
     ]);
+
+    const maxEndDate = packageItem && formData.start_date
+        ? moment(formData.start_date).add(30, 'days').format('YYYY-MM-DD')
+        : undefined;
 
 
 
@@ -435,6 +468,19 @@ export default function page() {
                                             value={formData.start_date}
                                             label="تاريخ البدأ "
                                             placeholder="  السعر الكلي *"
+                                        ></TextFieldNada>
+                                    </div>
+                                    <div className="col-span-6">
+                                        <TextFieldNada
+                                            name="end_date"
+                                            type="date"
+                                            handleChange={(e) =>
+                                                takeValue(e, "end_date")
+                                            }
+                                            value={formData.end_date}
+                                            label="تاريخ الانتهاء "
+                                            placeholder="تاريخ الانتهاء "
+
                                         ></TextFieldNada>
                                     </div>
 
