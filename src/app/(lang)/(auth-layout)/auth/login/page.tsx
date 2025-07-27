@@ -40,8 +40,8 @@ export default function AuthLoginPage() {
     });
 
     const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
-        email: "",
-        password: "",
+        email: "البريد الإلكتروني هو حقل مطلوب",
+        password: "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل",
     });
     const [errorMsg, setErrorMsg] = useState("");
 

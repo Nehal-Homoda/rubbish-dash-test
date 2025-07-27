@@ -19,6 +19,7 @@ import { Category } from "@/types/categories.interface";
 import { Visit } from "@/types/visits.interface";
 import {
     deleteVisitsService,
+    getVisitsByIdService,
     getVisitsService,
     updateVisitsService,
 } from "@/services/visitService";
@@ -71,30 +72,30 @@ export default function rubbush_collectors() {
         search = "",
         status = undefined,
         category_id = undefined,
-        page=undefined
+        page = undefined
     }: {
         search?: string;
         status?: string;
         category_id?: number | undefined;
-        page?:number | undefined
+        page?: number | undefined
     } = {}) => {
         console.log(status);
         const statusParam = status != undefined ? "&status=" + status : "";
         const category =
             category_id != undefined ? "&category_id=" + category_id : "";
         const hasSearch = search ? "&search=" + search : "";
-        const hasPagination= page ? "page=" + page : ""
-        
-        
-        const query =hasPagination ? `?${hasPagination}` : `?${hasSearch}${statusParam}${category}`;
+        const hasPagination = page ? "page=" + page : ""
+
+
+        const query = hasPagination ? `?${hasPagination}` : `?${hasSearch}${statusParam}${category}`;
 
         getVisitsService(query).then((response) => {
             setDataList(response.data);
             setTotalPages(response.meta.last_page);
         })
-        .catch(() => {
-            
-        })
+            .catch(() => {
+
+            })
     };
     const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         fetchDataList({ search: e.target.value });
@@ -120,7 +121,7 @@ export default function rubbush_collectors() {
 
                 console.log(response);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     const deleteSubmit = (item: Visit, selectedIndex: number) => {
@@ -131,11 +132,15 @@ export default function rubbush_collectors() {
                 setDataList(updatedArr);
                 successDialog(true);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     const updateDataItem = (item: Visit) => {
         setSelectedDataItem(item);
+        getVisitsByIdService(item.id).then((response) => {
+            console.log('response is', response.data)
+            setSelectedDataItem(response.data)
+        })
     };
 
     const updateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -152,7 +157,7 @@ export default function rubbush_collectors() {
                 fetchDataList();
                 successDialog(true);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     const updateFormChangeHander = (
@@ -171,7 +176,7 @@ export default function rubbush_collectors() {
         if (name === "not_collected")
             return "bg-red-100 text-red-600 hover:bg-text-red-200";
         if (name === "in_progress") return "bg-blue-100 text-blue-600 hover:bg-text-blue-200";
-        if (name === "collected") return undefined;
+        if (name === "collected") return "bg-green-100 text-green-500 ";
         if (name === "pending")
             return "bg-yellow-100 text-yellow-600 hover:bg-text-yellow-200";
     };
@@ -210,10 +215,10 @@ export default function rubbush_collectors() {
             .then((response) => {
                 setCategories(response.data);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
     useEffect(() => {
-        fetchDataList({page:page});
+        fetchDataList({ page: page });
         fetchCategories();
     }, [page]); // runs every time `page` changes
 
@@ -267,8 +272,8 @@ export default function rubbush_collectors() {
                                     </UIDialogConfirm>
                                     <UIBaseDialog
                                         hideConfirmBtn
-                                        title="تعديل منطقه"
-                                        confirmHandler={() => {}}
+                                        title="تفاصيل الزيارة "
+                                        confirmHandler={() => { }}
                                         confirmText="اضافة"
                                         form="update-form"
                                         btn={
@@ -286,7 +291,32 @@ export default function rubbush_collectors() {
                                             onSubmit={updateSubmit}
                                             id="update-form"
                                         >
-                                            <div className="space-y-7">
+                                            <div className="space-y-10">
+
+
+                                                <div className={`flex justify-start items-center `}>
+                                                    <div className={`text-start w-full py-3  px-4  rounded-lg  ${statusDropdownColor(
+                                                    item.status
+                                                )}`}>
+                                                        {selectedDataItem ? statusDropdownName(selectedDataItem.status) : ''}
+
+                                                    </div>
+                                                </div>
+
+
+                                                {/* <div className="flex items-center justify-start">
+                                                    <div
+                                                        className={`text-start py-2 px-5 rounded-md ${statusDropdownColor(
+                                                            item.status
+                                                        )}`}
+                                                    >
+                                                        {statusDropdownName(
+                                                            item.status
+                                                        )}
+                                                    </div>
+                                                </div> */}
+
+
                                                 <div className="relative py-3 px-5 border border-surface-light-700 rounded-2xl">
                                                     <div className="label flex items-center gap-1 absolute -top-4 start-4 bg-background w-fit px-3 text-sm font-semibold">
                                                         <label>
@@ -296,7 +326,7 @@ export default function rubbush_collectors() {
                                                     <div className="flex justify-between items-center">
                                                         <div className="text-start w-full py-2 ">
                                                             {
-                                                                selectedDataItem?.user_note  ? selectedDataItem?.user_note : 'لا يوجد ملاحظة'
+                                                                selectedDataItem?.user_note ? selectedDataItem?.user_note : 'لا يوجد ملاحظة'
                                                             }
                                                         </div>
                                                     </div>
@@ -316,17 +346,7 @@ export default function rubbush_collectors() {
                                                     </div>
                                                 </div>
 
-                                                <div className="flex items-center justify-start">
-                                                    <div
-                                                        className={`text-start py-2 px-5 rounded-md ${statusDropdownColor(
-                                                            item.status
-                                                        )}`}
-                                                    >
-                                                        {statusDropdownName(
-                                                            item.status
-                                                        )}
-                                                    </div>
-                                                </div>
+
                                             </div>
                                         </form>
                                     </UIBaseDialog>

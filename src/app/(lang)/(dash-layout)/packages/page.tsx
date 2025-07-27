@@ -349,6 +349,7 @@ export default function rubbush_collectors() {
                 value={formData.price_per_unit}
                 label=" سعر الوحدة"
                 placeholder=" ادخل سعر الوحدة "
+                isPrice={true}
               ></TextFieldNada>
 
               {categoryItem && categoryItem.has_recycle &&
@@ -359,6 +360,7 @@ export default function rubbush_collectors() {
                   value={recyclePrice.toString()}
                   label=" سعر الوحدة ( اعادة التدوير ) "
                   placeholder=" ادخل سعر الوحدة ( اعادة التدوير )"
+                  isPrice={true}
 
                 ></TextFieldNada>
 
@@ -546,6 +548,7 @@ export default function rubbush_collectors() {
                           value={updateFormData.price_per_unit}
                           label=" سعر الوحدة"
                           placeholder=" ادخل سعر الوحدة "
+                          isPrice={true}
                         ></TextFieldNada>
                         <TextFieldNada
                           name="days_count"

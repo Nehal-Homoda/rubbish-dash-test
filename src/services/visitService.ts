@@ -80,3 +80,24 @@ export const updateVisitsService = async (id: number, body: string) => {
         throw new Error(error.message);
     }
 };
+
+
+export const getVisitsByIdService = async (id: number) => {
+    try {
+        const response = await apiCall.get(`/admins/visits/${id}`, {
+            headers: {
+                // "Content-Type": "application/json",
+            },
+        });
+        if (!response.ok) {
+            await responseErrorServiceHandler(response, "show visits");
+        }
+        const data = await response.json();
+        console.log("response data =>>>>", data);
+        return data;
+    } catch (error: any) {
+        throw new Error(error.message);
+    }
+};
+
+
