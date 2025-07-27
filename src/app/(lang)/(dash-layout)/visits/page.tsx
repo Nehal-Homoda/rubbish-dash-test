@@ -71,18 +71,22 @@ export default function rubbush_collectors() {
         search = "",
         status = undefined,
         category_id = undefined,
+        page=undefined
     }: {
         search?: string;
         status?: string;
         category_id?: number | undefined;
+        page?:number | undefined
     } = {}) => {
         console.log(status);
         const statusParam = status != undefined ? "&status=" + status : "";
         const category =
             category_id != undefined ? "&category_id=" + category_id : "";
         const hasSearch = search ? "&search=" + search : "";
-
-        const query = `?${hasSearch}${statusParam}${category}`;
+        const hasPagination= page ? "page=" + page : ""
+        
+        
+        const query =hasPagination ? `?${hasPagination}` : `?${hasSearch}${statusParam}${category}`;
 
         getVisitsService(query).then((response) => {
             setDataList(response.data);
@@ -209,7 +213,7 @@ export default function rubbush_collectors() {
             .catch((error) => {});
     };
     useEffect(() => {
-        fetchDataList();
+        fetchDataList({page:page});
         fetchCategories();
     }, [page]); // runs every time `page` changes
 
