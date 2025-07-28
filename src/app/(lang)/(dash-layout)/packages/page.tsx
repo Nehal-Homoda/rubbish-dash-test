@@ -556,6 +556,13 @@ export default function rubbush_collectors() {
       price_per_unit: "",
       order: 0,
       days_count: "",
+      discounts:
+
+        [{
+          min_units: 0,
+          max_units: '',
+          discount_rate: 0
+        }]
     })
   }
 

@@ -2,7 +2,7 @@ import { responseErrorServiceHandler } from "@/utils/shared";
 import { apiCall } from "./apiCall";
 import { User } from "@/types/auth.interface";
 import { ResponseData } from "@/types/shared";
-import { ChartData, HomeCollector, HomePayment, Statistics } from "@/types/home.interface";
+import { ChartData, HomeCollector, Statistics } from "@/types/home.interface";
 
 let token = "Bearer 160|9eiDkr7DC2EryTIiZbQbO5CoJoxE7X88IPHqcNGs7f3d3254";
 
@@ -108,7 +108,7 @@ export const paymentsHomeService = async () => {
         if (!response.ok) {
             await responseErrorServiceHandler(response, "statistics");
         }
-        const data = (await response.json()) as ResponseData<HomePayment>;
+        const data = (await response.json());
         console.log("response data =>>>>", data);
         return data;
     } catch (error: any) {
