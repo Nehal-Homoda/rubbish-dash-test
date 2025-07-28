@@ -5,6 +5,7 @@ export interface Statistics {
     no_of_none_subscriptions: number;
     completed_visited: number;
     not_collected_visited: number;
+    total_visits_count: number;
     [key: string]: number;
 }
 export interface HomeCollector {
@@ -12,9 +13,9 @@ export interface HomeCollector {
     collectors: Collector[];
 }
 
-export interface HomePayment {
-    payments: Payment[];
-}
+// export interface HomePayment {
+//     payments: Payment[];
+// }
 
 export interface Payment {
     id: number;
@@ -24,6 +25,13 @@ export interface Payment {
     user_name: string;
     payment_method_image: string;
     created_at: string;
+}
+
+export interface UserListWithRecycle {
+    id: number;
+    name: string;
+    all_recycle_weights: number;
+    deserved_money_by_recycle: number;
 }
 
 export interface ChartData {

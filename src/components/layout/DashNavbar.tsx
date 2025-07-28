@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/stores/store";
 import { logout } from "@/stores/authSlice";
     import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
 interface Props {
     isOpen: boolean;
@@ -19,11 +20,14 @@ export default function DashNavbar({ isOpen, openSidebar }: Props) {
         (state: RootState) => state.authReducer.title
     );
     const dispatch = useDispatch<AppDispatch>();
+    const router=useRouter()
+   
     // const [title, setTitle] = useState('')
 
     const logoutHander = () => {
         dispatch(logout())
-        window.location.reload()
+        router.push('/auth/login') 
+        // window.location.reload()
     };
 
 

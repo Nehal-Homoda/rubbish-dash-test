@@ -3,12 +3,15 @@
 // import ChartDemo from "@/components/ui/UIChart";
 import React, { useEffect, useState } from "react";
 import { chartStatisticsHomeService, collectorsHomeService, paymentsHomeService, statisticsHomeService } from "@/services/sharedService";
-import { ChartData, HomeCollector, HomePayment, Statistics } from "@/types/home.interface";
+import { ChartData, HomeCollector, Payment, Statistics, UserListWithRecycle } from "@/types/home.interface";
 import paymentImg from "@/assets/images/payment-img.png"
 import dynamic from 'next/dynamic';
 import { ApexOptions } from "apexcharts";
 import GoogleMap from "@/components/GoogleMap";
 import Link from "next/link";
+import BaseDataTable from "@/components/data-tables/BaseDataTable";
+import { Users } from "@/types/auth.interface";
+import { getUserService } from "@/services/userService";
 
 // ✅ Dynamically import chart component only on client side
 const ReactApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
@@ -39,6 +42,16 @@ export default function Home() {
     name: 'عدد الاشتراكات',
     data: []
   },])
+  const headerArr = [
+    { text: "ID", name: "id" },
+    { text: "اسم المستخدم", name: "name" },
+    { text: "الوزن", name: "weight" },
+    { text: "الرصيد", name: "name" },
+    { text: "الاجراءات", name: "name" },
+
+  ];
+
+  const [dataList, setDataList] = useState<Users[]>([]);
 
   const [optionsBar, setOptionsBar] = useState<ApexOptions>({
     chart: {
@@ -143,11 +156,28 @@ export default function Home() {
 
   ]);
 
+
+  const fetchDataList = () => {
+
+
+    getUserService().then((response) => {
+      //@ts-ignore
+      setDataList(response.data);
+
+
+    });
+  };
+
+  useEffect(() => {
+    fetchDataList()
+  }, [])
+
   const [userStatistics, setUserStatistics] = useState<Statistics | null>(null)
   const [collectors, setCollectors] = useState<HomeCollector | null>(null)
-  const [payment, setPayment] = useState<HomePayment | null>(null)
+  const [payment, setPayment] = useState<Payment[]>([])
   const [chartData, setChartData] = useState<ChartData | null>(null)
   const [categoryName, setCatergoryName] = useState<string[]>([])
+  const [userListRecycle, setUserListRecycle] = useState<UserListWithRecycle[]>([])
 
 
   const paymentList = [
@@ -200,8 +230,9 @@ export default function Home() {
   }
   const fetchPayments = () => {
     paymentsHomeService().then((response) => {
-      console.log(response.data)
-      setPayment(response.data)
+      console.log(response.data.payments)
+      setPayment(response.data.payments)
+      setUserListRecycle(response.data.users_request_recycle)
     })
   }
 
@@ -314,7 +345,9 @@ export default function Home() {
 
 
                   <div className=" text-[#38433B] text-2xl font-bold">
-                    {userStatistics && <span> {userStatistics[item.slug]}</span>}
+                    {userStatistics && <span>{item.slug === 'completed_visited'
+                      ? ((userStatistics[item.slug] / userStatistics.total_visits_count) * 100).toFixed(2) + '%'
+                      : userStatistics[item.slug]}</span>}
                   </div>
 
 
@@ -343,28 +376,28 @@ export default function Home() {
                 <h4 className="font-bold mb-5 text-lg">الملاحظات</h4>
                 <div className="aspect-[3/3] overflow-auto">
 
-                {collectors && collectors.notes_visit.map((item, index) => (
-                  <div key={index} className="py-5">
-                    <div className="title flex justify-between">
-                      <div className="font-bold text-[#38433B] text-base mb-1">
-                        {item.user_name}
+                  {collectors && collectors.notes_visit.map((item, index) => (
+                    <div key={index} className="py-5">
+                      <div className="title flex justify-between">
+                        <div className="font-bold text-[#38433B] text-base mb-1">
+                          {item.user_name}
+                        </div>
+                        <div className=" text-[#009414] mb-1 text-sm">
+                          {item.created_at}
+                        </div>
                       </div>
-                      <div className=" text-[#009414] mb-1 text-sm">
-                        {item.created_at}
+                      <p className="text-[#ADAAAA] mb-1 text-sm">{item.address}</p>
+                      <div className="bg-[#00000009] text-sm  rounded-lg py-2 mb-1 px-3">
+
+                        <span className="text-[#38433B]">ملاحظة :  </span>
+                        <span className="text-[#ADAAAA] ms-2">{item.user_note}</span>
+
                       </div>
-                    </div>
-                    <p className="text-[#ADAAAA] mb-1 text-sm">{item.address}</p>
-                    <div className="bg-[#00000009] text-sm  rounded-lg py-2 mb-1 px-3">
 
-                      <span className="text-[#38433B]">ملاحظة :  </span>
-                      <span className="text-[#ADAAAA] ms-2">{item.user_note}</span>
+
 
                     </div>
-
-
-
-                  </div>
-                ))}
+                  ))}
                 </div>
               </div>
             </div>
@@ -396,13 +429,14 @@ export default function Home() {
 
 
         <div className="mb-10">
-          <div className="bg-[#00000009] p-3 rounded-3xl">
-
-            <div className="lg:grid grid-cols-2  rounded-2xl  bg-background p-5 w-full ">
 
 
+          <div className="lg:grid grid-cols-2 gap-5  rounded-2xl  bg-background  w-full ">
 
-              <div>
+
+
+            <div className="bg-[#00000009] p-4 rounded-3xl ">
+              <div className="rounded-2xl bg-background  p-5 w-full h-[500px] overflow-y-auto ">
 
                 <div className="flex justify-between mb-3">
                   <div>
@@ -417,7 +451,7 @@ export default function Home() {
 
                 </div>
 
-                {payment && payment.payments.map((item, index) => (
+                {payment && payment.map((item, index) => (
                   <div key={index} className="bg-[#00000009] rounded-3xl px-2 py-1 mb-4">
 
 
@@ -457,12 +491,85 @@ export default function Home() {
 
 
 
-              <div className="lg:flex hidden justify-center items-center">
+              {/* <div className="lg:flex hidden justify-center items-center">
                 <div className="w-full aspect-[3/1.8]">
                   <img className="w-full h-full object-contain" src={paymentImg.src} alt="" />
                 </div>
-              </div>
+              </div> */}
 
+
+
+            </div>
+
+
+            <div className="bg-[#00000009] p-4 rounded-3xl ">
+              <div className="rounded-2xl bg-background  p-5 w-full h-[500px] overflow-y-auto">
+                <div className="flex justify-between mb-3">
+                  <div>
+                    <h4 className="font-bold mb-5 text-lg">المستخدمين “ اعادة التدوير “</h4>
+                  </div>
+                  <div>
+                    <button className="border-none outline-none ">
+                      <Link className="text-[#009414]" href="/payments">عرض المزيد</Link>
+                      <span className="mdi mdi-chevron-left text-[#009414] ms-5 text-xl"></span>
+                    </button>
+                  </div>
+
+
+
+
+                </div>
+
+
+                <div className="w-full overflow-x-auto min-h-[350px]">
+                  <table
+                    id="default-table"
+                    className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400"
+                  >
+                    <thead className="  text-[#38433B8F] uppercase  dark:bg-gray-700 dark:text-gray-400">
+                      <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-100 hover:bg-gray-50 dark:hover:bg-gray-600 ">
+                        {headerArr.map((item, index) => (
+                          <th
+                            key={index}
+                            scope="col"
+                            className="px-4 py-5 "
+                          >
+                            <div className="flex gap-2 text-nowrap font-bold">
+                              <div className="flex flex-col cursor-pointer space-y-0 justify-center items-center leading-none ">
+
+                              </div>
+                              <span className="cursor-pointer">
+                                {item.text}
+                              </span>
+                            </div>
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {userListRecycle.map((item, index) => (
+                        <tr key={index} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-100 hover:bg-gray-50 dark:hover:bg-gray-600">
+                          <td className="py-5 px-4">{item.id}</td>
+                          <td className="py-2 px-4">{item.name}</td>
+                          <td className="py-2 px-4">{item.all_recycle_weights}</td>
+                          <td className="py-2 px-4">{item.deserved_money_by_recycle}</td>
+                          <td className="py-2 px-4">
+
+
+
+                            <button onClick={() => { }} className="bg-blue-100 p-1 px-2 rounded-lg">
+                              <span className="mdi mdi-eye text-blue-500"></span>
+                            </button>
+                          </td>
+
+                        </tr>
+                      ))}
+
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
 
           </div>
@@ -481,7 +588,7 @@ export default function Home() {
 
 
 
-      {/* </div> */}
+
     </>
   );
 }

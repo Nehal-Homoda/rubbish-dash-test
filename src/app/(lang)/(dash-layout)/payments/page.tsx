@@ -86,6 +86,11 @@ export default function rubbush_collectors() {
 
   const [selected, setSelected] = useState<null | Payment_methods>(null);
 
+
+  const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
+  const [searchTerm, setSearchTerm] = useState("");
+
+
   type FormDataType = {
     name_ar: string;
     name_en: string;
@@ -190,14 +195,16 @@ export default function rubbush_collectors() {
 
 
   const fetchDataList = ({
-    search = "",
-    is_active = undefined,
-  }: { search?: string; is_active?: boolean | undefined } = {}) => {
+    search = searchTerm,
+    is_active = statusFilter,
+    pageNum = page
+
+  }: { search?: string; is_active?: string | undefined; pageNum?: number } = {}) => {
     console.log(is_active);
     const isActive = is_active ? "&status=" + is_active : "";
     const hasSearch = search ? "&search=" + search : "";
 
-    const query = `?page=${page}${hasSearch}${isActive}`;
+    const query = `?page=${pageNum}${hasSearch}${isActive}`;
 
     getPaymentsService(query)
       .then((response) => {
@@ -207,15 +214,43 @@ export default function rubbush_collectors() {
       })
       .catch(() => { });
 
-    getUserService().then((response) => {
+  };
+  const fetchUserList = ({
+    search = searchTerm,
+    is_active = statusFilter,
+    pageNum = page
+
+  }: { search?: string; is_active?: string | undefined; pageNum?: number } = {}) => {
+    console.log(is_active);
+    const isActive = is_active ? "&status=" + is_active : "";
+    const hasSearch = search ? "&search=" + search : "";
+
+    const query = `?page=${pageNum}${hasSearch}${isActive}`;
+
+
+    getUserService(query).then((response) => {
       setUserList(response.data)
+    }).catch(() => {
+
     })
+
+
   };
+
+
   const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-
-    fetchDataList({ search: e.target.value });
+    const val = e.target.value;
+    setSearchTerm(val);
+    setPage(1);
+    fetchDataList({ search: val, pageNum: 1 });
   };
+  const handleActiveFilter = (value: string | undefined) => {
+    setPage(1)
+    setStatusFilter(value)
+    fetchDataList({ is_active: value, pageNum: 1 });
 
+
+  }
   const updateDataItemActive = (value: any, index: number, item: Payment) => {
     const service = dataList.find((item, i) => {
       return index == i;
@@ -407,7 +442,7 @@ export default function rubbush_collectors() {
 
   }
 
-  const handleAddPayment = async (e:any) => {
+  const handleAddPayment = async (e: any) => {
     e.preventDefault()
     console.log('hii')
 
@@ -436,6 +471,8 @@ export default function rubbush_collectors() {
 
 
   const handleSelectedUser = (selectedId: any) => {
+    console.log('selected isssssssssssssssss', selectedId)
+    fetchDataList({ search: selectedId })
     setAddPaymentFormData((prev) => ({
       ...prev,
       ['user_id']: selectedId
@@ -447,10 +484,19 @@ export default function rubbush_collectors() {
     })
 
   }
+  const takeInputValue = (text: string) => {
+
+    fetchUserList({ search: text })
+
+
+
+  }
+
   useEffect(() => {
     fetchPaymentMethodList();
     fetchCategories()
     fetchPackages()
+    fetchUserList()
 
   }, [])
 
@@ -486,8 +532,20 @@ export default function rubbush_collectors() {
               <div className="grid grid-cols-12 space-y-5 gap-7">
 
                 <div className="col-span-12">
-                  <ComboBoxNehal onChange={(e) => handleSelectedUser(e)} listItem={userList} itemName="name" itemValue="id" value={(addPaymentFormData.user_id ?? "").toString()} label="اسم المستخدم" />
-
+                  <ComboBoxNehal onQueryChange={takeInputValue} onChange={(e) => handleSelectedUser(e)} listItem={userList} itemName="name" itemValue="id" value={(addPaymentFormData.user_id ?? "").toString()} label="اسم المستخدم" />
+                  {/* <SelectInput
+                    value={addPaymentFormData.user_id ?? ""}
+                    items={userList}
+                    itemName="name"
+                    itemValue="id"
+                    label="اسم المستخدم"
+                    placeholder="اختر اسم المستخدم"
+                    name="name"
+                    required={true}
+                    onChange={(e) =>
+                      handleSelectedUser(e)
+                    }
+                  ></SelectInput> */}
                 </div>
                 <div className="col-span-12">
                   <TextFieldNada
@@ -645,9 +703,10 @@ export default function rubbush_collectors() {
           items={[{ is_active: undefined, name: "الكل" }, ...statusList]}
           itemName="name"
           itemValue="is_active"
-          onSelected={(value) => {
-            fetchDataList({ is_active: value });
-          }}
+          // onSelected={(value) => {
+          //   fetchDataList({ is_active: value });
+          // }}
+          onSelected={handleActiveFilter}
         >
           الحالة
         </UIPrimaryDropdown>

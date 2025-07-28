@@ -36,6 +36,8 @@ export default function rubbush_collectors() {
     const [selectedDataItem, setSelectedDataItem] = useState<Banner | null>(
         null
     );
+
+    const [activeFilter, setActiveFilter] = useState<boolean | undefined>(undefined);
     type FormDataType = {
         title_ar: string;
         title_en: string;
@@ -65,7 +67,8 @@ export default function rubbush_collectors() {
     const fetchDataList = ({
         search = "",
         is_active = undefined,
-    }: { search?: string; is_active?: boolean | undefined } = {}) => {
+        pageNum = page
+    }: { search?: string; is_active?: boolean | undefined; pageNum?: number } = {}) => {
         console.log(is_active);
         const isActive =
             is_active != undefined
@@ -75,7 +78,7 @@ export default function rubbush_collectors() {
                 : "";
         const hasSearch = search ? "&search=" + search : "";
 
-        const query = `?page=${page}${hasSearch}${isActive}`;
+        const query = `?page=${pageNum}${hasSearch}${isActive}`;
 
         getBannersService(query).then((response) => {
             setDataList(response.data);
@@ -85,6 +88,16 @@ export default function rubbush_collectors() {
 
             })
     };
+
+
+    const handleActiveFilter = (value: boolean | undefined) => {
+        setPage(1)
+        setActiveFilter(value)
+        setPage(1);
+        fetchDataList({ is_active: value, pageNum: 1 });
+
+
+    }
     const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         fetchDataList({ search: e.target.value });
     };
@@ -212,9 +225,10 @@ export default function rubbush_collectors() {
                     items={[{ is_active: undefined, name: "الكل" }, ...statusList]}
                     itemName="name"
                     itemValue="is_active"
-                    onSelected={(value) => {
-                        fetchDataList({ is_active: value });
-                    }}
+                    // onSelected={(value) => {
+                    //     fetchDataList({ is_active: value });
+                    // }}
+                    onSelected={handleActiveFilter}
                 >
                     الحالة
                 </UIPrimaryDropdown>

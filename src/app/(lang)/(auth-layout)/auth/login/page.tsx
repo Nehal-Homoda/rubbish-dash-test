@@ -35,13 +35,13 @@ export default function AuthLoginPage() {
     const router = useRouter();
 
     const formSchema = Yup.object().shape({
-        email: Yup.string().required().email(),
-        password: Yup.string().required().min(6),
+        email: Yup.string().required("البريد الإلكتروني هو حقل مطلوب").email("البريد الإلكتروني هو حقل مطلوب"),
+        password: Yup.string().required("كلمة المرور هو حقل مطلوب").min(6, "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل"),
     });
 
     const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
-        email: "البريد الإلكتروني هو حقل مطلوب",
-        password: "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل",
+        email: "",
+        password: "",
     });
     const [errorMsg, setErrorMsg] = useState("");
 

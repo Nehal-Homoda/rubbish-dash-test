@@ -10,7 +10,8 @@ type Props = {
     itemValue?: string
     value: string
     onChange: (value: any) => void;
-    label: string
+    label: string;
+    onQueryChange?: (query: string) => void
 }
 
 export default function ComboBoxNehal({ listItem,
@@ -18,7 +19,8 @@ export default function ComboBoxNehal({ listItem,
     itemValue,
     value,
     label,
-    onChange }: Props) {
+    onChange,
+    onQueryChange }: Props) {
 
 
     const [query, setQuery] = useState('')
@@ -38,7 +40,13 @@ export default function ComboBoxNehal({ listItem,
 
 
     }
-    const [selectedValue,setSelectedValue]=useState()
+
+
+    const handleInputChange = (e:any) => {
+        setQuery(e.target.value)
+        onQueryChange?.(e.target.value);
+    }
+    const [selectedValue, setSelectedValue] = useState()
 
     return (
         <>
@@ -53,7 +61,7 @@ export default function ComboBoxNehal({ listItem,
                             // @ts-ignore
                             return itemName ? item[itemName] : item;
                         }}
-                        onChange={(event) => setQuery(event.target.value)}
+                        onChange={(e) => handleInputChange(e)}
 
                     />
                     <div className="label flex items-center gap-1 absolute -top-4 start-4 bg-background w-fit px-3  text-sm font-semibold">

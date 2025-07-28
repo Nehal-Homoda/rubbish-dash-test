@@ -64,6 +64,15 @@ export default function rubbush_collectors() {
     const [selectedDataItem, setSelectedDataItem] = useState<Collector | null>(
         null
     );
+
+    // ################### FILTER SECTION ####################
+    const [searchTerm, setSearchTerm] = useState("");
+    const [statusFilter, setStatusFilter] = useState<boolean | undefined>(undefined);
+    const [regionFilter, setRegionFilter] = useState<string | undefined>(undefined)
+
+
+
+
     const localePath = useLocalePath()
     const router = useRouter();
     type FormDataType = {
@@ -118,13 +127,15 @@ export default function rubbush_collectors() {
     const [errorMsg, setErrorMsg] = useState("");
 
     const fetchDataList = ({
-        search = "",
-        distrect_id = "",
-        is_active = undefined,
+        search = searchTerm,
+        district_id = regionFilter,
+        is_active = statusFilter,
+        pageNum = page
     }: {
         search?: string;
-        distrect_id?: string;
+        district_id?: string;
         is_active?: boolean | undefined;
+        pageNum?: number
     } = {}) => {
         console.log(is_active);
         const isActive =
@@ -134,9 +145,9 @@ export default function rubbush_collectors() {
                     : "&is_active=" + 0
                 : "";
         const hasSearch = search ? "&search=" + search : "";
-        const hasDistrect = distrect_id ? "&district_id=" + distrect_id : "";
+        const hasDistrect = district_id ? "&district_id=" + district_id : "";
 
-        const query = `?page=${page}${hasSearch}${isActive}${hasDistrect}`;
+        const query = `?page=${pageNum}${hasSearch}${isActive}${hasDistrect}`;
 
         getCollectorsService(query)
             .then((response) => {
@@ -150,8 +161,28 @@ export default function rubbush_collectors() {
             });
     };
     const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-        fetchDataList({ search: e.target.value });
+        const val = e.target.value;
+        setSearchTerm(val);
+        setPage(1)
+        fetchDataList({ search: e.target.value, pageNum: 1 });
     };
+
+    const handleActiveFilter = (value: boolean | undefined) => {
+        setPage(1)
+        setStatusFilter(value)
+        setPage(1);
+        fetchDataList({ is_active: value, pageNum: 1 });
+
+
+    }
+    const handleRegionFilter = (value: string | undefined) => {
+        setPage(1)
+        setRegionFilter(value)
+        setPage(1);
+        fetchDataList({ district_id: value, pageNum: 1 });
+
+
+    }
 
     const updateDataItemActive = (value: any, index: number) => {
         const service = dataList.find((item, i) => {
@@ -200,13 +231,13 @@ export default function rubbush_collectors() {
         console.log(e.target.name, e.target.value);
     };
 
-    const resetForm=()=>{
+    const resetForm = () => {
         setFormData({
-            name:"",
-            district_id:[],
-            image:"",
-            phone:"",
-            password:""
+            name: "",
+            district_id: [],
+            image: "",
+            phone: "",
+            password: ""
         })
     }
 
@@ -321,9 +352,10 @@ export default function rubbush_collectors() {
                     items={[{ is_active: undefined, name: "الكل" }, ...statusList]}
                     itemName="name"
                     itemValue="is_active"
-                    onSelected={(value) => {
-                        fetchDataList({ is_active: value });
-                    }}
+                    // onSelected={(value) => {
+                    //     fetchDataList({ is_active: value });
+                    // }}
+                    onSelected={handleActiveFilter}
                 >
                     الحالة
                 </UIPrimaryDropdown>
@@ -331,9 +363,10 @@ export default function rubbush_collectors() {
                     items={[{ id: undefined, name_ar: "الكل" }, ...distrects]}
                     itemName="name_ar"
                     itemValue="id"
-                    onSelected={(value) => {
-                        fetchDataList({ distrect_id: value });
-                    }}
+                    // onSelected={(value) => {
+                    //     fetchDataList({ distrect_id: value });
+                    // }}
+                    onSelected={handleRegionFilter}
                 >
                     المنطقة
                 </UIPrimaryDropdown>

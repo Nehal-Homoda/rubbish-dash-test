@@ -30,11 +30,11 @@ export const authSlice = createSlice({
       Cookies.set("token", JSON.stringify(state.token));
     },
     logout: (state) => {
-      state.user = null;
-      state.token = null;
       Cookies.remove("user");
       Cookies.remove("token");
       Cookies.remove("title");
+      state.user = null;
+      state.token = null;
       state.isLoggedIn = false;
     },
     enter: (state) => {

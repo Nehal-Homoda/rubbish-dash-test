@@ -42,6 +42,9 @@ export default function rubbush_collectors() {
   const [selectedDataItem, setSelectedDataItem] = useState<Category | null>(
     null
   );
+
+  const [activeFilter, setActiveFilter] = useState<boolean | undefined>(undefined);
+  const [searchTerm, setSearchTerm] = useState<string | undefined>(undefined)
   const router = useRouter();
 
   const [isRecycled, setIsRecycled] = useState(false)
@@ -54,7 +57,7 @@ export default function rubbush_collectors() {
     if (name == 'add') {
       setFormData((prev) => ({
         ...prev,
-        ["has_recycle"]: value ? 1 :0,
+        ["has_recycle"]: value ? 1 : 0,
       }));
     }
 
@@ -62,7 +65,7 @@ export default function rubbush_collectors() {
     if (name == 'edit') {
       setUpdateFormData((prev) => ({
         ...prev,
-        ["has_recycle"]: value ? 1:0,
+        ["has_recycle"]: value ? 1 : 0,
       }));
     }
 
@@ -104,9 +107,10 @@ export default function rubbush_collectors() {
   ];
 
   const fetchDataList = ({
-    search = "",
-    is_active = undefined,
-  }: { search?: string; is_active?: boolean | undefined } = {}) => {
+    search = searchTerm,
+    is_active = activeFilter,
+    pageNum = page
+  }: { search?: string; is_active?: boolean | undefined; pageNum?: number } = {}) => {
     console.log(is_active);
     const isActive =
       is_active != undefined
@@ -116,7 +120,7 @@ export default function rubbush_collectors() {
         : "";
     const hasSearch = search ? "&search=" + search : "";
 
-    const query = `?page=${page}${hasSearch}${isActive}`;
+    const query = `?page=${pageNum}${hasSearch}${isActive}`;
 
     getCategoriesService(query)
       .then((response) => {
@@ -130,8 +134,20 @@ export default function rubbush_collectors() {
       });
   };
   const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    fetchDataList({ search: e.target.value });
+    const val = e.target.value;
+    setSearchTerm(val);
+    setPage(1);
+    fetchDataList({ search: val, pageNum: 1 });
   };
+
+  const handleActiveFilter = (value: boolean | undefined) => {
+    setPage(1)
+    setActiveFilter(value)
+    setPage(1);
+    fetchDataList({ is_active: value, pageNum: 1 });
+
+
+  }
 
   const updateDataItemActive = (value: any, index: number) => {
     const service = dataList.find((item, i) => {
@@ -266,6 +282,8 @@ export default function rubbush_collectors() {
     });
   };
 
+
+
   const tableHeadActionsSlot = () => {
     return (
       <>
@@ -273,9 +291,10 @@ export default function rubbush_collectors() {
           items={[{ is_active: undefined, name: "الكل" }, ...statusList]}
           itemName="name"
           itemValue="is_active"
-          onSelected={(value) => {
-            fetchDataList({ is_active: value });
-          }}
+          // onSelected={(value) => {
+          //   fetchDataList({ is_active: value });
+          // }}
+          onSelected={handleActiveFilter}
         >
           الحالة
         </UIPrimaryDropdown>
@@ -520,7 +539,7 @@ export default function rubbush_collectors() {
 
                         <div className="py-6 ">
                           <ToggleSwitch
-                            checked={item.has_recycle ==1 ? true : false}
+                            checked={item.has_recycle == 1 ? true : false}
                             label="اعادة تدوير"
                             onChange={(value) => handleCheckSubscription(value, 'edit')}
                           />

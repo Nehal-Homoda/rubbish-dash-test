@@ -68,26 +68,29 @@ export default function rubbush_collectors() {
         days_count: "",
     });
 
+    const [searchTerm, setSearchTerm] = useState("");
+    const [statusFilter, setStatusFilter] = useState<string | undefined>("");
+    const [categoryFilter, setCategoryFilter] = useState<number | undefined>(undefined);
+
     const fetchDataList = ({
-        search = "",
-        status = undefined,
-        category_id = undefined,
-        page = undefined
+        search = searchTerm,
+        status = statusFilter,
+        category_id = categoryFilter,
+        pageNum = page
     }: {
         search?: string;
         status?: string;
         category_id?: number | undefined;
-        page?: number | undefined
+        pageNum?: number | undefined
     } = {}) => {
         console.log(status);
         const statusParam = status != undefined ? "&status=" + status : "";
         const category =
             category_id != undefined ? "&category_id=" + category_id : "";
         const hasSearch = search ? "&search=" + search : "";
-        const hasPagination = page ? "page=" + page : ""
 
 
-        const query = hasPagination ? `?${hasPagination}` : `?${hasSearch}${statusParam}${category}`;
+        const query = `?page=${pageNum}${hasSearch}${statusParam}${category}`;
 
         getVisitsService(query).then((response) => {
             setDataList(response.data);
@@ -98,7 +101,24 @@ export default function rubbush_collectors() {
             })
     };
     const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-        fetchDataList({ search: e.target.value });
+        const val = e.target.value;
+        setSearchTerm(val);
+        setPage(1);
+        fetchDataList({ search: val, pageNum: 1 });
+        // fetchDataList({ search: e.target.value });
+    };
+
+
+    const handleStatusFilter = (value: string | undefined) => {
+        setStatusFilter(value);
+        setPage(1);
+        fetchDataList({ status: value, pageNum: 1 });
+    };
+
+    const handleCategoryFilter = (value: number | undefined) => {
+        setCategoryFilter(value);
+        setPage(1);
+        fetchDataList({ category_id: value, pageNum: 1 });
     };
 
     const updateDataItemActive = (value: any, index: number) => {
@@ -191,9 +211,10 @@ export default function rubbush_collectors() {
                     items={[{ id: undefined, name_ar: "الكل" }, ...categories]}
                     itemName="name_ar"
                     itemValue="id"
-                    onSelected={(value) => {
-                        fetchDataList({ category_id: value });
-                    }}
+                    // onSelected={(value) => {
+                    //     fetchDataList({ category_id: value });
+                    // }}
+                    onSelected={handleCategoryFilter}
                 >
                     نوع الخدمة
                 </UIPrimaryDropdown>
@@ -201,9 +222,10 @@ export default function rubbush_collectors() {
                     items={[{ is_active: undefined, name: "الكل" }, ...statusList]}
                     itemName="name"
                     itemValue="is_active"
-                    onSelected={(value) => {
-                        fetchDataList({ status: value });
-                    }}
+                    // onSelected={(value) => {
+                    //     fetchDataList({ status: value });
+                    // }}
+                    onSelected={handleStatusFilter}
                 >
                     الحالة
                 </UIPrimaryDropdown>
@@ -218,9 +240,9 @@ export default function rubbush_collectors() {
             .catch((error) => { });
     };
     useEffect(() => {
-        fetchDataList({ page: page });
+        fetchDataList();
         fetchCategories();
-    }, [page]); // runs every time `page` changes
+    }, [page]); 
 
     return (
         <>
@@ -296,8 +318,8 @@ export default function rubbush_collectors() {
 
                                                 <div className={`flex justify-start items-center `}>
                                                     <div className={`text-start w-full py-3  px-4  rounded-lg  ${statusDropdownColor(
-                                                    item.status
-                                                )}`}>
+                                                        item.status
+                                                    )}`}>
                                                         {selectedDataItem ? statusDropdownName(selectedDataItem.status) : ''}
 
                                                     </div>

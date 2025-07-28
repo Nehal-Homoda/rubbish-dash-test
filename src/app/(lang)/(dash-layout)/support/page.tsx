@@ -57,14 +57,30 @@ export default function rubbush_collectors() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [adminMessage, setAdminMessage] = useState<string>("");
 
+
+
+  //  ################ FILTERATION  QUERY #################
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
+
+
+  const handleStatusFilter = (value: string | undefined) => {
+    setStatusFilter(value);
+    setPage(1);
+    fetchDataList({ status: value, pageNum: 1 });
+  };
+
+
+
   const fetchDataList = ({
-    search = "",
-    status = undefined,
-  }: { search?: string; status?: string | undefined } = {}) => {
+    search = searchTerm,
+    status = statusFilter,
+    pageNum = page
+  }: { search?: string; status?: string | undefined; pageNum?: number } = {}) => {
     const isActive = status != undefined ? "&status=" + status : "";
     const hasSearch = search ? "&search=" + search : "";
 
-    const query = `?page=${page}${hasSearch}${isActive}`;
+    const query = `?page=${pageNum}${hasSearch}${isActive}`;
 
     getTicketsService(query)
       .then((response) => {
@@ -74,7 +90,11 @@ export default function rubbush_collectors() {
       .catch(() => { });
   };
   const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    fetchDataList({ search: e.target.value });
+    const val = e.target.value;
+    setSearchTerm(val);
+    setPage(1);
+    fetchDataList({ search: val, pageNum: 1 });
+    
   };
 
   const updateDataItemActive = (value: any, index: number) => {
@@ -118,9 +138,10 @@ export default function rubbush_collectors() {
           items={[{ is_active: undefined, name: "الكل" }, ...statusList]}
           itemName="name"
           itemValue="is_active"
-          onSelected={(value) => {
-            fetchDataList({ status: value });
-          }}
+          // onSelected={(value) => {
+          //   fetchDataList({ status: value });
+          // }}
+          onSelected={handleStatusFilter}
         >
           الحالة
         </UIPrimaryDropdown>

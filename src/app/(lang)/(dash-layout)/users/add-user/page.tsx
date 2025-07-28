@@ -49,6 +49,7 @@ export default function page() {
 
     //@ts-ignore
     const takeValue = (e, name) => {
+        console.log(e.target.value)
         console.log(e.target.value);
         setFormData((prev) => ({
             ...prev,
@@ -111,6 +112,7 @@ export default function page() {
             fd.append("has_subscription", formData.has_subscription);
             //@ts-ignore
             fd.append("units", formData.units);
+            fd.append("is_request_recycle", formData.is_request_recycle.toString());
             fd.append("package_id", formData.package_id);
             fd.append("payment_method_id", formData.payment_method_id);
             fd.append("address_lat", "34.1531");
@@ -156,6 +158,7 @@ export default function page() {
         district_id: "",
         has_subscription: 0,
         package_id: "",
+        is_request_recycle: 0,
 
         payment_method_id: "",
         days: [],
@@ -236,7 +239,7 @@ export default function page() {
         // console.log(e.target.value)
     };
 
-    const serviceTypeList = [{ id: 1, name: 'جمع' }, { id: 2, name: 'جمع وتدوير' }]
+    const serviceTypeList = [{ is_request_recycle: 0, name: 'جمع' }, { is_request_recycle: 1, name: 'جمع وتدوير' }]
 
     useEffect(() => {
         fetchDistrict();
@@ -405,14 +408,15 @@ export default function page() {
                                         <SelectInput
                                             items={serviceTypeList}
                                             placeholder="ادخل نوع الطلب"
-                                            name=""
+                                            name="is_request_recycle"
                                             itemName="name"
-                                            itemValue="id"
-                                            value={formData.package_id}
+                                            itemValue="is_request_recycle"
+                                            value={formData.is_request_recycle}
                                             label=" نوع الطلب"
-                                            onChange={(value) =>
-                                                handleSelectPackage(value)
-                                            }
+                                            onChange={(value) => setFormData((prev) => ({
+                                                ...prev,
+                                                ['is_request_recycle']: value
+                                            }))}
                                         ></SelectInput>
                                     </div>
 

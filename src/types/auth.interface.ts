@@ -61,6 +61,7 @@ export interface Users {
     created_at: string;
     all_recycle_weights:number;
     deserved_money_by_recycle:number;
+    is_request_recycle:number
 }
 
 export interface Payment {

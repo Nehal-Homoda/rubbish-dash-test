@@ -38,6 +38,7 @@ export default function rubbush_collectors() {
     { text: " الاشتراك", name: "has_subscription" },
     { text: "نوع الاشتراك", name: "subscription_name" },
     // { text: "الصورة الشخصية", name: "image" },
+    { text: "نوع الطلب", name: "is_request_recycle" },
     { text: "الحالة", name: "is_active" },
     { text: "ميعاد التجديد", name: "renewal_date" },
     { text: "الاجراءات", name: "" },
@@ -46,6 +47,11 @@ export default function rubbush_collectors() {
     { is_active: 1, name: "مفعل" },
     { is_active: 0, name: "غير مفعل" },
   ];
+
+  const requestTypeList = [{ is_request_recycle: 1, name: "جمع وتدوير" },
+  { is_request_recycle: 0, name: "جمع" },]
+
+
   const hasSubscriptionList = [
     { is_subscribe: 1, name: "مشترك" },
     { is_subscribe: 0, name: "غير مشترك" },
@@ -63,6 +69,14 @@ export default function rubbush_collectors() {
     is_active: 0,
 
   };
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeFilter, setActiveFilter] = useState<boolean | undefined>(undefined);
+  const [subscriptionFilter, setSubscriptionFilter] = useState<boolean | undefined>(undefined);
+  const [typeFilter, setTypeFilter] = useState<boolean | undefined>(undefined);
+
+
+
   const [formData, setFormData] = useState<FormDataType>({
     name: "",
     phone: "",
@@ -77,46 +91,105 @@ export default function rubbush_collectors() {
 
   const router = useRouter()
 
+  // const fetchDataList = ({
+  //   search = "",
+  //   is_active = undefined,
+  //   is_subscription = undefined,
+
+  // }: { search?: string; is_active?: boolean | undefined; is_subscription?: boolean | undefined; } = {}) => {
+  //   console.log(is_active);
+  //   const isActive = is_active != undefined ? is_active ? "&is_active=" + 1 : "&is_active=" + 0 : "";
+
+
+
+  //   const isSubscribe =
+  //     is_subscription != undefined
+  //       ? is_subscription
+  //         ? "&is_subscription=" + 1
+  //         : "&is_subscription=" + 0
+  //       : "";
+  //   const hasSearch = search ? "&search=" + search : "";
+
+  //   // const query = `?${page}${hasSearch}${isActive}${isSubscribe}`;
+
+  //   // const hasPagination = page ? "page=" + page : ""
+  //   // const query = hasPagination ? `?${hasPagination}` : `?${hasSearch}${isActive}${isSubscribe}`;
+  //   const query = `?page=${page}${hasSearch}${isActive}${isSubscribe}`;
+
+  //   getUserService(query).then((response) => {
+  //     //@ts-ignore
+  //     setDataList(response.data);
+  //     // response.data.map((item, index) => {
+  //     //   setDistrictDays(item.available_days);
+  //     //   setDistrictTime(item.available_times);
+  //     // });
+  //     setTotalPages(response.meta.last_page);
+  //   });
+  // };
+
+
   const fetchDataList = ({
-    search = "",
-    is_active = undefined,
-    is_subscription = undefined,
-    page = undefined
-  }: { search?: string; is_active?: boolean | undefined; is_subscription?: boolean | undefined; page?: number | undefined } = {}) => {
-    console.log(is_active);
-    const isActive = is_active != undefined ? is_active ? "&is_active=" + 1 : "&is_active=" + 0 : "";
+    search = searchTerm,
+    is_active = activeFilter,
+    is_subscription = subscriptionFilter,
+    is_request_recycle = typeFilter,
+    pageNum = page,
+  }: {
+    search?: string;
+    is_active?: boolean | undefined;
+    is_subscription?: boolean | undefined;
+    is_request_recycle?: boolean | undefined;
+    pageNum?: number;
+  } = {}) => {
+    const isActive = is_active != undefined ? "&is_active=" + (is_active ? 1 : 0) : "";
+    const isSubscribe = is_subscription != undefined ? "&is_subscription=" + (is_subscription ? 1 : 0) : "";
+    const isRecycle = is_request_recycle != undefined ? "&is_request_recycle=" + (is_request_recycle ? 1 : 0) : "";
 
-
-
-    const isSubscribe =
-      is_subscription != undefined
-        ? is_subscription
-          ? "&is_subscription=" + 1
-          : "&is_subscription=" + 0
-        : "";
     const hasSearch = search ? "&search=" + search : "";
 
-    // const query = `?${page}${hasSearch}${isActive}${isSubscribe}`;
-    const hasPagination = page ? "page=" + page : ""
-
-
-    const query = hasPagination ? `?${hasPagination}` : `?${hasSearch}${isActive}${isSubscribe}`;
-
+    const query = `?page=${pageNum}${hasSearch}${isActive}${isSubscribe}${isRecycle}`;
 
     getUserService(query).then((response) => {
       //@ts-ignore
       setDataList(response.data);
-      // response.data.map((item, index) => {
-      //   setDistrictDays(item.available_days);
-      //   setDistrictTime(item.available_times);
-      // });
       setTotalPages(response.meta.last_page);
     });
   };
+
+
+
+
+  // const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   console.log(e.target.value)
+  //   fetchDataList({ search: e.target.value });
+  // };
+
+
+
   const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value)
-    fetchDataList({ search: e.target.value });
+    const val = e.target.value;
+    setSearchTerm(val);
+    setPage(1);
+    fetchDataList({ search: val, pageNum: 1 });
   };
+
+  const handleActiveFilter = (value: boolean | undefined) => {
+    setActiveFilter(value);
+    setPage(1);
+    fetchDataList({ is_active: value, pageNum: 1 });
+  };
+  const handleTypeFilter = (value: boolean | undefined) => {
+    setTypeFilter(value);
+    setPage(1);
+    fetchDataList({ is_request_recycle: value, pageNum: 1 });
+  };
+
+  const handleSubscriptionFilter = (value: boolean | undefined) => {
+    setSubscriptionFilter(value);
+    setPage(1);
+    fetchDataList({ is_subscription: value, pageNum: 1 });
+  };
+
 
   const updateDataItemActive = (value: any, index: number) => {
     const service = dataList.find((item, i) => {
@@ -205,12 +278,26 @@ export default function rubbush_collectors() {
 
 
         <UIPrimaryDropdown
+          items={[{ is_request_recycle: undefined, name: "الكل" }, ...requestTypeList]}
+          itemName="name"
+          itemValue="is_request_recycle"
+          // onSelected={(value) => {
+          //   fetchDataList({ is_active: value });
+          // }}
+          onSelected={handleTypeFilter}
+        >
+          نوع الطلب
+        </UIPrimaryDropdown>
+
+
+        <UIPrimaryDropdown
           items={[{ is_active: undefined, name: "الكل" }, ...statusList]}
           itemName="name"
           itemValue="is_active"
-          onSelected={(value) => {
-            fetchDataList({ is_active: value });
-          }}
+          // onSelected={(value) => {
+          //   fetchDataList({ is_active: value });
+          // }}
+          onSelected={handleActiveFilter}
         >
           الحالة
         </UIPrimaryDropdown>
@@ -219,9 +306,10 @@ export default function rubbush_collectors() {
           items={[{ is_active: undefined, name: "الكل" }, ...hasSubscriptionList]}
           itemName="name"
           itemValue="is_subscribe"
-          onSelected={(value) => {
-            fetchDataList({ is_subscription: value });
-          }}
+          // onSelected={(value) => {
+          //   fetchDataList({ is_subscription: value });
+          // }}
+          onSelected={handleSubscriptionFilter}
         >
           الاشتراك
         </UIPrimaryDropdown>
@@ -239,7 +327,7 @@ export default function rubbush_collectors() {
     );
   };
   useEffect(() => {
-    fetchDataList({ page: page });
+    fetchDataList();
   }, [page]); // runs every time `page` changes
 
   return (
@@ -269,15 +357,16 @@ export default function rubbush_collectors() {
               <td className="py-2 px-4">{item.subscription_name}</td>
               {/* <td className="py-2 px-4">
                 <div className=" w-7 h-7 rounded-full overflow-hidden">
-                  <img
-                    className="w-full h-full object-contain"
-                    src={item.image}
-                    alt=""
-                  />
+                <img
+                className="w-full h-full object-contain"
+                src={item.image}
+                alt=""
+                />
                 </div>
-              </td> */}
+                </td> */}
 
 
+              <td className="py-2 px-4">{item.is_request_recycle ? 'جمع وتدوير' : 'جمع فقط'}</td>
 
 
               <td className="py-2 px-4">

@@ -14,7 +14,7 @@ import {
   getPackagesService,
   updatePackageService,
 } from "@/services/packagesOffersService";
-import { PackageOffer } from "@/types/packagesOffer.interface";
+import { PackageDiscount, PackageOffer } from "@/types/packagesOffer.interface";
 import { getCategoriesService, getCategoryByIdService } from "@/services/categoriesService";
 import { Category } from "@/types/categories.interface";
 
@@ -43,6 +43,29 @@ export default function rubbush_collectors() {
   const [categoryItem, setCategoryItem] = useState<Category | null>(null)
   const [recyclePrice, setRecyclePrice] = useState(0)
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<boolean | undefined>(undefined);
+  const [categoryFilter, setCategoryFilter] = useState<number | undefined>(undefined);
+
+
+  const discountArr = [
+    {
+      min_units: 5,
+      max_units: 10,
+      discount_rate: 0
+    },
+    {
+      min_units: 10,
+      max_units: 15,
+      discount_rate: 0
+    },
+    {
+      min_units: 20,
+      max_units: 0,
+      discount_rate: 0
+    }
+  ]
+
 
   type FormDataType = {
     name_ar: string;
@@ -52,7 +75,8 @@ export default function rubbush_collectors() {
     price_per_unit: number | string;
     order: number;
     days_count: number | string;
-    recycle_price?: number | string
+    recycle_price?: number | string;
+    discounts: PackageDiscount[]
   };
   const [formData, setFormData] = useState<FormDataType>({
     name_ar: "",
@@ -62,8 +86,27 @@ export default function rubbush_collectors() {
     price_per_unit: "",
     order: 0,
     days_count: "",
-    recycle_price: ""
+    recycle_price: "",
+    discounts: [
+      {
+        min_units: 5,
+        max_units: 10,
+        discount_rate: 0
+      },
+      {
+        min_units: 10,
+        max_units: 15,
+        discount_rate: 0
+      },
+      {
+        min_units: 20,
+        max_units: '',
+        discount_rate: 0
+      }
+    ]
   });
+
+
 
   const [updateFormData, setUpdateFormData] = useState<FormDataType>({
     name_ar: "",
@@ -73,16 +116,38 @@ export default function rubbush_collectors() {
     price_per_unit: "",
     order: 0,
     days_count: "",
+    discounts: [
+      {
+        min_units: 0,
+        max_units: 0,
+        discount_rate: 0
+      },
+      {
+        min_units: 0,
+        max_units: 0,
+        discount_rate: 0
+      },
+      {
+        min_units: 0,
+        max_units: 0,
+        discount_rate: 0
+      }
+    ]
   });
 
+
+
+
   const fetchDataList = ({
-    search = "",
-    is_active = undefined,
-    category_id = undefined,
+    search = searchTerm,
+    is_active = statusFilter,
+    category_id = categoryFilter,
+    pageNum = page
   }: {
     search?: string;
     is_active?: boolean | undefined;
     category_id?: number | undefined;
+    pageNum?: number
   } = {}) => {
     console.log(is_active);
     const isActive =
@@ -95,7 +160,7 @@ export default function rubbush_collectors() {
       category_id != undefined ? "&category_id=" + category_id : "";
     const hasSearch = search ? "&search=" + search : "";
 
-    const query = `?page=${page}${hasSearch}${isActive}${category}`;
+    const query = `?page=${pageNum}${hasSearch}${isActive}${category}`;
 
     getPackagesService(query)
       .then((response) => {
@@ -105,8 +170,26 @@ export default function rubbush_collectors() {
       .catch(() => { });
   };
   const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    fetchDataList({ search: e.target.value });
+    const val = e.target.value;
+    setSearchTerm(val);
+    setPage(1);
+    fetchDataList({ search: val, pageNum: 1 });
   };
+
+
+
+  const handleStatusFilter = (value: boolean | undefined) => {
+    setStatusFilter(value);
+    setPage(1);
+    fetchDataList({ is_active: value, pageNum: 1 });
+  };
+
+  const handleCategoryFilter = (value: number | undefined) => {
+    setCategoryFilter(value);
+    setPage(1);
+    fetchDataList({ category_id: value, pageNum: 1 });
+  };
+
 
   const updateDataItemActive = (value: any, index: number) => {
     const service = dataList.find((item, i) => {
@@ -147,15 +230,16 @@ export default function rubbush_collectors() {
 
     const ca = categories.find((cate) => cate.name_ar === item.category);
 
-    setUpdateFormData({
-      name_ar: item.name_ar,
-      name_en: item.name_ar,
-      order: item.order ? item.order : 0,
-      is_active: item.is_active ? 1 : 0,
-      category_id: ca?.id ?? "",
-      days_count: item.days_count ? parseInt(item.days_count) : "",
-      price_per_unit: item.price_per_unit ? parseInt(item.price_per_unit) : "",
-    });
+    // setUpdateFormData({
+    //   name_ar: item.name_ar,
+    //   name_en: item.name_ar,
+    //   order: item.order ? item.order : 0,
+    //   is_active: item.is_active ? 1 : 0,
+    //   category_id: ca?.id ?? "",
+    //   days_count: item.days_count ? parseInt(item.days_count) : "",
+    //   price_per_unit: item.price_per_unit ? parseInt(item.price_per_unit) : "",
+
+    // });
   };
 
   const updateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -206,11 +290,28 @@ export default function rubbush_collectors() {
 
     const fd = new FormData();
 
-    for (const keyName in formData) {
-      //@ts-ignore
-      fd.append(keyName, formData[keyName]);
+    // for (const keyName in formData) {
+    //   //@ts-ignore
+    //   fd.append(keyName, formData[keyName]);
 
-    }
+    // }
+
+
+    fd.append('name_ar', formData.name_ar),
+      fd.append('name_en', formData.name_en),
+      fd.append('category_id', formData.category_id.toString()),
+      fd.append('is_active', formData.is_active.toString()),
+      fd.append('price_per_unit', formData.price_per_unit.toString()),
+      fd.append('order', formData.order.toString()),
+      fd.append('days_count', formData.days_count.toString()),
+      // fd.append('recycle_price', recyclePrice.toString()),
+
+      formData.discounts.forEach((discount, index) => {
+        Object.keys(discount).forEach((keyName) => {
+          const value = discount[keyName as keyof typeof discount];
+          fd.append(`discounts[${index}][${keyName}]`, String(value));
+        });
+      });
 
     addPackageService(fd)
       .then((response) => {
@@ -225,6 +326,11 @@ export default function rubbush_collectors() {
           price_per_unit: 0,
           order: 0,
           days_count: 0,
+          discounts: [{
+            min_units: 0,
+            max_units: '',
+            discount_rate: 0
+          }]
         });
       })
       .catch((error) => { });
@@ -247,6 +353,30 @@ export default function rubbush_collectors() {
     })
   }
 
+  const handleChangeValue = (e: any, index: number) => {
+    console.log('index is', index)
+    console.log('value of discount is', e.target.value)
+
+
+
+
+    setFormData((prev) => {
+      const updateDiscount = [...prev.discounts]
+      updateDiscount[index].discount_rate = e.target.value;
+
+      return {
+        ...prev,
+        discounts: updateDiscount,
+      };
+    })
+
+    console.log('form data', formData)
+
+
+
+
+  }
+
   const tableHeadActionsSlot = () => {
     return (
       <>
@@ -254,9 +384,10 @@ export default function rubbush_collectors() {
           items={[{ id: undefined, name_ar: "الكل" }, ...categories]}
           itemName="name_ar"
           itemValue="id"
-          onSelected={(value) => {
-            fetchDataList({ category_id: value });
-          }}
+          // onSelected={(value) => {
+          //   fetchDataList({ category_id: value });
+          // }}
+          onSelected={handleCategoryFilter}
         >
           نوع الخدمة
         </UIPrimaryDropdown>
@@ -264,9 +395,10 @@ export default function rubbush_collectors() {
           items={[{ is_active: undefined, name: "الكل" }, ...statusList]}
           itemName="name"
           itemValue="is_active"
-          onSelected={(value) => {
-            fetchDataList({ is_active: value });
-          }}
+          // onSelected={(value) => {
+          //   fetchDataList({ is_active: value });
+          // }}
+          onSelected={handleStatusFilter}
         >
           الحالة
         </UIPrimaryDropdown>
@@ -374,6 +506,32 @@ export default function rubbush_collectors() {
                 label=" مدة الباقة "
                 placeholder=" ادخل مدة الباقة  "
               ></TextFieldNada>
+
+              <div>
+                <div className="label flex items-center gap-1  start-4  w-fit px-3 text-sm font-semibold">
+                  <label>
+                    نسبة الخصم
+                  </label>
+                </div>
+                <div className="my-4">
+                  {discountArr.map((item, index) => (
+                    <div key={index} className="grid grid-cols-12 gap-5">
+                      <div className="col-span-4 border px-4 py-4 flex justify-center items-center rounded-xl mb-4">
+                        <span>{item.min_units} - {item.max_units} وحدة</span>
+                      </div>
+                      <div className="col-span-8">
+                        <TextFieldNada handleChange={(value) => handleChangeValue(value, index)} name="discount_value_percentage" label="نسبة الخصم" placeholder="ادخل نسبة الخصم" type="number" value={formData.discounts[index]?.discount_rate} />
+                      </div>
+
+                    </div>
+                  ))}
+
+
+
+                </div>
+
+
+              </div>
             </div>
           </form>
         </UIBaseDialog>
@@ -403,14 +561,16 @@ export default function rubbush_collectors() {
 
 
   useEffect(() => {
-    if (categoryItem) {
-      setRecyclePrice((Number(formData.price_per_unit) * (categoryItem.discount_value_percentage / 100)))
+    if (categoryItem && formData.price_per_unit) {
+      setRecyclePrice(100 - (Number(formData.price_per_unit) * (categoryItem.discount_value_percentage / 100)))
     }
+    // setRecyclePrice(0)
   }, [categoryItem])
   useEffect(() => {
-    if (categoryItem) {
-      setRecyclePrice((Number(formData.price_per_unit) * (categoryItem.discount_value_percentage / 100)))
+    if (categoryItem && formData.price_per_unit) {
+      setRecyclePrice(100 - (Number(formData.price_per_unit) * (categoryItem.discount_value_percentage / 100)))
     }
+    // setRecyclePrice(0)
   }, [formData.price_per_unit])
 
   useEffect(() => {
