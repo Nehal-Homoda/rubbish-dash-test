@@ -8,6 +8,7 @@ import { Radio } from "flowbite-react";
 import trashImg from '@/assets/images/icons/trash.png'
 import editImg from '@/assets/images/icons/edit.png'
 import eyeImg from '@/assets/images/icons/eye.png'
+import { useSearchParams } from 'next/navigation'
 import {
   addUserService,
   getUserService,
@@ -31,6 +32,11 @@ import { PackageOffer } from "@/types/packagesOffer.interface";
 
 export default function rubbush_collectors() {
   const [dataList, setDataList] = useState<Users[]>([]);
+  const searchParams = useSearchParams()
+  const filterWith = searchParams.get('is_request_recycle')
+
+
+  console.log('filter is with', filterWith)
   const headerArr = [
     { text: "ID", name: "id" },
     { text: "اسم المستخدم", name: "name" },
@@ -328,6 +334,10 @@ export default function rubbush_collectors() {
   };
   useEffect(() => {
     fetchDataList();
+    if (filterWith) {
+      //@ts-ignore
+      fetchDataList({ is_request_recycle: 1, pageNum: 1 });
+    }
   }, [page]); // runs every time `page` changes
 
   return (

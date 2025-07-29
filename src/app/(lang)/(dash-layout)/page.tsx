@@ -12,6 +12,7 @@ import Link from "next/link";
 import BaseDataTable from "@/components/data-tables/BaseDataTable";
 import { Users } from "@/types/auth.interface";
 import { getUserService } from "@/services/userService";
+import { useRouter } from "next/navigation";
 
 // ✅ Dynamically import chart component only on client side
 const ReactApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
@@ -178,6 +179,7 @@ export default function Home() {
   const [chartData, setChartData] = useState<ChartData | null>(null)
   const [categoryName, setCatergoryName] = useState<string[]>([])
   const [userListRecycle, setUserListRecycle] = useState<UserListWithRecycle[]>([])
+  const router = useRouter()
 
 
   const paymentList = [
@@ -304,7 +306,10 @@ export default function Home() {
     fetchPayments()
     fetchChartStatistics()
   }, [])
+  const handleGoToUser = () => {
 
+    router.push('/users/is_request_recycle')
+  }
 
 
 
@@ -510,7 +515,7 @@ export default function Home() {
                   </div>
                   <div>
                     <button className="border-none outline-none ">
-                      <Link className="text-[#009414]" href="/payments">عرض المزيد</Link>
+                      <Link className="text-[#009414]" href="/users?is_request_recycle=1">عرض المزيد</Link>
                       <span className="mdi mdi-chevron-left text-[#009414] ms-5 text-xl"></span>
                     </button>
                   </div>

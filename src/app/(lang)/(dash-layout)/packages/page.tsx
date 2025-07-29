@@ -118,18 +118,18 @@ export default function rubbush_collectors() {
     days_count: "",
     discounts: [
       {
-        min_units: 0,
-        max_units: 0,
+        min_units: 5,
+        max_units: 10,
         discount_rate: 0
       },
       {
-        min_units: 0,
-        max_units: 0,
+        min_units: 10,
+        max_units: 15,
         discount_rate: 0
       },
       {
-        min_units: 0,
-        max_units: 0,
+        min_units: 20,
+        max_units: '',
         discount_rate: 0
       }
     ]
@@ -515,12 +515,12 @@ export default function rubbush_collectors() {
                 </div>
                 <div className="my-4">
                   {discountArr.map((item, index) => (
-                    <div key={index} className="grid grid-cols-12 gap-5">
-                      <div className="col-span-4 border px-4 py-4 flex justify-center items-center rounded-xl mb-4">
+                    <div key={index} className="grid grid-cols-12 gap-5 ">
+                      <div className="col-span-4 border py-3 px-5 flex justify-center items-center  rounded-xl mb-7 ">
                         <span>{item.min_units} - {item.max_units} وحدة</span>
                       </div>
-                      <div className="col-span-8">
-                        <TextFieldNada handleChange={(value) => handleChangeValue(value, index)} name="discount_value_percentage" label="نسبة الخصم" placeholder="ادخل نسبة الخصم" type="number" value={formData.discounts[index]?.discount_rate} />
+                      <div className="col-span-8 mb-7">
+                        <TextFieldNada prependIcon="mdi mdi-ticket-percent-outline text-gray-400 " handleChange={(value) => handleChangeValue(value, index)} name="discount_value_percentage" label="نسبة الخصم" placeholder="ادخل نسبة الخصم" type="number" value={formData.discounts[index]?.discount_rate} />
                       </div>
 
                     </div>
@@ -725,6 +725,36 @@ export default function rubbush_collectors() {
                           label=" مدة الباقة "
                           placeholder=" ادخل مدة الباقة  "
                         ></TextFieldNada>
+
+
+                        <div>
+                          <div className="label flex items-center gap-1  start-4  w-fit px-3 text-sm font-semibold">
+                            <label>
+                              نسبة الخصم
+                            </label>
+                          </div>
+                          <div className="my-4">
+                            {discountArr.map((item, index) => (
+                              <div key={index} className="grid grid-cols-12 gap-5 ">
+                                <div className="col-span-4 border py-3 px-5 flex justify-center items-center  rounded-xl mb-7 ">
+                                  <span>{item.min_units} - {item.max_units} وحدة</span>
+                                </div>
+                                <div className="col-span-8 mb-7">
+                                  <TextFieldNada prependIcon="mdi mdi-ticket-percent-outline text-gray-400 " handleChange={(value) => handleChangeValue(value, index)} name="discount_value_percentage" label="نسبة الخصم" placeholder="ادخل نسبة الخصم" type="number" value={formData.discounts[index]?.discount_rate} />
+                                </div>
+
+                              </div>
+                            ))}
+
+
+
+                          </div>
+
+
+                        </div>
+
+
+
                       </div>
                     </form>
                   </UIBaseDialog>
