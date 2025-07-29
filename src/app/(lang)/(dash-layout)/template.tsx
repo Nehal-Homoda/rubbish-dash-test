@@ -15,32 +15,52 @@ export default function Template({ children }: Props) {
     const isEnter = useSelector(
         (state: RootState) => state.authReducer.isEnter
     );
+    const isLoggedIn = useSelector(
+        (state: RootState) => state.authReducer.isLoggedIn
+    );
     const dispatch = useDispatch<AppDispatch>();
     const localePath = useLocalePath();
     const router = useRouter();
 
-    const getMe = async () => {
+    // const getMe = async () => {
 
-        meService()
-        .then(resposne => {
+    //     // meService()
+    //     //     .then(resposne => {
 
-        })
-        .catch(error => {
-            router.push(localePath('/auth/login'))
-        })
-    }
+    //     //     })
+    //     //     .catch(error => {
+    //     //         router.push(localePath('/auth/login'))
+    //     //     })
 
-    useEffect(() => {
-        console.log("recall");
+    //     if (!isEnter) {
+    //         return <div className="loader"></div>
+    //     }
 
-        if (isEnter) {
-            getMe();
-        }
-     }, [isEnter]);
-
+    // }
     useEffect(() => {
         dispatch(enter());
     }, [dispatch]);
+
+
+
+    useEffect(() => {
+        if (isEnter && !isLoggedIn) {
+            router.push(localePath('/auth/login'))
+        }
+
+    }, [isEnter, isLoggedIn, localePath, router]);
+
+
+    if (!isEnter) {
+        return <div className="w-full h-[100vh] fixed z-[9999] bg-white flex items-center justify-center">
+            <div className="loader"></div>
+        </div>
+
+    }
+    if (!isLoggedIn) {
+        return null
+    }
+
 
 
     return <div>{children}</div>;

@@ -26,8 +26,8 @@ export default function DashNavbar({ isOpen, openSidebar }: Props) {
 
     const logoutHander = () => {
         dispatch(logout())
-        router.push('/auth/login') 
-        // window.location.reload()
+        // router.push('/auth/login') 
+        window.location.reload()
     };
 
 
