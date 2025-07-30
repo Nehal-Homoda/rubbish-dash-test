@@ -35,6 +35,8 @@ export interface PaymentMethod {
     is_active: boolean;
 }
 
+
+
 export interface Subscription {
     id: number;
     uid: string;
@@ -46,6 +48,7 @@ export interface Subscription {
     starts_at: string;
     ends_at: string;
     created_at: string;
+    is_request_recycle?: boolean;
     district: District;
     package: Package;
     category: Category;

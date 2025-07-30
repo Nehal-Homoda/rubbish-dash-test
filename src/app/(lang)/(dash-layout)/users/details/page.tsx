@@ -10,6 +10,7 @@ import header_bg_img from "@/assets/images/bg/profile-header-bg.jpg";
 import { useParams } from "next/navigation";
 import { getQueryParam } from "@/utils/shared";
 import AddNewSubscription from "@/components/user-tabs/AddNewSubscription";
+import SubscriptionDataList from "@/components/user-tabs/SubscriptionDataList";
 
 // type Props = {
 //   params: { id: number }
@@ -39,7 +40,7 @@ export default function page() {
     };
     const btnTabs = [
         { name: "الملف الشخصي", type: "personal-data" },
-        { name: "الاشتراك", type: "subscription" },
+        { name: "الاشتراكات", type: "subscription" },
         { name: "المدفوعات", type: "payment" },
     ];
 
@@ -111,7 +112,7 @@ export default function page() {
 
                                 ))}
 
-                               
+
 
                             </div>
 
@@ -129,23 +130,29 @@ export default function page() {
 
                     {type == "subscription" && user && (
                         // 
-                        !user.has_subscription ? <>
-                            <div className="py-5 text-end">
-                                <button onClick={() => { setShowAddSubscription(true) }} className="delete-subscription-btn text-nowrap  px-7 py-2 bg-surface-light-800 hover:bg-surface-light-700 ring-1 ring-surface duration-150 text-surface rounded-md">
-                                    <span className="">
-                                        اضافة اشتراك
-                                    </span>
-                                    <span className="mdi mdi-plus ms-2"></span>
-                                </button>
-                            </div>
-                            {
-                                showAddSubscription && <AddNewSubscription getNewUser={(value) => { setUser(value) }} user={user} />
-                            }
+                        // !user.has_subscription ? <>
+                        //     <div className="py-5 text-end">
+                        //         <button onClick={() => { setShowAddSubscription(true) }} className="delete-subscription-btn text-nowrap  px-7 py-2 bg-surface-light-800 hover:bg-surface-light-700 ring-1 ring-surface duration-150 text-surface rounded-md">
+                        //             <span className="">
+                        //                 اضافة اشتراك
+                        //             </span>
+                        //             <span className="mdi mdi-plus ms-2"></span>
+                        //         </button>
+                        //     </div>
+                        //     {
+                        //         showAddSubscription && <AddNewSubscription getNewUser={(value) => { setUser(value) }} user={user} />
+                        //     }
 
-                        </> : <>
-                            <Subscription user={user} />
-                        </>
+                        // </> : <>
+                        //     <Subscription user={user} />
+                        // </>
+                        <SubscriptionDataList user={user} />
+
+
+
                     )}
+
+
                     {type == "payment" && user && <Payment user={user} />}
                 </div>
             </div>

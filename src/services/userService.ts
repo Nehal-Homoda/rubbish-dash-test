@@ -63,6 +63,31 @@ export const getUserByIdService = async (id: number | string) => {
         throw new Error(error.message);
     }
 };
+export const getUserSubscriptionByIdService = async (
+    id: number | string,
+    query?: string
+) => {
+    try {
+        const response = await apiCall.get(
+            `/admins/users/${id}/subscriptions${decodeURIComponent(
+                query || ""
+            )}`,
+            {
+                headers: {
+                    // "Content-Type": "application/json",
+                },
+            }
+        );
+        if (!response.ok) {
+            await responseErrorServiceHandler(response, "user subscription");
+        }
+        const data = await response.json();
+        console.log("response data =>>>>", data);
+        return data;
+    } catch (error: any) {
+        throw new Error(error.message);
+    }
+};
 
 export const addUserService = async (form: FormData) => {
     try {

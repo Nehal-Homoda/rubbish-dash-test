@@ -452,7 +452,7 @@ export default function Home() {
         <div className="mb-10">
 
 
-          <div className="lg:grid grid-cols-2 gap-5  rounded-2xl  bg-background  w-full ">
+          <div className="grid xl:grid-cols-2 grid-cols-1 gap-5  rounded-2xl  bg-background  w-full ">
 
 
 

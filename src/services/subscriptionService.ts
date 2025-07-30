@@ -80,6 +80,24 @@ export const deleteSubscriptionService = async (id: number) => {
         throw new Error(error.message);
     }
 };
+export const showSubscriptionService = async (id: number) => {
+    try {
+        const response = await apiCall.get(`/admins/subscriptions/${id}`, {
+            headers: {
+                // Authorization: `Bearer ${token}`,
+                // "Content-Type": "application/json",
+            },
+        });
+        if (!response.ok) {
+            await responseErrorServiceHandler(response, "delete payment");
+        }
+        const data = await response.json();
+        console.log("response data =>>>>", data);
+        return data;
+    } catch (error: any) {
+        throw new Error(error.message);
+    }
+};
 export const updateSubscriptionStatusService = async (id: number, status: 'reject' | 'accept' | 'pending') => {
     try {
         const response = await apiCall.post(`/admins/subscriptions/${id}/${status}`, {
