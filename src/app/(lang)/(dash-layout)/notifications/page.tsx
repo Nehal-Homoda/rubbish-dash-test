@@ -27,6 +27,10 @@ export default function rubbush_collectors() {
     const [usersList, setUsersList] = useState<AppUser[]>([]);
     const [collectorsList, setCollectorsList] = useState<Collector[]>([]);
     const [selectedAudience, setSelectedAudience] = useState("");
+
+    const [searchTerm, setSearchTerm] = useState("");
+    const [targetAudienceFilter, setTargetAudienceTypeFilter] = useState<string | undefined>(undefined);
+
     const headerArr = [
         { text: "ID", name: "id" },
         { text: " العنوان ", name: "image" },
@@ -70,15 +74,16 @@ export default function rubbush_collectors() {
     });
 
     const fetchDataList = ({
-        search = "",
-        target_audience = undefined,
-    }: { search?: string; target_audience?: string | undefined } = {}) => {
+        search = searchTerm,
+        target_audience = targetAudienceFilter,
+        pageNum = page
+    }: { search?: string; target_audience?: string | undefined; pageNum?: number } = {}) => {
         const isActive = target_audience
             ? "&target_audience=" + target_audience
             : "";
         const hasSearch = search ? "&search=" + search : "";
 
-        const query = `?page=${page}${hasSearch}${isActive}`;
+        const query = `?page=${pageNum}${hasSearch}${isActive}`;
 
         getNotificationsService(query)
             .then((response) => {
@@ -88,7 +93,17 @@ export default function rubbush_collectors() {
             .catch(() => { });
     };
     const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-        fetchDataList({ search: e.target.value });
+        const val = e.target.value;
+        setSearchTerm(val);
+        setPage(1);
+        fetchDataList({ search: val, pageNum: 1 });
+    };
+
+
+    const handleActiveFilter = (value: string | undefined) => {
+        setTargetAudienceTypeFilter(value);
+        setPage(1);
+        fetchDataList({ target_audience: value, pageNum: 1 });
     };
 
     const deleteSubmit = (item: Notification, selectedIndex: number) => {
@@ -238,9 +253,10 @@ export default function rubbush_collectors() {
                     items={[{ is_active: undefined, name: "الكل" }, ...statusList]}
                     itemName="name"
                     itemValue="is_active"
-                    onSelected={(value) => {
-                        fetchDataList({ target_audience: value });
-                    }}
+                    // onSelected={(value) => {
+                    //     fetchDataList({ target_audience: value });
+                    // }}
+                    onSelected={handleActiveFilter}
                 >
                     نوع الاشعار
                 </UIPrimaryDropdown>
