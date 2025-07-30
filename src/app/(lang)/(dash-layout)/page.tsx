@@ -22,27 +22,17 @@ type SeriesItem = {
   name: string;
   data: number[];
 };
-type BubblePoint = {
-  x: string;
-  y: number;
-  z: number;
-};
+
 
 type BubbleSeriesItem = {
   name: string;
-  data: BubblePoint[];
+  data: number[];
 };
 
 
 export default function Home() {
 
-  const [seriesBar, setSeriesBar] = useState<SeriesItem[]>([{
-    name: 'الشهر',
-    data: []
-  }, {
-    name: 'عدد الاشتراكات',
-    data: []
-  },])
+
   const headerArr = [
     { text: "ID", name: "id" },
     { text: "اسم المستخدم", name: "name" },
@@ -53,6 +43,31 @@ export default function Home() {
   ];
 
   const [dataList, setDataList] = useState<Users[]>([]);
+
+
+  const [seriesBar, setSeriesBar] = useState<SeriesItem[]>([
+    {
+      name: 'الشهر',
+      data: []
+    }, {
+      name: 'عدد الاشتراكات',
+      data: []
+    },])
+
+
+
+  const [seriesBarPackage, setSeriesBarPackage] = useState<BubbleSeriesItem[]>([
+
+
+
+    {
+      name: 'عدد الاشتراكات',
+      data: []
+    }
+
+  ])
+
+
 
   const [optionsBar, setOptionsBar] = useState<ApexOptions>({
     chart: {
@@ -96,21 +111,19 @@ export default function Home() {
   })
 
 
-  const [seriesBarPackage, setSeriesBarPackage] = useState<BubbleSeriesItem[]>([{
-    name: 'عدد الاشتراكات',
-    data: []
-  },])
+
   const [optionsBarPackage, setOptionsBarPackage] = useState<ApexOptions>({
     chart: {
-      type: 'bubble',
+      type: 'bar',
       height: 350
     },
     plotOptions: {
-      bubble: {
-        zScaling: true,
-        minBubbleRadius: 20,
-        maxBubbleRadius: 20,
-      }
+      bar: {
+        horizontal: false,
+        columnWidth: '55%',
+        borderRadius: 5,
+        borderRadiusApplication: 'end'
+      },
       // bar: {
       //   horizontal: false,
       //   columnWidth: '55%',
@@ -127,25 +140,13 @@ export default function Home() {
       colors: ['transparent']
     },
     xaxis: {
-      type: 'numeric',
 
       categories: [],
     },
-    // yaxis: {
-    //   title: {
-    //     text: '$ (thousands)'
-    //   }
-    // },
     fill: {
       opacity: 1
     },
-    // tooltip: {
-    //   y: {
-    //     formatter: function (val) {
-    //       return "$ " + val + " thousands"
-    //     }
-    //   }
-    // }
+
   })
 
 
@@ -250,19 +251,24 @@ export default function Home() {
       const no_subscription = response.data.statsCategory.map((item, index) => {
         return item.no_of_subscriptions
       })
+      const package_no_subscription = response.data.statsPackage.map((item, index) => {
+        return item.no_of_subscriptions
+      })
       const packageName = response.data.statsPackage.map((item, index) => {
         return item.package
       })
+
+
 
       // const package_no_subscription = response.data.statsPackage.map((item, index) => {
       //   return item.no_of_subscriptions
       // })
 
-      const bubbleSeries = response.data.statsPackage.map((item) => ({
-        x: item.package,
-        y: item.no_of_subscriptions,
-        z: 2,
-      }));
+      // const bubbleSeries = response.data.statsPackage.map((item) => ({
+      //   x: item.package,
+      //   y: item.no_of_subscriptions,
+      //   z: 2,
+      // }));
       console.log('x is', name)
 
       setOptionsBar(prev => ({
@@ -271,6 +277,19 @@ export default function Home() {
           ['categories']: name
         }
       }));
+
+
+
+
+      setOptionsBarPackage(prev => ({
+        ...prev, ['xaxis']: {
+          ...prev.xaxis,
+          ['categories']: packageName
+        }
+      }));
+
+
+
       setSeriesBar([{
         name: 'الشهر',
         data: month
@@ -280,16 +299,13 @@ export default function Home() {
       }])
 
 
-      setOptionsBarPackage(prev => ({
-        ...prev, ['xaxis']: {
-          ...prev.xaxis,
-          ['categories']: packageName
-        }
-      }));
-      setSeriesBarPackage([{
-        name: 'عدد الاشتراكات',
-        data: bubbleSeries
-      }])
+
+      setSeriesBarPackage([
+
+        {
+          name: 'عدد الاشتراكات',
+          data: package_no_subscription
+        }])
 
 
 
@@ -423,8 +439,8 @@ export default function Home() {
 
             <div className="bg-[#00000009] p-3 rounded-3xl">
               <div className="rounded-2xl bg-background  p-5 w-full ">
-                {/* <div id="chart"></div> */}
-                <ReactApexChart options={optionsBarPackage} series={seriesBarPackage} type="bubble" height={350} />
+
+                <ReactApexChart options={optionsBarPackage} series={seriesBarPackage} type="bar" height={350} />
               </div>
             </div>
 
