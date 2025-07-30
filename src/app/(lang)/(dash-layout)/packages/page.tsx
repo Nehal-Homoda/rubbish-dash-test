@@ -230,16 +230,34 @@ export default function rubbush_collectors() {
 
     const ca = categories.find((cate) => cate.name_ar === item.category);
 
-    // setUpdateFormData({
-    //   name_ar: item.name_ar,
-    //   name_en: item.name_ar,
-    //   order: item.order ? item.order : 0,
-    //   is_active: item.is_active ? 1 : 0,
-    //   category_id: ca?.id ?? "",
-    //   days_count: item.days_count ? parseInt(item.days_count) : "",
-    //   price_per_unit: item.price_per_unit ? parseInt(item.price_per_unit) : "",
+    setUpdateFormData({
+      name_ar: item.name_ar,
+      name_en: item.name_ar,
+      order: item.order ? item.order : 0,
+      is_active: item.is_active ? 1 : 0,
+      category_id: ca?.id ?? "",
+      days_count: item.days_count ? parseInt(item.days_count) : "",
+      price_per_unit: item.price_per_unit ? parseInt(item.price_per_unit) : "",
+      discounts: [
 
-    // });
+        {
+          min_units: 5,
+          max_units: 10,
+          discount_rate: item.discounts ? item.discounts[0].discount_rate : 0
+        },
+        {
+          min_units: 10,
+          max_units: 15,
+          discount_rate: item.discounts ? item.discounts[1].discount_rate :0
+        },
+        {
+          min_units: 20,
+          max_units: '',
+          discount_rate: item.discounts ? item.discounts[2].discount_rate :0
+        }
+      ]
+
+    });
   };
 
   const updateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -740,7 +758,7 @@ export default function rubbush_collectors() {
                                   <span>{item.min_units} - {item.max_units} وحدة</span>
                                 </div>
                                 <div className="col-span-8 mb-7">
-                                  <TextFieldNada prependIcon="mdi mdi-ticket-percent-outline text-gray-400 " handleChange={(value) => handleChangeValue(value, index)} name="discount_value_percentage" label="نسبة الخصم" placeholder="ادخل نسبة الخصم" type="number" value={formData.discounts[index]?.discount_rate} />
+                                  <TextFieldNada prependIcon="mdi mdi-ticket-percent-outline text-gray-400 " handleChange={(value) => handleChangeValue(value, index)} name="discount_value_percentage" label="نسبة الخصم" placeholder="ادخل نسبة الخصم" type="number" value={updateFormData.discounts[index]?.discount_rate} />
                                 </div>
 
                               </div>

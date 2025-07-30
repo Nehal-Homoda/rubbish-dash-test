@@ -9,6 +9,7 @@ export interface PackageOffer {
     no_of_subscriptions: number;
     category: string | null;
     created_at: string;
+    discounts:PackageDiscount[];
 }
 
 export interface PackageDiscount {

@@ -333,12 +333,18 @@ export default function rubbush_collectors() {
     );
   };
   useEffect(() => {
-    fetchDataList();
-    if (filterWith) {
+
+    const filterWith = searchParams.get('is_request_recycle')
+    console.log('filteration is', filterWith)
+    if (filterWith !== null) {
       //@ts-ignore
       fetchDataList({ is_request_recycle: 1, pageNum: 1 });
     }
-  }, [page]); // runs every time `page` changes
+    else {
+      fetchDataList()
+    }
+  }, [page, searchParams]); // runs every time `page` changes
+
 
   return (
     <>
