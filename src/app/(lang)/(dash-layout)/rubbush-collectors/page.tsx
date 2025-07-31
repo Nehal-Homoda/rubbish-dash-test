@@ -21,6 +21,8 @@ import {
 import { getDistrictService } from "@/services/districtService";
 import { District } from "@/types/district.interface";
 import { useLocalePath } from "@/utils/lang";
+import editImg from '@/assets/images/icons/edit.png'
+
 
 
 
@@ -523,8 +525,12 @@ export default function rubbush_collectors() {
                             <td className="">
                                 <div className="flex  gap-3">
                                     <button onClick={() => { router.push(localePath('/rubbush-collectors/details/profile?id=' + item.id)) }} className="bg-blue-100 p-1 px-2 rounded-lg">
-                                        <span className="mdi mdi-eye text-blue-500"></span>
+                                        <div className="w-4 h-4 cursor-pointer">
+                                            <img className="w-full h-full object-contain" src={editImg.src} alt="" />
+                                        </div>
                                     </button>
+
+
                                     <UIDialogConfirm
                                         danger
                                         title="هل انت متأكد من حذف العنصر"

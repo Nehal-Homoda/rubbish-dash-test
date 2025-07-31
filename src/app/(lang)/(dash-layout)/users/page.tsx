@@ -382,8 +382,15 @@ export default function rubbush_collectors() {
                 </td> */}
 
 
-              <td className="py-2 px-4">{item.is_request_recycle ? 'جمع وتدوير' : 'جمع فقط'}</td>
+              {/* <td className="py-2 px-4">{item.is_request_recycle ? 'جمع وتدوير' : 'جمع فقط'}</td> */}
 
+              <td className="py-2 px-4">
+                {!item.has_subscription
+                  ? '-'
+                  : item.is_request_recycle
+                    ? 'جمع وتدوير'
+                    : 'جمع فقط'}
+              </td>
 
               <td className="py-2 px-4">
                 <UIPrimaryDropdown

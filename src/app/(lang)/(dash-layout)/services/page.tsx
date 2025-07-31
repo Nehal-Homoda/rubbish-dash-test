@@ -385,7 +385,7 @@ export default function rubbush_collectors() {
                 //   label="نسبة الخصم"
                 //   prependIcon="mdi mdi-ticket-percent-outline"
                 // ></SelectInput>
-                <TextFieldNada prependIcon="mdi mdi-ticket-percent-outline text-gray-400 " handleChange={addFormChangeHander} name="discount_value_percentage" label="نسبة الخصم" placeholder="ادخل نسبة الخصم" type="number" value={formData.discount_value_percentage} />
+                <TextFieldNada isPercentage={true} prependIcon="mdi mdi-ticket-percent-outline text-gray-400 " handleChange={addFormChangeHander} name="discount_value_percentage" label="نسبة الخصم" placeholder="ادخل نسبة الخصم" type="number" value={formData.discount_value_percentage} />
               )}
             </div>
           </form>
@@ -564,7 +564,7 @@ export default function rubbush_collectors() {
                           // ></SelectInput>
 
 
-                          <TextFieldNada prependIcon="mdi mdi-ticket-percent-outline text-gray-400 " handleChange={updateFormChangeHander} name="discount_value_percentage" label="نسبة الخصم" placeholder="ادخل نسبة الخصم" type="number" value={updateFormData.discount_value_percentage} />
+                          <TextFieldNada isPercentage={true} prependIcon="mdi mdi-ticket-percent-outline text-gray-400 " handleChange={updateFormChangeHander} name="discount_value_percentage" label="نسبة الخصم" placeholder="ادخل نسبة الخصم" type="number" value={updateFormData.discount_value_percentage} />
                         )}
                       </div>
                     </form>

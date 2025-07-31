@@ -261,35 +261,35 @@ export default function rubbush_collectors() {
     const body = JSON.stringify({
       status: value,
     });
-    if (value == "accepted") {
-      return
-      // setSubscriptionStatus(item, "accept");
-    }
-    if (value == "pending") {
-      setSubscriptionStatus(item, "pending");
-    }
-    if (value == "reject") {
-      return
-      // setSubscriptionStatus(item, "reject");
-    }
+    // if (value == "accepted") {
+    //   return
+    //   // setSubscriptionStatus(item, "accept");
+    // }
+    // if (value == "pending") {
+    //   setSubscriptionStatus(item, "pending");
+    // }
+    // if (value == "reject") {
+    //   return
+    //   // setSubscriptionStatus(item, "reject");
+    // }
 
-    // updatePaymentService(service.id, body)
-    //   .then((response) => {
-    //     const arr = [...dataList];
-    //     arr[index].status = value;
+    updatePaymentService(service.id, body)
+      .then((response) => {
+        const arr = [...dataList];
+        arr[index].status = value;
 
-    //     // setDataList(arr);
+        setDataList(arr);
 
-    //     // console.log(value);
+        // console.log(value);
 
-    //     // if (value === "accepted") {
-    //     //   setSubscriptionStatus(item, "accept");
-    //     // }
-    //     // if (value === "rejected") {
-    //     //   setSubscriptionStatus(item, "reject");
-    //     // }
-    //   })
-    //   .catch((error) => { });
+        if (value === "accepted") {
+          setSubscriptionStatus(item, "accept");
+        }
+        if (value === "rejected") {
+          setSubscriptionStatus(item, "reject");
+        }
+      })
+      .catch((error) => { });
 
   };
   const setSubscriptionStatus = (

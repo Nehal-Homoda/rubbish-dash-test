@@ -84,7 +84,13 @@ export default function page() {
 
     const fetchDistrict = () => {
         districtListService().then((response) => {
-            setDistrict(response.data);
+
+//@ts-ignore
+            const activeDistricts = response.data.filter((item, index) => {
+                return item.is_active
+            })
+           
+            setDistrict(activeDistricts);
             //@ts-ignore
 
             setDistrictDays([]);
@@ -134,13 +140,21 @@ export default function page() {
     const fetchPackages = () => {
         getPackagesService().then((response) => {
             console.log(response);
-            setpackagesList(response.data);
+            const activePackages = response.data.filter((item, index) => {
+                return item.is_active
+            })
+           
+            setpackagesList(activePackages);
         });
     };
 
     const fetchCategories = () => {
         getCategoriesService().then((response) => {
-            setCategoryList(response.data);
+            const activeCategories = response.data.filter((item, index) => {
+                return item.is_active
+            })
+            console.log('filterrrred', activeCategories)
+            setCategoryList(activeCategories);
         });
     };
 

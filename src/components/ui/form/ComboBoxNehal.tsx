@@ -42,7 +42,7 @@ export default function ComboBoxNehal({ listItem,
     }
 
 
-    const handleInputChange = (e:any) => {
+    const handleInputChange = (e: any) => {
         setQuery(e.target.value)
         onQueryChange?.(e.target.value);
     }
@@ -66,6 +66,9 @@ export default function ComboBoxNehal({ listItem,
                     />
                     <div className="label flex items-center gap-1 absolute -top-4 start-4 bg-background w-fit px-3  text-sm font-semibold">
                         <label>{label}</label>
+                    </div>
+                    <div className="px-4 h-full flex justify-center items-center absolute top-0 left-0   ">
+                        <span className="mdi mdi-magnify"></span>
                     </div>
 
                     <ComboboxOptions className="h-64 overflow-y-auto empty:invisible max-w-full px-5 py-3 cursor-pointer absolute z-50 w-full ltr:left-0 rtl:right-0 mt-2 origin-top-right divide-y rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">

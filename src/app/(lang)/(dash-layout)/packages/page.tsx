@@ -61,7 +61,7 @@ export default function rubbush_collectors() {
     },
     {
       min_units: 20,
-      max_units: 0,
+      max_units: "",
       discount_rate: 0
     }
   ]
@@ -248,12 +248,12 @@ export default function rubbush_collectors() {
         {
           min_units: 10,
           max_units: 15,
-          discount_rate: item.discounts ? item.discounts[1].discount_rate :0
+          discount_rate: item.discounts ? item.discounts[1].discount_rate : 0
         },
         {
           min_units: 20,
           max_units: '',
-          discount_rate: item.discounts ? item.discounts[2].discount_rate :0
+          discount_rate: item.discounts ? item.discounts[2].discount_rate : 0
         }
       ]
 
@@ -516,7 +516,7 @@ export default function rubbush_collectors() {
 
 
               }
-              <TextFieldNada
+              <TextFieldNada isDays={true}
                 name="days_count"
                 type="number"
                 handleChange={addFormChangeHander}
@@ -535,7 +535,7 @@ export default function rubbush_collectors() {
                   {discountArr.map((item, index) => (
                     <div key={index} className="grid grid-cols-12 gap-5 ">
                       <div className="col-span-4 border py-3 px-5 flex justify-center items-center  rounded-xl mb-7 ">
-                        <span>{item.min_units} - {item.max_units} وحدة</span>
+                        {index < 2 ? <span>{item.min_units} - {item.max_units} وحدة</span> : <span>20 وحدة او اكثر</span>}
                       </div>
                       <div className="col-span-8 mb-7">
                         <TextFieldNada prependIcon="mdi mdi-ticket-percent-outline text-gray-400 " handleChange={(value) => handleChangeValue(value, index)} name="discount_value_percentage" label="نسبة الخصم" placeholder="ادخل نسبة الخصم" type="number" value={formData.discounts[index]?.discount_rate} />
@@ -742,6 +742,7 @@ export default function rubbush_collectors() {
                           value={updateFormData.days_count}
                           label=" مدة الباقة "
                           placeholder=" ادخل مدة الباقة  "
+                          isDays={true}
                         ></TextFieldNada>
 
 
@@ -755,7 +756,8 @@ export default function rubbush_collectors() {
                             {discountArr.map((item, index) => (
                               <div key={index} className="grid grid-cols-12 gap-5 ">
                                 <div className="col-span-4 border py-3 px-5 flex justify-center items-center  rounded-xl mb-7 ">
-                                  <span>{item.min_units} - {item.max_units} وحدة</span>
+                                  {index < 2 ? <span>{item.min_units} - {item.max_units} وحدة</span> : <span>20 وحدة او اكثر</span>}
+
                                 </div>
                                 <div className="col-span-8 mb-7">
                                   <TextFieldNada prependIcon="mdi mdi-ticket-percent-outline text-gray-400 " handleChange={(value) => handleChangeValue(value, index)} name="discount_value_percentage" label="نسبة الخصم" placeholder="ادخل نسبة الخصم" type="number" value={updateFormData.discounts[index]?.discount_rate} />

@@ -47,9 +47,6 @@ export default function Home() {
 
   const [seriesBar, setSeriesBar] = useState<SeriesItem[]>([
     {
-      name: 'الشهر',
-      data: []
-    }, {
       name: 'عدد الاشتراكات',
       data: []
     },])
@@ -290,10 +287,8 @@ export default function Home() {
 
 
 
-      setSeriesBar([{
-        name: 'الشهر',
-        data: month
-      }, {
+      setSeriesBar([
+        {
         name: 'عدد الاشتراكات',
         data: no_subscription
       }])

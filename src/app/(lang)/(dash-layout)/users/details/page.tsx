@@ -44,7 +44,7 @@ export default function page() {
         { name: "المدفوعات", type: "payment" },
     ];
 
-    const userRubbish = [{ title: 'الوزن', number: user?.all_recycle_weights }, { title: 'الرصيد', number: user?.deserved_money_by_recycle }]
+    const userRubbish = [{ title: 'الوزن', number: user?.all_recycle_weights  ? user?.all_recycle_weights :0 }, { title: 'الرصيد', number: user?.deserved_money_by_recycle }]
 
     //@ts-ignore
     const handleChangeBtnType = (item) => {

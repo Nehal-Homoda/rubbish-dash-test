@@ -475,6 +475,21 @@ export default function rubbush_collectors({ user }: Props) {
 
 
 
+    useEffect(() => {
+        if (addSubscriptionFormData.district_id) {
+            const ca = district.find(
+                (item) => item.id.toString() == addSubscriptionFormData.district_id.toString()
+            );
+
+            if (ca) {
+                setDistrictDays(ca.available_days);
+                setDistrictTime(ca.available_times);
+            }
+        }
+    }, [addSubscriptionFormData]);
+
+
+
 
 
 

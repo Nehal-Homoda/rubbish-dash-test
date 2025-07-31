@@ -17,6 +17,8 @@ type Props = {
     iconType?: "mdi" | "fa";
     disabled?: boolean;
     isPrice?: boolean;
+    isPercentage?:boolean;
+    isDays?:boolean;
     handleChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
@@ -35,6 +37,8 @@ export default function TextFieldNada({
     iconType = "mdi",
     disabled = false,
     isPrice = false,
+    isPercentage = false,
+    isDays=false,
     handleChange,
 }: Props) {
     const [inputType, setInputType] = useState(type);
@@ -84,6 +88,12 @@ export default function TextFieldNada({
 
                             {isPrice && <div className="px-4 h-full flex justify-center items-center absolute top-0 left-0  border-r ">
                                 جنيه
+                            </div>}
+                            {isPercentage && <div className="px-4 h-full flex justify-center items-center absolute top-0 left-0  border-r ">
+                                %
+                            </div>}
+                            {isDays && <div className="px-4 h-full flex justify-center items-center absolute top-0 left-0  border-r ">
+                                يوم
                             </div>}
                         </div>
 
