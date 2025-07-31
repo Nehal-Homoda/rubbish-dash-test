@@ -539,13 +539,13 @@ export default function rubbush_collectors() {
 
                         <div className="py-6 ">
                           <ToggleSwitch
-                            checked={item.has_recycle == 1 ? true : false}
+                            checked={switch1}
                             label="اعادة تدوير"
                             onChange={(value) => handleCheckSubscription(value, 'edit')}
                           />
                         </div>
 
-                        {item.has_recycle && (
+                        {item.has_recycle && switch1 && (
                           // <SelectInput
                           //   placeholder="اختر نسبة الخصم"
                           //   onChange={(value) =>
