@@ -367,7 +367,7 @@ export default function Home() {
 
                   <div className=" text-[#38433B] text-2xl font-bold">
                     {userStatistics && <span>{item.slug === 'completed_visited'
-                      ? ((userStatistics[item.slug] / userStatistics.total_visits_count) * 100).toFixed(2) + '%'
+                      ? (`${userStatistics[item.slug]} / ${userStatistics.total_visits_count}`)
                       : userStatistics[item.slug]}</span>}
                   </div>
 
