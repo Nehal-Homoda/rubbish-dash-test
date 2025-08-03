@@ -13,7 +13,11 @@ import BaseDataTable from "@/components/data-tables/BaseDataTable";
 import { Users } from "@/types/auth.interface";
 import { getUserService } from "@/services/userService";
 import { useRouter } from "next/navigation";
-
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import moment, { months } from "moment";
+import SelectInput from "@/components/ui/form/SelectInput";
+import CustomSelectInput from "@/components/ui/form/CustomSelectInput";
 // ✅ Dynamically import chart component only on client side
 const ReactApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
@@ -43,6 +47,64 @@ export default function Home() {
   ];
 
   const [dataList, setDataList] = useState<Users[]>([]);
+  const [selectedMonth, setSelectedMonth] = useState('')
+
+  const [month, setMonth] = useState([
+    { title: 'يناير ', slug: '1' },
+    { title: ' فبراير', slug: '2' },
+    { title: 'مارس ', slug: '3' },
+    { title: 'ابريل ', slug: '4' },
+    { title: 'مايو ', slug: '5' },
+    { title: 'يونيو ', slug: '6' },
+    { title: 'يوليو ', slug: '7' },
+    { title: 'اغسطس ', slug: '8' },
+    { title: 'سبتمبر ', slug: '9' },
+    { title: 'اكتوبر', slug: '10' },
+    { title: 'نوفمبر ', slug: '11' },
+    { title: 'ديسمبر ', slug: '12' },
+
+  ])
+
+  const getMonthName = (monthNumber: number) => {
+    if (monthNumber == 1) {
+      return 'يناير'
+    }
+    if (monthNumber == 2) {
+      return 'فبراير'
+    }
+    if (monthNumber == 3) {
+      return 'مارس'
+    }
+    if (monthNumber == 4) {
+      return 'ابريل'
+    }
+    if (monthNumber == 5) {
+      return 'مايو'
+    }
+    if (monthNumber == 6) {
+      return 'يونيو'
+    }
+    if (monthNumber == 7) {
+      return 'يوليو'
+    }
+    if (monthNumber == 8) {
+      return 'اغسطس'
+    }
+    if (monthNumber == 9) {
+      return 'سبتمبر'
+    }
+    if (monthNumber == 10) {
+      return 'اكتوبر'
+    }
+    if (monthNumber == 11) {
+      return 'نوفمبر'
+    }
+    if (monthNumber == 12) {
+      return 'ديسمبر'
+    }
+
+
+  }
 
 
   const [seriesBar, setSeriesBar] = useState<SeriesItem[]>([
@@ -178,6 +240,11 @@ export default function Home() {
   const [categoryName, setCatergoryName] = useState<string[]>([])
   const [userListRecycle, setUserListRecycle] = useState<UserListWithRecycle[]>([])
   const router = useRouter()
+  const [selectedDate, setSelectedDate] = useState(new Date())
+  const [year, setYear] = useState('')
+
+
+
 
 
   const paymentList = [
@@ -236,8 +303,15 @@ export default function Home() {
     })
   }
 
-  const fetchChartStatistics = () => {
-    chartStatisticsHomeService().then((response) => {
+  const fetchChartStatistics = ({ category_month = selectedMonth, category_year = year }: { category_month?: string; category_year?: string } = {}) => {
+
+    const hasCategoryMonth = category_month ? "&category_month=" + category_month : "";
+    const hasCategoryYear = category_year ? "&category_year=" + category_year : "";
+
+    const query = `?page=${hasCategoryMonth}${hasCategoryYear}`;
+
+
+    chartStatisticsHomeService(query).then((response) => {
       setChartData(response.data)
       const name = response.data.statsCategory.map((item, index) => {
         return item.category
@@ -289,9 +363,9 @@ export default function Home() {
 
       setSeriesBar([
         {
-        name: 'عدد الاشتراكات',
-        data: no_subscription
-      }])
+          name: 'عدد الاشتراكات',
+          data: no_subscription
+        }])
 
 
 
@@ -327,6 +401,37 @@ export default function Home() {
   useEffect(() => {
 
   }, [categoryName])
+
+  const renderYearContent = (year: any) => {
+
+    const tooltipText = `Tooltip for year: ${year}`;
+    return <span title={tooltipText}>{year}</span>;
+  };
+
+  const handleDateSelect = (item: any) => {
+    const formatedDate = moment(item).format('YYYY')
+    setSelectedDate(item)
+    setYear(formatedDate)
+  }
+
+  const handleBtnStyle = () => {
+    return (
+      <>
+        <div className="bg-[#0094140A] text-[#009414] py-3 px-2">
+          {!selectedMonth ? <span >احصائيات الشهر</span> : <span>{getMonthName(Number(selectedMonth))}</span>}
+
+        </div>
+
+      </>
+    )
+  }
+
+
+
+  useEffect(() => {
+    fetchChartStatistics({ category_month: selectedMonth, category_year: year })
+
+  }, [month, year])
 
 
 
@@ -425,8 +530,35 @@ export default function Home() {
         <div className="mb-10">
           <div className="grid xl:grid-cols-2 grid-cols-1 gap-5" >
             <div className="bg-[#00000009] p-3 rounded-3xl">
-              <div className="rounded-2xl bg-background  p-5 w-full ">
+              <div className="rounded-2xl bg-background  p-5 w-full relative ">
                 {/* <div id="chart"></div> */}
+                <div className="flex items-center">
+                  <div>
+                    <CustomSelectInput
+                      value={selectedMonth}
+                      items={month}
+                      itemName="title"
+                      itemValue="slug"
+                      btnSlot={handleBtnStyle()}
+                      onChange={(value) => {
+                        setSelectedMonth(value)
+                      }}
+                    >
+
+
+                    </CustomSelectInput>
+
+                  </div>
+                  <DatePicker className="absolute -top-5 -left-56 z-50"
+                    selected={selectedDate}
+                    onSelect={handleDateSelect}
+                    renderYearContent={renderYearContent}
+                    showYearPicker
+                    dateFormat="yyyy"
+                  />
+
+                </div>
+
                 <ReactApexChart options={optionsBar} series={seriesBar} type="bar" height={350} />
               </div>
             </div>

@@ -108,7 +108,7 @@ export const paymentsHomeService = async () => {
         if (!response.ok) {
             await responseErrorServiceHandler(response, "statistics");
         }
-        const data = (await response.json());
+        const data = await response.json();
         console.log("response data =>>>>", data);
         return data;
     } catch (error: any) {
@@ -116,15 +116,17 @@ export const paymentsHomeService = async () => {
     }
 };
 
-
-export const chartStatisticsHomeService = async () => {
+export const chartStatisticsHomeService = async (query?: string) => {
     try {
-        const response = await apiCall.get(`/admins/home/section-three`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-            },
-        });
+        const response = await apiCall.get(
+            `/admins/home/section-three${decodeURIComponent(query || "")}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
         if (!response.ok) {
             await responseErrorServiceHandler(response, "statistics");
         }
@@ -135,5 +137,3 @@ export const chartStatisticsHomeService = async () => {
         throw new Error(error.message);
     }
 };
-
-

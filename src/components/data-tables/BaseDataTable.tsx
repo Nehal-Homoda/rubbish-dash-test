@@ -15,6 +15,7 @@ type Props = {
     showSearch?: boolean;
     showPagination?: boolean;
     totalPages?: number;
+    headerVisitsSlot?: React.ReactNode;
     onSearchChange: (value: React.ChangeEvent<HTMLInputElement>) => void;
     onPageChange: (pageNum: number) => void;
 };
@@ -26,6 +27,7 @@ export default function ({
     showSearch = true,
     showPagination = true,
     totalPages = 1,
+    headerVisitsSlot,
     onSearchChange,
     onPageChange,
 }: Props) {
@@ -40,7 +42,7 @@ export default function ({
     };
     const searchChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchInput(e.target.value);
-       
+
         onSearchChange(e);
     };
     return (
@@ -88,6 +90,10 @@ export default function ({
                                 <i className="mdi mdi-tray-arrow-down text-[#009414] text-xl"></i>
                             </div> */}
                         </div>
+                    </div>
+
+                    <div>
+                        {headerVisitsSlot}
                     </div>
 
                     <div className="w-full overflow-x-auto min-h-[350px]">

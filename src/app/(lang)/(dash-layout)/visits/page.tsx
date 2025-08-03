@@ -43,6 +43,30 @@ export default function rubbush_collectors() {
         { is_active: "collected", name: "مجمع" },
         { is_active: "not_collected", name: "غير مجمع" },
     ];
+
+    const visitList = [
+
+
+        { name: 'الكل', archive: '' },
+
+        {
+
+
+            name: 'الزيارات القديمة',
+            archive: '1'
+
+        },
+
+        {
+            name: 'الزيارات الحديثة',
+            archive: '0'
+
+        }]
+
+
+    const [currentType, setCurrentType] = useState("")
+
+
     const [totalPages, setTotalPages] = useState(1);
     const [page, setPage] = useState(1);
     const [selectedDataItem, setSelectedDataItem] = useState<Visit | null>(
@@ -71,26 +95,30 @@ export default function rubbush_collectors() {
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState<string | undefined>("");
     const [categoryFilter, setCategoryFilter] = useState<number | undefined>(undefined);
+    const [archiveFilter, setArchiveFilter] = useState<number | undefined>(undefined);
 
     const fetchDataList = ({
         search = searchTerm,
         status = statusFilter,
         category_id = categoryFilter,
+        archive = archiveFilter,
         pageNum = page
     }: {
         search?: string;
         status?: string;
         category_id?: number | undefined;
+        archive?: number | undefined;
         pageNum?: number | undefined
     } = {}) => {
         console.log(status);
         const statusParam = status != undefined ? "&status=" + status : "";
         const category =
             category_id != undefined ? "&category_id=" + category_id : "";
+        const isArchive = archive != undefined ? "&archived=" + archive : "";
         const hasSearch = search ? "&search=" + search : "";
 
 
-        const query = `?page=${pageNum}${hasSearch}${statusParam}${category}`;
+        const query = `?page=${pageNum}${hasSearch}${statusParam}${category}${isArchive}`;
 
         getVisitsService(query).then((response) => {
             setDataList(response.data);
@@ -114,6 +142,19 @@ export default function rubbush_collectors() {
         setPage(1);
         fetchDataList({ status: value, pageNum: 1 });
     };
+
+    const handleArchiveFilter = (item: any) => {
+        console.log('item is', item)
+        setCurrentType(item.archive)
+        setArchiveFilter(item.archive)
+        setPage(1);
+        fetchDataList({ archive: item.archive, pageNum: 1 })
+
+
+
+    }
+
+
 
     const handleCategoryFilter = (value: number | undefined) => {
         setCategoryFilter(value);
@@ -204,6 +245,9 @@ export default function rubbush_collectors() {
         return statusList.find((item) => item.is_active === name)?.name ?? "";
     };
 
+
+
+
     const tableHeadActionsSlot = () => {
         return (
             <>
@@ -232,6 +276,25 @@ export default function rubbush_collectors() {
             </>
         );
     };
+
+
+    const tableVisitsFilteration = () => {
+        return (
+            <>
+                <div className="py-5 md:flex  ">
+                    {visitList.map((item, index) => (
+
+                        <button onClick={() => handleArchiveFilter(item)} key={index} className={`${item.archive == currentType ? 'border-b-2 border-[#009414]' : ''} w-40 pb-3 font-bold text-[#38433B]`}>
+                            {item.name}
+                        </button>
+                    ))}
+                </div>
+
+
+
+            </>
+        )
+    }
     const fetchCategories = () => {
         getCategoriesService()
             .then((response) => {
@@ -242,18 +305,24 @@ export default function rubbush_collectors() {
     useEffect(() => {
         fetchDataList();
         fetchCategories();
-    }, [page]); 
+    }, [page]);
 
     return (
         <>
             <div className="py-20">
+
+
+
+
                 <BaseDataTable
                     headItems={headerArr}
                     onPageChange={setPage}
                     totalPages={totalPages}
                     onSearchChange={tableSearchHandler}
                     headerActionsSlot={tableHeadActionsSlot()}
+                    headerVisitsSlot={tableVisitsFilteration()}
                 >
+
                     {dataList.map((item, index) => (
                         <tr key={index}>
                             <td className="py-2 px-4">{item.id}</td>
