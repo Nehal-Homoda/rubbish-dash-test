@@ -42,7 +42,7 @@ export default function Home() {
     { text: "اسم المستخدم", name: "name" },
     { text: "الوزن", name: "weight" },
     { text: "الرصيد", name: "name" },
-    { text: "الاجراءات", name: "name" },
+    // { text: "الاجراءات", name: "name" },
 
   ];
 
@@ -780,9 +780,9 @@ export default function Home() {
 
 
 
-                            <button onClick={() => { }} className="bg-blue-100 p-1 px-2 rounded-lg">
+                            {/* <button onClick={() => { }} className="bg-blue-100 p-1 px-2 rounded-lg">
                               <span className="mdi mdi-eye text-blue-500"></span>
-                            </button>
+                            </button> */}
                           </td>
 
                         </tr>

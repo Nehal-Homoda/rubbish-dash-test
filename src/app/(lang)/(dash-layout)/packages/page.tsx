@@ -200,6 +200,8 @@ export default function rubbush_collectors() {
 
     const body = JSON.stringify({
       is_active: value,
+     updateFormData
+      
     });
 
     updatePackageService(service.id, body)
