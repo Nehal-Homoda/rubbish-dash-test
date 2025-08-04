@@ -257,9 +257,7 @@ export default function rubbush_collectors({ user }: Props) {
         category_id: "",
         price_per_unit: "",
         units: 1,
-        // renew_date: "",
-        // address_details: "",
-        // payment_method_id: "",
+      
     });
 
 
