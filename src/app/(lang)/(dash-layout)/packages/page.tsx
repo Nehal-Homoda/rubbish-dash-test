@@ -50,8 +50,8 @@ export default function rubbush_collectors() {
 
   const discountArr = [
     {
-      min_units: 5,
-      max_units: 10,
+      min_units: 2,
+      max_units: 5,
       discount_rate: 0
     },
     {
@@ -118,8 +118,8 @@ export default function rubbush_collectors() {
     days_count: "",
     discounts: [
       {
-        min_units: 5,
-        max_units: 10,
+        min_units: 2,
+        max_units: 5,
         discount_rate: 0
       },
       {
@@ -241,8 +241,8 @@ export default function rubbush_collectors() {
       discounts: [
 
         {
-          min_units: 5,
-          max_units: 10,
+          min_units: 2,
+          max_units: 5,
           discount_rate: item.discounts ? item.discounts[0].discount_rate : 0
         },
         {

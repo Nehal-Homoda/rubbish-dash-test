@@ -212,12 +212,11 @@ input {
 /* override Tailwind's reset */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: auto;
+    -webkit-appearance: auto;
 }
 input[type="number"] {
-  -moz-appearance: number-input;
+    -moz-appearance: number-input;
 }
-
 
 @keyframes rotate {
     0% {
@@ -246,4 +245,14 @@ input[type="number"] {
             100% 100%
         );
     }
+}
+
+.react-datepicker-wrapper input::placeholder {
+    color: #009414;
+    font-family: Cairo, sans-serif !important;
+}
+.react-datepicker-wrapper input:focus {
+   
+    border: none;
+    outline: none;
 }

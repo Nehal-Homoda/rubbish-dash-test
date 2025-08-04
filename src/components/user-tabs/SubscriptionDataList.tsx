@@ -384,8 +384,15 @@ export default function rubbush_collectors({ user }: Props) {
 
     const fetchDistrict = () => {
         districtListService().then((response) => {
-            setDistrict(response.data);
+            // setDistrict(response.data);
 
+
+            //@ts-ignore
+            const activeDistricts = response.data.filter((item, index) => {
+                return item.is_active
+            })
+
+            setDistrict(activeDistricts);
             response.data.map((item: any, index: number) => {
                 setDistrictDays(item.available_days);
                 setDistrictTime(item.available_times);
@@ -394,15 +401,28 @@ export default function rubbush_collectors({ user }: Props) {
     };
     const fetchCategories = () => {
         getCategoriesService().then((response) => {
+            const activeCategories = response.data.filter((item, index) => {
+                return item.is_active
+            })
+            console.log('filterrrred', activeCategories)
             //@ts-ignore
-            setCategoryList(response.data);
+            setCategoryList(activeCategories);
+
+
+
+
+            // setCategoryList(response.data);
         });
     };
 
     const fetchPackagesList = () => {
         getPackagesService().then((response) => {
-            setpackagesList(response.data)
+            // setpackagesList(response.data)
+            const activePackages = response.data.filter((item, index) => {
+                return item.is_active
+            })
 
+            setpackagesList(activePackages);
         })
     }
 
@@ -417,16 +437,47 @@ export default function rubbush_collectors({ user }: Props) {
         console.log(img);
     };
 
+    const resetForm = () => {
+        setAddSubscriptionFormData({
+            name: "",
+            phone: "",
+            password: "default-password",
+            district_id: "",
+            has_subscription: 0,
+            package_id: "",
+
+            payment_method_id: "",
+            days: [],
+            start_date: "",
+            time_from: "",
+            units: 1,
+            category_id: "",
+            payment_verification: "",
+            address_title: "",
+            address_lat: "34.1531",
+            address_lng: "34.1531",
+            address_details: "",
+        })
+
+
+    }
+
     useEffect(() => {
         if (packageItem) {
             setTotalPrice(Number(packageItem.price_per_unit) * formData.units);
         }
     }, [formData.units]);
+
+
+
+
     useEffect(() => {
         if (packageItem) {
             setTotalPrice(Number(packageItem.price_per_unit) * formData.units);
         }
     }, [packageItem]);
+
+
 
     //@ts-ignore
     const handleSelectPackage = (value) => {
@@ -465,6 +516,28 @@ export default function rubbush_collectors({ user }: Props) {
             }
         }
     }, [formData]);
+
+
+    useEffect(() => {
+        if (addSubscriptionFormData.category_id) {
+            // // const ca = district.find(
+            // //     (item) => item.id.toString() == formData.district_id.toString()
+            // );
+            const categoryId = categoryList.find((item) => item.id.toString() == addSubscriptionFormData.category_id.toString())
+            console.log('aaaaaaaaaaaaaaa', categoryId)
+
+            if (categoryId) {
+                const query = `?category_id=${categoryId.id}`
+                getPackagesService(query).then((response) => {
+                    setpackagesList(response.data)
+                    console.log('responsssssssssssssssssssse is', response)
+
+                })
+
+
+            }
+        }
+    }, [addSubscriptionFormData]);
 
     useEffect(() => {
         fetchDistrict()
@@ -515,7 +588,7 @@ export default function rubbush_collectors({ user }: Props) {
                 </div> */}
 
 
-                <UIBaseDialog
+                <UIBaseDialog confirmCloseHandler={resetForm}
                     title="اضافة اشتراك"
                     confirmHandler={() => { }}
                     confirmText="اضافة"
@@ -595,6 +668,7 @@ export default function rubbush_collectors({ user }: Props) {
 
                             <div className="col-span-6">
                                 <SelectInput
+                                  disabled={!addSubscriptionFormData.category_id}
                                     errorMessage={formErrors.package_id || ''}
                                     items={packagesList}
                                     placeholder="ادخل نوع الباقه"
@@ -682,6 +756,7 @@ export default function rubbush_collectors({ user }: Props) {
                             </div>
                             <div className="col-span-6">
                                 <SelectInput
+                                    disabled={!addSubscriptionFormData.district_id}
                                     errorMessage={formErrors.time_from || ''}
 
                                     items={districtTime}

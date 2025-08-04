@@ -48,6 +48,7 @@ export default function Home() {
 
   const [dataList, setDataList] = useState<Users[]>([]);
   const [selectedMonth, setSelectedMonth] = useState('')
+  const [selectedPackageMonth, setSelectedPackageMonth] = useState('')
 
   const [month, setMonth] = useState([
     { title: 'يناير ', slug: '1' },
@@ -240,9 +241,10 @@ export default function Home() {
   const [categoryName, setCatergoryName] = useState<string[]>([])
   const [userListRecycle, setUserListRecycle] = useState<UserListWithRecycle[]>([])
   const router = useRouter()
-  const [selectedDate, setSelectedDate] = useState(new Date())
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [year, setYear] = useState('')
-
+  const [selectedPackageDate, setSelectedPackageDate] = useState<Date | null>(null)
+  const [packageYear, setPackageYear] = useState('')
 
 
 
@@ -303,12 +305,14 @@ export default function Home() {
     })
   }
 
-  const fetchChartStatistics = ({ category_month = selectedMonth, category_year = year }: { category_month?: string; category_year?: string } = {}) => {
+  const fetchChartStatistics = ({ category_month = selectedMonth, category_year = year, package_month = selectedPackageMonth, package_year = packageYear }: { category_month?: string; category_year?: string, package_month?: string; package_year?: string } = {}) => {
 
     const hasCategoryMonth = category_month ? "&category_month=" + category_month : "";
     const hasCategoryYear = category_year ? "&category_year=" + category_year : "";
+    const hasPackageMonth = package_month ? "&package_month=" + package_month : "";
+    const hasPackageYear = package_year ? "&package_year=" + package_year : "";
 
-    const query = `?page=${hasCategoryMonth}${hasCategoryYear}`;
+    const query = `?page=${hasCategoryMonth}${hasCategoryYear}${hasPackageMonth}${hasPackageYear}`;
 
 
     chartStatisticsHomeService(query).then((response) => {
@@ -391,10 +395,15 @@ export default function Home() {
     fetchPayments()
     fetchChartStatistics()
   }, [])
-  const handleGoToUser = () => {
 
-    router.push('/users/is_request_recycle')
-  }
+
+  // useEffect(() => {
+  //   const currentDate = new Date();
+  //   const currentMonth = (currentDate.getMonth() + 1).toString();
+  //   const currentYear = currentDate.getFullYear().toString();
+  //   setSelectedMonth(currentMonth);
+  //   setYear(currentYear);
+  // }, [])
 
 
 
@@ -402,36 +411,60 @@ export default function Home() {
 
   }, [categoryName])
 
-  const renderYearContent = (year: any) => {
+  // const renderYearContent = (year: any) => {
 
-    const tooltipText = `Tooltip for year: ${year}`;
-    return <span title={tooltipText}>{year}</span>;
-  };
+  //   const tooltipText = `Tooltip for year: ${year}`;
+  //   return <span title='ssss'>dsf</span>;
+  // };
 
-  const handleDateSelect = (item: any) => {
+  const handleDateSelect = (item: any, name: string) => {
     const formatedDate = moment(item).format('YYYY')
-    setSelectedDate(item)
-    setYear(formatedDate)
+    if (name == 'category') {
+      setSelectedDate(item)
+      setYear(formatedDate)
+    }
+    if (name == 'package') {
+      setSelectedPackageDate(item)
+      setPackageYear(formatedDate)
+
+    }
+
   }
 
-  const handleBtnStyle = () => {
+
+
+
+
+  const handleBtnStyle = (selectedMonth: string) => {
     return (
-      <>
-        <div className="bg-[#0094140A] text-[#009414] py-3 px-2">
-          {!selectedMonth ? <span >احصائيات الشهر</span> : <span>{getMonthName(Number(selectedMonth))}</span>}
-
-        </div>
-
-      </>
-    )
-  }
+      <div className="bg-[#0094140A] text-[#009414] py-3 px-4 rounded-lg min-w-32 flex items-center justify-between">
+        {!selectedMonth ? (
+          <>
+            <span>احصائيات الشهر</span>
+            <span className="mdi mdi-chevron-down"></span>
+          </>
+        ) : (
+          <span>{getMonthName(Number(selectedMonth))}</span>
+        )}
+      </div>
+    );
+  };
 
 
 
   useEffect(() => {
-    fetchChartStatistics({ category_month: selectedMonth, category_year: year })
+    if (year || selectedMonth) {
+      fetchChartStatistics({ category_month: selectedMonth, category_year: year })
+    }
+  }, [selectedMonth, year])
 
-  }, [month, year])
+
+
+  useEffect(() => {
+    if (packageYear || selectedPackageMonth) {
+      fetchChartStatistics({ package_month: selectedPackageMonth, package_year: packageYear })
+    }
+  }, [selectedPackageMonth, packageYear])
 
 
 
@@ -532,14 +565,14 @@ export default function Home() {
             <div className="bg-[#00000009] p-3 rounded-3xl">
               <div className="rounded-2xl bg-background  p-5 w-full relative ">
                 {/* <div id="chart"></div> */}
-                <div className="flex items-center">
+                <div className="flex items-center gap-2">
                   <div>
                     <CustomSelectInput
                       value={selectedMonth}
                       items={month}
                       itemName="title"
                       itemValue="slug"
-                      btnSlot={handleBtnStyle()}
+                      btnSlot={handleBtnStyle(selectedMonth)}
                       onChange={(value) => {
                         setSelectedMonth(value)
                       }}
@@ -549,13 +582,20 @@ export default function Home() {
                     </CustomSelectInput>
 
                   </div>
-                  <DatePicker className="absolute -top-5 -left-56 z-50"
-                    selected={selectedDate}
-                    onSelect={handleDateSelect}
-                    renderYearContent={renderYearContent}
-                    showYearPicker
-                    dateFormat="yyyy"
-                  />
+                  <div className="relative">
+                    <DatePicker className=" bg-[#0094140A] text-[#009414] py-3 px-4 rounded-lg min-w-32"
+                      selected={selectedDate}
+                      onSelect={(date) => handleDateSelect(date, 'category')}
+                      placeholderText="احصائيات السنة الحالية"
+
+                      // renderYearContent={renderYearContent}
+                      showYearPicker
+                      dateFormat="yyyy"
+                    />
+                    <span className="mdi mdi-chevron-down absolute text-[#009414] top-[0.7em] left-[1em]"></span>
+
+                  </div>
+
 
                 </div>
 
@@ -566,6 +606,40 @@ export default function Home() {
 
             <div className="bg-[#00000009] p-3 rounded-3xl">
               <div className="rounded-2xl bg-background  p-5 w-full ">
+
+                <div className="flex items-center gap-2">
+                  <div>
+                    <CustomSelectInput
+                      value={selectedPackageMonth}
+                      items={month}
+                      itemName="title"
+                      itemValue="slug"
+                      btnSlot={handleBtnStyle(selectedPackageMonth)}
+                      onChange={(value) => {
+                        setSelectedPackageMonth(value)
+                      }}
+                    >
+
+
+                    </CustomSelectInput>
+
+                  </div>
+                  <div className="relative">
+                    <DatePicker className=" bg-[#0094140A] text-[#009414] py-3 px-4 rounded-lg min-w-32"
+                      selected={selectedPackageDate}
+                      onSelect={(date) => handleDateSelect(date, 'package')}
+                      placeholderText="احصائيات السنة الحالية"
+
+                      // renderYearContent={renderYearContent}
+                      showYearPicker
+                      dateFormat="yyyy"
+                    />
+                    <span className="mdi mdi-chevron-down absolute text-[#009414] top-[0.7em] left-[1em]"></span>
+
+                  </div>
+
+
+                </div>
 
                 <ReactApexChart options={optionsBarPackage} series={seriesBarPackage} type="bar" height={350} />
               </div>

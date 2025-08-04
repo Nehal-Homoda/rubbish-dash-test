@@ -43,9 +43,9 @@ export default function rubbush_collectors() {
     { text: " اسم المستخدم", name: "name_ar" },
     { text: " اسم الباقة", name: "name_ar" },
     { text: " عدد الوحدات", name: "name_ar" },
+    { text: " السعر الكلي", name: "name_ar" },
     { text: " تمت الاضافة بواسطة", name: "added_by" },
     { text: " نوع الدفع", name: "type" },
-    { text: " السعر الكلي", name: "name_ar" },
     { text: " تاريخ الدفع", name: "name_ar" },
     { text: "الحالة", name: "is_active" },
     { text: "طريقة الدفع", name: "is_active" },
@@ -53,6 +53,7 @@ export default function rubbush_collectors() {
     { text: "الاجراءات", name: "image" },
   ];
   const statusList = [
+
     { is_active: "pending", name: "قيد الانتظار" },
     { is_active: "accepted", name: "مقبولة" },
     { is_active: "rejected", name: "مرفوضة" },
@@ -261,35 +262,42 @@ export default function rubbush_collectors() {
     const body = JSON.stringify({
       status: value,
     });
-    // if (value == "accepted") {
-    //   return
-    //   // setSubscriptionStatus(item, "accept");
-    // }
+
+
+    if (value == "accepted" && item.added_by == 'admin') {
+      return
+      // setSubscriptionStatus(item, "accept");
+    }
     // if (value == "pending") {
-    //   setSubscriptionStatus(item, "pending");
+    //   // setSubscriptionStatus(item, "pending");
     // }
     // if (value == "reject") {
     //   return
     //   // setSubscriptionStatus(item, "reject");
     // }
 
-    updatePaymentService(service.id, body)
-      .then((response) => {
-        const arr = [...dataList];
-        arr[index].status = value;
+    if (item.added_by == 'user') {
+      updatePaymentService(service.id, body)
+        .then((response) => {
+          const arr = [...dataList];
+          arr[index].status = value;
 
-        setDataList(arr);
+          setDataList(arr);
 
-        // console.log(value);
+          // console.log(value);
 
-        if (value === "accepted") {
-          setSubscriptionStatus(item, "accept");
-        }
-        if (value === "rejected") {
-          setSubscriptionStatus(item, "reject");
-        }
-      })
-      .catch((error) => { });
+          if (value === "accepted") {
+            setSubscriptionStatus(item, "accept");
+          }
+          if (value === "rejected") {
+            setSubscriptionStatus(item, "reject");
+          }
+        })
+        .catch((error) => { });
+
+    }
+
+
 
   };
   const setSubscriptionStatus = (
@@ -455,6 +463,7 @@ export default function rubbush_collectors() {
     fd.append('payment_verification', addPaymentFormData.payment_verification)
     await addPaymentService(fd).then((response) => {
       successDialog(true)
+      fetchDataList()
       console.log('response of payment is', response.data)
     })
 
@@ -740,12 +749,13 @@ export default function rubbush_collectors() {
               <td className="py-2 px-4">{item.user_name}</td>
               <td className="py-2 px-4">{item.subscription?.package.name}</td>
               <td className="py-2 px-4">{item.subscription?.units ?? "-"}</td>
+              <td className="py-2 px-4">{item.total_price}</td>
               <td className="py-2 px-4">{item.added_by == "user" ? 'مستخدم' : 'مسئول'}</td>
               <td className="py-2 px-4">{item.type}</td>
-              <td className="py-2 px-4">{item.total_price}</td>
+
               <td className="py-2 px-4">{item.created_at}</td>
               <td className="py-2 px-4">
-                <UIPrimaryDropdown
+                {item.added_by == 'user' ? <UIPrimaryDropdown
                   tiny={true}
                   itemName="name"
                   itemValue="is_active"
@@ -756,7 +766,8 @@ export default function rubbush_collectors() {
                   items={statusList}
                 >
                   {statusDropdownName(item.status)}
-                </UIPrimaryDropdown>
+                </UIPrimaryDropdown> : <span>-</span>}
+
               </td>
               {/* <td className="py-2 px-4">
                                 {item.subscription?.package.name ?? '-'}

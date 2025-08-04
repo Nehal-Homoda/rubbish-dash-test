@@ -101,7 +101,7 @@ export default function rubbush_collectors() {
   });
 
   const discountList = [
-    { id: 1, discount: "5-10" },
+    { id: 1, discount: "2-5" },
     { id: 2, discount: "10-15" },
     { id: 3, discount: "20-25" },
   ];
@@ -539,13 +539,13 @@ export default function rubbush_collectors() {
 
                         <div className="py-6 ">
                           <ToggleSwitch
-                            checked={switch1}
+                            checked={updateFormData.has_recycle ? true :false}
                             label="اعادة تدوير"
                             onChange={(value) => handleCheckSubscription(value, 'edit')}
                           />
                         </div>
 
-                        {item.has_recycle && switch1 && (
+                        {updateFormData.has_recycle && (
                           // <SelectInput
                           //   placeholder="اختر نسبة الخصم"
                           //   onChange={(value) =>
