@@ -27,6 +27,9 @@ import { Payment_methods } from "@/types/paymentMethod.interface";
 import { RadioGroup } from "@headlessui/react";
 import moment from "moment";
 
+
+
+
 export default function page() {
     const [district, setDistrict] = useState<Region[]>([]);
     const [selectedDate, setSelectedDate] = useState();
@@ -85,11 +88,11 @@ export default function page() {
     const fetchDistrict = () => {
         districtListService().then((response) => {
 
-//@ts-ignore
+            //@ts-ignore
             const activeDistricts = response.data.filter((item, index) => {
                 return item.is_active
             })
-           
+
             setDistrict(activeDistricts);
             //@ts-ignore
 
@@ -143,7 +146,7 @@ export default function page() {
             const activePackages = response.data.filter((item, index) => {
                 return item.is_active
             })
-           
+
             setpackagesList(activePackages);
         });
     };
@@ -262,18 +265,86 @@ export default function page() {
         fetchCategories();
     }, []);
 
+
+
+    // useEffect(() => {
+    //     if (formData.district_id) {
+    //         const ca = district.find(
+    //             (item) => item.id.toString() == formData.district_id.toString()
+    //         );
+
+    //         const daysObj = {
+    //             saturday: 'السبت',
+    //             sunday: 'الاحد',
+    //             monday: 'الاتنين',
+    //             tuesday: 'الثلاثاء',
+    //             wednesday: 'الاربعاء',
+    //             thursday: 'الخميس'
+    //         }
+
+    //         if (ca && districtAvailableDays) {
+    //             const updatedArr = ca?.available_days.map((item: string) => ({
+
+    //                 item,
+    //                 title: daysObj[item] || item
+
+    //             }))
+
+    //             //@ts-ignore
+    //             setDistrictAvailableDays(updatedArr)
+
+    //         }
+
+
+
+
+
+
+
+
+
+
+
+    //         // if (ca) {
+    //         //     setDistrictAvailableDays(ca.available_days);
+    //         //     setDistrictTime(ca.available_times);
+    //         // }
+    //     }
+    // }, [formData]);
+
+
+
     useEffect(() => {
         if (formData.district_id) {
             const ca = district.find(
-                (item) => item.id.toString() == formData.district_id.toString()
+                (item) => item.id.toString() === formData.district_id.toString()
             );
 
+            console.log('available days', ca?.available_days);
+
             if (ca) {
-                setDistrictDays(ca.available_days);
-                setDistrictTime(ca.available_times);
+                // Assuming ca.available_days is an array like ['sunday', 'monday']
+                const dayMap = {
+                    saturday: 'السبت',
+                    sunday: 'الاحد',
+                    monday: 'الاتنين',
+                    tuesday: 'الثلاثاء',
+                    wednesday: 'الاربعاء',
+                    thursday: 'الخميس',
+                    friday: 'الجمعه'
+                };
+                const updatedDays = ca.available_days.map((slug: string) => ({
+                    slug,
+                    //@ts-ignore
+                    title: dayMap[slug] || slug
+                }));
+
+                setDistrictAvailableDays(updatedDays);
+                setDistrictTime(ca.available_times)
+
             }
         }
-    }, [formData]);
+    }, [formData.district_id, district]);
 
     const [districtAvailableDays, setDistrictAvailableDays] = useState([
         { title: 'السبت ', slug: 'saturday' },
@@ -504,6 +575,7 @@ export default function page() {
 
                                     <div className="col-span-6">
                                         <MultiCheckbox
+                                            disbaled={!formData.district_id}
                                             items={districtAvailableDays}
                                             value={formData.days}
                                             label="اليوم"

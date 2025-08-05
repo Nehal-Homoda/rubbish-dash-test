@@ -42,9 +42,10 @@ export default function Home() {
     { text: "اسم المستخدم", name: "name" },
     { text: "الوزن", name: "weight" },
     { text: "الرصيد", name: "name" },
-    // { text: "الاجراءات", name: "name" },
+    { text: "الاجراءات", name: "name" },
 
   ];
+  const currentYear = new Date().getFullYear();
 
   const [dataList, setDataList] = useState<Users[]>([]);
   const [selectedMonth, setSelectedMonth] = useState('')
@@ -467,7 +468,11 @@ export default function Home() {
   }, [selectedPackageMonth, packageYear])
 
 
+  const handleSelectedUser = (item: any) => {
+    console.log('item is', item)
+    router.push(`/users/details?id=${item.id}`)
 
+  }
 
 
 
@@ -591,6 +596,8 @@ export default function Home() {
                       // renderYearContent={renderYearContent}
                       showYearPicker
                       dateFormat="yyyy"
+                      minDate={new Date(currentYear - 5, 0, 1)} // Jan 1 of (current year - 5)
+                      maxDate={new Date(currentYear, 11, 31)} // Dec 31 of current year
                     />
                     <span className="mdi mdi-chevron-down absolute text-[#009414] top-[0.7em] left-[1em]"></span>
 
@@ -629,6 +636,9 @@ export default function Home() {
                       selected={selectedPackageDate}
                       onSelect={(date) => handleDateSelect(date, 'package')}
                       placeholderText="احصائيات السنة الحالية"
+
+                      minDate={new Date(currentYear - 5, 0, 1)} // Jan 1 of (current year - 5)
+                      maxDate={new Date(currentYear, 11, 31)} // Dec 31 of current year
 
                       // renderYearContent={renderYearContent}
                       showYearPicker
@@ -780,9 +790,9 @@ export default function Home() {
 
 
 
-                            {/* <button onClick={() => { }} className="bg-blue-100 p-1 px-2 rounded-lg">
+                            <button onClick={() => handleSelectedUser(item)} className="bg-blue-100 p-1 px-2 rounded-lg">
                               <span className="mdi mdi-eye text-blue-500"></span>
-                            </button> */}
+                            </button>
                           </td>
 
                         </tr>
