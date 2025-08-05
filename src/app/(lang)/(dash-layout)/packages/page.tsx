@@ -200,7 +200,7 @@ export default function rubbush_collectors() {
 
     const body = JSON.stringify({
       is_active: value,
-     updateFormData
+       discounts:service.discounts
       
     });
 
