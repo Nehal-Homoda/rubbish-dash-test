@@ -200,8 +200,8 @@ export default function rubbush_collectors() {
 
     const body = JSON.stringify({
       is_active: value,
-       discounts:service.discounts
-      
+      discounts: service.discounts
+
     });
 
     updatePackageService(service.id, body)
@@ -297,12 +297,28 @@ export default function rubbush_collectors() {
     e: React.ChangeEvent<HTMLInputElement>,
     index?: number
   ) => {
+
+    console.log('name of change', e.target.name, e.target.value)
     setUpdateFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
 
     console.log(e.target.name, e.target.value);
+  };
+
+  const handleUpdateDiscountChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const value = e.target.value;
+
+    setUpdateFormData((prev) => {
+      const updatedDiscounts = [...prev.discounts];
+      updatedDiscounts[index].discount_rate = Number(value);
+
+      return {
+        ...prev,
+        discounts: updatedDiscounts,
+      };
+    });
   };
 
   const createSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -762,7 +778,7 @@ export default function rubbush_collectors() {
 
                                 </div>
                                 <div className="col-span-8 mb-7">
-                                  <TextFieldNada prependIcon="mdi mdi-ticket-percent-outline text-gray-400 " handleChange={(value) => handleChangeValue(value, index)} name="discount_value_percentage" label="نسبة الخصم" placeholder="ادخل نسبة الخصم" type="number" value={updateFormData.discounts[index]?.discount_rate} />
+                                  <TextFieldNada prependIcon="mdi mdi-ticket-percent-outline text-gray-400 " handleChange={(value) => handleUpdateDiscountChange(value, index)} name={`discounts[${index}].discount_rate`} label="نسبة الخصم" placeholder="ادخل نسبة الخصم" type="number" value={updateFormData.discounts[index]?.discount_rate} />
                                 </div>
 
                               </div>
