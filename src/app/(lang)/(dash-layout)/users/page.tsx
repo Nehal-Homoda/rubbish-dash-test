@@ -80,15 +80,15 @@ export default function rubbush_collectors() {
     null
   );
 
-  const takeUploadedImg = (img: any) => {
-    console.log('img', img)
-    setAddPaymentFormData((prev) => ({
-      ...prev,
-      ['payment_verification']: img.file
+  // const takeUploadedImg = (img: any) => {
+  //   console.log('img', img)
+  //   setAddPaymentFormData((prev) => ({
+  //     ...prev,
+  //     ['payment_verification']: img.file
 
-    }))
+  //   }))
 
-  }
+  // }
 
   const fetchPaymentMethodList = () => {
     paymentMethodListService().then((response) => {
@@ -278,24 +278,24 @@ export default function rubbush_collectors() {
   };
 
 
-  const handleAddPayment = async (e: any) => {
-    e.preventDefault()
-    console.log('hii')
+  // const handleAddPayment = async (e: any) => {
+  //   e.preventDefault()
+  //   console.log('hii')
 
-    const fd = new FormData()
-    fd.append('user_id', addPaymentFormData.user_id.toString())
-    fd.append('receiving_number', userItem ? userItem.phone : '')
-    fd.append('payment_method_id', addPaymentFormData.payment_method_id.toString())
-    //@ts-ignore
-    fd.append('total_price', userItem ? userItem.deserved_money_by_recycle : 0)
-    fd.append('payment_verification', addPaymentFormData.payment_verification)
-    await addPaymentService(fd).then((response) => {
-      successDialog(true)
-      fetchDataList()
-      console.log('response of payment is', response.data)
-    })
+  //   const fd = new FormData()
+  //   fd.append('user_id', addPaymentFormData.user_id.toString())
+  //   fd.append('receiving_number', userItem ? userItem.phone : '')
+  //   fd.append('payment_method_id', addPaymentFormData.payment_method_id.toString())
+  //   //@ts-ignore
+  //   fd.append('total_price', userItem ? userItem.deserved_money_by_recycle : 0)
+  //   fd.append('payment_verification', addPaymentFormData.payment_verification)
+  //   await addPaymentService(fd).then((response) => {
+  //     successDialog(true)
+  //     fetchDataList()
+  //     console.log('response of payment is', response.data)
+  //   })
 
-  }
+  // }
 
   // const updateUserItem = (item: Users) => {
   //   setSelectedDataItem(item);
@@ -472,190 +472,7 @@ export default function rubbush_collectors() {
         </UIPrimaryDropdown>
 
 
-        <UIBaseDialog
-          confirmCloseHandler={undefined}
-          title="اضافة تحويل"
-          confirmHandler={() => { }}
-          confirmText="اضافة"
-          form="update-form"
-          btn={
-            <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
-              <button className="bg-[#0094140D] p-1 rounded-lg">
-                تحويل رصيد
-              </button>
-            </div>
-          }
-        >
-          <div>
-            <form onSubmit={(e) => handleAddPayment(e)} id="update-form" className="">
-              <div className="grid grid-cols-12 space-y-5 gap-7">
-
-                <div className="col-span-12">
-                  <ComboBoxNehal onQueryChange={takeInputValue} onChange={(e) => handleSelectedUser(e)} listItem={userList} itemName="name" itemValue="id" value={(addPaymentFormData.user_id ?? "").toString()} label="اسم المستخدم" />
-                  {/* <SelectInput
-                    value={addPaymentFormData.user_id ?? ""}
-                    items={userList}
-                    itemName="name"
-                    itemValue="id"
-                    label="اسم المستخدم"
-                    placeholder="اختر اسم المستخدم"
-                    name="name"
-                    required={true}
-                    onChange={(e) =>
-                      handleSelectedUser(e)
-                    }
-                  ></SelectInput> */}
-                </div>
-                <div className="col-span-12">
-                  <TextFieldNada
-                    disabled
-                    name="receiving_number"
-                    type="number"
-                    handleChange={(e) =>
-                      takeValue(e, "receiving_number")
-                    }
-                    value={userItem?.phone ?? ""}
-                    label="رقم الاستلام"
-                    placeholder="رقم الاستلام"
-                  ></TextFieldNada>
-                </div>
-
-
-                <div className="col-span-6">
-                  <TextFieldNada
-                    disabled
-                    name="deserved_money_by_recycle"
-                    type="number"
-                    handleChange={(e) =>
-                      takeValue(e, "deserved_money_by_recycle")
-                    }
-                    value={userItem?.deserved_money_by_recycle ?? 0}
-                    label="الرصيد "
-                    placeholder=" ادخل الرصيد"
-                  ></TextFieldNada>
-                </div>
-
-
-
-                <div className="col-span-6">
-                  <TextFieldNada
-                    disabled
-                    name="all_recycle_weights"
-                    type="number"
-                    // handleChange={(e) =>
-                    //   takeValue(e, "units")
-                    // }
-                    value={userItem?.all_recycle_weights ?? 0}
-                    label="الوزن "
-                    placeholder=" ادخل الوزن"
-                  ></TextFieldNada>
-                </div>
-
-
-
-                <div className="col-span-12">
-                  <RadioGroup
-                    value={selected}
-                    onChange={(e) =>
-                      handleSelecteditem(e)
-                    }
-                  >
-                    <div className="grid grid-cols-2 gap-7">
-                      {paymentMethodList.map(
-                        (item, index) => (
-                          <RadioGroup.Option
-                            key={index}
-                            value={item}
-                            className={({
-                              active,
-                              checked,
-                            }) =>
-                              `${active
-                                ? "ring-2 ring-white/60 ring-offset-2 ring-offset-sky-300"
-                                : ""
-                              }
-                                                ${checked ? "border border-[#009414] " : ""}
-                                                  relative flex cursor-pointer  rounded-lg px-5 py-4 ring-1 ring-gray-100 focus:outline-none  col-span-1`
-                            }
-                          >
-                            {({
-                              active,
-                              checked,
-                            }) => (
-                              <>
-                                <div className="flex w-full items-center justify-between">
-                                  <div className="flex items-center">
-                                    <div className="text-sm">
-                                      <RadioGroup.Label
-                                        as="div"
-                                        className={`font-medium  ${checked
-                                          ? "text-gray-900"
-                                          : "text-gray-900"
-                                          }`}
-                                      >
-                                        <div className="flex items-center gap-4">
-                                          <div className="w-10 h-10 rounded-full">
-                                            <img
-                                              className="w-full h-full object-contain"
-                                              src={
-                                                item.image
-                                              }
-                                              alt=""
-                                            />
-                                          </div>
-                                          {
-                                            item.name_ar
-                                          }
-                                        </div>
-                                      </RadioGroup.Label>
-                                    </div>
-                                  </div>
-                                  {checked ? (
-                                    <div className="before:absolute before:content-[''] before:w-3 before:h-3 before:rounded-full before:bg-[#009414]   shrink-0 w-4 h-4 rounded-full ring-1 ring-surface text-surface flex justify-center items-center text-xs">
-                                      {/* <CheckIcon className="h-6 w-6" /> */}
-                                    </div>
-                                  ) : (
-                                    <div className="shrink-0 w-4 h-4 rounded-full ring-1 ring-surface text-surface flex justify-center items-center">
-                                      {/* <CheckIcon className="h-6 w-6" /> */}
-                                    </div>
-                                  )}
-                                </div>
-                              </>
-                            )}
-                          </RadioGroup.Option>
-                        )
-                      )}
-                    </div>
-                  </RadioGroup>
-                </div>
-
-                <div className="col-span-6">
-                  <FileInput
-                    onFileChange={(img) =>
-                      takeUploadedImg(img)
-                    }
-                    state="add"
-                    title="ارفاق صورة التحويل"
-                  />
-                </div>
-
-
-
-
-
-
-
-              </div>
-
-
-
-
-            </form >
-          </div>
-
-
-
-        </UIBaseDialog>
+       
 
 
         <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
