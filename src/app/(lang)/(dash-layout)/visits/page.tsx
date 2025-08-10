@@ -23,6 +23,10 @@ import {
     getVisitsService,
     updateVisitsService,
 } from "@/services/visitService";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import moment, { months } from "moment";
+
 
 export default function rubbush_collectors() {
     const [dataList, setDataList] = useState<Visit[]>([]);
@@ -97,10 +101,17 @@ export default function rubbush_collectors() {
     const [categoryFilter, setCategoryFilter] = useState<number | undefined>(undefined);
     const [archiveFilter, setArchiveFilter] = useState<number | undefined>(undefined);
 
+    const [startDate, setStartDate] = useState<Date>()
+    const [endDate, setEndDate] = useState<Date>()
+
+
+
     const fetchDataList = ({
         search = searchTerm,
         status = statusFilter,
         category_id = categoryFilter,
+        from_date = startDate,
+        end_date = endDate,
         archive = archiveFilter,
         pageNum = page
     }: {
@@ -108,6 +119,8 @@ export default function rubbush_collectors() {
         status?: string;
         category_id?: number | undefined;
         archive?: number | undefined;
+        from_date?: Date | null;
+        end_date?: Date | null;
         pageNum?: number | undefined
     } = {}) => {
         console.log(status);
@@ -116,13 +129,16 @@ export default function rubbush_collectors() {
             category_id != undefined ? "&category_id=" + category_id : "";
         const isArchive = archive != undefined ? "&archived=" + archive : "";
         const hasSearch = search ? "&search=" + search : "";
+        const hasDateFrom = from_date ? "&from_date=" + moment(from_date).format('YYYY-MM-DD') : "";
+        const hasDateTo = end_date ? "&to_date=" + moment(end_date).format('YYYY-MM-DD') : "";
 
 
-        const query = `?page=${pageNum}${hasSearch}${statusParam}${category}${isArchive}`;
+        const query = `?page=${pageNum}${hasSearch}${statusParam}${category}${isArchive}${hasDateFrom}${hasDateTo}`;
 
         getVisitsService(query).then((response) => {
             setDataList(response.data);
             setTotalPages(response.meta.last_page);
+
         })
             .catch(() => {
 
@@ -245,6 +261,24 @@ export default function rubbush_collectors() {
         return statusList.find((item) => item.is_active === name)?.name ?? "";
     };
 
+    const handleDateRange = (date: [Date | null, Date | null]) => {
+
+
+        console.log('date is', date)
+        const [start, end] = date;
+        setStartDate(start ?? undefined);
+        setEndDate(end ?? undefined);
+        if (!startDate && !endDate) return
+        //@ts-ignore
+        if (start > end) return
+        fetchDataList({ from_date: start, end_date: end, pageNum: 1 })
+        setStartDate(undefined);
+        setEndDate(undefined);
+
+    }
+
+
+
 
 
 
@@ -273,6 +307,27 @@ export default function rubbush_collectors() {
                 >
                     الحالة
                 </UIPrimaryDropdown>
+
+
+
+                <div className="relative">
+
+
+
+                    <DatePicker className="w-full max-w-32  text-[#009414] py-3 px-5 rounded-lg bg-surface-light-800 text-surface-light hover:bg-surface-light-700 cursor-pointer "
+                        selected={startDate}
+                        onChange={(date) => handleDateRange(date)}
+                        startDate={startDate}
+                        endDate={endDate}
+                        selectsRange
+                        placeholderText="التاريخ"
+
+                    />
+
+
+                    <span className="mdi mdi-chevron-down absolute text-[#009414] top-[0.7em] left-[1em]"></span>
+
+                </div>
             </>
         );
     };
@@ -289,6 +344,9 @@ export default function rubbush_collectors() {
                         </button>
                     ))}
                 </div>
+
+
+
 
 
 
