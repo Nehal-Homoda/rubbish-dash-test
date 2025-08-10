@@ -285,6 +285,26 @@ export default function rubbush_collectors() {
     const tableHeadActionsSlot = () => {
         return (
             <>
+
+
+                <div className="relative">
+
+
+
+                    <DatePicker className="w-full max-w-32   text-[#009414] py-3 px-5 rounded-lg bg-surface-light-800 text-surface-light hover:bg-surface-light-700 cursor-pointer "
+                        selected={startDate}
+                        onChange={(date) => handleDateRange(date)}
+                        startDate={startDate}
+                        endDate={endDate}
+                        selectsRange
+                        placeholderText="التاريخ"
+
+                    />
+
+
+                    <span className="mdi mdi-chevron-down absolute text-[#009414] top-[0.7em] left-[1em]"></span>
+
+                </div>
                 <UIPrimaryDropdown
                     items={[{ id: undefined, name_ar: "الكل" }, ...categories]}
                     itemName="name_ar"
@@ -310,24 +330,7 @@ export default function rubbush_collectors() {
 
 
 
-                <div className="relative">
 
-
-
-                    <DatePicker className="w-full max-w-32  text-[#009414] py-3 px-5 rounded-lg bg-surface-light-800 text-surface-light hover:bg-surface-light-700 cursor-pointer "
-                        selected={startDate}
-                        onChange={(date) => handleDateRange(date)}
-                        startDate={startDate}
-                        endDate={endDate}
-                        selectsRange
-                        placeholderText="التاريخ"
-
-                    />
-
-
-                    <span className="mdi mdi-chevron-down absolute text-[#009414] top-[0.7em] left-[1em]"></span>
-
-                </div>
             </>
         );
     };
