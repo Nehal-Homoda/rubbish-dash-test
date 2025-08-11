@@ -192,7 +192,7 @@ export default function rubbush_collectors() {
       is_active: item.is_active ? 1 : 0,
       image: item.image,
       has_recycle: item.has_recycle,
-      discount_value_percentage: Number(item.discount_value_percentage),
+      discount_value_percentage: item.has_recycle ? Number(item.discount_value_percentage) : 0,
     });
   };
 
@@ -539,7 +539,7 @@ export default function rubbush_collectors() {
 
                         <div className="py-6 ">
                           <ToggleSwitch
-                            checked={updateFormData.has_recycle ? true :false}
+                            checked={updateFormData.has_recycle ? true : false}
                             label="اعادة تدوير"
                             onChange={(value) => handleCheckSubscription(value, 'edit')}
                           />
