@@ -17,7 +17,6 @@ import {
   updateCategoryService,
 } from "@/services/categoriesService";
 import { Category } from "@/types/categories.interface";
-import FileInput from "@/components/ui/form/FileInput";
 import FileInputImg from "@/components/ui/form/FileInputImg";
 import { useRouter } from "next/navigation";
 import { ToggleSwitch } from "flowbite-react";
@@ -128,9 +127,7 @@ export default function rubbush_collectors() {
         setTotalPages(response.meta.last_page);
       })
       .catch((error) => {
-        // if (error.message === 'unauthorized') {
-        //     router.replace('/auth/login')
-        // }
+
       });
   };
   const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -369,22 +366,6 @@ export default function rubbush_collectors() {
               </div>
 
               {switch1 && (
-                // <SelectInput
-                //   placeholder="اختر نسبة الخصم"
-                //   onChange={(value) =>
-                //     setFormData((prev) => ({
-                //       ...prev,
-                //       ["discount_rate_id"]: value,
-                //     }))
-                //   }
-                //   value={formData.discount_rate_id}
-                //   name="discount"
-                //   items={discountList}
-                //   itemName="discount"
-                //   itemValue="id"
-                //   label="نسبة الخصم"
-                //   prependIcon="mdi mdi-ticket-percent-outline"
-                // ></SelectInput>
                 <TextFieldNada isPercentage={true} prependIcon="mdi mdi-ticket-percent-outline text-gray-400 " handleChange={addFormChangeHander} name="discount_value_percentage" label="نسبة الخصم" placeholder="ادخل نسبة الخصم" type="number" value={formData.discount_value_percentage} />
               )}
             </div>
@@ -395,7 +376,7 @@ export default function rubbush_collectors() {
   };
   useEffect(() => {
     fetchDataList();
-  }, [page]); // runs every time `page` changes
+  }, [page]); 
 
   return (
     <>
