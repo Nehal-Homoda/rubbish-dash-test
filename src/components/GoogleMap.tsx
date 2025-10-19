@@ -22,7 +22,7 @@ const markersData: MarkerData[] = [
 
 export default function GoogleMap() {
     const mapRef = useRef<HTMLDivElement | null>(null);
-//@ts-ignore
+    //@ts-ignore
     const [center, setCenter] = useState<google.maps.LatLngLiteral>({
         lat: 0,
         lng: 0,
@@ -72,7 +72,7 @@ export default function GoogleMap() {
 
         loader.load().then(() => {
             if (!mapRef.current) return;
-//@ts-ignore
+            //@ts-ignore
             const mapOptions: google.maps.MapOptions = {
                 zoom: 14,
                 center: centerPosition,
@@ -87,7 +87,7 @@ export default function GoogleMap() {
                 styles: gmapStyle
             };
             console.log('options', mapOptions)
-//@ts-ignore
+            //@ts-ignore
             const map = new google.maps.Map(mapRef.current, mapOptions);
 
             console.log('collector issssssssssss', collectors)

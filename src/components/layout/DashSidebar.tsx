@@ -143,6 +143,7 @@ export default function DashSidebar({ isOpen, toggleSidebarHandler }: Props) {
     dispatch(changeTitle(item.text));
     router.push(`${langPrefix}${item.path}`);
   };
+  
   return (
     <div
       className={`side-bar z-50 bg-surface text-white/85 fixed top-0 md:flex duration-300 flex-col h-full

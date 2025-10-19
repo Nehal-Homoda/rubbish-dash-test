@@ -393,7 +393,7 @@ export default function rubbush_collectors() {
               <td className="py-2 px-4">{item.id}</td>
 
               <td className="py-2 px-4">
-                <div className="w-[100px] aspect-[3/1.5] bg-gray-50 rounded-md">
+                <div className="w-[100px] aspect-[3/1.5] max-h-[30px] bg-gray-50 rounded-md">
                   {item.image && (
                     <img
                       src={item.image}
