@@ -15,6 +15,7 @@ export interface AuthResponse {
 export interface User {
     name: string;
     email: string;
+    open_tickets:string;
 }
 
 // export interface Users {

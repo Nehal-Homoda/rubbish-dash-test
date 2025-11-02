@@ -15,7 +15,10 @@ import {
   updatePackageService,
 } from "@/services/packagesOffersService";
 import { PackageDiscount, PackageOffer } from "@/types/packagesOffer.interface";
-import { getCategoriesService, getCategoryByIdService } from "@/services/categoriesService";
+import {
+  getCategoriesService,
+  getCategoryByIdService,
+} from "@/services/categoriesService";
 import { Category } from "@/types/categories.interface";
 
 export default function rubbush_collectors() {
@@ -40,32 +43,49 @@ export default function rubbush_collectors() {
   const [selectedDataItem, setSelectedDataItem] = useState<PackageOffer | null>(
     null
   );
-  const [categoryItem, setCategoryItem] = useState<Category | null>(null)
-  const [recyclePrice, setRecyclePrice] = useState(0)
+  const [categoryItem, setCategoryItem] = useState<Category | null>(null);
+  const [recyclePrice, setRecyclePrice] = useState(0);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<boolean | undefined>(undefined);
-  const [categoryFilter, setCategoryFilter] = useState<number | undefined>(undefined);
-
+  const [statusFilter, setStatusFilter] = useState<boolean | undefined>(
+    undefined
+  );
+  const [categoryFilter, setCategoryFilter] = useState<number | undefined>(
+    undefined
+  );
 
   const discountArr = [
     {
+      min_units: 1,
+      max_units: null,
+      discount_rate: 0,
+    },
+    {
       min_units: 2,
       max_units: 5,
-      discount_rate: 0
+      discount_rate: 0,
+    },
+    {
+      min_units: 6,
+      max_units: 9,
+      discount_rate: 0,
     },
     {
       min_units: 10,
       max_units: 15,
-      discount_rate: 0
+      discount_rate: 0,
+    },
+    {
+      min_units: 16,
+      max_units: 19,
+      discount_rate: 0,
     },
     {
       min_units: 20,
       max_units: "",
-      discount_rate: 0
-    }
-  ]
-
+      discount_rate: 0,
+    },
+  ];
 
   type FormDataType = {
     name_ar: string;
@@ -76,7 +96,7 @@ export default function rubbush_collectors() {
     order: number;
     days_count: number | string;
     recycle_price?: number | string;
-    discounts: PackageDiscount[]
+    discounts: PackageDiscount[];
   };
   const [formData, setFormData] = useState<FormDataType>({
     name_ar: "",
@@ -89,24 +109,37 @@ export default function rubbush_collectors() {
     recycle_price: "",
     discounts: [
       {
-        min_units: 5,
-        max_units: 10,
-        discount_rate: 0
+        min_units: 1,
+        max_units: "",
+        discount_rate: 0,
+      },
+      {
+        min_units: 2,
+        max_units: 5,
+        discount_rate: 0,
+      },
+      {
+        min_units: 6,
+        max_units: 9,
+        discount_rate: 0,
       },
       {
         min_units: 10,
         max_units: 15,
-        discount_rate: 0
+        discount_rate: 0,
+      },
+      {
+        min_units: 16,
+        max_units: 19,
+        discount_rate: 0,
       },
       {
         min_units: 20,
-        max_units: '',
-        discount_rate: 0
-      }
-    ]
+        max_units: "",
+        discount_rate: 0,
+      },
+    ],
   });
-
-
 
   const [updateFormData, setUpdateFormData] = useState<FormDataType>({
     name_ar: "",
@@ -118,36 +151,48 @@ export default function rubbush_collectors() {
     days_count: "",
     discounts: [
       {
+        min_units: 1,
+        max_units: "",
+        discount_rate: 0,
+      },
+      {
         min_units: 2,
         max_units: 5,
-        discount_rate: 0
+        discount_rate: 0,
+      },
+      {
+        min_units: 6,
+        max_units: 9,
+        discount_rate: 0,
       },
       {
         min_units: 10,
         max_units: 15,
-        discount_rate: 0
+        discount_rate: 0,
+      },
+      {
+        min_units: 16,
+        max_units: 19,
+        discount_rate: 0,
       },
       {
         min_units: 20,
-        max_units: '',
-        discount_rate: 0
-      }
-    ]
+        max_units: "",
+        discount_rate: 0,
+      },
+    ],
   });
-
-
-
 
   const fetchDataList = ({
     search = searchTerm,
     is_active = statusFilter,
     category_id = categoryFilter,
-    pageNum = page
+    pageNum = page,
   }: {
     search?: string;
     is_active?: boolean | undefined;
     category_id?: number | undefined;
-    pageNum?: number
+    pageNum?: number;
   } = {}) => {
     console.log(is_active);
     const isActive =
@@ -167,7 +212,7 @@ export default function rubbush_collectors() {
         setDataList(response.data);
         setTotalPages(response.meta.last_page);
       })
-      .catch(() => { });
+      .catch(() => {});
   };
   const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -175,8 +220,6 @@ export default function rubbush_collectors() {
     setPage(1);
     fetchDataList({ search: val, pageNum: 1 });
   };
-
-
 
   const handleStatusFilter = (value: boolean | undefined) => {
     setStatusFilter(value);
@@ -190,7 +233,6 @@ export default function rubbush_collectors() {
     fetchDataList({ category_id: value, pageNum: 1 });
   };
 
-
   const updateDataItemActive = (value: any, index: number) => {
     const service = dataList.find((item, i) => {
       return index == i;
@@ -200,8 +242,7 @@ export default function rubbush_collectors() {
 
     const body = JSON.stringify({
       is_active: value,
-      discounts: service.discounts
-
+      discounts: service.discounts,
     });
 
     updatePackageService(service.id, body)
@@ -213,7 +254,7 @@ export default function rubbush_collectors() {
 
         console.log(response);
       })
-      .catch((error) => { });
+      .catch((error) => {});
   };
 
   const deleteSubmit = (item: PackageOffer, selectedIndex: number) => {
@@ -224,7 +265,7 @@ export default function rubbush_collectors() {
         setDataList(updatedArr);
         successDialog(true);
       })
-      .catch((error) => { });
+      .catch((error) => {});
   };
 
   const updateDataItem = (item: PackageOffer) => {
@@ -240,24 +281,20 @@ export default function rubbush_collectors() {
       category_id: ca?.id ?? "",
       days_count: item.days_count ? parseInt(item.days_count) : "",
       price_per_unit: item.price_per_unit ? parseInt(item.price_per_unit) : "",
-      discounts: [
-
-        {
-          min_units: 2,
-          max_units: 5,
-          discount_rate: item.discounts ? item.discounts[0].discount_rate : 0
-        },
-        {
-          min_units: 10,
-          max_units: 15,
-          discount_rate: item.discounts ? item.discounts[1].discount_rate : 0
-        },
-        {
-          min_units: 20,
-          max_units: '',
-          discount_rate: item.discounts ? item.discounts[2].discount_rate : 0
-        }
-      ]
+      discounts: item.discounts?.length
+      ? item.discounts.map((d) => ({
+          min_units: d.min_units,
+          max_units: d.max_units,
+          discount_rate: d.discount_rate ?? 0,
+        }))
+      : [
+          { min_units: 1, max_units: "", discount_rate: 0 },
+          { min_units: 2, max_units: 5, discount_rate: 0 },
+          { min_units: 6, max_units: 9, discount_rate: 0 },
+          { min_units: 10, max_units: 15, discount_rate: 0 },
+          { min_units: 16, max_units: 19, discount_rate: 0 },
+          { min_units: 20, max_units: "", discount_rate: 0 },
+        ],
 
     });
   };
@@ -276,20 +313,17 @@ export default function rubbush_collectors() {
         fetchDataList();
         successDialog(true);
       })
-      .catch((error) => { });
+      .catch((error) => {});
   };
 
   const addFormChangeHander = (
     e: React.ChangeEvent<HTMLInputElement>,
     index?: number
   ) => {
-
-
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
-
 
     console.log(e.target.name, e.target.value);
   };
@@ -297,8 +331,7 @@ export default function rubbush_collectors() {
     e: React.ChangeEvent<HTMLInputElement>,
     index?: number
   ) => {
-
-    console.log('name of change', e.target.name, e.target.value)
+    console.log("name of change", e.target.name, e.target.value);
     setUpdateFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
@@ -307,7 +340,10 @@ export default function rubbush_collectors() {
     console.log(e.target.name, e.target.value);
   };
 
-  const handleUpdateDiscountChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+  const handleUpdateDiscountChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number
+  ) => {
     const value = e.target.value;
 
     setUpdateFormData((prev) => {
@@ -332,14 +368,13 @@ export default function rubbush_collectors() {
 
     // }
 
-
-    fd.append('name_ar', formData.name_ar),
-      fd.append('name_en', formData.name_en),
-      fd.append('category_id', formData.category_id.toString()),
-      fd.append('is_active', formData.is_active.toString()),
-      fd.append('price_per_unit', formData.price_per_unit.toString()),
-      fd.append('order', formData.order.toString()),
-      fd.append('days_count', formData.days_count.toString()),
+    fd.append("name_ar", formData.name_ar),
+      fd.append("name_en", formData.name_en),
+      fd.append("category_id", formData.category_id.toString()),
+      fd.append("is_active", formData.is_active.toString()),
+      fd.append("price_per_unit", formData.price_per_unit.toString()),
+      fd.append("order", formData.order.toString()),
+      fd.append("days_count", formData.days_count.toString()),
       // fd.append('recycle_price', recyclePrice.toString()),
 
       formData.discounts.forEach((discount, index) => {
@@ -354,6 +389,7 @@ export default function rubbush_collectors() {
         fetchDataList();
         //@ts-ignore
         successDialog(true);
+        
         setFormData({
           name_ar: "",
           name_en: "",
@@ -362,16 +398,17 @@ export default function rubbush_collectors() {
           price_per_unit: 0,
           order: 0,
           days_count: 0,
-          discounts: [{
-            min_units: 0,
-            max_units: '',
-            discount_rate: 0
-          }]
+          discounts: [
+            {
+              min_units: 0,
+              max_units: "",
+              discount_rate: 0,
+            },
+          ],
         });
       })
-      .catch((error) => { });
+      .catch((error) => {});
   };
-
 
   const handleSelectedCategory = (value: any) => {
     setFormData((prev) => ({
@@ -385,33 +422,26 @@ export default function rubbush_collectors() {
     // setSelectedCategory(selected)
 
     getCategoryByIdService(value).then((response) => {
-      setCategoryItem(response.data)
-    })
-  }
+      setCategoryItem(response.data);
+    });
+  };
 
   const handleChangeValue = (e: any, index: number) => {
-    console.log('index is', index)
-    console.log('value of discount is', e.target.value)
-
-
-
+    console.log("index is", index);
+    console.log("value of discount is", e.target.value);
 
     setFormData((prev) => {
-      const updateDiscount = [...prev.discounts]
+      const updateDiscount = [...prev.discounts];
       updateDiscount[index].discount_rate = e.target.value;
 
       return {
         ...prev,
         discounts: updateDiscount,
       };
-    })
+    });
 
-    console.log('form data', formData)
-
-
-
-
-  }
+    console.log("form data", formData);
+  };
 
   const tableHeadActionsSlot = () => {
     return (
@@ -438,9 +468,10 @@ export default function rubbush_collectors() {
         >
           الحالة
         </UIPrimaryDropdown>
-        <UIBaseDialog confirmCloseHandler={resetForm}
+        <UIBaseDialog
+          confirmCloseHandler={resetForm}
           title="اضافة باقة"
-          confirmHandler={() => { }}
+          confirmHandler={() => {}}
           confirmText="اضافة"
           form="update-form"
           btn={
@@ -487,7 +518,7 @@ export default function rubbush_collectors() {
                       //   ...prev,
                       //   ["category_id"]: value,
                       // }));
-                      handleSelectedCategory(value)
+                      handleSelectedCategory(value);
                     }}
                   ></SelectInput>
                 </div>
@@ -520,7 +551,7 @@ export default function rubbush_collectors() {
                 isPrice={true}
               ></TextFieldNada>
 
-              {categoryItem && categoryItem.has_recycle &&
+              {categoryItem && categoryItem.has_recycle && (
                 <TextFieldNada
                   name="recycle_price"
                   type="number"
@@ -529,12 +560,10 @@ export default function rubbush_collectors() {
                   label=" سعر الوحدة ( اعادة التدوير ) "
                   placeholder=" ادخل سعر الوحدة ( اعادة التدوير )"
                   isPrice={true}
-
                 ></TextFieldNada>
-
-
-              }
-              <TextFieldNada isDays={true}
+              )}
+              <TextFieldNada
+                isDays={true}
                 name="days_count"
                 type="number"
                 handleChange={addFormChangeHander}
@@ -545,28 +574,37 @@ export default function rubbush_collectors() {
 
               <div>
                 <div className="label flex items-center gap-1  start-4  w-fit px-3 text-sm font-semibold">
-                  <label>
-                    نسبة الخصم
-                  </label>
+                  <label>نسبة الخصم</label>
                 </div>
                 <div className="my-4">
                   {discountArr.map((item, index) => (
                     <div key={index} className="grid grid-cols-12 gap-5 ">
                       <div className="col-span-4 border py-3 px-5 flex justify-center items-center  rounded-xl mb-7 ">
-                        {index < 2 ? <span>{item.min_units} - {item.max_units} وحدة</span> : <span>20 وحدة او اكثر</span>}
+                        {index < 5 ? (
+                          <span>
+                            {item.min_units} {index > 0 ? <span>-</span> : ""}{" "}
+                            {item.max_units} وحدة
+                          </span>
+                        ) : (
+                          <span>20 وحدة او اكثر</span>
+                        )}
                       </div>
                       <div className="col-span-8 mb-7">
-                        <TextFieldNada prependIcon="mdi mdi-ticket-percent-outline text-gray-400 " handleChange={(value) => handleChangeValue(value, index)} name="discount_value_percentage" label="نسبة الخصم" placeholder="ادخل نسبة الخصم" type="number" value={formData.discounts[index]?.discount_rate} />
+                        <TextFieldNada
+                          prependIcon="mdi mdi-ticket-percent-outline text-gray-400 "
+                          handleChange={(value) =>
+                            handleChangeValue(value, index)
+                          }
+                          name="discount_value_percentage"
+                          label="نسبة الخصم"
+                          placeholder="ادخل نسبة الخصم"
+                          type="number"
+                          value={formData.discounts[index]?.discount_rate}
+                        />
                       </div>
-
                     </div>
                   ))}
-
-
-
                 </div>
-
-
               </div>
             </div>
           </form>
@@ -579,9 +617,8 @@ export default function rubbush_collectors() {
       .then((response) => {
         setCategories(response.data);
       })
-      .catch((error) => { });
+      .catch((error) => {});
   };
-
 
   const resetForm = () => {
     setFormData({
@@ -592,29 +629,36 @@ export default function rubbush_collectors() {
       price_per_unit: "",
       order: 0,
       days_count: "",
-      discounts:
-
-        [{
+      discounts: [
+        {
           min_units: 0,
-          max_units: '',
-          discount_rate: 0
-        }]
-    })
-  }
-
+          max_units: "",
+          discount_rate: 0,
+        },
+      ],
+    });
+  };
 
   useEffect(() => {
     if (categoryItem && formData.price_per_unit) {
-      setRecyclePrice(100 - (Number(formData.price_per_unit) * (categoryItem.discount_value_percentage / 100)))
+      setRecyclePrice(
+        100 -
+          Number(formData.price_per_unit) *
+            (categoryItem.discount_value_percentage / 100)
+      );
     }
     // setRecyclePrice(0)
-  }, [categoryItem])
+  }, [categoryItem]);
   useEffect(() => {
     if (categoryItem && formData.price_per_unit) {
-      setRecyclePrice(100 - (Number(formData.price_per_unit) * (categoryItem.discount_value_percentage / 100)))
+      setRecyclePrice(
+        100 -
+          Number(formData.price_per_unit) *
+            (categoryItem.discount_value_percentage / 100)
+      );
     }
     // setRecyclePrice(0)
-  }, [formData.price_per_unit])
+  }, [formData.price_per_unit]);
 
   useEffect(() => {
     fetchDataList();
@@ -672,7 +716,7 @@ export default function rubbush_collectors() {
                   </UIDialogConfirm>
                   <UIBaseDialog
                     title="تعديل باقة"
-                    confirmHandler={() => { }}
+                    confirmHandler={() => {}}
                     confirmText="تعديل"
                     form="update-form"
                     btn={
@@ -763,36 +807,45 @@ export default function rubbush_collectors() {
                           isDays={true}
                         ></TextFieldNada>
 
-
                         <div>
                           <div className="label flex items-center gap-1  start-4  w-fit px-3 text-sm font-semibold">
-                            <label>
-                              نسبة الخصم
-                            </label>
+                            <label>نسبة الخصم</label>
                           </div>
                           <div className="my-4">
                             {discountArr.map((item, index) => (
-                              <div key={index} className="grid grid-cols-12 gap-5 ">
+                              <div
+                                key={index}
+                                className="grid grid-cols-12 gap-5 "
+                              >
                                 <div className="col-span-4 border py-3 px-5 flex justify-center items-center  rounded-xl mb-7 ">
-                                  {index < 2 ? <span>{item.min_units} - {item.max_units} وحدة</span> : <span>20 وحدة او اكثر</span>}
-
+                                  {index < 5 ? (
+                                    <span>
+                                      {item.min_units} - {item.max_units} وحدة
+                                    </span>
+                                  ) : (
+                                    <span>20 وحدة او اكثر</span>
+                                  )}
                                 </div>
                                 <div className="col-span-8 mb-7">
-                                  <TextFieldNada prependIcon="mdi mdi-ticket-percent-outline text-gray-400 " handleChange={(value) => handleUpdateDiscountChange(value, index)} name={`discounts[${index}].discount_rate`} label="نسبة الخصم" placeholder="ادخل نسبة الخصم" type="number" value={updateFormData.discounts[index]?.discount_rate} />
+                                  <TextFieldNada
+                                    prependIcon="mdi mdi-ticket-percent-outline text-gray-400 "
+                                    handleChange={(value) =>
+                                      handleUpdateDiscountChange(value, index)
+                                    }
+                                    name={`discounts[${index}].discount_rate`}
+                                    label="نسبة الخصم"
+                                    placeholder="ادخل نسبة الخصم"
+                                    type="number"
+                                    value={
+                                      updateFormData.discounts[index]
+                                        ?.discount_rate
+                                    }
+                                  />
                                 </div>
-
                               </div>
                             ))}
-
-
-
                           </div>
-
-
                         </div>
-
-
-
                       </div>
                     </form>
                   </UIBaseDialog>
@@ -805,3 +858,4 @@ export default function rubbush_collectors() {
     </>
   );
 }
+
