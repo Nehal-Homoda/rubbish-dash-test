@@ -395,7 +395,7 @@ export default function rubbush_collectors() {
 
   const createSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+    setErrorMsg('')
     const validateResult = await validateAllInputs<FormDataType>(
       formSchema,
       formData
@@ -483,6 +483,7 @@ export default function rubbush_collectors() {
       .catch((error) => {
         setErrorMsg(error?.message);
         console.log("error message is", errorMsg);
+        window.scrollTo({ top: 0, behavior: "smooth" });
       });
   };
 
@@ -504,6 +505,7 @@ export default function rubbush_collectors() {
 
 
   const resetForm = () => {
+    setErrorMsg('')
     setFormData({
       name_ar: "",
       name_en: "",
@@ -606,8 +608,8 @@ export default function rubbush_collectors() {
         >
           <form onSubmit={createSubmit} id="update-form">
             {errorMsg && (
-              <div className="mb-5">
-                <span className="text-red-800">
+              <div className="mb-6 text-start border border-red-800 bg-red-100 px-3 py-3 rounded-lg">
+                <span className="text-red-800 error-alert">
                   {" "}
                   {errorMsg}
                 </span>
