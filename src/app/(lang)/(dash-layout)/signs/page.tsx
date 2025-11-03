@@ -139,8 +139,8 @@ export default function rubbush_collectors() {
     const updateDataItem = (item: Banner) => {
         setSelectedDataItem(item);
         setUpdateFormData({
-            title_ar: item.title,
-            title_en: item.title,
+            title_ar: item.title_ar,
+            title_en: item.title_en,
             order: item.order,
             link: item.link,
             is_active: item.is_active ? 1 : 0,

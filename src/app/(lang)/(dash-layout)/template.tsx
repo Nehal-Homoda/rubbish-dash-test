@@ -1,6 +1,8 @@
 "use client";
 import { meService } from "@/services/authServices";
+import { showTicketMessagesCountService } from "@/services/sharedService";
 import { enter } from "@/stores/authSlice";
+import { changeCount } from "@/stores/authSlice"
 import { AppDispatch, RootState } from "@/stores/store";
 import { useLocalePath } from "@/utils/lang";
 import { useRouter } from "next/navigation";
@@ -17,6 +19,9 @@ export default function Template({ children }: Props) {
     );
     const isLoggedIn = useSelector(
         (state: RootState) => state.authReducer.isLoggedIn
+    );
+    const count = useSelector(
+        (state: RootState) => state.authReducer.count
     );
     const dispatch = useDispatch<AppDispatch>();
     const localePath = useLocalePath();
@@ -39,7 +44,21 @@ export default function Template({ children }: Props) {
     // }
     useEffect(() => {
         dispatch(enter());
+
     }, [dispatch]);
+
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            showTicketMessagesCountService().then((response) => {
+                dispatch(changeCount(response.data.open_tickets_count))
+
+
+            })
+        }, 1000);
+
+        return () => clearInterval(intervalId);
+    }, []);
+
 
 
 

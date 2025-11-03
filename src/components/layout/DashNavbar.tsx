@@ -18,6 +18,7 @@ export default function DashNavbar({ isOpen, openSidebar }: Props) {
   const { lang, dict } = useLangAndDictionary();
   const title = useSelector((state: RootState) => state.authReducer.title);
   const user = useSelector((state: RootState) => state.authReducer.user);
+  const count = useSelector((state: RootState) => state.authReducer.count);
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
 
@@ -48,11 +49,11 @@ export default function DashNavbar({ isOpen, openSidebar }: Props) {
             <div className="title font-bold text-lg flex items-center gap-2">
               <span>{title}</span>
 
-              {title=== "الدعم" &&
-                user &&
-                user.open_tickets !== undefined && (
+              {title === "الدعم" &&
+                count &&
+                (
                   <div className="bg-red-100 text-red-600 text-sm px-3 py-1 rounded-full font-medium">
-                    <span>{user.open_tickets} تذكرة مفتوحة</span>
+                    <span>{count} تذكرة مفتوحة</span>
                   </div>
                 )}
             </div>

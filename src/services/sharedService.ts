@@ -137,3 +137,25 @@ export const chartStatisticsHomeService = async (query?: string) => {
         throw new Error(error.message);
     }
 };
+
+export const showTicketMessagesCountService = async () => {
+    try {
+        const response = await apiCall.get(
+            `/admins/tickets/open-tickets-count`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+        if (!response.ok) {
+            await responseErrorServiceHandler(response, "show messages");
+        }
+        const data = await response.json();
+        console.log("response data =>>>>", data);
+        return data;
+    } catch (error: any) {
+        throw new Error(error.message);
+    }
+};

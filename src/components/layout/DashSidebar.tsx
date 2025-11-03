@@ -8,9 +8,10 @@ import { useParams, usePathname } from "next/navigation";
 import Routes from "@/core/manager/route.manager";
 import { useLangAndDictionary } from "@/utils/lang";
 import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/stores/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/stores/store";
 import { changeTitle } from "@/stores/authSlice";
+import { showTicketMessagesCountService } from "@/services/sharedService";
 
 interface Props {
   isOpen: boolean;
@@ -22,6 +23,10 @@ export default function DashSidebar({ isOpen, toggleSidebarHandler }: Props) {
   const { lang, dict } = useLangAndDictionary();
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
+  const user = useSelector((state: RootState) => state.authReducer.user);
+  const count = useSelector((state: RootState) => state.authReducer.count);
+
+
 
   const ListItems: ListItem[] = [
     {
@@ -139,18 +144,23 @@ export default function DashSidebar({ isOpen, toggleSidebarHandler }: Props) {
     toggleSidebarHandler();
   };
 
+
+  
+
+
+
   const handleOnClick = (item: ListItem) => {
     dispatch(changeTitle(item.text));
     router.push(`${langPrefix}${item.path}`);
   };
-  
+
+
   return (
     <div
       className={`side-bar z-50 bg-surface text-white/85 fixed top-0 md:flex duration-300 flex-col h-full
-  ${
-    isOpen ? "flex" : "md:translate-x-0 " + "translate-x-full"
-    // (params.lang === "ar" ? "translate-x-full" : "-translate-x-full")
-  }
+  ${isOpen ? "flex" : "md:translate-x-0 " + "translate-x-full"
+        // (params.lang === "ar" ? "translate-x-full" : "-translate-x-full")
+        }
   `}
     >
       <span
@@ -174,15 +184,13 @@ export default function DashSidebar({ isOpen, toggleSidebarHandler }: Props) {
             <button onClick={() => handleOnClick(item)}>
               <Link
                 href={""}
-                className={`relative flex items-center justify-between capitalize cursor-pointer text-base hover:bg-white/10 rounded-2xl mb-2 w-52 h-12 transition-all px-4 ${
-                  cleanPathname === item.path
-                    ? `bg-white/10 before:content-[''] before:absolute before:bg-white before:h-[85%] before:w-[6px] before:rounded-md ${
-                        params.lang === "en"
-                          ? "before:-left-4"
-                          : "before:-right-3"
-                      }`
-                    : ""
-                }`}
+                className={`relative flex items-center justify-between capitalize cursor-pointer text-base hover:bg-white/10 rounded-2xl mb-2 w-52 h-12 transition-all px-4 ${cleanPathname === item.path
+                  ? `bg-white/10 before:content-[''] before:absolute before:bg-white before:h-[85%] before:w-[6px] before:rounded-md ${params.lang === "en"
+                    ? "before:-left-4"
+                    : "before:-right-3"
+                  }`
+                  : ""
+                  }`}
                 onClick={(e) => {
                   if (item.subLinks) e.preventDefault();
                   toggleDropDown(index);
@@ -196,23 +204,41 @@ export default function DashSidebar({ isOpen, toggleSidebarHandler }: Props) {
                     <i className={`fa ${item.icon}  me-2 text-2xl`}></i>
                   ) : null}
 
-                  <span>{dict[item.name] || item.name}</span>
+
+
+                  {item.name === "support"
+                    ? (
+                      <div className="flex items-center gap-3 justify-center ">
+                        <span>{dict[item.name] || item.name}</span>
+                        <div className="bg-red-100 text-red-600 text-sm  w-5 h-5 rounded-full font-medium">
+                          <span>{count} </span>
+                        </div>
+
+                      </div>
+                    ) : (
+
+                      <span>{dict[item.name] || item.name}</span>
+
+
+                    )}
+
+
+
+
                 </div>
                 {item.subLinks && (
                   <span
-                    className={`mdi mdi-chevron-down transition-all duration-200 ${
-                      dropdownIndex === index ? "-rotate-180" : "rotate-0"
-                    }`}
+                    className={`mdi mdi-chevron-down transition-all duration-200 ${dropdownIndex === index ? "-rotate-180" : "rotate-0"
+                      }`}
                   ></span>
                 )}
               </Link>
             </button>
             <div
-              className={`drop-down flex  flex-col justify-between pr-5 pt-1 pb-3 text-sm overflow-hidden transition-all duration-500 gap-1 ${
-                dropdownIndex === index
-                  ? "max-h-[500px]"
-                  : "max-h-0 pointer-events-none "
-              }`}
+              className={`drop-down flex  flex-col justify-between pr-5 pt-1 pb-3 text-sm overflow-hidden transition-all duration-500 gap-1 ${dropdownIndex === index
+                ? "max-h-[500px]"
+                : "max-h-0 pointer-events-none "
+                }`}
             >
               {item.subLinks?.map((dropKey, index) => (
                 // <button onClick={() => handleOnClick(item)}>
@@ -233,9 +259,8 @@ export default function DashSidebar({ isOpen, toggleSidebarHandler }: Props) {
                     router.push(`${langPrefix}${dropKey.path}`);
                     toggleSidebarHandler();
                   }}
-                  className={`text-right cursor-pointer hover:bg-white/10 py-2 px-3 rounded-xl w-full text-sm ${
-                    cleanPathname === dropKey.path ? "text-white" : ""
-                  }`}
+                  className={`text-right cursor-pointer hover:bg-white/10 py-2 px-3 rounded-xl w-full text-sm ${cleanPathname === dropKey.path ? "text-white" : ""
+                    }`}
                 >
                   {dict[dropKey.name] || dropKey.name}
                 </button>

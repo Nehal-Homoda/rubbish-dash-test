@@ -8,6 +8,7 @@ interface InitialState {
   isLoggedIn: boolean;
   isEnter: boolean;
   title: null | string;
+  count: string
 }
 
 const initialState: InitialState = {
@@ -16,6 +17,7 @@ const initialState: InitialState = {
   isLoggedIn: false,
   isEnter: false,
   title: "  صباح الخير 👋",
+  count: ""
 };
 
 export const authSlice = createSlice({
@@ -69,8 +71,11 @@ export const authSlice = createSlice({
       state.title = action.payload;
       Cookies.set("title", JSON.stringify(state.title));
     },
+    changeCount: (state, action: PayloadAction<string>) => {
+      state.count = action.payload
+    }
   },
 });
 
-export const { login, logout, enter, changeTitle } = authSlice.actions;
+export const { login, logout, enter, changeTitle, changeCount } = authSlice.actions;
 export default authSlice.reducer;

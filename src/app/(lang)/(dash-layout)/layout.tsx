@@ -5,6 +5,7 @@ import UIDialogAlert from "@/components/ui/UIDialogAlert";
 import Template from "./template";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { showTicketMessagesCountService } from "@/services/sharedService";
 
 type Props = {
     children: Readonly<React.ReactNode>;
@@ -23,6 +24,7 @@ export default function RootLayout({ children }: Props) {
     useEffect(() => {
         setLoaded(true);
     }, []);
+
 
     return (
         <>

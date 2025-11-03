@@ -212,7 +212,7 @@ export default function rubbush_collectors() {
         setDataList(response.data);
         setTotalPages(response.meta.last_page);
       })
-      .catch(() => {});
+      .catch(() => { });
   };
   const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -254,7 +254,7 @@ export default function rubbush_collectors() {
 
         console.log(response);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const deleteSubmit = (item: PackageOffer, selectedIndex: number) => {
@@ -265,7 +265,7 @@ export default function rubbush_collectors() {
         setDataList(updatedArr);
         successDialog(true);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const updateDataItem = (item: PackageOffer) => {
@@ -282,12 +282,12 @@ export default function rubbush_collectors() {
       days_count: item.days_count ? parseInt(item.days_count) : "",
       price_per_unit: item.price_per_unit ? parseInt(item.price_per_unit) : "",
       discounts: item.discounts?.length
-      ? item.discounts.map((d) => ({
+        ? item.discounts.map((d) => ({
           min_units: d.min_units,
           max_units: d.max_units,
           discount_rate: d.discount_rate ?? 0,
         }))
-      : [
+        : [
           { min_units: 1, max_units: "", discount_rate: 0 },
           { min_units: 2, max_units: 5, discount_rate: 0 },
           { min_units: 6, max_units: 9, discount_rate: 0 },
@@ -313,7 +313,7 @@ export default function rubbush_collectors() {
         fetchDataList();
         successDialog(true);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const addFormChangeHander = (
@@ -389,25 +389,50 @@ export default function rubbush_collectors() {
         fetchDataList();
         //@ts-ignore
         successDialog(true);
-        
+
         setFormData({
           name_ar: "",
           name_en: "",
-          category_id: 0,
+          category_id: "",
           is_active: 0,
           price_per_unit: 0,
           order: 0,
           days_count: 0,
           discounts: [
             {
-              min_units: 0,
+              min_units: 1,
+              max_units: "",
+              discount_rate: 0,
+            },
+            {
+              min_units: 2,
+              max_units: 5,
+              discount_rate: 0,
+            },
+            {
+              min_units: 6,
+              max_units: 9,
+              discount_rate: 0,
+            },
+            {
+              min_units: 10,
+              max_units: 15,
+              discount_rate: 0,
+            },
+            {
+              min_units: 16,
+              max_units: 19,
+              discount_rate: 0,
+            },
+            {
+              min_units: 20,
               max_units: "",
               discount_rate: 0,
             },
           ],
         });
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const handleSelectedCategory = (value: any) => {
@@ -425,6 +450,11 @@ export default function rubbush_collectors() {
       setCategoryItem(response.data);
     });
   };
+
+
+  const resetForm = () => {
+
+  }
 
   const handleChangeValue = (e: any, index: number) => {
     console.log("index is", index);
@@ -471,7 +501,7 @@ export default function rubbush_collectors() {
         <UIBaseDialog
           confirmCloseHandler={resetForm}
           title="اضافة باقة"
-          confirmHandler={() => {}}
+          confirmHandler={() => { }}
           confirmText="اضافة"
           form="update-form"
           btn={
@@ -617,34 +647,59 @@ export default function rubbush_collectors() {
       .then((response) => {
         setCategories(response.data);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
-  const resetForm = () => {
-    setFormData({
-      name_ar: "",
-      name_en: "",
-      category_id: "",
-      is_active: 0,
-      price_per_unit: "",
-      order: 0,
-      days_count: "",
-      discounts: [
-        {
-          min_units: 0,
-          max_units: "",
-          discount_rate: 0,
-        },
-      ],
-    });
-  };
+  // const resetForm = () => {
+  //   setFormData({
+  //     name_ar: "",
+  //     name_en: "",
+  //     category_id: "",
+  //     is_active: 0,
+  //     price_per_unit: "",
+  //     order: 0,
+  //     days_count: "",
+  //     discounts: [
+  //       {
+  //         min_units: 1,
+  //         max_units: "",
+  //         discount_rate: 0,
+  //       },
+  //       {
+  //         min_units: 2,
+  //         max_units: 5,
+  //         discount_rate: 0,
+  //       },
+  //       {
+  //         min_units: 6,
+  //         max_units: 9,
+  //         discount_rate: 0,
+  //       },
+  //       {
+  //         min_units: 10,
+  //         max_units: 15,
+  //         discount_rate: 0,
+  //       },
+  //       {
+  //         min_units: 16,
+  //         max_units: 19,
+  //         discount_rate: 0,
+  //       },
+  //       {
+  //         min_units: 20,
+  //         max_units: "",
+  //         discount_rate: 0,
+  //       },
+  //     ],
+  //   });
+  // };
 
   useEffect(() => {
     if (categoryItem && formData.price_per_unit) {
       setRecyclePrice(
         100 -
-          Number(formData.price_per_unit) *
-            (categoryItem.discount_value_percentage / 100)
+        Number(formData.price_per_unit) *
+        (categoryItem.discount_value_percentage / 100)
       );
     }
     // setRecyclePrice(0)
@@ -653,8 +708,8 @@ export default function rubbush_collectors() {
     if (categoryItem && formData.price_per_unit) {
       setRecyclePrice(
         100 -
-          Number(formData.price_per_unit) *
-            (categoryItem.discount_value_percentage / 100)
+        Number(formData.price_per_unit) *
+        (categoryItem.discount_value_percentage / 100)
       );
     }
     // setRecyclePrice(0)
@@ -716,7 +771,7 @@ export default function rubbush_collectors() {
                   </UIDialogConfirm>
                   <UIBaseDialog
                     title="تعديل باقة"
-                    confirmHandler={() => {}}
+                    confirmHandler={() => { }}
                     confirmText="تعديل"
                     form="update-form"
                     btn={
