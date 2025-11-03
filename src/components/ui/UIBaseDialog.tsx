@@ -13,10 +13,10 @@ type Props = {
     title: string;
     form?: string;
     confirmHandler: () => void;
-    confirmCloseHandler?: () => void;
+    confirmCloseHandler?:()=>void;
     confirmText: string;
     hideConfirmBtn?: boolean;
-    heightStyle?: string
+    heightStyle?:string
 };
 
 export default function UIBaseDialog({
@@ -34,17 +34,10 @@ export default function UIBaseDialog({
 
     function closeModal() {
         setIsOpen(false);
-        if (confirmCloseHandler) {
+        if(confirmCloseHandler){
 
             confirmCloseHandler()
-
-
         }
-    }
-
-    function handleClose() {
-        confirmHandler()
-        closeModal()
     }
 
     function openModal() {
@@ -109,7 +102,7 @@ export default function UIBaseDialog({
                                                     form ? "submit" : "button"
                                                 }
                                                 className="base-btn min-w-[200px]"
-                                                onClick={handleClose}
+                                                onClick={confirmHandler}
                                                 form={form ?? undefined}
                                             >
                                                 {confirmText}

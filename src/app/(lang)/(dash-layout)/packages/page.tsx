@@ -6,8 +6,9 @@ import UIPrimaryDropdown from "@/components/ui/UIPrimaryDropdown";
 import UIBaseDialog from "@/components/ui/UIBaseDialog";
 import MultiCheckbox from "@/components/ui/form/MultiCheckbox";
 import SelectInput from "@/components/ui/form/SelectInput";
-import { successDialog } from "@/utils/shared";
+import { successDialog, validateAllInputs, validateInput } from "@/utils/shared";
 import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
+import * as Yup from "yup"
 import {
   addPackageService,
   deletePackageService,
@@ -90,7 +91,7 @@ export default function rubbush_collectors() {
   type FormDataType = {
     name_ar: string;
     name_en: string;
-    category_id: number | string;
+    category_id: number | string | null;
     is_active: number;
     price_per_unit: number | string;
     order: number;
@@ -101,7 +102,7 @@ export default function rubbush_collectors() {
   const [formData, setFormData] = useState<FormDataType>({
     name_ar: "",
     name_en: "",
-    category_id: "",
+    category_id: null,
     is_active: 0,
     price_per_unit: "",
     order: 0,
@@ -141,10 +142,43 @@ export default function rubbush_collectors() {
     ],
   });
 
-  const [updateFormData, setUpdateFormData] = useState<FormDataType>({
+
+  interface FormDataInputErrors {
+    name_ar: string | null,
+    name_en: string | null,
+    category_id: string | null,
+    price_per_unit: string | null
+
+  }
+
+
+  const formSchema = Yup.object().shape({
+    name_ar: Yup.string().required('الاسم باللغه العربيه مطلوب'),
+    name_en: Yup.string().required('الاسم باللغه الانجليزيه مطلوب'),
+    category_id: Yup.string().required('نوع الخدمة مطلوب'),
+    price_per_unit: Yup.string().required('سعر الوحده الواحده')
+    // is_active: Yup.array()
+    //   .of(Yup.string())
+    //   .min(1, "Select at least one district")
+    //   .required("Available districts are required"),
+
+
+  })
+  const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
     name_ar: "",
     name_en: "",
     category_id: "",
+    price_per_unit: ""
+
+  });
+
+
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const [updateFormData, setUpdateFormData] = useState<FormDataType>({
+    name_ar: "",
+    name_en: "",
+    category_id: null,
     is_active: 0,
     price_per_unit: "",
     order: 0,
@@ -278,7 +312,7 @@ export default function rubbush_collectors() {
       name_en: item.name_ar,
       order: item.order ? item.order : 0,
       is_active: item.is_active ? 1 : 0,
-      category_id: ca?.id ?? "",
+      category_id: ca?.id ?? null,
       days_count: item.days_count ? parseInt(item.days_count) : "",
       price_per_unit: item.price_per_unit ? parseInt(item.price_per_unit) : "",
       discounts: item.discounts?.length
@@ -325,6 +359,8 @@ export default function rubbush_collectors() {
       [e.target.name]: e.target.value,
     }));
 
+
+
     console.log(e.target.name, e.target.value);
   };
   const updateFormChangeHander = (
@@ -357,8 +393,21 @@ export default function rubbush_collectors() {
     });
   };
 
-  const createSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const createSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+
+
+
+    const validateResult = await validateAllInputs<FormDataType>(
+      formSchema,
+      formData
+    );
+    if (!validateResult) return;
+
+    setFormErrors({ ...validateResult.outputResult });
+    console.log("form error", formErrors);
+    if (validateResult.isInvalid) return;
 
     const fd = new FormData();
 
@@ -370,7 +419,8 @@ export default function rubbush_collectors() {
 
     fd.append("name_ar", formData.name_ar),
       fd.append("name_en", formData.name_en),
-      fd.append("category_id", formData.category_id.toString()),
+      //@ts-ignore
+      fd.append("category_id", formData.category_id ? formData.category_id.toString() : null),
       fd.append("is_active", formData.is_active.toString()),
       fd.append("price_per_unit", formData.price_per_unit.toString()),
       fd.append("order", formData.order.toString()),
@@ -393,7 +443,7 @@ export default function rubbush_collectors() {
         setFormData({
           name_ar: "",
           name_en: "",
-          category_id: "",
+          category_id: null,
           is_active: 0,
           price_per_unit: 0,
           order: 0,
@@ -431,14 +481,18 @@ export default function rubbush_collectors() {
             },
           ],
         });
+        setCategoryItem(null)
       })
-      .catch((error) => { });
+      .catch((error) => {
+        setErrorMsg(error?.message);
+        console.log("error message is", errorMsg);
+      });
   };
 
   const handleSelectedCategory = (value: any) => {
     setFormData((prev) => ({
       ...prev,
-      ["category_id"]: value,
+      ["category_id"]: value ? value : null,
     }));
     // const selected = categories.find((item, index) => {
     //   return item.id == value
@@ -453,7 +507,48 @@ export default function rubbush_collectors() {
 
 
   const resetForm = () => {
-
+    setFormData({
+      name_ar: "",
+      name_en: "",
+      category_id: null,
+      is_active: 0,
+      price_per_unit: 0,
+      order: 0,
+      days_count: 0,
+      discounts: [
+        {
+          min_units: 1,
+          max_units: "",
+          discount_rate: 0,
+        },
+        {
+          min_units: 2,
+          max_units: 5,
+          discount_rate: 0,
+        },
+        {
+          min_units: 6,
+          max_units: 9,
+          discount_rate: 0,
+        },
+        {
+          min_units: 10,
+          max_units: 15,
+          discount_rate: 0,
+        },
+        {
+          min_units: 16,
+          max_units: 19,
+          discount_rate: 0,
+        },
+        {
+          min_units: 20,
+          max_units: "",
+          discount_rate: 0,
+        },
+      ],
+    });
+    setCategoryItem(null)
   }
 
   const handleChangeValue = (e: any, index: number) => {
@@ -513,6 +608,14 @@ export default function rubbush_collectors() {
           }
         >
           <form onSubmit={createSubmit} id="update-form">
+            {errorMsg && (
+              <div className="mb-5">
+                <span className="text-red-800">
+                  {" "}
+                  {errorMsg}
+                </span>
+              </div>
+            )}
             <div className="space-y-7">
               <TextFieldNada
                 name="name_ar"
@@ -521,6 +624,7 @@ export default function rubbush_collectors() {
                 value={formData.name_ar}
                 label=" اسم الباقة ( عربي ) "
                 placeholder=" اسم الباقة  "
+                errorMessage={formErrors.name_ar || ""}
               ></TextFieldNada>
 
               <TextFieldNada
@@ -530,12 +634,13 @@ export default function rubbush_collectors() {
                 value={formData.name_en}
                 label=" اسم الباقة ( انجليزي ) "
                 placeholder=" اسم الباقة  "
+                errorMessage={formErrors.name_en || ""}
               ></TextFieldNada>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="col-span-1">
                   <SelectInput
-                    value={formData.category_id}
+                    value={formData.category_id ? formData.category_id : null}
                     items={categories}
                     itemName="name_ar"
                     itemValue="id"
@@ -544,12 +649,10 @@ export default function rubbush_collectors() {
                     name="category_id"
                     required={true}
                     onChange={(value) => {
-                      // setFormData((prev) => ({
-                      //   ...prev,
-                      //   ["category_id"]: value,
-                      // }));
+
                       handleSelectedCategory(value);
                     }}
+                    errorMessage={formErrors.category_id || ""}
                   ></SelectInput>
                 </div>
                 <div className="col-span-1">
@@ -579,6 +682,7 @@ export default function rubbush_collectors() {
                 label=" سعر الوحدة"
                 placeholder=" ادخل سعر الوحدة "
                 isPrice={true}
+                errorMessage={formErrors.price_per_unit || ""}
               ></TextFieldNada>
 
               {categoryItem && categoryItem.has_recycle && (
@@ -649,6 +753,8 @@ export default function rubbush_collectors() {
       })
       .catch((error) => { });
   };
+
+
 
   // const resetForm = () => {
   //   setFormData({
@@ -808,7 +914,7 @@ export default function rubbush_collectors() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                           <div className="col-span-1">
                             <SelectInput
-                              value={updateFormData.category_id}
+                              value={updateFormData.category_id ?? null}
                               items={categories}
                               itemName="name_ar"
                               itemValue="id"
@@ -819,7 +925,7 @@ export default function rubbush_collectors() {
                               onChange={(value) => {
                                 setUpdateFormData((prev) => ({
                                   ...prev,
-                                  ["category_id"]: value,
+                                  ["category_id"]: value ? value : null,
                                 }));
                               }}
                             ></SelectInput>

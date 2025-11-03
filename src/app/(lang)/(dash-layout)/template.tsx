@@ -42,22 +42,22 @@ export default function Template({ children }: Props) {
     //     }
 
     // }
+
+
     useEffect(() => {
         dispatch(enter());
 
     }, [dispatch]);
 
-    useEffect(() => {
-        const intervalId = setInterval(() => {
-            showTicketMessagesCountService().then((response) => {
-                dispatch(changeCount(response.data.open_tickets_count))
+    // useEffect(() => {
+    //     const intervalId = setInterval(() => {
+    //         showTicketMessagesCountService().then((response) => {
+    //             dispatch(changeCount(response.data.open_tickets_count))
+    //         })
+    //     }, 1000);
 
-
-            })
-        }, 1000);
-
-        return () => clearInterval(intervalId);
-    }, []);
+    //     return () => clearInterval(intervalId);
+    // }, []);
 
 
 

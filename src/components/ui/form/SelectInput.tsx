@@ -47,6 +47,11 @@ export default function SelectInput({
     };
 
     useEffect(() => {
+        if (!value) {
+            setSelected(placeholder);
+            
+            return;
+        }
         if (itemName && itemValue) {
             console.log('itemsss', items)
             const item = items.find((item) => {

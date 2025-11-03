@@ -6,6 +6,10 @@ import Template from "./template";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { showTicketMessagesCountService } from "@/services/sharedService";
+import { changeCount } from "@/stores/authSlice"
+import { AppDispatch } from "@/stores/store";
+import { useDispatch } from "react-redux";
+
 
 type Props = {
     children: Readonly<React.ReactNode>;
@@ -16,6 +20,7 @@ export default function RootLayout({ children }: Props) {
     const [isOpen, setIsOpen] = useState(false);
     const router = useRouter();
     const pathname = usePathname();
+    const dispatch = useDispatch<AppDispatch>();
 
     const openSidebar = () => {
         setIsOpen(!isOpen);
@@ -23,6 +28,16 @@ export default function RootLayout({ children }: Props) {
 
     useEffect(() => {
         setLoaded(true);
+    }, []);
+
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            showTicketMessagesCountService().then((response) => {
+                dispatch(changeCount(response.data.open_tickets_count))
+            })
+        }, 5000);
+
+        return () => clearInterval(intervalId);
     }, []);
 
 
