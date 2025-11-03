@@ -178,13 +178,13 @@ export default function rubbush_collectors({ user }: Props) {
             [name]: e.target.value,
         }));
         if (name == "units") {
-            if (packageItem) {
+            if (packageItem && selectedPackage) {
                 // setFormData((prev)=>({
                 //   ...prev,
 
                 // }))
                 //@ts-ignore
-                setTotalPrice(selectedPackage.price_per_unit * formData.units);
+                setTotalPrice(packageItem.price_per_unit * addSubscriptionFormData.units);
             }
         }
     };
@@ -465,16 +465,16 @@ export default function rubbush_collectors({ user }: Props) {
 
     useEffect(() => {
         if (packageItem) {
-            setTotalPrice(Number(packageItem.price_per_unit) * formData.units);
+            setTotalPrice(Number(packageItem.price_per_unit) * addSubscriptionFormData.units);
         }
-    }, [formData.units]);
+    }, [addSubscriptionFormData.units]);
 
 
 
 
     useEffect(() => {
         if (packageItem) {
-            setTotalPrice(Number(packageItem.price_per_unit) * formData.units);
+            setTotalPrice(Number(packageItem.price_per_unit) * addSubscriptionFormData.units);
         }
     }, [packageItem]);
 
@@ -992,9 +992,9 @@ export default function rubbush_collectors({ user }: Props) {
                                                         label="اسم المنطقة"
                                                         disabled
                                                         onChange={(value) =>
-                                                           
-                                                           
-                                                           undefined
+
+
+                                                            undefined
                                                             // setFormData((prev) => ({
                                                             //     ...prev,
                                                             //     ["district_id"]: value,

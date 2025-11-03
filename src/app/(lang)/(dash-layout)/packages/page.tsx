@@ -396,9 +396,6 @@ export default function rubbush_collectors() {
   const createSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-
-
-
     const validateResult = await validateAllInputs<FormDataType>(
       formSchema,
       formData
