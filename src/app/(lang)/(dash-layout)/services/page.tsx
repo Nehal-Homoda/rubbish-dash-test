@@ -7,8 +7,10 @@ import UIPrimaryDropdown from "@/components/ui/UIPrimaryDropdown";
 import UIBaseDialog from "@/components/ui/UIBaseDialog";
 import MultiCheckbox from "@/components/ui/form/MultiCheckbox";
 import SelectInput from "@/components/ui/form/SelectInput";
-import { successDialog } from "@/utils/shared";
+import { successDialog, validateAllInputs } from "@/utils/shared";
 import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
+import * as Yup from "yup"
+
 
 import {
   addCategoryService,
@@ -77,7 +79,7 @@ export default function rubbush_collectors() {
     is_active: number;
     image: File | null | string;
     has_recycle: number;
-    discount_value_percentage: number;
+    discount_value_percentage: number | string;
   };
   const [formData, setFormData] = useState<FormDataType>({
     name_ar: "",
@@ -86,8 +88,15 @@ export default function rubbush_collectors() {
     is_active: 0,
     image: null,
     has_recycle: 0,
-    discount_value_percentage: 0,
+    discount_value_percentage: switch1 ? 0 : '',
   });
+
+  const formSchema = Yup.object().shape({
+    name_ar: Yup.string().required('الاسم باللغه العربيه مطلوب'),
+    name_en: Yup.string().required('الاسم باللغه الانجليزيه مطلوب'),
+
+
+  })
 
   const [updateFormData, setUpdateFormData] = useState<FormDataType>({
     name_ar: "",
@@ -99,11 +108,24 @@ export default function rubbush_collectors() {
     discount_value_percentage: 0,
   });
 
-  const discountList = [
-    { id: 1, discount: "2-5" },
-    { id: 2, discount: "10-15" },
-    { id: 3, discount: "20-25" },
-  ];
+  interface FormDataInputErrors {
+    name_ar: string | null,
+    name_en: string | null,
+
+  }
+
+  const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
+    name_ar: "",
+    name_en: "",
+
+
+  });
+
+  // const discountList = [
+  //   { id: 1, discount: "2-5" },
+  //   { id: 2, discount: "10-15" },
+  //   { id: 3, discount: "20-25" },
+  // ];
 
   const fetchDataList = ({
     search = searchTerm,
@@ -116,7 +138,7 @@ export default function rubbush_collectors() {
         ? is_active
           ? "&is_active=" + 1
           : "&is_active=" + 0
-        : "";
+        : '';
     const hasSearch = search ? "&search=" + search : "";
 
     const query = `?page=${pageNum}${hasSearch}${isActive}`;
@@ -139,8 +161,8 @@ export default function rubbush_collectors() {
 
   const handleActiveFilter = (value: boolean | undefined) => {
     setPage(1)
-    setActiveFilter(value)
-    setPage(1);
+    // setActiveFilter(value)
+    // setPage(1);
     fetchDataList({ is_active: value, pageNum: 1 });
 
 
@@ -233,8 +255,24 @@ export default function rubbush_collectors() {
     console.log(e.target.name, e.target.value);
   };
 
-  const createSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const createSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setErrorMsg('')
+
+
+    setErrorMsg('')
+    const validateResult = await validateAllInputs<FormDataType>(
+      formSchema,
+      formData
+    );
+    if (!validateResult) return;
+
+    setFormErrors({ ...validateResult.outputResult });
+
+    if (validateResult.isInvalid) return;
+
 
     const fd = new FormData();
     fd.append("name_ar", formData.name_ar);
@@ -264,7 +302,9 @@ export default function rubbush_collectors() {
           discount_value_percentage: 0,
         });
       })
-      .catch((error) => { });
+      .catch((error) => {
+        setErrorMsg(error?.message);
+      });
   };
 
   const resetForm = () => {
@@ -310,6 +350,14 @@ export default function rubbush_collectors() {
           }
         >
           <form onSubmit={createSubmit} id="update-form">
+            {errorMsg && (
+              <div className="mb-6 text-start border border-red-800 bg-red-100 px-3 py-3 rounded-lg">
+                <span className="text-red-800 error-alert">
+                  {" "}
+                  {errorMsg}
+                </span>
+              </div>
+            )}
             <div className="space-y-7">
               <div className="w-full flex justify-center mb-20">
                 <FileInputImg
@@ -329,6 +377,7 @@ export default function rubbush_collectors() {
                 value={formData.name_ar}
                 label=" اسم الخدمة ( عربي ) "
                 placeholder=" اسم الخدمة  "
+                errorMessage={formErrors.name_ar || ""}
               ></TextFieldNada>
 
               <TextFieldNada
@@ -338,6 +387,7 @@ export default function rubbush_collectors() {
                 value={formData.name_en}
                 label=" اسم الخدمة ( انجليزي ) "
                 placeholder=" اسم الخدمة  "
+                errorMessage={formErrors.name_en || ""}
               ></TextFieldNada>
 
               <SelectInput
@@ -376,7 +426,7 @@ export default function rubbush_collectors() {
   };
   useEffect(() => {
     fetchDataList();
-  }, [page]); 
+  }, [page]);
 
   return (
     <>

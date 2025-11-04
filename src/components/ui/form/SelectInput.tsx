@@ -47,7 +47,7 @@ export default function SelectInput({
     };
 
     useEffect(() => {
-        if (!value) {
+        if (!value && value != 0) {
             setSelected(placeholder);
             
             return;

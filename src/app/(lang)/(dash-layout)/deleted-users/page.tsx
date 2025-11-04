@@ -2,10 +2,12 @@
 
 import BaseDataTable from '@/components/data-tables/BaseDataTable';
 import UIPrimaryDropdown from '@/components/ui/UIPrimaryDropdown';
-import { getDeletedUserService } from '@/services/userService';
+import { getDeletedUserService, restoreUserService } from '@/services/userService';
 import { Users } from '@/types/auth.interface';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
+import editImg from '@/assets/images/icons/edit.png'
+
 
 export default function page() {
   const [dataList, setDataList] = useState<Users[]>([]);
@@ -17,7 +19,7 @@ export default function page() {
     { text: " الاشتراك", name: "has_subscription" },
     { text: "الصورة الشخصية", name: "image" },
     { text: "تاريخ الحذف", name: "created_at" },
-    // { text: "الاجراءات", name: "" },
+    { text: "الاجراءات", name: "" },
   ];
   const statusList = [
     { is_active: 1, name: "مفعل" },
@@ -58,7 +60,7 @@ export default function page() {
       // });
       // setTotalPages(response.meta.last_page);
     }).catch(() => {
-      
+
     })
   };
 
@@ -105,6 +107,18 @@ export default function page() {
     fetchDataList({ search: e.target.value });
   };
 
+
+  const handleRestoreUser = async (itemId: number) => {
+    await restoreUserService(itemId).then((response) => {
+      console.log('response', response.data)
+      fetchDataList()
+
+    })
+
+
+
+  }
+
   useEffect(() => {
     fetchDataList();
   }, [page]);
@@ -142,12 +156,29 @@ export default function page() {
                 </div>
               </td>
 
-        
+
 
 
 
 
               <td className="py-2 px-4">{item.created_at}</td>
+
+
+
+
+              <td className="">
+                <div className="flex  gap-3">
+                  <button onClick={() => handleRestoreUser(item.id)} className="border border-green-700 text-green-700 p-1 px-2 rounded-lg">
+                    <div className=" cursor-pointer">
+                      {/* <img className="w-full h-full object-contain" src={editImg.src} alt="" /> */}
+
+                      <span>Restore</span>
+                    </div>
+                  </button>
+
+
+                </div>
+              </td>
 
 
 

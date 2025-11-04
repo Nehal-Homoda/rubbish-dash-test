@@ -91,8 +91,8 @@ export default function rubbush_collectors() {
 
 
     const handleActiveFilter = (value: boolean | undefined) => {
-        setPage(1)
-        setActiveFilter(value)
+        // setPage(1)
+        // setActiveFilter(value)
         setPage(1);
         fetchDataList({ is_active: value, pageNum: 1 });
 

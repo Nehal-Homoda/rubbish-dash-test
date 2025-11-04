@@ -8,7 +8,7 @@ interface InitialState {
   isLoggedIn: boolean;
   isEnter: boolean;
   title: null | string;
-  count: string
+  count: string | number
 }
 
 const initialState: InitialState = {

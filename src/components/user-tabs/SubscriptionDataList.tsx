@@ -543,7 +543,13 @@ export default function rubbush_collectors({ user }: Props) {
             if (categoryId) {
                 const query = `?category_id=${categoryId.id}`
                 getPackagesService(query).then((response) => {
-                    setpackagesList(response.data)
+                    // setpackagesList(response.data)
+
+                    const activePackages = response.data.filter((item, index) => {
+                        return item.is_active
+                    })
+
+                    setpackagesList(activePackages);
                     console.log('responsssssssssssssssssssse is', response)
 
                 })

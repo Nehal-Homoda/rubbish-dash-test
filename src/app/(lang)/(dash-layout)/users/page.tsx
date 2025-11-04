@@ -226,7 +226,7 @@ export default function rubbush_collectors() {
   };
 
   const handleActiveFilter = (value: boolean | undefined) => {
-    setActiveFilter(value);
+    // setActiveFilter(value);
     setPage(1);
     fetchDataList({ is_active: value, pageNum: 1 });
   };

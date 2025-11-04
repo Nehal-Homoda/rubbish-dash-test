@@ -95,14 +95,12 @@ export default function rubbush_collectors() {
         name_ar: Yup.string().required(),
         name_en: Yup.string().required(),
         available_days: Yup.array()
-            .of(Yup.string())
+            .of(Yup.string()) 
             .min(1, "Select at least one day")
             .required("Available days are required"),
-        available_times: Yup.array()
-            .of(Yup.string())
-            .min(1, "Select at least one time")
-            .required("Available times are required"),
+        available_times: Yup.array().required('available times are required')
     });
+
     const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
         name_ar: "",
         name_en: "",
@@ -133,8 +131,15 @@ export default function rubbush_collectors() {
 
     const addDynamicTime = () => {
         setDynamicFromToTime((prev) => {
+
             const ar = [...prev];
-            ar.push({ from: "", to: "" });
+            ar.forEach((item, index) => {
+                if (!item.from || !item.to) {
+                    return
+                }
+                ar.push({ from: "", to: "" });
+            })
+
 
             return [...ar];
         });
@@ -149,6 +154,7 @@ export default function rubbush_collectors() {
     };
     const addDynamicTimeUpdate = () => {
         setDynamicFromToTimeUpdate((prev) => {
+
             const ar = [...prev];
             ar.push({ from: "", to: "" });
 
@@ -256,10 +262,19 @@ export default function rubbush_collectors() {
         });
     };
 
-    const updateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const updateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         if (!selectedDataItem) return;
+        const validateResult = await validateAllInputs<FormDataInputs>(
+            formSchema,
+            updateFormData
+        );
+        console.log("validate", validateResult);
+        if (!validateResult) return;
+        setFormErrors({ ...validateResult.outputResult });
+        console.log("form error", formErrors);
+        if (validateResult.isInvalid) return;
 
         const body = JSON.stringify({
             ...updateFormData,
@@ -397,7 +412,7 @@ export default function rubbush_collectors() {
                                 itemName="name"
                                 itemValue="is_active"
                                 label="الحالة"
-                                placeholder="لختر الحالة"
+                                placeholder="اختر الحالة"
                                 name="is_active"
                                 required={true}
                                 onChange={(value) => {
@@ -407,6 +422,34 @@ export default function rubbush_collectors() {
                                     }));
                                 }}
                             ></SelectInput>
+
+
+                            <MultiCheckbox
+                                items={collectors}
+                                itemName="name"
+                                itemValue="id"
+                                value={
+                                    formData.collector_id
+                                }
+                                label="جامع القمامة"
+                                required={true}
+                                name="collector_id"
+                                placeholder="اختر جامع القمامة"
+                                // prependIcon="mdi mdi-calendar-month-outline"
+                                iconType="mdi"
+                                onChange={(value) => {
+                                    setFormData(
+                                        (prev) => ({
+                                            ...prev,
+                                            ["collector_id"]:
+                                                value,
+                                        })
+                                    );
+                                }}
+                            ></MultiCheckbox>
+
+
+
                             <MultiCheckbox
                                 errorMessage={formErrors.available_days}
                                 items={districtDays}
@@ -432,7 +475,8 @@ export default function rubbush_collectors() {
                                 >
                                     <div className="col-span-5">
                                         <TextFieldNada
-                                            name="price"
+                                            errorMessage={formErrors.available_times}
+                                            name="available_times"
                                             type="time"
                                             handleChange={
                                                 (e) => {
@@ -455,12 +499,14 @@ export default function rubbush_collectors() {
                                                 dynamicFromToTime[index].from
                                             }
                                             label="من "
-                                            placeholder="  السعر الكلي *"
+                                            placeholder=""
+
                                         ></TextFieldNada>
                                     </div>
                                     <div className="col-span-5">
                                         <TextFieldNada
-                                            name="price"
+                                            errorMessage={formErrors.available_times}
+                                            name="available_times"
                                             type="time"
                                             handleChange={
                                                 (e) => {
@@ -481,7 +527,7 @@ export default function rubbush_collectors() {
                                             }
                                             value={dynamicFromToTime[index].to}
                                             label="الي "
-                                            placeholder="  السعر الكلي *"
+                                            placeholder=" "
                                         ></TextFieldNada>
                                     </div>
                                     <div className="col-span-1">
@@ -637,6 +683,7 @@ export default function rubbush_collectors() {
                                                     }
                                                     label=" اسم المنطقة ( عربي ) "
                                                     placeholder=" اسم المنطقة  "
+                                                    errorMessage=""
                                                 ></TextFieldNada>
 
                                                 <TextFieldNada

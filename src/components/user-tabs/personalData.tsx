@@ -24,6 +24,7 @@ export default function personalData({ user }: Props) {
 
     const router = useRouter();
 
+    const [errorMsg, setErrorMsg] = useState("");
     useEffect(() => {
         setFormData({
             //@ts-ignore
@@ -34,6 +35,7 @@ export default function personalData({ user }: Props) {
     }, []);
 
     const updateUser = () => {
+        setErrorMsg('')
         const body = JSON.stringify({
             name: formData.name,
             phone: formData.phone,
@@ -44,8 +46,12 @@ export default function personalData({ user }: Props) {
             // router.push('/users')
 
             console.log(response);
-        });
+        }).catch((error) => {
+            setErrorMsg(error?.message)
+        })
     };
+
+
 
     const reset = () => {
         setFormData({
@@ -58,9 +64,17 @@ export default function personalData({ user }: Props) {
 
     return (
         <div className="container">
+
             <div className="bg-white rounded-xl  px-3 ">
                 <h3 className="font-bold py-14">الملف الشخصي</h3>
-
+                {errorMsg && (
+                    <div className="mb-6 text-start border border-red-800 bg-red-100 px-3 py-3 rounded-lg">
+                        <span className="text-red-800 error-alert">
+                            {" "}
+                            {errorMsg}
+                        </span>
+                    </div>
+                )}
                 <div className="grid grid-cols-2 lg:gap-5">
                     <div className="lg:col-span-1 col-span-2 input-wrap mb-14">
                         <TextFieldNada

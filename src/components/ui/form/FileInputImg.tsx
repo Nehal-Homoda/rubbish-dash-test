@@ -34,6 +34,7 @@ export default function FileInputImg({
         }
         if (state === "edit") {
             setImageUrl(placeholder_img.src);
+
             return;
         }
         setImageUrl(null);
@@ -43,7 +44,9 @@ export default function FileInputImg({
     }, []);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const fileInput = e.target
         const file = e.target.files?.[0] || null;
+        console.log('file is', file)
         if (file) {
             setFileType(file.type);
             setFileName(file.name);
@@ -68,14 +71,19 @@ export default function FileInputImg({
             setFileType(null);
             resetImgUrlToPlaceholder();
             if (onFileChange) onFileChange();
+            fileInput.value = "";
+
+
         }
+        fileInput.value = "";
     };
     const removeImage = () => {
         setFileName("");
         setFileType(null);
         resetImgUrlToPlaceholder();
-        onFileChange();
+        // onFileChange();
         handleRemoveImage();
+
     };
     return (
         <>
@@ -83,8 +91,8 @@ export default function FileInputImg({
                 {title && <p className="text-foreground mb-5">{title}</p>}
                 <div
                     className={`relative  ${state === "add"
-                            ? "border-2 border-dashed rounded-lg "
-                            : " rounded-2xl shadow-[0_0_0.5625rem_0.4375rem_rgb(0,0,0,0.07)] text-center"
+                        ? "border-2 border-dashed rounded-lg "
+                        : " rounded-2xl shadow-[0_0_0.5625rem_0.4375rem_rgb(0,0,0,0.07)] text-center"
                         } w-fit`}
                 >
                     <input disabled={disabled}

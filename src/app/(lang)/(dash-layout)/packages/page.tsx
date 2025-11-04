@@ -9,6 +9,9 @@ import SelectInput from "@/components/ui/form/SelectInput";
 import { successDialog, validateAllInputs, validateInput } from "@/utils/shared";
 import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
 import * as Yup from "yup"
+
+
+
 import {
   addPackageService,
   deletePackageService,
@@ -111,7 +114,7 @@ export default function rubbush_collectors() {
     discounts: [
       {
         min_units: 1,
-        max_units: "",
+        max_units: 1,
         discount_rate: 0,
       },
       {
@@ -186,7 +189,7 @@ export default function rubbush_collectors() {
     discounts: [
       {
         min_units: 1,
-        max_units: "",
+        max_units: 1,
         discount_rate: 0,
       },
       {
@@ -309,7 +312,7 @@ export default function rubbush_collectors() {
 
     setUpdateFormData({
       name_ar: item.name_ar,
-      name_en: item.name_ar,
+      name_en: item.name_en,
       order: item.order ? item.order : 0,
       is_active: item.is_active ? 1 : 0,
       category_id: ca?.id ?? null,
@@ -448,7 +451,7 @@ export default function rubbush_collectors() {
           discounts: [
             {
               min_units: 1,
-              max_units: "",
+              max_units: 1,
               discount_rate: 0,
             },
             {
@@ -517,7 +520,7 @@ export default function rubbush_collectors() {
       discounts: [
         {
           min_units: 1,
-          max_units: "",
+          max_units: 1,
           discount_rate: 0,
         },
         {
@@ -665,6 +668,7 @@ export default function rubbush_collectors() {
                     name="is_active"
                     required={true}
                     onChange={(value) => {
+                      console.log('value', value)
                       setFormData((prev) => ({
                         ...prev,
                         ["is_active"]: value,

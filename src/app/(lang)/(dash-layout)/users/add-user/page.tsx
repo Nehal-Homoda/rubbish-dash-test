@@ -26,6 +26,9 @@ import { useRouter } from "next/navigation";
 import { Payment_methods } from "@/types/paymentMethod.interface";
 import { RadioGroup } from "@headlessui/react";
 import moment from "moment";
+import * as Yup from "yup";
+import { validateAllInputs } from "@/utils/shared";
+
 
 
 
@@ -59,7 +62,8 @@ export default function page() {
             [name]: e.target.value,
         }));
         if (name == "units") {
-            if (packageItem) {
+
+            if (packageItem && selectedPackage) {
                 // setFormData((prev)=>({
                 //   ...prev,
 
@@ -78,6 +82,46 @@ export default function page() {
         //     }
         // }
     };
+
+
+    interface FormDataInputErrors {
+        name: string | null;
+        phone: string;
+        days: string;
+        time_from: string;
+        
+
+    }
+    type FormDataType = {
+        name: string;
+        phone: string;
+        days: string[];
+        time_from: string;
+       
+
+    };
+
+    const formSchema = Yup.object().shape({
+        name: Yup.string().required(),
+        phone: Yup.string().required(),
+        days: Yup.array()
+            .of(Yup.string())
+            .min(1, "Select at least one day")
+            .required("Available days are required"),
+        time_from: Yup.string().required("Time is  required"),
+       
+
+    });
+
+    const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
+        name: "",
+        phone: "",
+        days: "",
+        time_from: "",
+     
+
+    });
+
 
     //   const form = {
     //     name: "",
@@ -101,9 +145,21 @@ export default function page() {
         });
     };
     //@ts-ignore
-    const handleAddUserSubmit = (e) => {
+    const handleAddUserSubmit = async (e) => {
         e.preventDefault();
         setErrorMessage("");
+
+        const validateResult = await validateAllInputs(
+            formSchema,
+            formData
+        );
+        console.log("validate", validateResult);
+        if (!validateResult) return;
+        //@ts-ignore
+        setFormErrors({ ...validateResult.outputResult });
+        console.log("form error", formErrors);
+        if (validateResult.isInvalid) return;
+
         const t = formData.time_from.split("-");
         const fd = new FormData();
 
@@ -370,27 +426,33 @@ export default function page() {
                     <div className="mb-14">
                         <p className="font-bold">اضافة مستخدم جديد</p>
                     </div>
-                    {!!errorMessage && (
-                        <p className="text-sm text-red-500 mb-10">
-                            {errorMessage}
-                        </p>
+                    {errorMessage && (
+                        <div className="mb-6 text-start border border-red-800 bg-red-100 px-3 py-3 rounded-lg">
+                            <span className="text-red-800 error-alert">
+                                {" "}
+                                {errorMessage}
+                            </span>
+                        </div>
                     )}
 
                     <form onSubmit={handleAddUserSubmit} className="">
                         <div className="grid grid-cols-12 space-y-5 gap-7">
                             <div className="col-span-12">
                                 <TextFieldNada
+                                    errorMessage={formErrors.name || ""}
                                     name="name"
                                     type="text"
                                     handleChange={(e) => takeValue(e, "name")}
                                     value={formData.name}
                                     label="اسم المستخدم"
                                     placeholder="اسم المستخدم"
+
                                 ></TextFieldNada>
                             </div>
 
                             <div className="col-span-12">
                                 <TextFieldNada
+                                    errorMessage={formErrors.phone || ""}
                                     name="phone"
                                     type="number"
                                     handleChange={(e) => takeValue(e, "phone")}
@@ -575,6 +637,7 @@ export default function page() {
 
                                     <div className="col-span-6">
                                         <MultiCheckbox
+
                                             disbaled={!formData.district_id}
                                             items={districtAvailableDays}
                                             value={formData.days}
@@ -593,10 +656,12 @@ export default function page() {
                                                     ["days"]: value,
                                                 }));
                                             }}
+                                            errorMessage={formErrors.days || ""}
                                         ></MultiCheckbox>
                                     </div>
                                     <div className="col-span-6">
                                         <SelectInput
+                                        errorMessage={formErrors.time_from}
                                             items={districtTime}
                                             placeholder="اختر الوقت"
                                             name=""

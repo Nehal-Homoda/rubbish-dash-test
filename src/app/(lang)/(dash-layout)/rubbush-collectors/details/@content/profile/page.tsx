@@ -71,18 +71,18 @@ export default function page() {
 
         updateCollectorService(id(), body)
             .then((response) => {
-                console.log('response issssssssssss',response)
+                console.log('response issssssssssss', response)
                 setCollector(response.data);
                 successDialog(true);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
     const fetchDistrects = () => {
         getDistrictService()
             .then((response) => {
                 setDistrects(response.data);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
     const resetHandler = () => {
         if (!collector) {
@@ -118,10 +118,10 @@ export default function page() {
             <h5 className="text-lg font-bold mb-10">الملف الشخصي</h5>
             <form onSubmit={updateSubmit} id="update-form">
                 <div className="space-y-7">
-                    <div className="mb-16">
+                    {collector && <div className="mb-16">
                         <FileInputImg
                             state="edit"
-                            fileUrl={updateFormData.image ?? ""}
+                            fileUrl={collector.image}
                             onFileChange={(arg) => {
                                 setUpdateFormData((prev) => ({
                                     ...prev,
@@ -129,7 +129,7 @@ export default function page() {
                                 }));
                             }}
                         ></FileInputImg>
-                    </div>
+                    </div>}
                     <TextFieldNada
                         name="name"
                         type="text"

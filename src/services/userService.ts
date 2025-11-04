@@ -163,3 +163,22 @@ export const userListByPageService = async (pageNumber: number) => {
         throw new Error(error.message);
     }
 };
+
+export const restoreUserService = async (id: number) => {
+    try {
+        const response = await apiCall.post(`/admins/users/${id}/restore`, {
+          
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        if (!response.ok) {
+            await responseErrorServiceHandler(response, "update user");
+        }
+        const data = (await response.json()) as ResponseData<User>;
+        console.log("response data =>>>>", data);
+        return data;
+    } catch (error: any) {
+        throw new Error(error.message);
+    }
+};

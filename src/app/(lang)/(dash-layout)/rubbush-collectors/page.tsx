@@ -109,7 +109,7 @@ export default function rubbush_collectors() {
     const formSchema = Yup.object().shape({
         name: Yup.string().required(),
         phone: Yup.number().required(),
-        password: Yup.number().required(),
+        password: Yup.string().required(),
         district_id: Yup.array()
             .of(Yup.string())
             .min(1, "Select at least one district")
@@ -293,7 +293,7 @@ export default function rubbush_collectors() {
 
     const createSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
+        setErrorMsg('')
 
         const validateResult = await validateAllInputs<FormDataType>(
             formSchema,
@@ -387,8 +387,8 @@ export default function rubbush_collectors() {
                 >
                     <form onSubmit={createSubmit} id="update-form">
                         {errorMsg && (
-                            <div className="mb-5">
-                                <span className="text-red-800">
+                            <div className="mb-6 text-start border border-red-800 bg-red-100 px-3 py-3 rounded-lg">
+                                <span className="text-red-800 error-alert">
                                     {" "}
                                     {errorMsg}
                                 </span>

@@ -172,6 +172,7 @@ export default function rubbush_collectors() {
   };
 
 
+  const [errorMsg, setErrorMsg] = useState("");
 
 
   const handleSelecteditem = (item: any) => {
@@ -379,7 +380,7 @@ export default function rubbush_collectors() {
 
   const createSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+    setErrorMsg('')
     const fd = new FormData();
     fd.append("name_ar", formData.name_ar);
     fd.append("name_en", formData.name_en);
@@ -406,7 +407,9 @@ export default function rubbush_collectors() {
           available_times: [],
         });
       })
-      .catch((error) => { });
+      .catch((error) => {
+        setErrorMsg(error?.message)
+      });
   };
   const statusDropdownColor = (name: string) => {
     if (name === "rejected")
@@ -538,6 +541,15 @@ export default function rubbush_collectors() {
         >
           <div>
             <form onSubmit={(e) => handleAddPayment(e)} id="update-form" className="">
+
+              {errorMsg && (
+                <div className="mb-6 text-start border border-red-800 bg-red-100 px-3 py-3 rounded-lg">
+                  <span className="text-red-800 error-alert">
+                    {" "}
+                    {errorMsg}
+                  </span>
+                </div>
+              )}
               <div className="grid grid-cols-12 space-y-5 gap-7">
 
                 <div className="col-span-12">

@@ -145,7 +145,7 @@ export default function DashSidebar({ isOpen, toggleSidebarHandler }: Props) {
   };
 
 
-  
+
 
 
 
@@ -206,7 +206,7 @@ export default function DashSidebar({ isOpen, toggleSidebarHandler }: Props) {
 
 
 
-                  {item.name === "support"
+                  {item.name === "support" && count > 0
                     ? (
                       <div className="flex items-center gap-3 justify-center ">
                         <span>{dict[item.name] || item.name}</span>

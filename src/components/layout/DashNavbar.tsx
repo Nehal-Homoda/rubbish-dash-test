@@ -50,7 +50,7 @@ export default function DashNavbar({ isOpen, openSidebar }: Props) {
               <span>{title}</span>
 
               {title === "الدعم" &&
-                count &&
+                count >0  &&
                 (
                   <div className="bg-red-100 text-red-600 text-sm px-3 py-1 rounded-full font-medium">
                     <span>{count} تذكرة مفتوحة</span>
