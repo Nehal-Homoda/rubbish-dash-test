@@ -243,6 +243,9 @@ export default function rubbush_collectors() {
         })
     }
 
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
+
+
     // const updateDataItem = (item: Collector) => {
     //     setSelectedDataItem(item);
     //     setUpdateFormData({
@@ -318,9 +321,11 @@ export default function rubbush_collectors() {
         formData.district_id.forEach((item, index) => {
             fd.append(`district_id[${index}]`, item);
         });
+        setIsDialogOpen(false)
 
         addCollectorService(fd)
             .then((response) => {
+                setIsDialogOpen(true)
                 fetchDataList();
                 //@ts-ignore
                 successDialog(true);
@@ -333,6 +338,7 @@ export default function rubbush_collectors() {
                 });
             })
             .catch((error) => {
+                setIsDialogOpen(false)
                 setErrorMsg(error?.message);
                 console.log("error message is", errorMsg);
 
@@ -372,7 +378,7 @@ export default function rubbush_collectors() {
                 >
                     المنطقة
                 </UIPrimaryDropdown>
-                <UIBaseDialog confirmCloseHandler={resetForm}
+                <UIBaseDialog confirmCloseHandler={resetForm} dismiss={isDialogOpen}
                     title="اضافة جامع القمامة"
                     confirmHandler={() => { }}
                     confirmText="اضافة"

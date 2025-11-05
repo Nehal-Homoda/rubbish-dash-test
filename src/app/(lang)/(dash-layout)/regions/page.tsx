@@ -95,13 +95,19 @@ export default function rubbush_collectors() {
         name_ar: Yup.string().required(),
         name_en: Yup.string().required(),
         available_days: Yup.array()
-            .of(Yup.string()) 
+            .of(Yup.string())
             .min(1, "Select at least one day")
             .required("Available days are required"),
         available_times: Yup.array().required('available times are required')
     });
 
     const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
+        name_ar: "",
+        name_en: "",
+        available_days: "",
+        available_times: "",
+    });
+    const [updateFormErrors, setUpdateFormErrors] = useState<FormDataInputErrors>({
         name_ar: "",
         name_en: "",
         available_days: "",
@@ -128,6 +134,8 @@ export default function rubbush_collectors() {
         available_days: [],
         available_times: [],
     });
+
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
 
     const addDynamicTime = () => {
         setDynamicFromToTime((prev) => {
@@ -264,7 +272,6 @@ export default function rubbush_collectors() {
 
     const updateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
         if (!selectedDataItem) return;
         const validateResult = await validateAllInputs<FormDataInputs>(
             formSchema,
@@ -272,7 +279,7 @@ export default function rubbush_collectors() {
         );
         console.log("validate", validateResult);
         if (!validateResult) return;
-        setFormErrors({ ...validateResult.outputResult });
+        setUpdateFormErrors({ ...validateResult.outputResult });
         console.log("form error", formErrors);
         if (validateResult.isInvalid) return;
 
@@ -280,13 +287,19 @@ export default function rubbush_collectors() {
             ...updateFormData,
         });
         console.log("update form", updateFormData);
+        setIsDialogOpen(false)
 
         updateDistrictService(selectedDataItem.id, body)
             .then((response) => {
                 fetchDataList();
                 successDialog(true);
+                setIsDialogOpen(true)
             })
-            .catch((error) => { });
+            .catch((error) => {
+                setErrorMsg(error?.message)
+                setIsDialogOpen(false)
+
+            });
     };
 
     const addFormChangeHander = (
@@ -314,7 +327,7 @@ export default function rubbush_collectors() {
 
     const createSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
+        setIsDialogOpen(false)
         const validateResult = await validateAllInputs<FormDataInputs>(
             formSchema,
             formData
@@ -340,6 +353,7 @@ export default function rubbush_collectors() {
         addDistrictService(fd)
             .then((response) => {
                 fetchDataList();
+                setIsDialogOpen(true)
                 //@ts-ignore
                 successDialog(true);
                 setFormData({
@@ -355,6 +369,7 @@ export default function rubbush_collectors() {
             })
             .catch((error) => {
                 setErrorMsg(error?.message);
+                setIsDialogOpen(false)
                 console.log("error message is", errorMsg);
             });
     };
@@ -362,7 +377,7 @@ export default function rubbush_collectors() {
     const tableHeadActionsSlot = () => {
         return (
             <>
-                <UIBaseDialog confirmCloseHandler={resetForm}
+                <UIBaseDialog dismiss={isDialogOpen} confirmCloseHandler={resetForm}
                     title="اضافة منطقه"
                     confirmHandler={() => { }}
                     confirmText="اضافة"
@@ -651,7 +666,7 @@ export default function rubbush_collectors() {
                                             <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
                                         </button>
                                     </UIDialogConfirm>
-                                    <UIBaseDialog
+                                    <UIBaseDialog dismiss={isDialogOpen}
                                         title="تعديل منطقه"
                                         confirmHandler={() => { }}
                                         confirmText="حفظ"
@@ -683,7 +698,7 @@ export default function rubbush_collectors() {
                                                     }
                                                     label=" اسم المنطقة ( عربي ) "
                                                     placeholder=" اسم المنطقة  "
-                                                    errorMessage=""
+                                                    errorMessage={updateFormErrors.name_ar || ''}
                                                 ></TextFieldNada>
 
                                                 <TextFieldNada
@@ -697,6 +712,7 @@ export default function rubbush_collectors() {
                                                     }
                                                     label=" اسم المنطقة ( انجليزي ) "
                                                     placeholder=" اسم المنطقة  "
+                                                    errorMessage={updateFormErrors.name_en || ''}
                                                 ></TextFieldNada>
 
                                                 {/* <SelectInput
@@ -767,6 +783,7 @@ export default function rubbush_collectors() {
                                                     }}
                                                 ></MultiCheckbox>
                                                 <MultiCheckbox
+                                                    errorMessage={updateFormErrors.available_days || ''}
                                                     items={districtDays}
                                                     value={
                                                         updateFormData.available_days
@@ -831,6 +848,7 @@ export default function rubbush_collectors() {
                                                             </div>
                                                             <div className="col-span-5">
                                                                 <TextFieldNada
+                                                                    errorMessage={updateFormErrors.available_times || ''}
                                                                     name="price"
                                                                     type="time"
                                                                     handleChange={
@@ -861,7 +879,7 @@ export default function rubbush_collectors() {
                                                                         ].to
                                                                     }
                                                                     label="الي "
-                                                                    placeholder="  السعر الكلي *"
+                                                                    placeholder="الوقت"
                                                                 ></TextFieldNada>
                                                             </div>
                                                             <div className="col-span-1">

@@ -5,9 +5,9 @@ import BaseDataTable from "@/components/data-tables/BaseDataTable";
 import UIPrimaryDropdown from "@/components/ui/UIPrimaryDropdown";
 import UIBaseDialog from "@/components/ui/UIBaseDialog";
 import SelectInput from "@/components/ui/form/SelectInput";
-import { successDialog } from "@/utils/shared";
+import { successDialog, validateAllInputs } from "@/utils/shared";
 import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
-
+import * as Yup from "yup"
 import FileInputImg from "@/components/ui/form/FileInputImg";
 import {
     addNotificationService,
@@ -65,6 +65,31 @@ export default function rubbush_collectors() {
         target_audience: "",
     });
 
+
+    const formSchema = Yup.object().shape({
+        title_ar: Yup.string().required('الاسم باللغه العربيه مطلوب'),
+        title_en: Yup.string().required('الاسم باللغه الانجليزيه مطلوب'),
+        body_ar: Yup.string(),
+        body_en: Yup.string(),
+        target_audience: Yup.string(),
+
+
+    })
+
+
+    interface FormDataInputErrors {
+        title_ar: string | null,
+        title_en: string | null,
+
+    }
+
+    const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
+        title_ar: "",
+        title_en: "",
+
+
+    });
+
     const [updateFormData, setUpdateFormData] = useState<FormDataType>({
         title_ar: "",
         title_en: "",
@@ -72,6 +97,8 @@ export default function rubbush_collectors() {
         body_en: "",
         target_audience: "",
     });
+
+    const [errorMsg, setErrorMsg] = useState('')
 
     const fetchDataList = ({
         search = searchTerm,
@@ -168,8 +195,19 @@ export default function rubbush_collectors() {
         console.log(e.target.name, e.target.value);
     };
 
-    const createSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const createSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        setErrorMsg('')
+        const validateResult = await validateAllInputs<FormDataType>(
+            formSchema,
+            formData
+        );
+        if (!validateResult) return;
+
+        setFormErrors({ ...validateResult.outputResult });
+
+        if (validateResult.isInvalid) return;
 
         const fd = new FormData();
         fd.append("title_ar", formData.title_ar);
@@ -184,9 +222,12 @@ export default function rubbush_collectors() {
         if (formData.target_audience === "specific_collector") {
             fd.append("specific_collector", selectedAudience);
         }
+        setErrorMsg('')
+        setIsDialogOpen(false)
 
         addNotificationService(fd)
             .then((response) => {
+                setIsDialogOpen(true)
                 fetchDataList();
                 //@ts-ignore
                 successDialog(true);
@@ -198,7 +239,10 @@ export default function rubbush_collectors() {
                     target_audience: "",
                 });
             })
-            .catch((error) => { });
+            .catch((error) => {
+                setIsDialogOpen(false)
+                setErrorMsg(error?.message)
+            });
     };
 
     const handleAudienceSearch = (value: string, audience: string) => {
@@ -245,6 +289,7 @@ export default function rubbush_collectors() {
             target_audience: "",
         })
     }
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
 
     const tableHeadActionsSlot = () => {
         return (
@@ -260,7 +305,7 @@ export default function rubbush_collectors() {
                 >
                     نوع الاشعار
                 </UIPrimaryDropdown>
-                <UIBaseDialog confirmCloseHandler={resetForm}
+                <UIBaseDialog dismiss={isDialogOpen} confirmCloseHandler={resetForm}
                     title="اضافة اشعار"
                     confirmHandler={() => { }}
                     confirmText="اضافة"
@@ -274,6 +319,14 @@ export default function rubbush_collectors() {
                     }
                 >
                     <form onSubmit={createSubmit} id="update-form">
+                        {errorMsg && (
+                            <div className="mb-6 text-start border border-red-800 bg-red-100 px-3 py-3 rounded-lg">
+                                <span className="text-red-800 error-alert">
+                                    {" "}
+                                    {errorMsg}
+                                </span>
+                            </div>
+                        )}
                         <div className="space-y-10">
                             <SelectInput
                                 value={formData.target_audience}
@@ -351,6 +404,7 @@ export default function rubbush_collectors() {
                                         value={formData.title_ar}
                                         label=" العنوان ( عربي ) "
                                         placeholder=" ادخل عنوان الاشعار بالغة العربية  "
+                                        errorMessage={formErrors.title_ar || ''}
                                     ></TextFieldNada>
                                 </div>
                                 <div className="col-span-2 md:col-span-1">
@@ -363,6 +417,7 @@ export default function rubbush_collectors() {
                                         value={formData.title_en}
                                         label=" العنوان ( انجليزي ) "
                                         placeholder=" ادخل عنوان الاشعار بالغة الانجليزية  "
+                                        errorMessage={formErrors.title_en || ''}
                                     ></TextFieldNada>
                                 </div>
                             </div>
@@ -402,7 +457,7 @@ export default function rubbush_collectors() {
 
     useEffect(() => {
         fetchDataList();
-    }, [page]); // runs every time `page` changes
+    }, [page]);
 
     useEffect(() => {
         fetchUsersList();

@@ -2,6 +2,7 @@
 import FileInputImg from "@/components/ui/form/FileInputImg";
 import MultiCheckbox from "@/components/ui/form/MultiCheckbox";
 import TextFieldNada from "@/components/ui/form/TextFieldNada";
+import * as Yup from "yup"
 import {
     showCollectorService,
     updateCollectorService,
@@ -9,7 +10,7 @@ import {
 import { getDistrictService } from "@/services/districtService";
 import { Collector } from "@/types/collectors.interface";
 import { District } from "@/types/district.interface";
-import { getQueryParam, successDialog } from "@/utils/shared";
+import { getQueryParam, successDialog, validateAllInputs } from "@/utils/shared";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
@@ -19,6 +20,12 @@ export default function page() {
     };
     const [collector, setCollector] = useState<Collector | null>(null);
     const [distrects, setDistrects] = useState<District[]>([]);
+    const [errorMsg, setErrorMsg] = useState("");
+
+    const [formErrors, setFormErrors] = useState({
+        name: "",
+    });
+
     type UpdateFormDataType = {
         name: string;
         phone: string;
@@ -53,10 +60,28 @@ export default function page() {
                 console.log(error.message);
             });
     };
-    const updateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
 
+
+    const formSchema = Yup.object().shape({
+        name: Yup.string().required('الاسم مطلوب'),
+
+    })
+    const updateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
         if (!collector) return;
+
+        setErrorMsg('')
+        const validateResult = await validateAllInputs(
+            formSchema,
+            updateFormData
+        );
+        if (!validateResult) return;
+
+        setFormErrors({ ...validateResult.outputResult });
+
+        if (validateResult.isInvalid) return;
+
+
 
         const form = { ...updateFormData };
 
@@ -75,7 +100,7 @@ export default function page() {
                 setCollector(response.data);
                 successDialog(true);
             })
-            .catch((error) => { });
+            .catch((error) => { setErrorMsg(error?.message) });
     };
     const fetchDistrects = () => {
         getDistrictService()
@@ -99,8 +124,8 @@ export default function page() {
             name: collector.name,
             phone: collector.phone,
             password: "",
-            district_id: collector.districts.map((item) => item.id.toString()),
-            image: collector.image || "",
+            district_id: collector.districts?.map((item) => item.id.toString()),
+            image: null,
         });
     };
     useEffect(() => {
@@ -117,6 +142,15 @@ export default function page() {
         <div className="relative px-7 py-10 shadow-[0_0_1rem_#00000015] rounded-xl">
             <h5 className="text-lg font-bold mb-10">الملف الشخصي</h5>
             <form onSubmit={updateSubmit} id="update-form">
+
+                {errorMsg && (
+                    <div className="mb-6 text-start border border-red-800 bg-red-100 px-3 py-3 rounded-lg">
+                        <span className="text-red-800 error-alert">
+                            {" "}
+                            {errorMsg}
+                        </span>
+                    </div>
+                )}
                 <div className="space-y-7">
                     {collector && <div className="mb-16">
                         <FileInputImg
@@ -137,6 +171,7 @@ export default function page() {
                         value={updateFormData.name}
                         label=" اسم  "
                         placeholder=" اسم الجامع القمامة  "
+                        errorMessage={formErrors.name}
                     ></TextFieldNada>
                     <TextFieldNada
                         name="phone"

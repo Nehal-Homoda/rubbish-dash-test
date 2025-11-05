@@ -37,6 +37,7 @@ export default function FileInputImg({
 
             return;
         }
+
         setImageUrl(null);
     };
     useEffect(() => {
@@ -77,11 +78,18 @@ export default function FileInputImg({
         }
         fileInput.value = "";
     };
-    const removeImage = () => {
+    const removeImage = (e: any) => {
+        console.log('yessss yes im here :)')
+        const fileInput = e.target
         setFileName("");
         setFileType(null);
-        resetImgUrlToPlaceholder();
-        // onFileChange();
+        setImageUrl(placeholder_img.src)
+        // resetImgUrlToPlaceholder();
+        fileInput.value = "";
+
+
+
+
         handleRemoveImage();
 
     };
@@ -130,14 +138,14 @@ export default function FileInputImg({
                         <div className="">
                             <button
                                 type="button"
-                                onClick={removeImage}
+                                onClick={(e) => removeImage(e)}
                                 className="absolute -top-2 -right-2 w-7 h-7 z-20 text-surface bg-surface-light-800 text-sm rounded-full"
                             >
                                 <i className="mdi mdi-window-close"></i>
                             </button>
                             <button
                                 type="button"
-                                onClick={removeImage}
+                                onClick={(e) => removeImage(e)}
                                 className="absolute -bottom-2 -left-2 w-7 h-7 text-surface bg-surface-light-800 text-sm rounded-full"
                             >
                                 <span className="mdi mdi-pencil"></span>

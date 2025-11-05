@@ -5,7 +5,7 @@ import {
     Transition,
     TransitionChild,
 } from "@headlessui/react";
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 
 type Props = {
     btn: React.ReactNode;
@@ -13,10 +13,11 @@ type Props = {
     title: string;
     form?: string;
     confirmHandler: () => void;
-    confirmCloseHandler?:()=>void;
+    confirmCloseHandler?: () => void;
     confirmText: string;
     hideConfirmBtn?: boolean;
-    heightStyle?:string
+    heightStyle?: string;
+    dismiss?: boolean
 };
 
 export default function UIBaseDialog({
@@ -28,21 +29,29 @@ export default function UIBaseDialog({
     confirmHandler,
     confirmCloseHandler,
     hideConfirmBtn = false,
-    heightStyle
+    heightStyle,
+    dismiss
 }: Props) {
     let [isOpen, setIsOpen] = useState(false);
 
     function closeModal() {
         setIsOpen(false);
-        if(confirmCloseHandler){
+        // if (confirmCloseHandler) {
 
-            confirmCloseHandler()
-        }
+        //     confirmCloseHandler()
+        // }
     }
 
     function openModal() {
         setIsOpen(true);
     }
+
+    useEffect(() => {
+        if (dismiss) {
+            closeModal()
+        }
+
+    }, [dismiss])
 
     return (
         <>

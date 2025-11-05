@@ -5,10 +5,12 @@ import BaseDataTable from "@/components/data-tables/BaseDataTable";
 import UIPrimaryDropdown from "@/components/ui/UIPrimaryDropdown";
 import UIBaseDialog from "@/components/ui/UIBaseDialog";
 import SelectInput from "@/components/ui/form/SelectInput";
-import { successDialog } from "@/utils/shared";
+import { successDialog, validateAllInputs } from "@/utils/shared";
 import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
 import FileInputImg from "@/components/ui/form/FileInputImg";
 import { Banner } from "@/types/banners.interface";
+import * as Yup from "yup"
+
 import {
     addBannerService,
     deleteBannerService,
@@ -46,6 +48,9 @@ export default function rubbush_collectors() {
         is_active: number;
         image: File | null | string;
     };
+
+    const [errorMsg, setErrorMsg] = useState("");
+
     const [formData, setFormData] = useState<FormDataType>({
         title_ar: "",
         title_en: "",
@@ -63,6 +68,19 @@ export default function rubbush_collectors() {
         is_active: 0,
         image: null,
     });
+
+
+    interface FormDataInputErrors {
+        image: string | null,
+    }
+
+    const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
+        image: "",
+    });
+
+    const formSchema = Yup.object().shape({
+        image: Yup.string().required('الصورة مطلوبه'),
+    })
 
     const fetchDataList = ({
         search = "",
@@ -136,6 +154,8 @@ export default function rubbush_collectors() {
             .catch((error) => { });
     };
 
+
+
     const updateDataItem = (item: Banner) => {
         setSelectedDataItem(item);
         setUpdateFormData({
@@ -156,13 +176,16 @@ export default function rubbush_collectors() {
         const body = JSON.stringify({
             ...updateFormData,
         });
-
+        setIsDialogOpen(false)
         updateBannerService(selectedDataItem.id, body)
             .then((response) => {
+                setIsDialogOpen(true)
                 fetchDataList();
                 successDialog(true);
             })
-            .catch((error) => { });
+            .catch((error) => {
+                 setIsDialogOpen(false)
+             });
     };
 
     const addFormChangeHander = (
@@ -188,9 +211,23 @@ export default function rubbush_collectors() {
         console.log(e.target.name, e.target.value);
     };
 
-    const createSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const createSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+
         e.preventDefault();
 
+
+        const validateResult = await validateAllInputs<FormDataType>(
+            formSchema,
+            formData
+        );
+        if (!validateResult) return;
+
+        setFormErrors({ ...validateResult.outputResult });
+
+        if (validateResult.isInvalid) return;
+
+
+        setErrorMsg('')
         const fd = new FormData();
         fd.append("title_ar", formData.title_ar);
         fd.append("title_en", formData.title_en);
@@ -200,9 +237,10 @@ export default function rubbush_collectors() {
         if (formData.image) {
             fd.append("image", formData.image);
         }
-
+        setIsDialogOpen(false)
         addBannerService(fd)
             .then((response) => {
+                setIsDialogOpen(true)
                 fetchDataList();
                 //@ts-ignore
                 successDialog(true);
@@ -215,8 +253,14 @@ export default function rubbush_collectors() {
                     image: null,
                 });
             })
-            .catch((error) => { });
+            .catch((error) => {
+                setIsDialogOpen(false)
+                console.log('error is', error?.message)
+                setErrorMsg(error?.message)
+            });
     };
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
+
 
     const tableHeadActionsSlot = () => {
         return (
@@ -232,7 +276,7 @@ export default function rubbush_collectors() {
                 >
                     الحالة
                 </UIPrimaryDropdown>
-                <UIBaseDialog
+                <UIBaseDialog dismiss={isDialogOpen}
                     confirmCloseHandler={resetForm}
                     title="اضافة لافتة"
                     confirmHandler={() => { }}
@@ -247,9 +291,18 @@ export default function rubbush_collectors() {
                     }
                 >
                     <form onSubmit={createSubmit} id="update-form">
+                        {errorMsg && (
+                            <div className="mb-6 text-start border border-red-800 bg-red-100 px-3 py-3 rounded-lg">
+                                <span className="text-red-800 error-alert">
+                                    {" "}
+                                    {errorMsg}
+                                </span>
+                            </div>
+                        )}
                         <div className="space-y-7">
                             <div className="w-full flex justify-center mb-20">
                                 <FileInputImg
+                                    errorMessage={formErrors.image || ''}
                                     state="edit"
                                     onFileChange={(arg) => {
                                         setFormData((prev) => ({
@@ -397,7 +450,7 @@ export default function rubbush_collectors() {
                                             <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
                                         </button>
                                     </UIDialogConfirm>
-                                    <UIBaseDialog
+                                    <UIBaseDialog dismiss={isDialogOpen}
 
                                         title="تعديل اللافتة"
                                         confirmHandler={() => { }}

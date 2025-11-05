@@ -207,6 +207,8 @@ export default function rubbush_collectors({ user }: Props) {
 
 
   })
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+
 
   const fetchCategories = () => {
     getCategoriesService().then((response) => {
@@ -317,7 +319,9 @@ export default function rubbush_collectors({ user }: Props) {
 
   };
   const takeInputValue = (text: string) => {
-
+    if (!text) {
+      setUserItem(null)
+    }
     fetchUserList({ search: text })
 
 
@@ -354,10 +358,16 @@ export default function rubbush_collectors({ user }: Props) {
     //@ts-ignore
     fd.append('total_price', userItem ? userItem.deserved_money_by_recycle : 0)
     fd.append('payment_verification', addPaymentFormData.payment_verification)
+    setErrorMsg('')
+    setIsDialogOpen(false)
     await addPaymentService(fd).then((response) => {
+      setIsDialogOpen(true)
       successDialog(true)
       fetchDataList()
       console.log('response of payment is', response.data)
+    }).catch((error) => {
+      setIsDialogOpen(false)
+      setErrorMsg(error?.message)
     })
   }
 
@@ -379,6 +389,9 @@ export default function rubbush_collectors({ user }: Props) {
       setTotalPrice(Number(packageItem.price_per_unit) * formData.units);
     }
   }, [packageItem]);
+  const handleClose = () => {
+    setUserItem(null)
+  }
 
 
   const tableHeadActionsSlot = () => {
@@ -386,8 +399,8 @@ export default function rubbush_collectors({ user }: Props) {
       <>
 
 
-        <UIBaseDialog
-          confirmCloseHandler={undefined}
+        <UIBaseDialog dismiss={isDialogOpen}
+          confirmCloseHandler={handleClose}
           title="اضافة تحويل"
           confirmHandler={() => { }}
           confirmText="اضافة"
@@ -402,6 +415,15 @@ export default function rubbush_collectors({ user }: Props) {
         >
           <div>
             <form onSubmit={(e) => handleAddFund(e)} id="update-form" className="">
+
+              {errorMsg && (
+                <div className="mb-6 text-start border border-red-800 bg-red-100 px-3 py-3 rounded-lg">
+                  <span className="text-red-800 error-alert">
+                    {" "}
+                    {errorMsg}
+                  </span>
+                </div>
+              )}
               <div className="grid grid-cols-12 space-y-5 gap-7">
 
                 <div className="col-span-12">
@@ -768,6 +790,8 @@ export default function rubbush_collectors({ user }: Props) {
   useEffect(() => {
     fetchDataList();
   }, [page]); // runs every time `page` changes
+
+  const [errorMsg, setErrorMsg] = useState("");
 
   return (
     <>

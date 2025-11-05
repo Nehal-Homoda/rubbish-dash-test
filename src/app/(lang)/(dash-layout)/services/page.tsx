@@ -121,6 +121,16 @@ export default function rubbush_collectors() {
 
   });
 
+
+  const [updateFormErrors, setUpdateFormErrors] = useState<FormDataInputErrors>({
+    name_ar: "",
+    name_en: "",
+
+
+  });
+
+
+
   // const discountList = [
   //   { id: 1, discount: "2-5" },
   //   { id: 2, discount: "10-15" },
@@ -209,27 +219,52 @@ export default function rubbush_collectors() {
       name_en: item.name_en,
       order: item.order,
       is_active: item.is_active ? 1 : 0,
-      image: item.image,
+      image: null,
       has_recycle: item.has_recycle,
       discount_value_percentage: item.has_recycle ? Number(item.discount_value_percentage) : 0,
     });
   };
 
-  const updateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const updateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setErrorMsg('')
+    const validateResult = await validateAllInputs<FormDataType>(
+      formSchema,
+      updateFormData
+    );
+    if (!validateResult) return;
+
+    setFormErrors({ ...validateResult.outputResult });
+
+    if (validateResult.isInvalid) return;
+
 
     if (!selectedDataItem) return;
 
     const body = JSON.stringify({
       ...updateFormData,
     });
+    setIsDialogOpen(false)
 
     updateCategoryService(selectedDataItem.id, body)
       .then((response) => {
+        setIsDialogOpen(true)
+
+        // setUpdateFormData({
+        //   name_ar: "",
+        //   name_en: "",
+        //   order: 0,
+        //   is_active: 0,
+        //   image: null,
+        //   has_recycle: 0,
+        //   discount_value_percentage: 0,
+        // })
         fetchDataList();
         successDialog(true);
       })
-      .catch((error) => { });
+      .catch((error) => {
+         setIsDialogOpen(false)
+       });
   };
 
   const addFormChangeHander = (
@@ -257,10 +292,10 @@ export default function rubbush_collectors() {
 
   const [errorMsg, setErrorMsg] = useState("");
 
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+
   const createSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setErrorMsg('')
-
 
     setErrorMsg('')
     const validateResult = await validateAllInputs<FormDataType>(
@@ -273,6 +308,7 @@ export default function rubbush_collectors() {
 
     if (validateResult.isInvalid) return;
 
+    setIsDialogOpen(false)
 
     const fd = new FormData();
     fd.append("name_ar", formData.name_ar);
@@ -289,7 +325,9 @@ export default function rubbush_collectors() {
 
     addCategoryService(fd)
       .then((response) => {
+        setIsDialogOpen(true)
         fetchDataList();
+
         //@ts-ignore
         successDialog(true);
         setFormData({
@@ -304,6 +342,7 @@ export default function rubbush_collectors() {
       })
       .catch((error) => {
         setErrorMsg(error?.message);
+        setIsDialogOpen(false)
       });
   };
 
@@ -318,6 +357,8 @@ export default function rubbush_collectors() {
       discount_value_percentage: 0,
     });
   };
+
+
 
 
 
@@ -336,6 +377,7 @@ export default function rubbush_collectors() {
           الحالة
         </UIPrimaryDropdown>
         <UIBaseDialog
+          dismiss={isDialogOpen}
           confirmCloseHandler={resetForm}
           title="اضافة خدمة"
           confirmHandler={() => { }}
@@ -503,6 +545,7 @@ export default function rubbush_collectors() {
                     </button>
                   </UIDialogConfirm>
                   <UIBaseDialog
+                    dismiss={isDialogOpen}
                     title="تعديل خدمة"
                     confirmHandler={() => { }}
                     confirmText="تعديل"
@@ -523,7 +566,7 @@ export default function rubbush_collectors() {
                         <div className="w-full flex justify-center mb-20">
                           <FileInputImg
                             state="edit"
-                            fileUrl={item.image}
+                            fileUrl={item.image ? item.image : ''}
                             onFileChange={(arg) => {
                               setUpdateFormData((prev) => ({
                                 ...prev,
@@ -540,6 +583,7 @@ export default function rubbush_collectors() {
                           value={updateFormData.name_ar}
                           label=" اسم الخدمة ( عربي ) "
                           placeholder=" اسم الخدمة  "
+                          errorMessage={formErrors.name_ar || ''}
                         ></TextFieldNada>
 
                         <TextFieldNada
@@ -549,6 +593,7 @@ export default function rubbush_collectors() {
                           value={updateFormData.name_en}
                           label=" اسم الخدمة ( انجليزي ) "
                           placeholder=" اسم الخدمة  "
+                          errorMessage={formErrors.name_en || ''}
                         ></TextFieldNada>
 
                         <SelectInput
@@ -607,7 +652,7 @@ export default function rubbush_collectors() {
             </tr>
           ))}
         </BaseDataTable>
-      </div>
+      </div >
     </>
   );
 }

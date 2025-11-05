@@ -36,6 +36,8 @@ interface FormDataInputErrors {
 
 
 
+
+
 export default function rubbush_collectors() {
     const [dataList, setDataList] = useState<Guideline[]>([]);
     const headerArr = [
@@ -73,9 +75,16 @@ export default function rubbush_collectors() {
     const formSchema = Yup.object().shape({
         title_ar: Yup.string().required(),
         title_en: Yup.string().required(),
-        image: Yup.string().required()
+
     });
     const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
+        title_ar: "",
+        title_en: "",
+        order: "",
+        is_active: "",
+        image: "",
+    });
+    const [updateFormErrors, setUpdateFormErrors] = useState<FormDataInputErrors>({
         title_ar: "",
         title_en: "",
         order: "",
@@ -99,8 +108,8 @@ export default function rubbush_collectors() {
     const fetchDataList = ({
         search = searchTerm,
         is_active = activeFilter,
-        pageNum=page
-    }: { search?: string; is_active?: boolean | undefined; pageNum?:number } = {}) => {
+        pageNum = page
+    }: { search?: string; is_active?: boolean | undefined; pageNum?: number } = {}) => {
         console.log(is_active);
         const isActive =
             is_active != undefined
@@ -185,21 +194,37 @@ export default function rubbush_collectors() {
         });
     };
 
-    const updateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const updateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        setErrorMsg('')
+        const validateResult = await validateAllInputs(
+            formSchema,
+            updateFormData
+        );
+        if (!validateResult) return;
+
+        //@ts-ignore
+        setUpdateFormErrors({ ...validateResult.outputResult });
+
+        if (validateResult.isInvalid) return;
 
         if (!selectedDataItem) return;
 
         const body = JSON.stringify({
             ...updateFormData,
         });
+        setIsDialogOpen(false)
 
         updateGuidelineService(selectedDataItem.id, body)
             .then((response) => {
+                setIsDialogOpen(true)
                 fetchDataList();
                 successDialog(true);
             })
-            .catch((error) => { });
+            .catch((error) => { 
+                 setIsDialogOpen(false)
+                setErrorMsg(error?.message) });
     };
 
     const addFormChangeHander = (
@@ -256,9 +281,10 @@ export default function rubbush_collectors() {
         if (formData.image) {
             fd.append("image", formData.image);
         }
-
+setIsDialogOpen(false)
         addGuidelineService(fd)
             .then((response) => {
+                setIsDialogOpen(true)
                 fetchDataList();
                 //@ts-ignore
                 successDialog(true);
@@ -271,9 +297,11 @@ export default function rubbush_collectors() {
                 });
             })
             .catch((error) => {
+                setIsDialogOpen(false)
                 setErrorMsg(error.message)
             });
     };
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
 
 
 
@@ -292,7 +320,7 @@ export default function rubbush_collectors() {
                 >
                     الحالة
                 </UIPrimaryDropdown>
-                <UIBaseDialog confirmCloseHandler={resetForm}
+                <UIBaseDialog dismiss={isDialogOpen} confirmCloseHandler={resetForm}
                     title="اضافة ارشاد"
                     confirmHandler={() => { }}
                     confirmText="اضافة"
@@ -445,7 +473,7 @@ export default function rubbush_collectors() {
                                             <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
                                         </button>
                                     </UIDialogConfirm>
-                                    <UIBaseDialog
+                                    <UIBaseDialog dismiss={isDialogOpen}
                                         title="تعديل الارشاد"
                                         confirmHandler={() => { }}
                                         confirmText="تعديل"
@@ -465,9 +493,19 @@ export default function rubbush_collectors() {
                                             onSubmit={updateSubmit}
                                             id="update-form"
                                         >
+
+                                            {errorMsg && (
+                                                <div className="mb-6 text-start border border-red-800 bg-red-100 px-3 py-3 rounded-lg">
+                                                    <span className="text-red-800 error-alert">
+                                                        {" "}
+                                                        {errorMsg}
+                                                    </span>
+                                                </div>
+                                            )}
                                             <div className="space-y-7">
                                                 <div className="w-full flex justify-center mb-20">
                                                     <FileInputImg
+
                                                         state="edit"
                                                         fileUrl={item.image}
                                                         onFileChange={(arg) => {
@@ -483,6 +521,7 @@ export default function rubbush_collectors() {
                                                     ></FileInputImg>
                                                 </div>
                                                 <TextFieldNada
+                                                    errorMessage={updateFormErrors.title_ar || ''}
                                                     name="title_ar"
                                                     type="text"
                                                     prependIcon="mdi mdi-notebook-edit-outline"
@@ -496,6 +535,7 @@ export default function rubbush_collectors() {
                                                 ></TextFieldNada>
 
                                                 <TextFieldNada
+                                                    errorMessage={updateFormErrors.title_en || ''}
                                                     name="title_en"
                                                     type="text"
                                                     prependIcon="mdi mdi-notebook-edit-outline"

@@ -12,6 +12,7 @@ type Props = {
     onChange: (value: any) => void;
     label: string;
     onQueryChange?: (query: string) => void
+    errorMessage: string
 }
 
 export default function ComboBoxNehal({ listItem,
@@ -19,6 +20,7 @@ export default function ComboBoxNehal({ listItem,
     itemValue,
     value,
     label,
+    errorMessage="",
     onChange,
     onQueryChange }: Props) {
 
@@ -81,6 +83,12 @@ export default function ComboBoxNehal({ listItem,
 
                 </div>
             </Combobox>
+
+            {errorMessage && (
+                <div className="err-msg text-red-600 text-xs text-start font-semibold ps-2">
+                    {errorMessage}
+                </div>
+            )}
 
         </>
 

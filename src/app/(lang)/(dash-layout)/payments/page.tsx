@@ -8,10 +8,12 @@ import UIPrimaryDropdown from "@/components/ui/UIPrimaryDropdown";
 import UIBaseDialog from "@/components/ui/UIBaseDialog";
 import MultiCheckbox from "@/components/ui/form/MultiCheckbox";
 import SelectInput from "@/components/ui/form/SelectInput";
-import { successDialog } from "@/utils/shared";
+import { successDialog, validateAllInputs } from "@/utils/shared";
 import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
 import { Payment } from "@/types/payment.interface";
 import FileInput from "@/components/ui/form/FileInput";
+import * as Yup from "yup"
+
 import {
   addPaymentService,
   deletePaymentService,
@@ -109,7 +111,7 @@ export default function rubbush_collectors() {
     available_times: [],
   });
   const [addPaymentFormData, setAddPaymentFormData] = useState({
-    user_id: 0,
+    user_id: null,
     receiving_number: 0,
     total_price: 0,
     payment_method_id: 0,
@@ -121,11 +123,12 @@ export default function rubbush_collectors() {
     total_price: "",
     receiving_number: "",
     payment_method_id: 0,
-    // user_id: 0,
-    payment_verification: "",
+    user_id: null,
+    payment_verification: null,
   });
 
   const [userItem, setUserItem] = useState<AppUser | null>(null)
+
 
   const fetchPaymentMethodList = () => {
     paymentMethodListService().then((response) => {
@@ -332,9 +335,9 @@ export default function rubbush_collectors() {
       total_price: item.total_price.toString(),
       receiving_number: item.receiving_number,
       payment_method_id: item.payment_method.id,
-      user_id: item.user_id,
+      user_id: item.user_id || null,
       //@ts-ignore
-      payment_verification: item.payment_verification,
+      payment_verification: null,
     });
   };
 
@@ -450,24 +453,86 @@ export default function rubbush_collectors() {
 
 
   const resetForm = () => {
+    setAddPaymentFormData({
+      user_id: null,
+      receiving_number: 0,
+      total_price: 0,
+      payment_method_id: 0,
+      payment_verification: ''
+
+    })
+
+    setUserItem(null)
 
   }
 
+
+  const formSchema = Yup.object().shape({
+    user_id: Yup.string().required(' المستخدم مطلوب'),
+    // payment_method_id: Yup.string().required('طريقه الدفع مطلوبه'),
+    total_price: Yup.string().required('اجمالي السعر مطلوب'),
+    receiving_number: Yup.string().required('رقم الهاتف مطلوب'),
+    payment_verification: Yup.string().required('صورة التحويل مطلوب'),
+  })
+
+  interface FormDataInputErrors {
+    user_id: string | null,
+    // payment_method_id: string | null,
+    total_price: string | null,
+    receiving_number: string | null,
+    payment_verification: string | null
+
+
+  }
+
+  const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
+    user_id: "",
+    // payment_method_id: "",
+    total_price: "",
+    receiving_number: "",
+    payment_verification: ""
+
+  });
+
   const handleAddPayment = async (e: any) => {
     e.preventDefault()
-    console.log('hii')
 
+
+    const validateResult = await validateAllInputs(
+      formSchema,
+      addPaymentFormData
+    );
+    if (!validateResult) return;
+
+    setFormErrors({ ...validateResult.outputResult });
+
+    if (validateResult.isInvalid) return;
+    console.log('hii')
+    setErrorMsg('')
     const fd = new FormData()
+    //@ts-ignore
     fd.append('user_id', addPaymentFormData.user_id.toString())
     fd.append('receiving_number', userItem ? userItem.phone : '')
     fd.append('payment_method_id', addPaymentFormData.payment_method_id.toString())
     //@ts-ignore
     fd.append('total_price', userItem ? userItem.deserved_money_by_recycle : 0)
     fd.append('payment_verification', addPaymentFormData.payment_verification)
+    setIsDialogOpen(false)
     await addPaymentService(fd).then((response) => {
+      setIsDialogOpen(true)
       successDialog(true)
       fetchDataList()
+      setAddPaymentFormData({
+        user_id: null,
+        receiving_number: 0,
+        total_price: 0,
+        payment_method_id: 0,
+        payment_verification: ''
+      })
       console.log('response of payment is', response.data)
+    }).catch((error) => {
+      setErrorMsg(error?.message)
+      setIsDialogOpen(false)
     })
 
   }
@@ -498,7 +563,12 @@ export default function rubbush_collectors() {
   }
   const takeInputValue = (text: string) => {
 
+    if (!text) {
+      setUserItem(null)
+    }
+
     fetchUserList({ search: text })
+
 
 
 
@@ -517,6 +587,7 @@ export default function rubbush_collectors() {
   //     setTotalPrice(Number(userItem.deserved_money_by_recycle))
   //   }
 
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
 
 
   // }, [userItem])
@@ -526,6 +597,7 @@ export default function rubbush_collectors() {
       <>
 
         <UIBaseDialog
+          dismiss={isDialogOpen}
           confirmCloseHandler={resetForm}
           title="اضافة تحويل"
           confirmHandler={() => { }}
@@ -553,32 +625,20 @@ export default function rubbush_collectors() {
               <div className="grid grid-cols-12 space-y-5 gap-7">
 
                 <div className="col-span-12">
-                  <ComboBoxNehal onQueryChange={takeInputValue} onChange={(e) => handleSelectedUser(e)} listItem={userList} itemName="name" itemValue="id" value={(addPaymentFormData.user_id ?? "").toString()} label="اسم المستخدم" />
-                  {/* <SelectInput
-                    value={addPaymentFormData.user_id ?? ""}
-                    items={userList}
-                    itemName="name"
-                    itemValue="id"
-                    label="اسم المستخدم"
-                    placeholder="اختر اسم المستخدم"
-                    name="name"
-                    required={true}
-                    onChange={(e) =>
-                      handleSelectedUser(e)
-                    }
-                  ></SelectInput> */}
+                  <ComboBoxNehal errorMessage={formErrors.user_id || ''} onQueryChange={takeInputValue} onChange={(e) => handleSelectedUser(e)} listItem={userList} itemName="name" itemValue="id" value={(addPaymentFormData.user_id ?? "").toString()} label="اسم المستخدم" />
                 </div>
                 <div className="col-span-12">
-                  <TextFieldNada
+                  <TextFieldNada errorMessage={formErrors.receiving_number || ''}
                     disabled
                     name="receiving_number"
                     type="number"
                     handleChange={(e) =>
                       takeValue(e, "receiving_number")
                     }
-                    value={userItem?.phone ?? ""}
+                    value={userItem ? userItem.phone : addPaymentFormData.receiving_number}
                     label="رقم الاستلام"
                     placeholder="رقم الاستلام"
+
                   ></TextFieldNada>
                 </div>
 
@@ -594,6 +654,8 @@ export default function rubbush_collectors() {
                     value={userItem?.deserved_money_by_recycle ?? 0}
                     label="الرصيد "
                     placeholder=" ادخل الرصيد"
+                    errorMessage={formErrors.total_price || ''}
+
                   ></TextFieldNada>
                 </div>
 
@@ -604,9 +666,7 @@ export default function rubbush_collectors() {
                     disabled
                     name="all_recycle_weights"
                     type="number"
-                    // handleChange={(e) =>
-                    //   takeValue(e, "units")
-                    // }
+
                     value={userItem?.all_recycle_weights ?? 0}
                     label="الوزن "
                     placeholder=" ادخل الوزن"
@@ -670,25 +730,38 @@ export default function rubbush_collectors() {
                                           }
                                         </div>
                                       </RadioGroup.Label>
+
+
                                     </div>
+
                                   </div>
                                   {checked ? (
                                     <div className="before:absolute before:content-[''] before:w-3 before:h-3 before:rounded-full before:bg-[#009414]   shrink-0 w-4 h-4 rounded-full ring-1 ring-surface text-surface flex justify-center items-center text-xs">
-                                      {/* <CheckIcon className="h-6 w-6" /> */}
+
                                     </div>
                                   ) : (
                                     <div className="shrink-0 w-4 h-4 rounded-full ring-1 ring-surface text-surface flex justify-center items-center">
-                                      {/* <CheckIcon className="h-6 w-6" /> */}
+
                                     </div>
                                   )}
+
+
+
+
+
+
                                 </div>
                               </>
                             )}
                           </RadioGroup.Option>
+
                         )
                       )}
                     </div>
+
                   </RadioGroup>
+
+
                 </div>
 
                 <div className="col-span-6">
@@ -698,6 +771,7 @@ export default function rubbush_collectors() {
                     }
                     state="add"
                     title="ارفاق صورة التحويل"
+                    errorMessage={formErrors.payment_verification || ''}
                   />
                 </div>
 
@@ -708,11 +782,8 @@ export default function rubbush_collectors() {
 
 
               </div>
-
-
-
-
             </form >
+
           </div>
 
 

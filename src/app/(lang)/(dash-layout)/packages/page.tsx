@@ -174,6 +174,13 @@ export default function rubbush_collectors() {
     price_per_unit: ""
 
   });
+  const [updateFormErrors, setUpdateFormErrors] = useState<FormDataInputErrors>({
+    name_ar: "",
+    name_en: "",
+    category_id: "",
+    price_per_unit: ""
+
+  });
 
 
   const [errorMsg, setErrorMsg] = useState("");
@@ -336,21 +343,38 @@ export default function rubbush_collectors() {
     });
   };
 
-  const updateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const updateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     if (!selectedDataItem) return;
+
+    setErrorMsg('')
+    const validateResult = await validateAllInputs<FormDataType>(
+      formSchema,
+      updateFormData
+    );
+    if (!validateResult) return;
+
+    setUpdateFormErrors({ ...validateResult.outputResult });
+    console.log("form error", formErrors);
+    if (validateResult.isInvalid) return;
+
 
     const body = JSON.stringify({
       ...updateFormData,
     });
+    setIsDialogOpen(false)
 
     updatePackageService(selectedDataItem.id, body)
       .then((response) => {
+        setIsDialogOpen(true)
         fetchDataList();
         successDialog(true);
       })
-      .catch((error) => { });
+      .catch((error) => {
+        setErrorMsg(error?.message)
+
+        setIsDialogOpen(false)
+      });
   };
 
   const addFormChangeHander = (
@@ -433,9 +457,11 @@ export default function rubbush_collectors() {
           fd.append(`discounts[${index}][${keyName}]`, String(value));
         });
       });
+    setIsDialogOpen(false)
 
     addPackageService(fd)
       .then((response) => {
+        setIsDialogOpen(true)
         fetchDataList();
         //@ts-ignore
         successDialog(true);
@@ -487,6 +513,7 @@ export default function rubbush_collectors() {
         setErrorMsg(error?.message);
         console.log("error message is", errorMsg);
         window.scrollTo({ top: 0, behavior: "smooth" });
+        setIsDialogOpen(false)
       });
   };
 
@@ -552,6 +579,8 @@ export default function rubbush_collectors() {
     });
     setCategoryItem(null)
   }
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+
 
   const handleChangeValue = (e: any, index: number) => {
     console.log("index is", index);
@@ -595,7 +624,7 @@ export default function rubbush_collectors() {
         >
           الحالة
         </UIPrimaryDropdown>
-        <UIBaseDialog
+        <UIBaseDialog dismiss={isDialogOpen}
           confirmCloseHandler={resetForm}
           title="اضافة باقة"
           confirmHandler={() => { }}
@@ -878,7 +907,7 @@ export default function rubbush_collectors() {
                       <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
                     </button>
                   </UIDialogConfirm>
-                  <UIBaseDialog
+                  <UIBaseDialog dismiss={isDialogOpen}
                     title="تعديل باقة"
                     confirmHandler={() => { }}
                     confirmText="تعديل"
@@ -903,6 +932,7 @@ export default function rubbush_collectors() {
                           value={updateFormData.name_ar}
                           label=" اسم الباقة ( عربي ) "
                           placeholder=" اسم الباقة  "
+                          errorMessage={updateFormErrors.name_ar || ''}
                         ></TextFieldNada>
 
                         <TextFieldNada
@@ -912,6 +942,7 @@ export default function rubbush_collectors() {
                           value={updateFormData.name_en}
                           label=" اسم الباقة ( انجليزي ) "
                           placeholder=" اسم الباقة  "
+                          errorMessage={updateFormErrors.name_en || ''}
                         ></TextFieldNada>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -931,6 +962,7 @@ export default function rubbush_collectors() {
                                   ["category_id"]: value ? value : null,
                                 }));
                               }}
+                              errorMessage={updateFormErrors.category_id || ''}
                             ></SelectInput>
                           </div>
                           <div className="col-span-1">
@@ -953,6 +985,7 @@ export default function rubbush_collectors() {
                           </div>
                         </div>
                         <TextFieldNada
+                          errorMessage={updateFormErrors.price_per_unit || ''}
                           name="price_per_unit"
                           type="number"
                           handleChange={updateFormChangeHander}

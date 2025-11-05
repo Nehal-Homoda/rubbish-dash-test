@@ -47,7 +47,7 @@ export default function CollectorHeader() {
                             {collector?.name ?? "****"}
                         </h5>
                         <p className="">
-                            {collector && collector.districts.length ? collector.districts
+                            {collector && collector.districts&& collector.districts.length ? collector.districts
                                 .map((item) => item.name)
                                 .join(" | ") : "***"}
                         </p>
