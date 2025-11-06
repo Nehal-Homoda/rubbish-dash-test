@@ -5,7 +5,11 @@
     "scripts": {
         "dev": "next dev --turbopack",
         "build": "next build",
-        "start": "next start",
+        "start": "next start -p 3000",
+        "deploy": "next build && pm2 delete rubbish-dash || true && pm2 start npm --name \"rubbish-dash\" -- run start",
+        "logs": "pm2 logs rubbish-dash",
+        "restart": "pm2 restart rubbish-dash",
+        "stop": "pm2 stop rubbish-dash",
         "lint": "next lint",
         "postinstall": "flowbite-react patch"
     },
