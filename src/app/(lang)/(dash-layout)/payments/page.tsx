@@ -335,6 +335,7 @@ export default function rubbush_collectors() {
       total_price: item.total_price.toString(),
       receiving_number: item.receiving_number,
       payment_method_id: item.payment_method.id,
+      //@ts-ignore
       user_id: item.user_id || null,
       //@ts-ignore
       payment_verification: null,

@@ -206,6 +206,8 @@ export default function DashSidebar({ isOpen, toggleSidebarHandler }: Props) {
 
 
 
+                  
+                  {/* @ts-ignore */}
                   {item.name === "support" && count > 0
                     ? (
                       <div className="flex items-center gap-3 justify-center ">

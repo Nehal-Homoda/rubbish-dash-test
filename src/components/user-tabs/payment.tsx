@@ -427,6 +427,7 @@ export default function rubbush_collectors({ user }: Props) {
               <div className="grid grid-cols-12 space-y-5 gap-7">
 
                 <div className="col-span-12">
+                  {/* @ts-ignore */}
                   <ComboBoxNehal onQueryChange={takeInputValue} onChange={(e) => handleSelectedUser(e)} listItem={userList} itemName="name" itemValue="id" value={(addPaymentFormData.user_id ?? "").toString()} label="اسم المستخدم" />
                   {/* <SelectInput
                     value={addPaymentFormData.user_id ?? ""}
