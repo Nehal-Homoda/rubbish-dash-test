@@ -99,17 +99,20 @@ export default function rubbush_collectors() {
         image: null,
     });
 
-    const [updateFormData, setUpdateFormData] = useState<UpdateFormDataType>({
-        name: "",
-        phone: "",
-        password: "",
-        district_id: [],
-        image: null,
-    });
+    // const [updateFormData, setUpdateFormData] = useState<UpdateFormDataType>({
+    //     name: "",
+    //     phone: "",
+    //     password: "",
+    //     district_id: [],
+    //     image: null,
+    // });
     const formSchema = Yup.object().shape({
         name: Yup.string().required(),
-        phone: Yup.number().required(),
-        password: Yup.string().required(),
+        phone: Yup.string()
+            .required("رقم الهاتف مطلوب.")
+            .matches(/^[0-9]+$/, "يجب أن يحتوي رقم الهاتف على أرقام فقط.")
+            .min(11, "رقم الهاتف يجب أن يكون على الأقل 11 رقم."),
+        password: Yup.string().required('كلمة المرور مطلوبه').min(8, "كلمة المرور يجب ان تحتوي علي 8 علي الاقل."),
         district_id: Yup.array()
             .of(Yup.string())
             .min(1, "Select at least one district")
