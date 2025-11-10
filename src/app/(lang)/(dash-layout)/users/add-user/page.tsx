@@ -249,6 +249,8 @@ export default function page() {
     });
 
     const [categoryDiscount, setCategoryDiscount] = useState(0)
+
+    const [unitsDiscount, setUnitsDiscount] = useState(0)
     const [packagePrice, setPackagePrice] = useState(0)
 
 
@@ -257,41 +259,180 @@ export default function page() {
         console.log(img);
     };
 
-    useEffect(() => {
-        if (packageItem && !!formData.is_request_recycle) {
+
+    const getRecyclingPrice = () => {
+        if (packageItem)
             setPackagePrice(Number(packageItem.price_per_unit) - (Number(packageItem.price_per_unit) * (Number((categoryDiscount) / 100))))
-            console.log('hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii i have extra discount')
+    }
+
+    const getUnitsDiscountPrice = () => {
+        if (packageItem)
+            setPackagePrice(Number(packageItem.price_per_unit) - (Number(packageItem.price_per_unit) * (Number((unitsDiscount) / 100))))
+    }
+
+    const getBothDiscountPrice = () => {
+        if (packageItem) {
+
+            const recyclingPrice = Number(packageItem.price_per_unit) - (Number(packageItem.price_per_unit) * (Number((categoryDiscount) / 100)))
+            setPackagePrice(recyclingPrice - (recyclingPrice * ((unitsDiscount) / 100)))
 
         }
-        else {
-            setPackagePrice(Number(packageItem?.price_per_unit))
-        }
+    }
 
 
 
-    }, [packageItem, !!formData.is_request_recycle])
+    // useEffect(() => {
+
+    //     if (formData.units == 1) {
+    //         const x = packageItem?.discounts.find((item, index) => {
+    //             return item.min_units == 1
+    //         })
+    //         if (!x) return
+    //         setUnitsDiscount(parseFloat(x.discount_rate))
+    //         getUnitsDiscountPrice()
+
+    //         console.log('wefiuhpeuw')
+
+
+
+    //     }
+    //     else if (formData.units > 1 && formData.units <= 5) {
+
+    //         const x = packageItem?.discounts.find((item, index) => {
+    //             return item.min_units == 2
+    //         })
+    //         if (!x) return
+    //         setUnitsDiscount(parseFloat(x.discount_rate))
+    //         getUnitsDiscountPrice()
+
+    //     }
+    //     else if (formData.units > 5 && formData.units <= 9) {
+
+    //         const x = packageItem?.discounts.find((item, index) => {
+    //             return item.min_units == 6
+    //         })
+    //         if (!x) return
+    //         setUnitsDiscount(parseFloat(x.discount_rate))
+    //         getUnitsDiscountPrice()
+
+    //     }
+    //     else if (formData.units > 9 && formData.units <= 15) {
+
+    //         const x = packageItem?.discounts.find((item, index) => {
+    //             return item.min_units == 6
+    //         })
+    //         if (!x) return
+    //         setUnitsDiscount(parseFloat(x.discount_rate))
+    //         getUnitsDiscountPrice()
+
+    //     }
+    //     else {
+    //         setUnitsDiscount(0)
+    //     }
+    // }, [formData.units, packageItem])
+
+
+
 
 
 
     useEffect(() => {
+
         if (packageItem && !!formData.is_request_recycle) {
+            console.log('is recycle and have discount of units')
+            getBothDiscountPrice()
+
+        }
+
+        else {
+
+            if (formData.units == 1 ) {
+                
+                const x = packageItem?.discounts.find((item, index) => {
+                    return item.min_units == 1
+                })
+
+                if (!x) return
+                setUnitsDiscount(parseFloat(x.discount_rate))
+                getUnitsDiscountPrice()
+
+                console.log('discount of 1')
+            }
+            else if (formData.units >= 2 && formData.units <= 5) {
+
+                const x = packageItem?.discounts.find((item, index) => {
+                    return item.min_units == 2
+                })
+                if (!x) return
+                setUnitsDiscount(parseFloat(x.discount_rate))
+                getUnitsDiscountPrice()
+                console.log('discount between 2 and 5')
+
+            }
+            else if (formData.units >=6 && formData.units <= 9) {
+
+                const x = packageItem?.discounts.find((item, index) => {
+                    return item.min_units == 6
+                })
+                if (!x) return
+                setUnitsDiscount(parseFloat(x.discount_rate))
+                getUnitsDiscountPrice()
+                console.log('discount between 6 and 9')
+
+            }
+            else if (formData.units >= 10 && formData.units <= 15) {
+
+                const x = packageItem?.discounts.find((item, index) => {
+                    return item.min_units == 6
+                })
+                if (!x) return
+                setUnitsDiscount(parseFloat(x.discount_rate))
+                getUnitsDiscountPrice()
+
+            }
+            else {
+                const x = packageItem?.discounts.find((item, index) => {
+                    return item.min_units == 1
+                })
+
+                if (!x) return
+                setUnitsDiscount(parseFloat(x.discount_rate))
+                getUnitsDiscountPrice()
+
+            }
+
+
+        }
+
+
+
+    }, [packageItem, formData.is_request_recycle, formData.category_id, formData.units])
+
+
+
+    useEffect(() => {
+        if (packageItem) {
             setTotalPrice(Number(packagePrice) * formData.units);
         }
         else {
             setTotalPrice(Number(packageItem?.price_per_unit) * formData.units);
 
         }
-    }, [formData.units ,formData.is_request_recycle]);
+    }, [formData.units]);
 
     useEffect(() => {
-        if (packageItem && !!formData.is_request_recycle) {
+        if (packageItem) {
             setTotalPrice(Number(packagePrice) * formData.units);
         }
         else {
             setTotalPrice(Number(packageItem?.price_per_unit) * formData.units);
 
         }
-    }, [packagePrice , formData.is_request_recycle]);
+    }, [packagePrice]);
+
+
+
+
 
     useEffect(() => {
         if (packageItem) {

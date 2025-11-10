@@ -5,8 +5,8 @@ const nextConfig: NextConfig = {
     /* config options here */
     output: "export",
     trailingSlash: true,
-    basePath: "/panel",
-    assetPrefix: "/panel/",
+    // basePath: "/panel",
+    // assetPrefix: "/panel/",
     images: { unoptimized: true },
 };
 export default nextConfig;

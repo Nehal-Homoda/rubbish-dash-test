@@ -15,5 +15,5 @@ export interface PackageOffer {
 export interface PackageDiscount {
     min_units: number;
     max_units: number |string;
-    discount_rate: number;
+    discount_rate: string;
 }
