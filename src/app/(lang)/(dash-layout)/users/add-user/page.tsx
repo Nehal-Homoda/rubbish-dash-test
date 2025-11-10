@@ -89,7 +89,7 @@ export default function page() {
         phone: string;
         days: string;
         time_from: string;
-        
+
 
     }
     type FormDataType = {
@@ -97,7 +97,7 @@ export default function page() {
         phone: string;
         days: string[];
         time_from: string;
-       
+
 
     };
 
@@ -109,7 +109,7 @@ export default function page() {
             .min(1, "Select at least one day")
             .required("Available days are required"),
         time_from: Yup.string().required("Time is  required"),
-       
+
 
     });
 
@@ -118,7 +118,7 @@ export default function page() {
         phone: "",
         days: "",
         time_from: "",
-     
+
 
     });
 
@@ -248,21 +248,50 @@ export default function page() {
         address_details: "",
     });
 
+    const [categoryDiscount, setCategoryDiscount] = useState(0)
+    const [packagePrice, setPackagePrice] = useState(0)
+
+
     //@ts-ignore
     const takeUploadedImg = (img) => {
         console.log(img);
     };
 
     useEffect(() => {
-        if (packageItem) {
-            setTotalPrice(Number(packageItem.price_per_unit) * formData.units);
+        if (packageItem && !!formData.is_request_recycle) {
+            setPackagePrice(Number(packageItem.price_per_unit) - (Number(packageItem.price_per_unit) * (Number((categoryDiscount) / 100))))
+            console.log('hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii i have extra discount')
+
         }
-    }, [formData.units]);
+        else {
+            setPackagePrice(Number(packageItem?.price_per_unit))
+        }
+
+
+
+    }, [packageItem, !!formData.is_request_recycle])
+
+
+
     useEffect(() => {
-        if (packageItem) {
-            setTotalPrice(Number(packageItem.price_per_unit) * formData.units);
+        if (packageItem && !!formData.is_request_recycle) {
+            setTotalPrice(Number(packagePrice) * formData.units);
         }
-    }, [packageItem]);
+        else {
+            setTotalPrice(Number(packageItem?.price_per_unit) * formData.units);
+
+        }
+    }, [formData.units ,formData.is_request_recycle]);
+
+    useEffect(() => {
+        if (packageItem && !!formData.is_request_recycle) {
+            setTotalPrice(Number(packagePrice) * formData.units);
+        }
+        else {
+            setTotalPrice(Number(packageItem?.price_per_unit) * formData.units);
+
+        }
+    }, [packagePrice , formData.is_request_recycle]);
 
     useEffect(() => {
         if (packageItem) {
@@ -311,6 +340,25 @@ export default function page() {
 
         // console.log(e.target.value)
     };
+
+
+    const handleSelectedCategory = (value: any) => {
+
+        setFormData((prev) => ({
+            ...prev,
+            ["category_id"]: value,
+        }))
+        const obj = categoryList.find((item, index) => {
+            return item.id == value
+
+        })
+        if (!obj) return
+        setCategoryDiscount(obj.discount_value_percentage)
+        console.log('discount is', obj.discount_value_percentage)
+
+
+
+    }
 
     const serviceTypeList = [{ is_request_recycle: 0, name: 'جمع' }, { is_request_recycle: 1, name: 'جمع وتدوير' }]
 
@@ -367,6 +415,7 @@ export default function page() {
     //         // }
     //     }
     // }, [formData]);
+
 
 
 
@@ -528,12 +577,7 @@ export default function page() {
                                             itemValue="id"
                                             value={formData.category_id}
                                             label=" نوع الخدمة"
-                                            onChange={(value) =>
-                                                setFormData((prev) => ({
-                                                    ...prev,
-                                                    ["category_id"]: value,
-                                                }))
-                                            }
+                                            onChange={(value) => handleSelectedCategory(value)}
                                         ></SelectInput>
                                     </div>
 
@@ -575,9 +619,8 @@ export default function page() {
                                                 takeValue(e, "units")
                                             }
                                             value={
-                                                packageItem
-                                                    ? packageItem.price_per_unit
-                                                    : 0
+                                                packagePrice.toString()
+
                                             }
                                             label=" سعر الباقة "
                                             placeholder="  سعر الباقة "
@@ -604,7 +647,7 @@ export default function page() {
                                             handleChange={(e) =>
                                                 takeValue(e, "price")
                                             }
-                                            value={totalPrice.toString()}
+                                            value={totalPrice}
                                             label="السعر الكلي "
                                             placeholder="  السعر الكلي "
                                         ></TextFieldNada>
@@ -661,7 +704,7 @@ export default function page() {
                                     </div>
                                     <div className="col-span-6">
                                         <SelectInput
-                                        errorMessage={formErrors.time_from}
+                                            errorMessage={formErrors.time_from}
                                             items={districtTime}
                                             placeholder="اختر الوقت"
                                             name=""
