@@ -249,6 +249,8 @@ export default function page() {
     });
 
     const [categoryDiscount, setCategoryDiscount] = useState(0)
+
+    const [unitsDiscount, setUnitsDiscount] = useState(0)
     const [packagePrice, setPackagePrice] = useState(0)
 
 
@@ -257,41 +259,140 @@ export default function page() {
         console.log(img);
     };
 
-    useEffect(() => {
-        if (packageItem && !!formData.is_request_recycle) {
+
+    const getRecyclingPrice = () => {
+        if (packageItem)
             setPackagePrice(Number(packageItem.price_per_unit) - (Number(packageItem.price_per_unit) * (Number((categoryDiscount) / 100))))
-            console.log('hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii i have extra discount')
+    }
+
+    const getUnitsDiscountPrice = () => {
+        if (packageItem) {
+
+            if (formData.units == 1) {
+                const x = packageItem?.discounts.find((item, index) => {
+                    return item.min_units == 1
+                })
+
+                if (!x) return
+                setUnitsDiscount(parseFloat(x.discount_rate))
+                setPackagePrice(Number(packageItem.price_per_unit) - (Number(packageItem.price_per_unit) * (Number((unitsDiscount) / 100))))
+            }
+
+            else if (formData.units >= 2 && formData.units <= 5) {
+
+                const x = packageItem?.discounts.find((item, index) => {
+                    return item.min_units == 2
+                })
+                if (!x) return
+                setUnitsDiscount(parseFloat(x.discount_rate))
+                setPackagePrice(Number(packageItem.price_per_unit) - (Number(packageItem.price_per_unit) * (Number((unitsDiscount) / 100))))
+                console.log('discount between 2 and 5')
+
+            }
+            else if (formData.units >= 6 && formData.units <= 9) {
+
+                const x = packageItem?.discounts.find((item, index) => {
+                    return item.min_units == 6
+                })
+                if (!x) return
+                setUnitsDiscount(parseFloat(x.discount_rate))
+                setPackagePrice(Number(packageItem.price_per_unit) - (Number(packageItem.price_per_unit) * (Number((unitsDiscount) / 100))))
+                console.log('discount between 6 and 9')
+
+            }
+            else if (formData.units >= 10 && formData.units <= 15) {
+
+                const x = packageItem?.discounts.find((item, index) => {
+                    return item.min_units == 6
+                })
+                if (!x) return
+                setUnitsDiscount(parseFloat(x.discount_rate))
+                setPackagePrice(Number(packageItem.price_per_unit) - (Number(packageItem.price_per_unit) * (Number((unitsDiscount) / 100))))
+
+            }
+            else {
+                const x = packageItem?.discounts.find((item, index) => {
+                    return item.min_units == 1
+                })
+
+                if (!x) return
+                setUnitsDiscount(parseFloat(x.discount_rate))
+                setPackagePrice(Number(packageItem.price_per_unit) - (Number(packageItem.price_per_unit) * (Number((unitsDiscount) / 100))))
+
+
+            }
 
         }
         else {
-            setPackagePrice(Number(packageItem?.price_per_unit))
+            return
+        }
+    }
+
+
+
+    const getBothDiscountPrice = () => {
+        if (packageItem) {
+            getUnitsDiscountPrice()
+            const recyclingPrice = Number(packageItem.price_per_unit) - (Number(packageItem.price_per_unit) * (Number((categoryDiscount) / 100)))
+            setPackagePrice(recyclingPrice - (recyclingPrice * ((unitsDiscount) / 100)))
+
+        }
+    }
+
+
+    useEffect(() => {
+
+        if (packageItem && !!formData.is_request_recycle) {
+            console.log('is recycle and have discount of units')
+            getBothDiscountPrice()
+
         }
 
 
+        else {
+            console.log('is not recycle but have discount of units')
 
-    }, [packageItem, !!formData.is_request_recycle])
+            getUnitsDiscountPrice()
+        }
+
+    }, [packageItem, formData.is_request_recycle, formData.category_id, formData.units])
+
+
+    //😏chatgpt as setPackagePrice is asynchronous 
+    useEffect(() => {
+        if (unitsDiscount != null && formData.is_request_recycle) {
+            getBothDiscountPrice()
+
+        } else {
+            getUnitsDiscountPrice()
+        }
+    }, [unitsDiscount, formData.is_request_recycle]);
+
+
+
+
+
+
+
+
+
+
+
 
 
 
     useEffect(() => {
-        if (packageItem && !!formData.is_request_recycle) {
+        if (packageItem) {
             setTotalPrice(Number(packagePrice) * formData.units);
         }
         else {
+            //@ts-ignore
             setTotalPrice(Number(packageItem?.price_per_unit) * formData.units);
 
         }
-    }, [formData.units ,formData.is_request_recycle]);
+    }, [formData.units, packagePrice]);
 
-    useEffect(() => {
-        if (packageItem && !!formData.is_request_recycle) {
-            setTotalPrice(Number(packagePrice) * formData.units);
-        }
-        else {
-            setTotalPrice(Number(packageItem?.price_per_unit) * formData.units);
 
-        }
-    }, [packagePrice , formData.is_request_recycle]);
 
     useEffect(() => {
         if (packageItem) {
@@ -618,12 +719,14 @@ export default function page() {
                                             handleChange={(e) =>
                                                 takeValue(e, "units")
                                             }
+
                                             value={
                                                 packagePrice.toString()
 
                                             }
                                             label=" سعر الباقة "
                                             placeholder="  سعر الباقة "
+
                                         ></TextFieldNada>
                                     </div>
 
