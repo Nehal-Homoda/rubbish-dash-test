@@ -303,7 +303,27 @@ export default function page() {
             else if (formData.units >= 10 && formData.units <= 15) {
 
                 const x = packageItem?.discounts.find((item, index) => {
-                    return item.min_units == 6
+                    return item.min_units == 10
+                })
+                if (!x) return
+                setUnitsDiscount(parseFloat(x.discount_rate))
+                setPackagePrice(Number(packageItem.price_per_unit) - (Number(packageItem.price_per_unit) * (Number((unitsDiscount) / 100))))
+
+            }
+            else if (formData.units >= 16 && formData.units <= 19) {
+
+                const x = packageItem?.discounts.find((item, index) => {
+                    return item.min_units == 16
+                })
+                if (!x) return
+                setUnitsDiscount(parseFloat(x.discount_rate))
+                setPackagePrice(Number(packageItem.price_per_unit) - (Number(packageItem.price_per_unit) * (Number((unitsDiscount) / 100))))
+
+            }
+            else if (formData.units >=20) {
+
+                const x = packageItem?.discounts.find((item, index) => {
+                    return item.min_units == 20
                 })
                 if (!x) return
                 setUnitsDiscount(parseFloat(x.discount_rate))

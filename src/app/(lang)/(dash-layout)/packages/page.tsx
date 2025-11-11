@@ -62,32 +62,32 @@ export default function rubbush_collectors() {
     {
       min_units: 1,
       max_units: null,
-      discount_rate: 0,
+      discount_rate: "",
     },
     {
       min_units: 2,
       max_units: 5,
-      discount_rate: 0,
+      discount_rate: "",
     },
     {
       min_units: 6,
       max_units: 9,
-      discount_rate: 0,
+      discount_rate: "",
     },
     {
       min_units: 10,
       max_units: 15,
-      discount_rate: 0,
+      discount_rate: "",
     },
     {
       min_units: 16,
       max_units: 19,
-      discount_rate: 0,
+      discount_rate: "",
     },
     {
       min_units: 20,
       max_units: "",
-      discount_rate: 0,
+      discount_rate: "",
     },
   ];
 
@@ -115,32 +115,32 @@ export default function rubbush_collectors() {
       {
         min_units: 1,
         max_units: 1,
-        discount_rate: 0,
+        discount_rate: "",
       },
       {
         min_units: 2,
         max_units: 5,
-        discount_rate: 0,
+        discount_rate: "",
       },
       {
         min_units: 6,
         max_units: 9,
-        discount_rate: 0,
+        discount_rate: "",
       },
       {
         min_units: 10,
         max_units: 15,
-        discount_rate: 0,
+        discount_rate: "",
       },
       {
         min_units: 16,
         max_units: 19,
-        discount_rate: 0,
+        discount_rate: "",
       },
       {
         min_units: 20,
         max_units: "",
-        discount_rate: 0,
+        discount_rate: "",
       },
     ],
   });
@@ -197,32 +197,32 @@ export default function rubbush_collectors() {
       {
         min_units: 1,
         max_units: 1,
-        discount_rate: 0,
+        discount_rate: "",
       },
       {
         min_units: 2,
         max_units: 5,
-        discount_rate: 0,
+        discount_rate: "",
       },
       {
         min_units: 6,
         max_units: 9,
-        discount_rate: 0,
+        discount_rate: "",
       },
       {
         min_units: 10,
         max_units: 15,
-        discount_rate: 0,
+        discount_rate: "",
       },
       {
         min_units: 16,
         max_units: 19,
-        discount_rate: 0,
+        discount_rate: "",
       },
       {
         min_units: 20,
         max_units: "",
-        discount_rate: 0,
+        discount_rate: "",
       },
     ],
   });
@@ -329,15 +329,15 @@ export default function rubbush_collectors() {
         ? item.discounts.map((d) => ({
           min_units: d.min_units,
           max_units: d.max_units,
-          discount_rate: d.discount_rate ?? 0,
+          discount_rate: d.discount_rate ?? "",
         }))
         : [
-          { min_units: 1, max_units: "", discount_rate: 0 },
-          { min_units: 2, max_units: 5, discount_rate: 0 },
-          { min_units: 6, max_units: 9, discount_rate: 0 },
-          { min_units: 10, max_units: 15, discount_rate: 0 },
-          { min_units: 16, max_units: 19, discount_rate: 0 },
-          { min_units: 20, max_units: "", discount_rate: 0 },
+          { min_units: 1, max_units: "",  discount_rate: "", },
+          { min_units: 2, max_units: 5,  discount_rate: "", },
+          { min_units: 6, max_units: 9,  discount_rate: "", },
+          { min_units: 10, max_units: 15,  discount_rate: "", },
+          { min_units: 16, max_units: 19,  discount_rate: "", },
+          { min_units: 20, max_units: "",  discount_rate: "", },
         ],
 
     });
@@ -411,7 +411,7 @@ export default function rubbush_collectors() {
 
     setUpdateFormData((prev) => {
       const updatedDiscounts = [...prev.discounts];
-      updatedDiscounts[index].discount_rate = Number(value);
+      updatedDiscounts[index].discount_rate = value;
 
       return {
         ...prev,
@@ -478,32 +478,32 @@ export default function rubbush_collectors() {
             {
               min_units: 1,
               max_units: 1,
-              discount_rate: 0,
+              discount_rate: "",
             },
             {
               min_units: 2,
               max_units: 5,
-              discount_rate: 0,
+              discount_rate: "",
             },
             {
               min_units: 6,
               max_units: 9,
-              discount_rate: 0,
+              discount_rate: "",
             },
             {
               min_units: 10,
               max_units: 15,
-              discount_rate: 0,
+              discount_rate: "",
             },
             {
               min_units: 16,
               max_units: 19,
-              discount_rate: 0,
+              discount_rate: "",
             },
             {
               min_units: 20,
               max_units: "",
-              discount_rate: 0,
+              discount_rate: "",
             },
           ],
         });
@@ -548,32 +548,32 @@ export default function rubbush_collectors() {
         {
           min_units: 1,
           max_units: 1,
-          discount_rate: 0,
+          discount_rate: "",
         },
         {
           min_units: 2,
           max_units: 5,
-          discount_rate: 0,
+          discount_rate: "",
         },
         {
           min_units: 6,
           max_units: 9,
-          discount_rate: 0,
+          discount_rate: "",
         },
         {
           min_units: 10,
           max_units: 15,
-          discount_rate: 0,
+          discount_rate: "",
         },
         {
           min_units: 16,
           max_units: 19,
-          discount_rate: 0,
+          discount_rate: "",
         },
         {
           min_units: 20,
           max_units: "",
-          discount_rate: 0,
+          discount_rate: "",
         },
       ],
     });
@@ -801,32 +801,32 @@ export default function rubbush_collectors() {
   //       {
   //         min_units: 1,
   //         max_units: "",
-  //         discount_rate: 0,
+  //         discount_rate: "",
   //       },
   //       {
   //         min_units: 2,
   //         max_units: 5,
-  //         discount_rate: 0,
+  //         discount_rate: "",
   //       },
   //       {
   //         min_units: 6,
   //         max_units: 9,
-  //         discount_rate: 0,
+  //         discount_rate: "",
   //       },
   //       {
   //         min_units: 10,
   //         max_units: 15,
-  //         discount_rate: 0,
+  //         discount_rate: "",
   //       },
   //       {
   //         min_units: 16,
   //         max_units: 19,
-  //         discount_rate: 0,
+  //         discount_rate: "",
   //       },
   //       {
   //         min_units: 20,
   //         max_units: "",
-  //         discount_rate: 0,
+  //         discount_rate: "",
   //       },
   //     ],
   //   });
