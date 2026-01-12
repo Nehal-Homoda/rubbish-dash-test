@@ -52,6 +52,8 @@ export default function rubbush_collectors() {
 
   const [switch1, setSwitch1] = useState(false);
 
+  const [addressSwicth, setAddressSwicth] = useState(false)
+
   const handleCheckSubscription = (value: boolean, name: string) => {
 
     setSwitch1(!switch1);
@@ -71,6 +73,24 @@ export default function rubbush_collectors() {
     }
 
   };
+  const handleCheckDetails = (value: boolean, name: string) => {
+    setAddressSwicth(!addressSwicth)
+    if (name == 'add') {
+      setFormData((prev) => ({
+        ...prev,
+        ["has_detailed_address"]: value ? 1 : 0,
+      }));
+    }
+
+
+    if (name == 'edit') {
+      setUpdateFormData((prev) => ({
+        ...prev,
+        ["has_detailed_address"]: value ? 1 : 0,
+      }));
+    }
+
+  };
 
   type FormDataType = {
     name_ar: string;
@@ -79,6 +99,7 @@ export default function rubbush_collectors() {
     is_active: number;
     image: File | null | string;
     has_recycle: number;
+    has_detailed_address: number;
     discount_value_percentage: number | string;
   };
   const [formData, setFormData] = useState<FormDataType>({
@@ -88,6 +109,7 @@ export default function rubbush_collectors() {
     is_active: 0,
     image: null,
     has_recycle: 0,
+    has_detailed_address: 0,
     discount_value_percentage: switch1 ? 0 : '',
   });
 
@@ -105,6 +127,7 @@ export default function rubbush_collectors() {
     is_active: 0,
     image: null,
     has_recycle: 0,
+    has_detailed_address: 0,
     discount_value_percentage: 0,
   });
 
@@ -221,6 +244,7 @@ export default function rubbush_collectors() {
       is_active: item.is_active ? 1 : 0,
       image: null,
       has_recycle: item.has_recycle,
+      has_detailed_address: item.has_detailed_address,
       discount_value_percentage: item.has_recycle ? Number(item.discount_value_percentage) : 0,
     });
   };
@@ -263,8 +287,8 @@ export default function rubbush_collectors() {
         successDialog(true);
       })
       .catch((error) => {
-         setIsDialogOpen(false)
-       });
+        setIsDialogOpen(false)
+      });
   };
 
   const addFormChangeHander = (
@@ -316,6 +340,7 @@ export default function rubbush_collectors() {
     fd.append("order", formData.order.toString());
     fd.append("is_active", formData.is_active.toString());
     fd.append("has_recycle", formData.has_recycle.toString())
+    fd.append("has_detailed_address", formData.has_detailed_address.toString())
     if (formData.image) {
       fd.append("image", formData.image);
     }
@@ -337,6 +362,7 @@ export default function rubbush_collectors() {
           is_active: 0,
           image: null,
           has_recycle: 0,
+          has_detailed_address: 0,
           discount_value_percentage: 0,
         });
       })
@@ -355,6 +381,7 @@ export default function rubbush_collectors() {
       order: 0,
       has_recycle: 0,
       discount_value_percentage: 0,
+      has_detailed_address: 0
     });
   };
 
@@ -449,12 +476,20 @@ export default function rubbush_collectors() {
                 }}
               ></SelectInput>
 
-              <div className="py-6 ">
+
+              <div className="grid grid-cols-2 py-6 ">
+
                 <ToggleSwitch
                   checked={switch1}
                   label="اعادة تدوير"
                   onChange={(value) => handleCheckSubscription(value, 'add')}
                 />
+                <ToggleSwitch
+                  checked={addressSwicth}
+                  label="عرض تفاصيل العنوان"
+                  onChange={(value) => handleCheckDetails(value, 'add')}
+                />
+
               </div>
 
               {switch1 && (
@@ -592,7 +627,7 @@ export default function rubbush_collectors() {
                           handleChange={updateFormChangeHander}
                           value={updateFormData.name_en}
                           label=" اسم الخدمة ( انجليزي ) "
-                          placeholder=" اسم الخدمة  "
+                          placeholder=" اسم الخدمة "
                           errorMessage={formErrors.name_en || ''}
                         ></TextFieldNada>
 
@@ -613,12 +648,23 @@ export default function rubbush_collectors() {
                           }}
                         ></SelectInput>
 
-                        <div className="py-6 ">
-                          <ToggleSwitch
+
+                        <div className="grid grid-cols-2 py-6 ">
+
+
+                          <ToggleSwitch className="col-span-1"
                             checked={updateFormData.has_recycle ? true : false}
                             label="اعادة تدوير"
                             onChange={(value) => handleCheckSubscription(value, 'edit')}
                           />
+
+
+                          <ToggleSwitch className="col-span-1"
+                            checked={updateFormData.has_detailed_address ? true : false}
+                            label="عرض تفاصيل العنوان"
+                            onChange={(value) => handleCheckDetails(value, 'edit')}
+                          />
+
                         </div>
 
                         {updateFormData.has_recycle && (
