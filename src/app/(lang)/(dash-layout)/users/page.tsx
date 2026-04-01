@@ -472,7 +472,7 @@ export default function rubbush_collectors() {
         </UIPrimaryDropdown>
 
 
-       
+
 
 
         <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">

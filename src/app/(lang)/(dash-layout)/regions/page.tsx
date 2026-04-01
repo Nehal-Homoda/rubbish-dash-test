@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Checkbox, Label } from "flowbite-react";
-import { Radio } from "flowbite-react";
+// import { Checkbox, Label } from "flowbite-react";
+// import { Radio } from "flowbite-react";
 import {
     addDistrictService,
     deleteDistrictService,
@@ -842,7 +842,7 @@ export default function rubbush_collectors() {
                                                                             index
                                                                         ].from
                                                                     }
-                                                                    label="الي "
+                                                                    label="من "
                                                                     placeholder="  السعر الكلي *"
                                                                 ></TextFieldNada>
                                                             </div>
