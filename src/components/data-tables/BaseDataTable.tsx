@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import arrowImage from "@/assets/images/icons/arrow-left.png";
+// import arrowImage from "@/assets/images/icons/arrow-left.png";
 import UIPagination from "@/components/ui/UIPagination";
 
 interface HeaderItem {
@@ -16,6 +16,7 @@ type Props = {
     showPagination?: boolean;
     totalPages?: number;
     headerVisitsSlot?: React.ReactNode;
+    checkedList?: number[];
     onSearchChange: (value: React.ChangeEvent<HTMLInputElement>) => void;
     onPageChange: (pageNum: number) => void;
 };
@@ -28,6 +29,7 @@ export default function ({
     showPagination = true,
     totalPages = 1,
     headerVisitsSlot,
+    checkedList,
     onSearchChange,
     onPageChange,
 }: Props) {
