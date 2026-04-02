@@ -628,7 +628,7 @@ export default function rubbush_collectors() {
           onSearchChange={tableSearchHandler}
           headerActionsSlot={tableHeadActionsSlot()} // Add your "Add District" dialog button
           renderers={{
-            is_active: (item: Users, index: number) => (
+            is_active: (item, index: number) => (
               <UIPrimaryDropdown
                 tiny
                 itemName="name"

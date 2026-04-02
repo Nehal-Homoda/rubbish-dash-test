@@ -61,7 +61,6 @@ export default function DataTable({
     useState<number[]>(checkedList);
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
 
-  // ✅ sync checked list
   useEffect(() => {
     const isSame =
       checkedList.length === internalCheckedList.length &&
@@ -111,7 +110,6 @@ export default function DataTable({
 
   return (
     <div className="base-data-table relative px-7 py-10 shadow-[0_0_1rem_#00000015] sm:rounded-xl">
-      {/* 🔍 Search + Actions */}
       <div className="w-full flex flex-col-reverse lg:flex-row lg:items-center lg:justify-between gap-4 mb-3">
         {showSearch && (
           <input
@@ -128,7 +126,6 @@ export default function DataTable({
 
       {headerVisitsSlot && <div>{headerVisitsSlot}</div>}
 
-      {/* 📊 Table */}
       <div className="w-full overflow-x-auto min-h-[350px]">
         <table className="w-full text-sm text-left rtl:text-right text-gray-500">
           <thead className="text-[#38433B8F] uppercase">
@@ -161,7 +158,6 @@ export default function DataTable({
             {items.map((item, index) => (
               <React.Fragment key={item.id}>
                 <tr className="border-b hover:bg-gray-50">
-                  {/* ✅ checkbox */}
                   {checkedList && (
                     <td className="px-4 py-5">
                       <input
@@ -175,7 +171,6 @@ export default function DataTable({
                     </td>
                   )}
 
-                  {/* ✅ expand button */}
                   {expandable && !expandableColumn && (
                     <td className="px-4 py-5">
                       <button onClick={() => toggleRow(index)}>
@@ -184,7 +179,6 @@ export default function DataTable({
                     </td>
                   )}
 
-                  {/* 🔥 dynamic columns */}
                   {headItems.map((col) => {
                     const renderer = renderers?.[col.name];
 
@@ -205,7 +199,6 @@ export default function DataTable({
                   })}
                 </tr>
 
-                {/* 🔥 nested row */}
                 {expandedRow === index && (
                   <tr>
                     <td
@@ -225,7 +218,6 @@ export default function DataTable({
         </table>
       </div>
 
-      {/* 📄 Pagination */}
       {showPagination && (
         <div className="flex justify-center mt-8">
           <UIPagination
