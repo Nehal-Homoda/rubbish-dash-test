@@ -1,17 +1,12 @@
-
-
-
 "use client";
 import React, { useEffect, useState } from "react";
-import trashImg from '@/assets/images/icons/trash.png'
-import editImg from '@/assets/images/icons/edit.png'
-import { useSearchParams } from 'next/navigation'
+import trashImg from "@/assets/images/icons/trash.png";
+import editImg from "@/assets/images/icons/edit.png";
+import { useSearchParams } from "next/navigation";
 import {
-
   getUserService,
   deleteUserService,
   updateUserService,
-
 } from "@/services/userService";
 
 import { District } from "@/types/district.interface";
@@ -29,13 +24,14 @@ import { getPackagesService } from "@/services/packagesOffersService";
 
 export default function rubbush_collectors() {
   const [dataList, setDataList] = useState<Users[]>([]);
-  const searchParams = useSearchParams()
-  const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
-  const filterWith = searchParams.get('is_request_recycle')
+  const searchParams = useSearchParams();
+  const [statusFilter, setStatusFilter] = useState<string | undefined>(
+    undefined,
+  );
+  const filterWith = searchParams.get("is_request_recycle");
   const [packagesList, setpackagesList] = useState<PackageOffer[]>([]);
 
-
-  console.log('filter is with', filterWith)
+  console.log("filter is with", filterWith);
   const headerArr = [
     { text: "ID", name: "id" },
     { text: "اسم المستخدم", name: "name" },
@@ -46,16 +42,17 @@ export default function rubbush_collectors() {
     { text: "نوع الطلب", name: "is_request_recycle" },
     { text: "الحالة", name: "is_active" },
     { text: "ميعاد التجديد", name: "renewal_date" },
-    { text: "الاجراءات", name: "" },
+    { text: "الاجراءات", name: "procedures" },
   ];
   const statusList = [
     { is_active: 1, name: "مفعل" },
     { is_active: 0, name: "غير مفعل" },
   ];
 
-  const requestTypeList = [{ is_request_recycle: 1, name: "جمع وتدوير" },
-  { is_request_recycle: 0, name: "جمع" },]
-
+  const requestTypeList = [
+    { is_request_recycle: 1, name: "جمع وتدوير" },
+    { is_request_recycle: 0, name: "جمع" },
+  ];
 
   const hasSubscriptionList = [
     { is_subscribe: 1, name: "مشترك" },
@@ -63,10 +60,7 @@ export default function rubbush_collectors() {
   ];
   const [totalPages, setTotalPages] = useState(1);
   const [page, setPage] = useState(1);
-  const [selectedDataItem, setSelectedDataItem] = useState<Users | null>(
-    null
-  );
-
+  const [selectedDataItem, setSelectedDataItem] = useState<Users | null>(null);
 
   const fetchPaymentMethodList = () => {
     paymentMethodListService().then((response) => {
@@ -75,24 +69,27 @@ export default function rubbush_collectors() {
     });
   };
   type FormDataType = {
-    name: "",
-    phone: "",
-    is_active: 0,
-
+    name: "";
+    phone: "";
+    is_active: 0;
   };
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeFilter, setActiveFilter] = useState<boolean | undefined>(undefined);
-  const [subscriptionFilter, setSubscriptionFilter] = useState<boolean | undefined>(undefined);
+  const [activeFilter, setActiveFilter] = useState<boolean | undefined>(
+    undefined,
+  );
+  const [subscriptionFilter, setSubscriptionFilter] = useState<
+    boolean | undefined
+  >(undefined);
   const [typeFilter, setTypeFilter] = useState<boolean | undefined>(undefined);
-  const [userList, setUserList] = useState<AppUser[]>([])
-  const [userItem, setUserItem] = useState<AppUser | null>(null)
+  const [userList, setUserList] = useState<AppUser[]>([]);
+  const [userItem, setUserItem] = useState<AppUser | null>(null);
   const [selected, setSelected] = useState<null | Payment_methods>(null);
   const [paymentMethodList, setPaymentMethodList] = useState<Payment_methods[]>(
-    []
+    [],
   );
   const [checkedList, setCheckedList] = useState<number[]>([]);
-  const router = useRouter()
+  const router = useRouter();
   const fetchDataList = ({
     search = searchTerm,
     is_active = activeFilter,
@@ -106,9 +103,16 @@ export default function rubbush_collectors() {
     is_request_recycle?: boolean | undefined;
     pageNum?: number;
   } = {}) => {
-    const isActive = is_active != undefined ? "&is_active=" + (is_active ? 1 : 0) : "";
-    const isSubscribe = is_subscription != undefined ? "&is_subscription=" + (is_subscription ? 1 : 0) : "";
-    const isRecycle = is_request_recycle != undefined ? "&is_request_recycle=" + (is_request_recycle ? 1 : 0) : "";
+    const isActive =
+      is_active != undefined ? "&is_active=" + (is_active ? 1 : 0) : "";
+    const isSubscribe =
+      is_subscription != undefined
+        ? "&is_subscription=" + (is_subscription ? 1 : 0)
+        : "";
+    const isRecycle =
+      is_request_recycle != undefined
+        ? "&is_request_recycle=" + (is_request_recycle ? 1 : 0)
+        : "";
 
     const hasSearch = search ? "&search=" + search : "";
 
@@ -164,7 +168,7 @@ export default function rubbush_collectors() {
 
         console.log(response);
       })
-      .catch((error) => { });
+      .catch((error) => {});
   };
 
   const deleteSubmit = (item: District, selectedIndex: number) => {
@@ -175,29 +179,29 @@ export default function rubbush_collectors() {
         setDataList(updatedArr);
         successDialog(true);
       })
-      .catch((error) => { });
+      .catch((error) => {});
   };
 
   const fetchUserList = ({
     search = searchTerm,
     is_active = statusFilter,
-    pageNum = page
-
-  }: { search?: string; is_active?: string | undefined; pageNum?: number } = {}) => {
+    pageNum = page,
+  }: {
+    search?: string;
+    is_active?: string | undefined;
+    pageNum?: number;
+  } = {}) => {
     console.log(is_active);
     const isActive = is_active ? "&status=" + is_active : "";
     const hasSearch = search ? "&search=" + search : "";
 
     const query = `?page=${pageNum}${hasSearch}${isActive}`;
 
-
-    getUserService(query).then((response) => {
-      setUserList(response.data)
-    }).catch(() => {
-
-    })
-
-
+    getUserService(query)
+      .then((response) => {
+        setUserList(response.data);
+      })
+      .catch(() => {});
   };
   const fetchPackages = () => {
     getPackagesService().then((response) => {
@@ -207,27 +211,24 @@ export default function rubbush_collectors() {
 
   useEffect(() => {
     fetchPaymentMethodList();
-    fetchPackages()
-    fetchUserList()
-
-  }, [])
-
-
-
+    fetchPackages();
+    fetchUserList();
+  }, []);
 
   const tableHeadActionsSlot = () => {
     return (
       <>
-
         <UIPrimaryDropdown
-          items={[{ is_request_recycle: undefined, name: "الكل" }, ...requestTypeList]}
+          items={[
+            { is_request_recycle: undefined, name: "الكل" },
+            ...requestTypeList,
+          ]}
           itemName="name"
           itemValue="is_request_recycle"
           onSelected={handleTypeFilter}
         >
           نوع الطلب
         </UIPrimaryDropdown>
-
 
         <UIPrimaryDropdown
           items={[{ is_active: undefined, name: "الكل" }, ...statusList]}
@@ -242,45 +243,38 @@ export default function rubbush_collectors() {
         </UIPrimaryDropdown>
 
         <UIPrimaryDropdown
-          items={[{ is_active: undefined, name: "الكل" }, ...hasSubscriptionList]}
+          items={[
+            { is_active: undefined, name: "الكل" },
+            ...hasSubscriptionList,
+          ]}
           itemName="name"
           itemValue="is_subscribe"
-
           onSelected={handleSubscriptionFilter}
         >
           الاشتراك
         </UIPrimaryDropdown>
 
-
-
-
-
         <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
-          <button onClick={() => router.push('/users/add-user')} className="bg-[#0094140D] p-1 rounded-lg">
+          <button
+            onClick={() => router.push("/users/add-user")}
+            className="bg-[#0094140D] p-1 rounded-lg"
+          >
             اضافة مستخدم
           </button>
         </div>
-
-
-
-
-
       </>
     );
   };
   useEffect(() => {
-
-    const filterWith = searchParams.get('is_request_recycle')
-    console.log('filteration is', filterWith)
+    const filterWith = searchParams.get("is_request_recycle");
+    console.log("filteration is", filterWith);
     if (filterWith !== null) {
       //@ts-ignore
       fetchDataList({ is_request_recycle: 1, pageNum: 1 });
-    }
-    else {
-      fetchDataList()
+    } else {
+      fetchDataList();
     }
   }, [page, searchParams]);
-
 
   return (
     // <>
@@ -355,13 +349,9 @@ export default function rubbush_collectors() {
     //                 </button>
     //               </UIDialogConfirm>
 
-
-
-
     //               <div className="w-4 h-4 cursor-pointer" onClick={() => router.push(`/users/details?id=${item.id}`)}>
     //                 <img className="w-full h-full object-contain" src={editImg.src} alt="" />
     //               </div>
-
 
     //             </div>
     //           </td>
@@ -375,107 +365,83 @@ export default function rubbush_collectors() {
       <div className="py-20">
         <BaseDataTable
           headItems={headerArr}
+          items={dataList}
           onPageChange={setPage}
           totalPages={totalPages}
           onSearchChange={tableSearchHandler}
           headerActionsSlot={tableHeadActionsSlot()}
-          items={dataList}
           checkedList={checkedList}
           onChecked={setCheckedList}
-        >
-          {dataList.map((item, index) => (
-            <tr key={item.id}>
-              <td className="py-2 px-4">{item.id}</td>
-              <td className="py-2 px-4">{item.name}</td>
-              <td className="py-2 px-4">{item.phone}</td>
-
-              {/* your other table cells */}
-              <td className="py-2 px-4">
-                <div
-                  className={`rounded-lg py-1 text-center ${item.has_subscription
+          renderers={{
+            has_subscription: (item: Users) => (
+              <div
+                className={`rounded-lg py-1 text-center ${
+                  item.has_subscription
                     ? "text-[#31D000] bg-[#31D00012]"
-                    : "bg-red-100 text-red-600 hover:bg-text-red-200"
-                    }`}
-                >
-                  <span>{item.has_subscription ? "مشترك" : "غير مشترك"}</span>
-                </div>
-              </td>
-
-              <td className="py-2 px-4">{item.subscription_name}</td>
-              <td className="py-2 px-4">
-                {!item.has_subscription
-                  ? "-"
-                  : item.is_request_recycle
+                    : "bg-red-100 text-red-600 hover:bg-red-200"
+                }`}
+              >
+                {item.has_subscription ? "مشترك" : "غير مشترك"}
+              </div>
+            ),
+            is_request_recycle: (item: Users) => (
+              <span>
+                {item.has_subscription
+                  ? item.is_request_recycle
                     ? "جمع وتدوير"
-                    : "جمع فقط"}
-              </td>
-
-              <td className="py-2 px-4">
-                <UIPrimaryDropdown
-                  tiny
-                  itemName="name"
-                  itemValue="is_active"
-                  btnColorTailwindClass={
-                    !item.is_active
-                      ? "bg-red-100 text-red-600 hover:bg-text-red-200"
-                      : undefined
-                  }
-                  onSelected={(value) => updateDataItemActive(value, index)}
-                  items={statusList}
+                    : "جمع فقط"
+                  : "-"}
+              </span>
+            ),
+            is_active: (item: Users, index: number) => (
+              <UIPrimaryDropdown
+                tiny
+                itemName="name"
+                itemValue="is_active"
+                btnColorTailwindClass={
+                  !item.is_active
+                    ? "bg-red-100 text-red-600 hover:bg-red-200"
+                    : undefined
+                }
+                items={statusList}
+                onSelected={(value) => updateDataItemActive(value, index)}
+              >
+                {item.is_active ? "مفعل" : "غير مفعل"}
+              </UIPrimaryDropdown>
+            ),
+            procedures: (item: Users, index: number) => (
+              <div className="flex justify-center items-center gap-3">
+                <UIDialogConfirm
+                  danger
+                  title="هل انت متأكد من حذف العنصر"
+                  confirmHandler={() => deleteSubmit(item, index)}
                 >
-                  {item.is_active ? "مفعل" : "غير مفعل"}
-                </UIPrimaryDropdown>
-              </td>
+                  <button className="bg-[#F9285A0A] p-1 rounded-lg">
+                    <div className="w-4 h-4">
+                      <img
+                        src={trashImg.src}
+                        className="w-full h-full object-contain"
+                        alt=""
+                      />
+                    </div>
+                  </button>
+                </UIDialogConfirm>
 
-              <td className="py-2 px-4">{item.renewal_date}</td>
-
-              <td>
-                <div className="flex justify-center items-center gap-3">
-                  {/* Delete button */}
-                  <UIDialogConfirm
-                    danger
-                    title="هل انت متأكد من حذف العنصر"
-                    confirmHandler={() => deleteSubmit(item, index)}
-                  >
-                    <button className="bg-[#F9285A0A] p-1 rounded-lg">
-                      <div className="w-4 h-4">
-                        <img src={trashImg.src} className="w-full h-full object-contain" alt="" />
-                      </div>
-                    </button>
-                  </UIDialogConfirm>
-
-                  {/* Edit button */}
-                  <div
-                    className="w-4 h-4 cursor-pointer"
-                    onClick={() => router.push(`/users/details?id=${item.id}`)}
-                  >
-                    <img src={editImg.src} className="w-full h-full object-contain" alt="" />
-                  </div>
+                <div
+                  className="w-4 h-4 cursor-pointer"
+                  onClick={() => router.push(`/users/details?id=${item.id}`)}
+                >
+                  <img
+                    src={editImg.src}
+                    className="w-full h-full object-contain"
+                    alt=""
+                  />
                 </div>
-              </td>
-            </tr>
-          ))}
-        </BaseDataTable>
+              </div>
+            ),
+          }}
+        />
       </div>
     </>
-
-
-
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
