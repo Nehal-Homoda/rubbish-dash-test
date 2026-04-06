@@ -53,6 +53,7 @@ export default function rubbush_collectors() {
     is_active: number;
     image: File | null | string;
     type: "internal" | "external" | "";
+    page_id?: string;
   };
 
   const [errorMsg, setErrorMsg] = useState("");
@@ -125,7 +126,7 @@ export default function rubbush_collectors() {
         setDataList(response.data);
         setTotalPages(response.meta.last_page);
       })
-      .catch(() => {});
+      .catch(() => { });
   };
 
   const handleActiveFilter = (value: boolean | undefined) => {
@@ -158,7 +159,7 @@ export default function rubbush_collectors() {
 
         console.log(response);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const deleteSubmit = (item: Banner, selectedIndex: number) => {
@@ -169,7 +170,7 @@ export default function rubbush_collectors() {
         setDataList(updatedArr);
         successDialog(true);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const updateDataItem = (item: Banner) => {
@@ -181,6 +182,7 @@ export default function rubbush_collectors() {
       link: item.link,
       is_active: item.is_active ? 1 : 0,
       image: item.image,
+      type: item.type,
     });
   };
 
@@ -296,7 +298,7 @@ export default function rubbush_collectors() {
           title="اضافة لافتة"
           confirmText="اضافة"
           form="add-form"
-          confirmHandler={() => {}}
+          confirmHandler={() => { }}
           btn={
             <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
               <button
@@ -386,15 +388,15 @@ export default function rubbush_collectors() {
                   value={formData.type}
                   items={typeList}
                   itemName="name"
-                  itemValue="type"
-                  label="نوع الرابط"
-                  placeholder="اختر نوع الرابط"
+                  itemValue="id"
+                  label="الصفحة المستهدفة"
+                  placeholder="اختر الصفحة"
                   name="type"
                   required={true}
                   onChange={(value) => {
                     setFormData((prev) => ({
                       ...prev,
-                      ["type"]: value,
+                      page_id: value,
                     }));
                   }}
                 ></SelectInput>
@@ -515,7 +517,7 @@ export default function rubbush_collectors() {
           open={isDialogOpen}
           onClose={() => setIsDialogOpen(false)}
           title="تعديل اللافتة"
-          confirmHandler={() => {}}
+          confirmHandler={() => { }}
           confirmText="تعديل"
           form="update-form"
         >
