@@ -10,28 +10,22 @@ interface HeaderItem {
 interface DataTableProps {
   headItems: HeaderItem[];
   items?: any[];
-
-  // 🔥 slots replacement
   renderers?: {
     [key: string]: (item: any, index: number) => React.ReactNode;
   };
-
   nestedRenderer?: (item: any, index: number) => React.ReactNode;
-
   showSearch?: boolean;
   showPagination?: boolean;
   totalPages?: number;
-
   headerActionsSlot?: React.ReactNode;
   headerVisitsSlot?: React.ReactNode;
-
   checkedList?: number[];
   expandable?: boolean;
   expandableColumn?: string;
-
   onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onPageChange: (page: number) => void;
   onChecked?: (checkedIds: number[]) => void;
+  showCheckList?: boolean;
 }
 
 export default function DataTable({
@@ -39,21 +33,18 @@ export default function DataTable({
   items = [],
   renderers,
   nestedRenderer,
-
   showSearch = true,
   showPagination = true,
   totalPages = 1,
-
   headerActionsSlot,
   headerVisitsSlot,
-
   checkedList = [],
   expandable = false,
   expandableColumn,
-
   onSearchChange,
   onPageChange,
   onChecked,
+  showCheckList = false,
 }: DataTableProps) {
   const [searchInput, setSearchInput] = useState("");
   const [page, setPage] = useState(1);
@@ -105,8 +96,7 @@ export default function DataTable({
     items.length > 0 && internalCheckedList.length === items.length;
 
   const isIndeterminate =
-    internalCheckedList.length > 0 &&
-    internalCheckedList.length < items.length;
+    internalCheckedList.length > 0 && internalCheckedList.length < items.length;
 
   return (
     <div className="base-data-table relative px-7 py-10 shadow-[0_0_1rem_#00000015] sm:rounded-xl">
@@ -130,7 +120,7 @@ export default function DataTable({
         <table className="w-full text-sm text-left rtl:text-right text-gray-500">
           <thead className="text-[#38433B8F] uppercase">
             <tr className="bg-white border-b border-gray-100">
-              {checkedList && items.length > 0 && (
+              { showCheckList && checkedList && items.length > 0 && (
                 <th className="px-4 py-5">
                   <input
                     type="checkbox"
@@ -158,7 +148,7 @@ export default function DataTable({
             {items.map((item, index) => (
               <React.Fragment key={item.id}>
                 <tr className="border-b hover:bg-gray-50">
-                  {checkedList && (
+                  {showCheckList && checkedList && (
                     <td className="px-4 py-5">
                       <input
                         type="checkbox"
@@ -192,7 +182,7 @@ export default function DataTable({
                             {expandedRow === index ? "▲" : "▼"}
                           </div>
                         ) : (
-                          item[col.name] ?? "-"
+                          (item[col.name] ?? "-")
                         )}
                       </td>
                     );

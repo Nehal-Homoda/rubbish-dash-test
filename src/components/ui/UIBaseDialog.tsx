@@ -1,136 +1,82 @@
 import {
-    Dialog,
-    DialogPanel,
-    DialogTitle,
-    Transition,
-    TransitionChild,
+  Dialog,
+  DialogPanel,
+  DialogTitle,
+  Transition,
+  TransitionChild,
 } from "@headlessui/react";
 import React, { Fragment, useEffect, useState } from "react";
 
 type Props = {
-    btn: React.ReactNode;
-    children: React.ReactNode;
-    title: string;
-    form?: string;
-    confirmHandler: () => void;
-    confirmCloseHandler?: () => void;
-    confirmText: string;
-    hideConfirmBtn?: boolean;
-    heightStyle?: string;
-    dismiss?: boolean
+  open: boolean; 
+  onClose: () => void; 
+  btn?: React.ReactNode;
+  children: React.ReactNode;
+  title: string;
+  form?: string;
+  confirmHandler: () => void;
+  confirmText: string;
+  hideConfirmBtn?: boolean;
+  heightStyle?: string;
 };
 
 export default function UIBaseDialog({
-    btn,
-    children,
-    title,
-    confirmText,
-    form,
-    confirmHandler,
-    confirmCloseHandler,
-    hideConfirmBtn = false,
-    heightStyle,
-    dismiss
+  open,
+  onClose,
+  btn,
+  children,
+  title,
+  confirmText,
+  form,
+  confirmHandler,
+  hideConfirmBtn = false,
+  heightStyle,
 }: Props) {
-    let [isOpen, setIsOpen] = useState(false);
+  return (
+    <>
+      {btn && <div>{btn}</div>}
 
-    function closeModal() {
-        setIsOpen(false);
-        // if (confirmCloseHandler) {
+      <Transition appear show={open} as={Fragment}>
+        <Dialog as="div" className="relative z-50"  onClose={() => {}} static>
+          <TransitionChild as={Fragment}>
+            <div className="fixed inset-0 z-30 bg-black/25" />
+          </TransitionChild>
 
-        //     confirmCloseHandler()
-        // }
-    }
-
-    function openModal() {
-        setIsOpen(true);
-    }
-
-    useEffect(() => {
-        if (dismiss) {
-            closeModal()
-        }
-
-    }, [dismiss])
-
-    return (
-        <>
-            <div className="" onClick={openModal}>
-                {btn}
-            </div>
-
-            <Transition appear show={isOpen} as={Fragment}>
-                <Dialog
-                    as="div"
-                    className=" relative z-50"
-                    onClose={closeModal}
+          <div className="fixed z-30 inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <TransitionChild as={Fragment}>
+                <DialogPanel
+                  className={`w-full max-w-[750px] ${heightStyle} rounded-2xl bg-white p-10 shadow-xl`}
                 >
-                    <TransitionChild
-                        as={Fragment}
-                        enter="ease-out duration-300"
-                        enterFrom="opacity-0"
-                        enterTo="opacity-100"
-                        leave="ease-in duration-200"
-                        leaveFrom="opacity-100"
-                        leaveTo="opacity-0"
-                    >
-                        <div className="fixed inset-0 bg-black/25" />
-                    </TransitionChild>
+                  <DialogTitle className="relative text-lg font-bold text-center">
+                    {title}
+                    <button onClick={onClose} className="absolute left-2">
+                      ✕
+                    </button>
+                  </DialogTitle>
 
-                    <div className="fixed inset-0 overflow-y-auto">
-                        <div className="flex min-h-full items-center justify-center p-4 text-center">
-                            <TransitionChild
-                                as={Fragment}
-                                enter="ease-out duration-300"
-                                enterFrom="opacity-0 scale-95"
-                                enterTo="opacity-100 scale-100"
-                                leave="ease-in duration-200"
-                                leaveFrom="opacity-100 scale-100"
-                                leaveTo="opacity-0 scale-95"
-                            >
-                                <DialogPanel className={`w-full max-w-[750px] ${heightStyle} transform rounded-2xl bg-white  p-10 text-left align-middle shadow-xl transition-all`}>
-                                    <DialogTitle
-                                        as="h3"
-                                        className="relative text-lg font-bold leading-6 text-center text-gray-900 "
-                                    >
-                                        {/* <div className="w-24 h-1 rounded-2xl mb-5 bg-gray-300 mx-auto"></div> */}
-                                        {title}
-                                        <button
-                                            onClick={closeModal}
-                                            className="absolute bottom-[-2px] left-2 bg-transparent"
-                                        >
-                                            <span className="text-2xl mdi mdi-close"></span>
-                                        </button>
-                                    </DialogTitle>
-                                    <div className="my-10">{children}</div>
+                  <div className="my-10">{children}</div>
 
-                                    <div className="mt-4 flex items-center justify-center gap-4">
-                                        {!hideConfirmBtn && (
-                                            <button
-                                                type={
-                                                    form ? "submit" : "button"
-                                                }
-                                                className="base-btn min-w-[200px]"
-                                                onClick={confirmHandler}
-                                                form={form ?? undefined}
-                                            >
-                                                {confirmText}
-                                            </button>
-                                        )}
-                                        <button
-                                            type="button"
-                                            className="btn-secondary px-10"
-                                            onClick={closeModal}
-                                        >
-                                            الغاء
-                                        </button>
-                                    </div>
-                                </DialogPanel>
-                            </TransitionChild>
-                        </div>
-                    </div>
-                </Dialog>
-            </Transition>
-        </>
-    );
+                  <div className="flex justify-center gap-4">
+                    {!hideConfirmBtn && (
+                      <button
+                        type={form ? "submit" : "button"}
+                        onClick={confirmHandler}
+                        form={form}
+                        className="base-btn min-w-[200px]"
+                      >
+                        {confirmText}
+                      </button>
+                    )}
+
+                    <button onClick={onClose}>الغاء</button>
+                  </div>
+                </DialogPanel>
+              </TransitionChild>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
+    </>
+  );
 }
