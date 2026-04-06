@@ -8,8 +8,8 @@ import {
 import React, { Fragment, useEffect, useState } from "react";
 
 type Props = {
-  open: boolean; 
-  onClose: () => void; 
+  open: boolean;
+  onClose: () => void;
   btn?: React.ReactNode;
   children: React.ReactNode;
   title: string;
@@ -37,7 +37,7 @@ export default function UIBaseDialog({
       {btn && <div>{btn}</div>}
 
       <Transition appear show={open} as={Fragment}>
-        <Dialog as="div" className="relative z-50"  onClose={() => {}} static>
+        <Dialog as="div" className="relative z-50" onClose={() => { }} static>
           <TransitionChild as={Fragment}>
             <div className="fixed inset-0 z-30 bg-black/25" />
           </TransitionChild>
@@ -69,7 +69,8 @@ export default function UIBaseDialog({
                       </button>
                     )}
 
-                    <button onClick={onClose}>الغاء</button>
+                    <button type="button"
+                      className="btn-secondary px-10" onClick={onClose}>الغاء</button>
                   </div>
                 </DialogPanel>
               </TransitionChild>

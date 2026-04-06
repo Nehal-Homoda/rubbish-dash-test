@@ -120,11 +120,11 @@ export default function DataTable({
         <table className="w-full text-sm text-left rtl:text-right text-gray-500">
           <thead className="text-[#38433B8F] uppercase">
             <tr className="bg-white border-b border-gray-100">
-              { showCheckList && checkedList && items.length > 0 && (
+              {showCheckList && checkedList && items.length > 0 && (
                 <th className="px-4 py-5">
                   <input
                     type="checkbox"
-                    className="w-5 h-5 accent-green-600"
+                    className="w-5 h-5 accent-green-600 cursor-pointer"
                     checked={allChecked}
                     ref={(el) => {
                       if (el) el.indeterminate = isIndeterminate;
@@ -152,7 +152,7 @@ export default function DataTable({
                     <td className="px-4 py-5">
                       <input
                         type="checkbox"
-                        className="w-5 h-5 accent-green-600"
+                        className="w-5 h-5 accent-green-600 cursor-pointer"
                         checked={internalCheckedList.includes(item.id)}
                         onChange={(e) =>
                           handleCheckRow(item.id, e.target.checked)

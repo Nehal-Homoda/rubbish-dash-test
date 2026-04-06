@@ -21,6 +21,20 @@ import { AppUser } from "@/types/user.interface";
 import { Payment_methods } from "@/types/paymentMethod.interface";
 import { paymentMethodListService } from "@/services/sharedService";
 import { getPackagesService } from "@/services/packagesOffersService";
+import pdfMake from "pdfmake/build/pdfmake";
+import * as pdfFonts from "pdfmake/build/vfs_fonts";
+import { amiriFont } from '@/assets/fonts/Amiri-Regular-vfs.js'
+// pdfMake.vfs = amiriFont;
+
+pdfMake.fonts = {
+  Amiri: {
+    normal: "Amiri-Regular.ttf",
+    bold: "Amiri-Regular.ttf",
+    italics: "Amiri-Regular.ttf",
+    bolditalics: "Amiri-Regular.ttf",
+  },
+};
+
 
 export default function rubbush_collectors() {
   const [dataList, setDataList] = useState<Users[]>([]);
@@ -168,7 +182,7 @@ export default function rubbush_collectors() {
 
         console.log(response);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const deleteSubmit = (item: District, selectedIndex: number) => {
@@ -179,7 +193,7 @@ export default function rubbush_collectors() {
         setDataList(updatedArr);
         successDialog(true);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const fetchUserList = ({
@@ -201,7 +215,7 @@ export default function rubbush_collectors() {
       .then((response) => {
         setUserList(response.data);
       })
-      .catch(() => {});
+      .catch(() => { });
   };
   const fetchPackages = () => {
     getPackagesService().then((response) => {
@@ -262,6 +276,15 @@ export default function rubbush_collectors() {
             اضافة مستخدم
           </button>
         </div>
+
+        <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
+          <button
+            onClick={() => handleExport()}
+            className="bg-[#0094140D] p-1 rounded-lg"
+          >
+            تصدير
+          </button>
+        </div>
       </>
     );
   };
@@ -275,6 +298,38 @@ export default function rubbush_collectors() {
       fetchDataList();
     }
   }, [page, searchParams]);
+
+  const handleExport = async () => {
+  if (!checkedList.length) return;
+
+  const pdfMakeModule = (await import("pdfmake/build/pdfmake")).default;
+  const vfsModule = await import("@/vfs_fonts_amiri");
+
+  const vfs = vfsModule.amiriFont || vfsModule.default;
+
+  pdfMakeModule.vfs = vfs;
+
+  pdfMakeModule.fonts = {
+    Amiri: {
+      normal: "Amiri-Regular.ttf",
+      bold: "Amiri-Regular.ttf", // use same for now
+      italics: "Amiri-Regular.ttf",
+      bolditalics: "Amiri-Regular.ttf",
+    },
+  };
+
+  console.log("VFS keys:", Object.keys(pdfMakeModule.vfs)); // must show font
+
+  const docDefinition = {
+    defaultStyle: { font: "Amiri", alignment: "right" },
+    content: [
+      { text: "اختبار عربي", alignment: "center" },
+    ],
+  };
+
+  pdfMakeModule.createPdf(docDefinition).download("test.pdf");
+};
+
 
   return (
     // <>
@@ -372,14 +427,14 @@ export default function rubbush_collectors() {
           headerActionsSlot={tableHeadActionsSlot()}
           checkedList={checkedList}
           onChecked={setCheckedList}
+          showCheckList={true}
           renderers={{
             has_subscription: (item: Users) => (
               <div
-                className={`rounded-lg py-1 text-center ${
-                  item.has_subscription
-                    ? "text-[#31D000] bg-[#31D00012]"
-                    : "bg-red-100 text-red-600 hover:bg-red-200"
-                }`}
+                className={`rounded-lg py-1 text-center ${item.has_subscription
+                  ? "text-[#31D000] bg-[#31D00012]"
+                  : "bg-red-100 text-red-600 hover:bg-red-200"
+                  }`}
               >
                 {item.has_subscription ? "مشترك" : "غير مشترك"}
               </div>
