@@ -21,19 +21,19 @@ import { AppUser } from "@/types/user.interface";
 import { Payment_methods } from "@/types/paymentMethod.interface";
 import { paymentMethodListService } from "@/services/sharedService";
 import { getPackagesService } from "@/services/packagesOffersService";
-import pdfMake from "pdfmake/build/pdfmake";
-import * as pdfFonts from "pdfmake/build/vfs_fonts";
+// import pdfMake from "pdfmake/build/pdfmake";
+// import * as pdfFonts from "pdfmake/build/vfs_fonts";
 import { amiriFont } from '@/assets/fonts/Amiri-Regular-vfs.js'
 // pdfMake.vfs = amiriFont;
 
-pdfMake.fonts = {
-  Amiri: {
-    normal: "Amiri-Regular.ttf",
-    bold: "Amiri-Regular.ttf",
-    italics: "Amiri-Regular.ttf",
-    bolditalics: "Amiri-Regular.ttf",
-  },
-};
+// pdfMake.fonts = {
+//   Amiri: {
+//     normal: "Amiri-Regular.ttf",
+//     bold: "Amiri-Regular.ttf",
+//     italics: "Amiri-Regular.ttf",
+//     bolditalics: "Amiri-Regular.ttf",
+//   },
+// };
 
 
 export default function rubbush_collectors() {
@@ -300,35 +300,42 @@ export default function rubbush_collectors() {
   }, [page, searchParams]);
 
   const handleExport = async () => {
-  if (!checkedList.length) return;
+    if (!checkedList.length) return;
 
-  const pdfMakeModule = (await import("pdfmake/build/pdfmake")).default;
-  const vfsModule = await import("@/vfs_fonts_amiri");
+    // ✅ load pdfMake
+    const pdfMake = (await import("pdfmake/build/pdfmake")).default;
 
-  const vfs = vfsModule.amiriFont || vfsModule.default;
+    // ✅ load your generated vfs
+    const { amiriFont } = await import("@/vfs_fonts_amiri"); // fix path if needed
 
-  pdfMakeModule.vfs = vfs;
+    // ✅ assign vfs BEFORE anything
+    pdfMake.vfs = amiriFont;
 
-  pdfMakeModule.fonts = {
-    Amiri: {
-      normal: "Amiri-Regular.ttf",
-      bold: "Amiri-Regular.ttf", // use same for now
-      italics: "Amiri-Regular.ttf",
-      bolditalics: "Amiri-Regular.ttf",
-    },
+    // ✅ VERY IMPORTANT: log to confirm
+    console.log("VFS keys:", Object.keys(pdfMake.vfs));
+
+    // ✅ use SAME font for all styles (avoid bold crash)
+    pdfMake.fonts = {
+      Amiri: {
+        normal: "Amiri-Regular.ttf",
+        bold: "Amiri-Regular.ttf",
+        italics: "Amiri-Regular.ttf",
+        bolditalics: "Amiri-Regular.ttf",
+      },
+    };
+
+    const docDefinition = {
+      defaultStyle: {
+        font: "Amiri",
+        alignment: "right",
+      },
+      content: [
+        { text: "اختبار عربي", alignment: "center" },
+      ],
+    };
+
+    pdfMake.createPdf(docDefinition).download("test.pdf");
   };
-
-  console.log("VFS keys:", Object.keys(pdfMakeModule.vfs)); // must show font
-
-  const docDefinition = {
-    defaultStyle: { font: "Amiri", alignment: "right" },
-    content: [
-      { text: "اختبار عربي", alignment: "center" },
-    ],
-  };
-
-  pdfMakeModule.createPdf(docDefinition).download("test.pdf");
-};
 
 
   return (
