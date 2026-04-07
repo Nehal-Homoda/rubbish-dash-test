@@ -1,13 +1,10 @@
 "use client";
 import React, { useEffect, useState } from "react";
-// import { Checkbox, Label } from "flowbite-react";
-// import { Radio } from "flowbite-react";
 import {
   addDistrictService,
   deleteDistrictService,
   updateDistrictService,
 } from "@/services/districtService";
-
 import { getDistrictService } from "@/services/districtService";
 import { District } from "@/types/district.interface";
 import TextFieldNada from "@/components/ui/form/TextFieldNada";
@@ -19,7 +16,6 @@ import SelectInput from "@/components/ui/form/SelectInput";
 import { successDialog, validateAllInputs } from "@/utils/shared";
 import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
 import { getCollectorsService } from "@/services/collectorsService";
-// import { Collector } from "@/types/regions.interface";
 import { Collector } from "@/types/collectors.interface";
 import * as Yup from "yup";
 
@@ -44,7 +40,6 @@ type FormDataType = {
   available_days: string[];
   available_times: string[];
 };
-
 type FromToTimeType = {
   from: string;
   to: string;
@@ -90,12 +85,7 @@ export default function rubbush_collectors() {
   const [selectedDataItem, setSelectedDataItem] = useState<District | null>(
     null,
   );
-
   const [collectors, setCollectors] = useState<Collector[]>([]);
-
-  const [timefrom, setTimefrom] = useState("");
-  const [timeto, setTimeto] = useState("");
-
   const formSchema = Yup.object().shape({
     name_ar: Yup.string().required(),
     name_en: Yup.string().required(),
@@ -143,6 +133,7 @@ export default function rubbush_collectors() {
   });
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
 
   const addDynamicTime = () => {
     setDynamicFromToTime((prev) => {
@@ -206,7 +197,7 @@ export default function rubbush_collectors() {
           setDistrictTime(item.available_times);
         });
       })
-      .catch(() => {});
+      .catch(() => { });
   };
 
   const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -233,7 +224,7 @@ export default function rubbush_collectors() {
 
         console.log(response);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const deleteSubmit = (item: District, selectedIndex: number) => {
@@ -244,7 +235,7 @@ export default function rubbush_collectors() {
         setDataList(updatedArr);
         successDialog(true);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const updateDataItem = (item: District) => {
@@ -280,16 +271,13 @@ export default function rubbush_collectors() {
       formSchema,
       updateFormData,
     );
-    console.log("validate", validateResult);
     if (!validateResult) return;
     setUpdateFormErrors({ ...validateResult.outputResult });
-    console.log("form error", formErrors);
     if (validateResult.isInvalid) return;
 
     const body = JSON.stringify({
       ...updateFormData,
     });
-    console.log("update form", updateFormData);
     setIsDialogOpen(false);
 
     updateDistrictService(selectedDataItem.id, body)
@@ -329,15 +317,12 @@ export default function rubbush_collectors() {
 
   const createSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsDialogOpen(false);
     const validateResult = await validateAllInputs<FormDataInputs>(
       formSchema,
       formData,
     );
-    console.log("validate", validateResult);
     if (!validateResult) return;
     setFormErrors({ ...validateResult.outputResult });
-    console.log("form error", formErrors);
     if (validateResult.isInvalid) return;
 
     const fd = new FormData();
@@ -355,9 +340,9 @@ export default function rubbush_collectors() {
     addDistrictService(fd)
       .then((response) => {
         fetchDataList();
-        setIsDialogOpen(true);
         //@ts-ignore
         successDialog(true);
+        setIsDialogOpen(false);
         setFormData({
           name_ar: "",
           name_en: "",
@@ -371,8 +356,7 @@ export default function rubbush_collectors() {
       })
       .catch((error) => {
         setErrorMsg(error?.message);
-        setIsDialogOpen(false);
-        console.log("error message is", errorMsg);
+
       });
   };
 
@@ -380,15 +364,15 @@ export default function rubbush_collectors() {
     return (
       <>
         <UIBaseDialog
-          dismiss={isDialogOpen}
-          confirmCloseHandler={resetForm}
+          open={isDialogOpen}
+          onClose={() => setIsDialogOpen(false)}
           title="اضافة منطقه"
-          confirmHandler={() => {}}
+          confirmHandler={() => { }}
           confirmText="اضافة"
           form="update-form"
           btn={
             <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
-              <button className="bg-[#0094140D] p-1 rounded-lg">
+              <button onClick={() => setIsDialogOpen(true)} className="bg-[#0094140D] p-1 rounded-lg">
                 اضافة منطقة
               </button>
             </div>
@@ -580,7 +564,6 @@ export default function rubbush_collectors() {
 
   const fetchCollectors = () => {
     getCollectorsService().then((response) => {
-      // console.log('collectors are', response)
       setCollectors(response.data);
     });
   };
@@ -588,7 +571,7 @@ export default function rubbush_collectors() {
   useEffect(() => {
     fetchDataList();
     fetchCollectors();
-  }, [page]); // runs every time `page` changes
+  }, [page]);
 
   useEffect(() => {
     console.log(dynamicFromToTime);
@@ -606,17 +589,6 @@ export default function rubbush_collectors() {
     }));
   }, [dynamicFromToTimeUpdate]);
 
-  const resetForm = () => {
-    setFormData({
-      name_ar: "",
-      name_en: "",
-      order: 0,
-      is_active: 0,
-      collector_id: [],
-      available_days: [],
-      available_times: [],
-    });
-  };
   return (
     <>
       <div className="py-20">
@@ -626,7 +598,7 @@ export default function rubbush_collectors() {
           onPageChange={setPage}
           totalPages={totalPages}
           onSearchChange={tableSearchHandler}
-          headerActionsSlot={tableHeadActionsSlot()} // Add your "Add District" dialog button
+          headerActionsSlot={tableHeadActionsSlot()}
           renderers={{
             is_active: (item, index: number) => (
               <UIPrimaryDropdown
@@ -657,9 +629,10 @@ export default function rubbush_collectors() {
                 </UIDialogConfirm>
 
                 <UIBaseDialog
-                  dismiss={isDialogOpen}
+                  open={isUpdateDialogOpen}
+                  onClose={() => setIsUpdateDialogOpen(false)}
                   title="تعديل منطقه"
-                  confirmHandler={() => {}}
+                  confirmHandler={() => { }}
                   confirmText="حفظ"
                   form="update-form"
                   btn={

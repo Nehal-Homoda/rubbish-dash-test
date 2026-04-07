@@ -19,6 +19,24 @@ import {
 } from "@/services/bannersServices";
 
 export default function rubbush_collectors() {
+
+  interface FormDataInputErrors {
+    image: string | null;
+    title_ar: string | null;
+    title_en: string | null;
+    order: string | null;
+    type: string | null;
+  }
+  type FormDataType = {
+    title_ar: string;
+    title_en: string;
+    order: number;
+    link: string;
+    is_active: number;
+    image: File | null | string;
+    type: "internal" | "external" | "";
+    page_id?: string;
+  };
   const [dataList, setDataList] = useState<Banner[]>([]);
   const headerArr = [
     { text: "ID", name: "id" },
@@ -45,19 +63,8 @@ export default function rubbush_collectors() {
     undefined,
   );
 
-  type FormDataType = {
-    title_ar: string;
-    title_en: string;
-    order: number;
-    link: string;
-    is_active: number;
-    image: File | null | string;
-    type: "internal" | "external" | "";
-    page_id?: string;
-  };
 
   const [errorMsg, setErrorMsg] = useState("");
-
   const [formData, setFormData] = useState<FormDataType>({
     title_ar: "",
     title_en: "",
@@ -78,13 +85,7 @@ export default function rubbush_collectors() {
     type: "",
   });
 
-  interface FormDataInputErrors {
-    image: string | null;
-    title_ar: string | null;
-    title_en: string | null;
-    order: string | null;
-    type: string | null;
-  }
+
 
   const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
     image: "",
@@ -130,8 +131,6 @@ export default function rubbush_collectors() {
   };
 
   const handleActiveFilter = (value: boolean | undefined) => {
-    // setPage(1)
-    // setActiveFilter(value)
     setPage(1);
     fetchDataList({ is_active: value, pageNum: 1 });
   };
@@ -182,7 +181,7 @@ export default function rubbush_collectors() {
       link: item.link,
       is_active: item.is_active ? 1 : 0,
       image: item.image,
-      type: item.type,
+      type: "",
     });
   };
 
@@ -445,6 +444,7 @@ export default function rubbush_collectors() {
       link: "",
       is_active: 0,
       image: "",
+      type: ""
     });
   };
   useEffect(() => {

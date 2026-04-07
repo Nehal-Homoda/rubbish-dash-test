@@ -4,14 +4,10 @@ import TextFieldNada from "@/components/ui/form/TextFieldNada";
 import BaseDataTable from "@/components/data-tables/BaseDataTable";
 import UIPrimaryDropdown from "@/components/ui/UIPrimaryDropdown";
 import UIBaseDialog from "@/components/ui/UIBaseDialog";
-import MultiCheckbox from "@/components/ui/form/MultiCheckbox";
 import SelectInput from "@/components/ui/form/SelectInput";
 import { successDialog, validateAllInputs, validateInput } from "@/utils/shared";
 import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
 import * as Yup from "yup"
-
-
-
 import {
   addPackageService,
   deletePackageService,
@@ -25,18 +21,39 @@ import {
 } from "@/services/categoriesService";
 import { Category } from "@/types/categories.interface";
 
+
+
+type FormDataType = {
+  name_ar: string;
+  name_en: string;
+  category_id: number | string | null;
+  is_active: number;
+  price_per_unit: number | string;
+  order: number;
+  days_count: number | string;
+  recycle_price?: number | string;
+  discounts: PackageDiscount[];
+};
+
+interface FormDataInputErrors {
+  name_ar: string | null,
+  name_en: string | null,
+  category_id: string | null,
+  price_per_unit: string | null
+
+}
 export default function rubbush_collectors() {
   const [dataList, setDataList] = useState<PackageOffer[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const headerArr = [
     { text: "ID", name: "id" },
-    { text: " اسم الباقة", name: "name" },
+    { text: " اسم الباقة", name: "name_ar" },
     { text: " نوع الخدمة", name: "category" },
     { text: "سعر الوحدة", name: "price_per_unit" },
     { text: "مدة الباقة", name: "days_count" },
     { text: "عدد الاشتراكات", name: "price_per_unit" },
     { text: "الحالة", name: "is_active" },
-    { text: "الاجراءات", name: "" },
+    { text: "الاجراءات", name: "procedures" },
   ];
   const statusList = [
     { is_active: 1, name: "مفعل" },
@@ -49,7 +66,6 @@ export default function rubbush_collectors() {
   );
   const [categoryItem, setCategoryItem] = useState<Category | null>(null);
   const [recyclePrice, setRecyclePrice] = useState(0);
-
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<boolean | undefined>(
     undefined
@@ -90,18 +106,6 @@ export default function rubbush_collectors() {
       discount_rate: "",
     },
   ];
-
-  type FormDataType = {
-    name_ar: string;
-    name_en: string;
-    category_id: number | string | null;
-    is_active: number;
-    price_per_unit: number | string;
-    order: number;
-    days_count: number | string;
-    recycle_price?: number | string;
-    discounts: PackageDiscount[];
-  };
   const [formData, setFormData] = useState<FormDataType>({
     name_ar: "",
     name_en: "",
@@ -145,16 +149,6 @@ export default function rubbush_collectors() {
     ],
   });
 
-
-  interface FormDataInputErrors {
-    name_ar: string | null,
-    name_en: string | null,
-    category_id: string | null,
-    price_per_unit: string | null
-
-  }
-
-
   const formSchema = Yup.object().shape({
     name_ar: Yup.string().required('الاسم باللغه العربيه مطلوب'),
     name_en: Yup.string().required('الاسم باللغه الانجليزيه مطلوب'),
@@ -181,10 +175,7 @@ export default function rubbush_collectors() {
     price_per_unit: ""
 
   });
-
-
   const [errorMsg, setErrorMsg] = useState("");
-
   const [updateFormData, setUpdateFormData] = useState<FormDataType>({
     name_ar: "",
     name_en: "",
@@ -226,6 +217,8 @@ export default function rubbush_collectors() {
       },
     ],
   });
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false)
 
   const fetchDataList = ({
     search = searchTerm,
@@ -314,15 +307,13 @@ export default function rubbush_collectors() {
 
   const updateDataItem = (item: PackageOffer) => {
     setSelectedDataItem(item);
-
-    const ca = categories.find((cate) => cate.name_ar === item.category);
-
+    // const ca = categories.find((category) => category.name_en === item.category);
     setUpdateFormData({
       name_ar: item.name_ar,
       name_en: item.name_en,
       order: item.order ? item.order : 0,
       is_active: item.is_active ? 1 : 0,
-      category_id: ca?.id ?? null,
+      category_id: item.category,
       days_count: item.days_count ? parseInt(item.days_count) : "",
       price_per_unit: item.price_per_unit ? parseInt(item.price_per_unit) : "",
       discounts: item.discounts?.length
@@ -332,14 +323,13 @@ export default function rubbush_collectors() {
           discount_rate: d.discount_rate ?? "",
         }))
         : [
-          { min_units: 1, max_units: "",  discount_rate: "", },
-          { min_units: 2, max_units: 5,  discount_rate: "", },
-          { min_units: 6, max_units: 9,  discount_rate: "", },
-          { min_units: 10, max_units: 15,  discount_rate: "", },
-          { min_units: 16, max_units: 19,  discount_rate: "", },
-          { min_units: 20, max_units: "",  discount_rate: "", },
+          { min_units: 1, max_units: "", discount_rate: "", },
+          { min_units: 2, max_units: 5, discount_rate: "", },
+          { min_units: 6, max_units: 9, discount_rate: "", },
+          { min_units: 10, max_units: 15, discount_rate: "", },
+          { min_units: 16, max_units: 19, discount_rate: "", },
+          { min_units: 20, max_units: "", discount_rate: "", },
         ],
-
     });
   };
 
@@ -355,20 +345,15 @@ export default function rubbush_collectors() {
     if (!validateResult) return;
 
     setUpdateFormErrors({ ...validateResult.outputResult });
-    console.log("form error", formErrors);
     if (validateResult.isInvalid) return;
-
-
     const body = JSON.stringify({
       ...updateFormData,
     });
-    setIsDialogOpen(false)
-
     updatePackageService(selectedDataItem.id, body)
       .then((response) => {
-        setIsDialogOpen(true)
         fetchDataList();
         successDialog(true);
+        setIsUpdateDialogOpen(false)
       })
       .catch((error) => {
         setErrorMsg(error?.message)
@@ -394,13 +379,11 @@ export default function rubbush_collectors() {
     e: React.ChangeEvent<HTMLInputElement>,
     index?: number
   ) => {
-    console.log("name of change", e.target.name, e.target.value);
     setUpdateFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
 
-    console.log(e.target.name, e.target.value);
   };
 
   const handleUpdateDiscountChange = (
@@ -430,17 +413,8 @@ export default function rubbush_collectors() {
     if (!validateResult) return;
 
     setFormErrors({ ...validateResult.outputResult });
-    console.log("form error", formErrors);
     if (validateResult.isInvalid) return;
-
     const fd = new FormData();
-
-    // for (const keyName in formData) {
-    //   //@ts-ignore
-    //   fd.append(keyName, formData[keyName]);
-
-    // }
-
     fd.append("name_ar", formData.name_ar),
       fd.append("name_en", formData.name_en),
       //@ts-ignore
@@ -449,7 +423,6 @@ export default function rubbush_collectors() {
       fd.append("price_per_unit", formData.price_per_unit.toString()),
       fd.append("order", formData.order.toString()),
       fd.append("days_count", formData.days_count.toString()),
-      // fd.append('recycle_price', recyclePrice.toString()),
 
       formData.discounts.forEach((discount, index) => {
         Object.keys(discount).forEach((keyName) => {
@@ -457,11 +430,10 @@ export default function rubbush_collectors() {
           fd.append(`discounts[${index}][${keyName}]`, String(value));
         });
       });
-    setIsDialogOpen(false)
 
     addPackageService(fd)
       .then((response) => {
-        setIsDialogOpen(true)
+        setIsDialogOpen(false)
         fetchDataList();
         //@ts-ignore
         successDialog(true);
@@ -511,7 +483,6 @@ export default function rubbush_collectors() {
       })
       .catch((error) => {
         setErrorMsg(error?.message);
-        console.log("error message is", errorMsg);
         window.scrollTo({ top: 0, behavior: "smooth" });
         setIsDialogOpen(false)
       });
@@ -533,59 +504,7 @@ export default function rubbush_collectors() {
     });
   };
 
-
-  const resetForm = () => {
-    setErrorMsg('')
-    setFormData({
-      name_ar: "",
-      name_en: "",
-      category_id: null,
-      is_active: 0,
-      price_per_unit: 0,
-      order: 0,
-      days_count: 0,
-      discounts: [
-        {
-          min_units: 1,
-          max_units: 1,
-          discount_rate: "",
-        },
-        {
-          min_units: 2,
-          max_units: 5,
-          discount_rate: "",
-        },
-        {
-          min_units: 6,
-          max_units: 9,
-          discount_rate: "",
-        },
-        {
-          min_units: 10,
-          max_units: 15,
-          discount_rate: "",
-        },
-        {
-          min_units: 16,
-          max_units: 19,
-          discount_rate: "",
-        },
-        {
-          min_units: 20,
-          max_units: "",
-          discount_rate: "",
-        },
-      ],
-    });
-    setCategoryItem(null)
-  }
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-
-
   const handleChangeValue = (e: any, index: number) => {
-    console.log("index is", index);
-    console.log("value of discount is", e.target.value);
-
     setFormData((prev) => {
       const updateDiscount = [...prev.discounts];
       updateDiscount[index].discount_rate = e.target.value;
@@ -595,8 +514,13 @@ export default function rubbush_collectors() {
         discounts: updateDiscount,
       };
     });
-
-    console.log("form data", formData);
+  };
+  const fetchCategories = () => {
+    getCategoriesService()
+      .then((response) => {
+        setCategories(response.data);
+      })
+      .catch((error) => { });
   };
 
   const tableHeadActionsSlot = () => {
@@ -606,9 +530,6 @@ export default function rubbush_collectors() {
           items={[{ id: undefined, name_ar: "الكل" }, ...categories]}
           itemName="name_ar"
           itemValue="id"
-          // onSelected={(value) => {
-          //   fetchDataList({ category_id: value });
-          // }}
           onSelected={handleCategoryFilter}
         >
           نوع الخدمة
@@ -617,22 +538,20 @@ export default function rubbush_collectors() {
           items={[{ is_active: undefined, name: "الكل" }, ...statusList]}
           itemName="name"
           itemValue="is_active"
-          // onSelected={(value) => {
-          //   fetchDataList({ is_active: value });
-          // }}
           onSelected={handleStatusFilter}
         >
           الحالة
         </UIPrimaryDropdown>
-        <UIBaseDialog dismiss={isDialogOpen}
-          confirmCloseHandler={resetForm}
+        <UIBaseDialog
+          open={isDialogOpen}
+          onClose={() => setIsDialogOpen(false)}
           title="اضافة باقة"
           confirmHandler={() => { }}
           confirmText="اضافة"
           form="update-form"
           btn={
             <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
-              <button className="bg-[#0094140D] p-1 rounded-lg">
+              <button onClick={() => setIsDialogOpen(true)} className="bg-[#0094140D] p-1 rounded-lg">
                 اضافة باقة
               </button>
             </div>
@@ -778,60 +697,6 @@ export default function rubbush_collectors() {
       </>
     );
   };
-  const fetchCategories = () => {
-    getCategoriesService()
-      .then((response) => {
-        setCategories(response.data);
-      })
-      .catch((error) => { });
-  };
-
-
-
-  // const resetForm = () => {
-  //   setFormData({
-  //     name_ar: "",
-  //     name_en: "",
-  //     category_id: "",
-  //     is_active: 0,
-  //     price_per_unit: "",
-  //     order: 0,
-  //     days_count: "",
-  //     discounts: [
-  //       {
-  //         min_units: 1,
-  //         max_units: "",
-  //         discount_rate: "",
-  //       },
-  //       {
-  //         min_units: 2,
-  //         max_units: 5,
-  //         discount_rate: "",
-  //       },
-  //       {
-  //         min_units: 6,
-  //         max_units: 9,
-  //         discount_rate: "",
-  //       },
-  //       {
-  //         min_units: 10,
-  //         max_units: 15,
-  //         discount_rate: "",
-  //       },
-  //       {
-  //         min_units: 16,
-  //         max_units: 19,
-  //         discount_rate: "",
-  //       },
-  //       {
-  //         min_units: 20,
-  //         max_units: "",
-  //         discount_rate: "",
-  //       },
-  //     ],
-  //   });
-  // };
-
   useEffect(() => {
     if (categoryItem && formData.price_per_unit) {
       setRecyclePrice(
@@ -856,202 +721,198 @@ export default function rubbush_collectors() {
   useEffect(() => {
     fetchDataList();
     fetchCategories();
-  }, [page]); // runs every time `page` changes
+  }, [page]);
 
   return (
     <>
       <div className="py-20">
         <BaseDataTable
+          items={dataList}
           headItems={headerArr}
           onPageChange={setPage}
           totalPages={totalPages}
           onSearchChange={tableSearchHandler}
           headerActionsSlot={tableHeadActionsSlot()}
-        >
-          {dataList.map((item, index) => (
-            <tr key={index}>
-              <td className="py-2 px-4">{item.id}</td>
-              <td className="py-2 px-4">{item.name_ar}</td>
-              <td className="py-2 px-4">{item.category}</td>
-              <td className="py-2 px-4">{item.price_per_unit}</td>
-              <td className="py-2 px-4">{item.days_count}</td>
-              <td className="py-2 px-4">{item.no_of_subscriptions}</td>
-              <td className="py-2 px-4">
-                <UIPrimaryDropdown
-                  tiny={true}
-                  itemName="name"
-                  itemValue="is_active"
-                  btnColorTailwindClass={
-                    !item.is_active
-                      ? "bg-red-100 text-red-600 hover:bg-text-red-200"
-                      : undefined
-                  }
-                  onSelected={(value) => {
-                    updateDataItemActive(value, index);
+          renderers={{
+            is_active: (item, index: number) => (
+              <UIPrimaryDropdown
+                tiny
+                itemName="name"
+                itemValue="is_active"
+                btnColorTailwindClass={
+                  !item.is_active
+                    ? "bg-red-100 text-red-600 hover:bg-red-200"
+                    : undefined
+                }
+                items={statusList}
+                onSelected={(value) => updateDataItemActive(value, index)}
+              >
+                {item.is_active ? "مفعل" : "غير مفعل"}
+              </UIPrimaryDropdown>
+            ),
+
+            procedures: (item, index: number) => (
+              <div className="flex justify-center gap-3">
+                <UIDialogConfirm
+                  danger
+                  title="هل انت متأكد من حذف العنصر"
+                  confirmHandler={() => {
+                    deleteSubmit(item, index);
                   }}
-                  items={statusList}
                 >
-                  {item.is_active ? "مفعل" : "غير مفعل"}
-                </UIPrimaryDropdown>
-              </td>
-              <td className="">
-                <div className=" flex gap-3">
-                  <UIDialogConfirm
-                    danger
-                    title="هل انت متأكد من حذف العنصر"
-                    confirmHandler={() => {
-                      deleteSubmit(item, index);
-                    }}
-                  >
-                    <button className="bg-[#F9285A0A] p-1 rounded-lg">
-                      <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
-                    </button>
-                  </UIDialogConfirm>
-                  <UIBaseDialog dismiss={isDialogOpen}
-                    title="تعديل باقة"
-                    confirmHandler={() => { }}
-                    confirmText="تعديل"
-                    form="update-form"
-                    btn={
-                      <button
-                        onClick={() => {
-                          updateDataItem(item);
-                        }}
-                        className="bg-[#0094140D] p-1 rounded-lg"
-                      >
-                        <span className="mdi mdi-folder-edit-outline text-[#009414]"></span>
-                      </button>
-                    }
-                  >
-                    <form onSubmit={updateSubmit} id="update-form">
-                      <div className="space-y-7">
-                        <TextFieldNada
-                          name="name_ar"
-                          type="text"
-                          handleChange={updateFormChangeHander}
-                          value={updateFormData.name_ar}
-                          label=" اسم الباقة ( عربي ) "
-                          placeholder=" اسم الباقة  "
-                          errorMessage={updateFormErrors.name_ar || ''}
-                        ></TextFieldNada>
+                  <button className="bg-[#F9285A0A] p-1 rounded-lg">
+                    <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
+                  </button>
+                </UIDialogConfirm>
+                <button
+                  onClick={() => {
+                    updateDataItem(item);
+                    setIsUpdateDialogOpen(true);
+                  }}
+                  className="bg-[#0094140D] p-1 rounded-lg"
+                >
+                  <span className="mdi mdi-folder-edit-outline text-[#009414]"></span>
+                </button>
+              </div>
+            ),
+          }}
+        >
 
-                        <TextFieldNada
-                          name="name_en"
-                          type="text"
-                          handleChange={updateFormChangeHander}
-                          value={updateFormData.name_en}
-                          label=" اسم الباقة ( انجليزي ) "
-                          placeholder=" اسم الباقة  "
-                          errorMessage={updateFormErrors.name_en || ''}
-                        ></TextFieldNada>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          <div className="col-span-1">
-                            <SelectInput
-                              value={updateFormData.category_id ?? null}
-                              items={categories}
-                              itemName="name_ar"
-                              itemValue="id"
-                              label="نوع الخدمة"
-                              placeholder="اختر نوع الخدمة"
-                              name="category_id"
-                              required={true}
-                              onChange={(value) => {
-                                setUpdateFormData((prev) => ({
-                                  ...prev,
-                                  ["category_id"]: value ? value : null,
-                                }));
-                              }}
-                              errorMessage={updateFormErrors.category_id || ''}
-                            ></SelectInput>
-                          </div>
-                          <div className="col-span-1">
-                            <SelectInput
-                              value={updateFormData.is_active}
-                              items={statusList}
-                              itemName="name"
-                              itemValue="is_active"
-                              label="الحالة"
-                              placeholder="اختر الحالة"
-                              name="is_active"
-                              required={true}
-                              onChange={(value) => {
-                                setUpdateFormData((prev) => ({
-                                  ...prev,
-                                  ["is_active"]: value,
-                                }));
-                              }}
-                            ></SelectInput>
-                          </div>
-                        </div>
-                        <TextFieldNada
-                          errorMessage={updateFormErrors.price_per_unit || ''}
-                          name="price_per_unit"
-                          type="number"
-                          handleChange={updateFormChangeHander}
-                          value={updateFormData.price_per_unit}
-                          label=" سعر الوحدة"
-                          placeholder=" ادخل سعر الوحدة "
-                          isPrice={true}
-                        ></TextFieldNada>
-                        <TextFieldNada
-                          name="days_count"
-                          type="number"
-                          handleChange={updateFormChangeHander}
-                          value={updateFormData.days_count}
-                          label=" مدة الباقة "
-                          placeholder=" ادخل مدة الباقة  "
-                          isDays={true}
-                        ></TextFieldNada>
-
-                        <div>
-                          <div className="label flex items-center gap-1  start-4  w-fit px-3 text-sm font-semibold">
-                            <label>نسبة الخصم</label>
-                          </div>
-                          <div className="my-4">
-                            {discountArr.map((item, index) => (
-                              <div
-                                key={index}
-                                className="grid grid-cols-12 gap-5 "
-                              >
-                                <div className="col-span-4 border py-3 px-5 flex justify-center items-center  rounded-xl mb-7 ">
-                                  {index < 5 ? (
-                                    <span>
-                                      {item.min_units} - {item.max_units} وحدة
-                                    </span>
-                                  ) : (
-                                    <span>20 وحدة او اكثر</span>
-                                  )}
-                                </div>
-                                <div className="col-span-8 mb-7">
-                                  <TextFieldNada
-                                    prependIcon="mdi mdi-ticket-percent-outline text-gray-400 "
-                                    handleChange={(value) =>
-                                      handleUpdateDiscountChange(value, index)
-                                    }
-                                    name={`discounts[${index}].discount_rate`}
-                                    label="نسبة الخصم"
-                                    placeholder="ادخل نسبة الخصم"
-                                    type="number"
-                                    value={
-                                      updateFormData.discounts[index]
-                                        ?.discount_rate
-                                    }
-                                  />
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </form>
-                  </UIBaseDialog>
-                </div>
-              </td>
-            </tr>
-          ))}
         </BaseDataTable>
       </div>
+      <UIBaseDialog
+        open={isUpdateDialogOpen}
+        onClose={() => setIsUpdateDialogOpen(false)}
+        title="تعديل باقة"
+        confirmHandler={() => { }}
+        confirmText="تعديل"
+        form="update-form"
+      >
+        <form onSubmit={updateSubmit} id="update-form">
+          <div className="space-y-7">
+            <TextFieldNada
+              name="name_ar"
+              type="text"
+              handleChange={updateFormChangeHander}
+              value={updateFormData.name_ar}
+              label=" اسم الباقة ( عربي ) "
+              placeholder=" اسم الباقة  "
+              errorMessage={updateFormErrors.name_ar || ''}
+            ></TextFieldNada>
+
+            <TextFieldNada
+              name="name_en"
+              type="text"
+              handleChange={updateFormChangeHander}
+              value={updateFormData.name_en}
+              label=" اسم الباقة ( انجليزي ) "
+              placeholder=" اسم الباقة  "
+              errorMessage={updateFormErrors.name_en || ''}
+            ></TextFieldNada>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="col-span-1">
+                <SelectInput
+                  value={updateFormData.category_id ?? null}
+                  items={categories}
+                  label="نوع الخدمة"
+                  itemName="name_en"
+                  itemValue="id"
+                  placeholder="اختر نوع الخدمة"
+                  name="category_id"
+                  required={true}
+                  onChange={(value) => {
+                    setUpdateFormData((prev) => ({
+                      ...prev,
+                      ["category_id"]: value ? value : null,
+                    }));
+                  }}
+                  errorMessage={updateFormErrors.category_id || ''}
+                ></SelectInput>
+              </div>
+              <div className="col-span-1">
+                <SelectInput
+                  value={updateFormData.is_active}
+                  items={statusList}
+                  itemName="name"
+                  itemValue="is_active"
+                  label="الحالة"
+                  placeholder="اختر الحالة"
+                  name="is_active"
+                  required={true}
+                  onChange={(value) => {
+                    setUpdateFormData((prev) => ({
+                      ...prev,
+                      ["is_active"]: value,
+                    }));
+                  }}
+                ></SelectInput>
+              </div>
+            </div>
+            <TextFieldNada
+              errorMessage={updateFormErrors.price_per_unit || ''}
+              name="price_per_unit"
+              type="number"
+              handleChange={updateFormChangeHander}
+              value={updateFormData.price_per_unit}
+              label=" سعر الوحدة"
+              placeholder=" ادخل سعر الوحدة "
+              isPrice={true}
+            ></TextFieldNada>
+            <TextFieldNada
+              name="days_count"
+              type="number"
+              handleChange={updateFormChangeHander}
+              value={updateFormData.days_count}
+              label=" مدة الباقة "
+              placeholder=" ادخل مدة الباقة  "
+              isDays={true}
+            ></TextFieldNada>
+
+            <div>
+              <div className="label flex items-center gap-1  start-4  w-fit px-3 text-sm font-semibold">
+                <label>نسبة الخصم</label>
+              </div>
+              <div className="my-4">
+                {discountArr.map((item, index) => (
+                  <div
+                    key={index}
+                    className="grid grid-cols-12 gap-5 "
+                  >
+                    <div className="col-span-4 border py-3 px-5 flex justify-center items-center  rounded-xl mb-7 ">
+                      {index < 5 ? (
+                        <span>
+                          {item.min_units} - {item.max_units} وحدة
+                        </span>
+                      ) : (
+                        <span>20 وحدة او اكثر</span>
+                      )}
+                    </div>
+                    <div className="col-span-8 mb-7">
+                      <TextFieldNada
+                        prependIcon="mdi mdi-ticket-percent-outline text-gray-400 "
+                        handleChange={(value) =>
+                          handleUpdateDiscountChange(value, index)
+                        }
+                        name={`discounts[${index}].discount_rate`}
+                        label="نسبة الخصم"
+                        placeholder="ادخل نسبة الخصم"
+                        type="number"
+                        value={
+                          updateFormData.discounts[index]
+                            ?.discount_rate
+                        }
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </form>
+      </UIBaseDialog>
+
+
     </>
   );
 }
