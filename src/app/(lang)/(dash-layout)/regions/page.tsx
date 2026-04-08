@@ -627,48 +627,55 @@ export default function rubbush_collectors() {
                     <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
                   </button>
                 </UIDialogConfirm>
-
-                <UIBaseDialog
-                  open={isUpdateDialogOpen}
-                  onClose={() => setIsUpdateDialogOpen(false)}
-                  title="تعديل منطقه"
-                  confirmHandler={() => { }}
-                  confirmText="حفظ"
-                  form="update-form"
-                  btn={
-                    <button
-                      onClick={() => {
-                        updateDataItem(item);
-                      }}
-                      className="bg-[#0094140D] p-1 rounded-lg"
-                    >
-                      <span className="mdi mdi-folder-edit-outline text-[#009414]"></span>
-                    </button>
-                  }
+                <button
+                  onClick={() => {
+                    updateDataItem(item);
+                    setIsUpdateDialogOpen(true);
+                  }}
+                  className="bg-[#0094140D] p-1 rounded-lg"
                 >
-                  <form onSubmit={updateSubmit} id="update-form">
-                    <div className="space-y-7">
-                      <TextFieldNada
-                        name="name_ar"
-                        type="text"
-                        handleChange={updateFormChangeHander}
-                        value={updateFormData.name_ar}
-                        label=" اسم المنطقة ( عربي ) "
-                        placeholder=" اسم المنطقة  "
-                        errorMessage={updateFormErrors.name_ar || ""}
-                      ></TextFieldNada>
+                  <span className="mdi mdi-folder-edit-outline text-[#009414]"></span>
+                </button>
 
-                      <TextFieldNada
-                        name="name_en"
-                        type="text"
-                        handleChange={updateFormChangeHander}
-                        value={updateFormData.name_en}
-                        label=" اسم المنطقة ( انجليزي ) "
-                        placeholder=" اسم المنطقة  "
-                        errorMessage={updateFormErrors.name_en || ""}
-                      ></TextFieldNada>
 
-                      {/* <SelectInput
+              </div>
+            ),
+          }}
+        ></BaseDataTable>
+
+
+        <UIBaseDialog
+          open={isUpdateDialogOpen}
+          onClose={() => setIsUpdateDialogOpen(false)}
+          title="تعديل منطقه"
+          confirmHandler={() => { }}
+          confirmText="حفظ"
+          form="update-form"
+
+        >
+          <form onSubmit={updateSubmit} id="update-form">
+            <div className="space-y-7">
+              <TextFieldNada
+                name="name_ar"
+                type="text"
+                handleChange={updateFormChangeHander}
+                value={updateFormData.name_ar}
+                label=" اسم المنطقة ( عربي ) "
+                placeholder=" اسم المنطقة  "
+                errorMessage={updateFormErrors.name_ar || ""}
+              ></TextFieldNada>
+
+              <TextFieldNada
+                name="name_en"
+                type="text"
+                handleChange={updateFormChangeHander}
+                value={updateFormData.name_en}
+                label=" اسم المنطقة ( انجليزي ) "
+                placeholder=" اسم المنطقة  "
+                errorMessage={updateFormErrors.name_en || ""}
+              ></TextFieldNada>
+
+              {/* <SelectInput
                                                     value={
                                                         updateFormData.collector_id
                                                     }
@@ -690,141 +697,137 @@ export default function rubbush_collectors() {
                                                     }}
                                                 ></SelectInput> */}
 
-                      <SelectInput
-                        value={updateFormData.is_active}
-                        items={statusList}
-                        itemName="name"
-                        itemValue="is_active"
-                        label="الحالة"
-                        placeholder="لختر الحالة"
-                        name="is_active"
-                        required={true}
-                        onChange={(value) => {
-                          setUpdateFormData((prev) => ({
-                            ...prev,
-                            ["is_active"]: value,
-                          }));
+              <SelectInput
+                value={updateFormData.is_active}
+                items={statusList}
+                itemName="name"
+                itemValue="is_active"
+                label="الحالة"
+                placeholder="لختر الحالة"
+                name="is_active"
+                required={true}
+                onChange={(value) => {
+                  setUpdateFormData((prev) => ({
+                    ...prev,
+                    ["is_active"]: value,
+                  }));
+                }}
+              ></SelectInput>
+
+              <MultiCheckbox
+                items={collectors}
+                itemName="name"
+                itemValue="id"
+                value={updateFormData.collector_id}
+                label="جامع القمامة"
+                required={true}
+                name="collector_id"
+                placeholder="اختر جامع القمامة"
+                // prependIcon="mdi mdi-calendar-month-outline"
+                iconType="mdi"
+                onChange={(value) => {
+                  setUpdateFormData((prev) => ({
+                    ...prev,
+                    ["collector_id"]: value,
+                  }));
+                }}
+              ></MultiCheckbox>
+              <MultiCheckbox
+                errorMessage={updateFormErrors.available_days || ""}
+                items={districtDays}
+                value={updateFormData.available_days}
+                label="اليوم"
+                required={true}
+                name="available_days"
+                placeholder="اختر اليوم"
+                prependIcon="mdi mdi-calendar-month-outline"
+                iconType="mdi"
+                onChange={(value) => {
+                  setUpdateFormData((prev) => ({
+                    ...prev,
+                    ["available_days"]: value,
+                  }));
+                }}
+              ></MultiCheckbox>
+
+              {dynamicFromToTimeUpdate.map((item, index) => (
+                <div
+                  key={index}
+                  className="time_from_to grid grid-cols-11 gap-2 items-center"
+                >
+                  <div className="col-span-5">
+                    <TextFieldNada
+                      name="price"
+                      type="time"
+                      handleChange={
+                        (e) => {
+                          setDynamicFromToTimeUpdate((prev) => {
+                            const ar = [...prev];
+
+                            ar[index].from = e.target.value;
+
+                            return ar;
+                          });
+                        }
+                        // takeValue(e, "time_to")
+                      }
+                      value={dynamicFromToTimeUpdate[index].from}
+                      label="من "
+                      placeholder="  السعر الكلي *"
+                    ></TextFieldNada>
+                  </div>
+                  <div className="col-span-5">
+                    <TextFieldNada
+                      errorMessage={
+                        updateFormErrors.available_times || ""
+                      }
+                      name="price"
+                      type="time"
+                      handleChange={
+                        (e) => {
+                          setDynamicFromToTimeUpdate((prev) => {
+                            const ar = [...prev];
+
+                            ar[index].to = e.target.value;
+
+                            return ar;
+                          });
+                        }
+                        // takeValue(e, "time_to")
+                      }
+                      value={dynamicFromToTimeUpdate[index].to}
+                      label="الي "
+                      placeholder="الوقت"
+                    ></TextFieldNada>
+                  </div>
+                  <div className="col-span-1">
+                    {index > 0 ? (
+                      <button
+                        type="button"
+                        className="w-10 h-10 rounded-md bg-red-500 text-white"
+                        onClick={() => {
+                          removeDynamicTimeUpdate(index);
                         }}
-                      ></SelectInput>
-
-                      <MultiCheckbox
-                        items={collectors}
-                        itemName="name"
-                        itemValue="id"
-                        value={updateFormData.collector_id}
-                        label="جامع القمامة"
-                        required={true}
-                        name="collector_id"
-                        placeholder="اختر جامع القمامة"
-                        // prependIcon="mdi mdi-calendar-month-outline"
-                        iconType="mdi"
-                        onChange={(value) => {
-                          setUpdateFormData((prev) => ({
-                            ...prev,
-                            ["collector_id"]: value,
-                          }));
+                      >
+                        <span className="mdi mdi-minus"></span>
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          addDynamicTimeUpdate();
                         }}
-                      ></MultiCheckbox>
-                      <MultiCheckbox
-                        errorMessage={updateFormErrors.available_days || ""}
-                        items={districtDays}
-                        value={updateFormData.available_days}
-                        label="اليوم"
-                        required={true}
-                        name="available_days"
-                        placeholder="اختر اليوم"
-                        prependIcon="mdi mdi-calendar-month-outline"
-                        iconType="mdi"
-                        onChange={(value) => {
-                          setUpdateFormData((prev) => ({
-                            ...prev,
-                            ["available_days"]: value,
-                          }));
-                        }}
-                      ></MultiCheckbox>
-
-                      {dynamicFromToTimeUpdate.map((item, index) => (
-                        <div
-                          key={index}
-                          className="time_from_to grid grid-cols-11 gap-2 items-center"
-                        >
-                          <div className="col-span-5">
-                            <TextFieldNada
-                              name="price"
-                              type="time"
-                              handleChange={
-                                (e) => {
-                                  setDynamicFromToTimeUpdate((prev) => {
-                                    const ar = [...prev];
-
-                                    ar[index].from = e.target.value;
-
-                                    return ar;
-                                  });
-                                }
-                                // takeValue(e, "time_to")
-                              }
-                              value={dynamicFromToTimeUpdate[index].from}
-                              label="من "
-                              placeholder="  السعر الكلي *"
-                            ></TextFieldNada>
-                          </div>
-                          <div className="col-span-5">
-                            <TextFieldNada
-                              errorMessage={
-                                updateFormErrors.available_times || ""
-                              }
-                              name="price"
-                              type="time"
-                              handleChange={
-                                (e) => {
-                                  setDynamicFromToTimeUpdate((prev) => {
-                                    const ar = [...prev];
-
-                                    ar[index].to = e.target.value;
-
-                                    return ar;
-                                  });
-                                }
-                                // takeValue(e, "time_to")
-                              }
-                              value={dynamicFromToTimeUpdate[index].to}
-                              label="الي "
-                              placeholder="الوقت"
-                            ></TextFieldNada>
-                          </div>
-                          <div className="col-span-1">
-                            {index > 0 ? (
-                              <button
-                                type="button"
-                                className="w-10 h-10 rounded-md bg-red-500 text-white"
-                                onClick={() => {
-                                  removeDynamicTimeUpdate(index);
-                                }}
-                              >
-                                <span className="mdi mdi-minus"></span>
-                              </button>
-                            ) : (
-                              <button
-                                onClick={() => {
-                                  addDynamicTimeUpdate();
-                                }}
-                                type="button"
-                                className="w-10 h-10 rounded-md bg-surface text-white"
-                              >
-                                <span className="mdi mdi-plus"></span>
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </form>
-                </UIBaseDialog>
-              </div>
-            ),
-          }}
-        ></BaseDataTable>
+                        type="button"
+                        className="w-10 h-10 rounded-md bg-surface text-white"
+                      >
+                        <span className="mdi mdi-plus"></span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </form>
+        </UIBaseDialog>
       </div>
     </>
   );

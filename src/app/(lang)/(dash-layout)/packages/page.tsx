@@ -51,7 +51,7 @@ export default function rubbush_collectors() {
     { text: " نوع الخدمة", name: "category" },
     { text: "سعر الوحدة", name: "price_per_unit" },
     { text: "مدة الباقة", name: "days_count" },
-    { text: "عدد الاشتراكات", name: "price_per_unit" },
+    { text: "عدد الاشتراكات", name: "no_of_subscriptions" },
     { text: "الحالة", name: "is_active" },
     { text: "الاجراءات", name: "procedures" },
   ];

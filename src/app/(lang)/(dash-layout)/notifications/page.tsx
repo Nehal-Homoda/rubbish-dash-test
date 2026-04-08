@@ -22,6 +22,22 @@ import { Collector } from "@/types/collectors.interface";
 import { getUserService } from "@/services/userService";
 import { getCollectorsService } from "@/services/collectorsService";
 
+
+
+
+type FormDataType = {
+    title_ar: string;
+    title_en: string;
+    body_ar: string;
+    body_en: string;
+    target_audience: string;
+};
+interface FormDataInputErrors {
+    title_ar: string | null,
+    title_en: string | null,
+
+}
+
 export default function rubbush_collectors() {
     const [dataList, setDataList] = useState<Notification[]>([]);
     const [usersList, setUsersList] = useState<AppUser[]>([]);
@@ -30,15 +46,14 @@ export default function rubbush_collectors() {
 
     const [searchTerm, setSearchTerm] = useState("");
     const [targetAudienceFilter, setTargetAudienceTypeFilter] = useState<string | undefined>(undefined);
-
     const headerArr = [
         { text: "ID", name: "id" },
-        { text: " العنوان ", name: "image" },
-        { text: " النص", name: "name_ar" },
-        { text: "المستخدم", name: "is_active" },
-        { text: "اسم المستخدم", name: "is_active" },
-        { text: "تاريخ الانشاء", name: "image" },
-        { text: "الاجراءات", name: "image" },
+        { text: " العنوان ", name: "title" },
+        { text: " النص", name: "body" },
+        { text: "المستخدم", name: "type" },
+        { text: "اسم المستخدم", name: "name" },
+        { text: "تاريخ الانشاء", name: "created_at" },
+        { text: "الاجراءات", name: "procedures" },
     ];
     const statusList = [
         { is_active: "all_users", name: "كل المستخدمين" },
@@ -50,13 +65,7 @@ export default function rubbush_collectors() {
     const [page, setPage] = useState(1);
     const [selectedDataItem, setSelectedDataItem] =
         useState<Notification | null>(null);
-    type FormDataType = {
-        title_ar: string;
-        title_en: string;
-        body_ar: string;
-        body_en: string;
-        target_audience: string;
-    };
+
     const [formData, setFormData] = useState<FormDataType>({
         title_ar: "",
         title_en: "",
@@ -75,14 +84,6 @@ export default function rubbush_collectors() {
 
 
     })
-
-
-    interface FormDataInputErrors {
-        title_ar: string | null,
-        title_en: string | null,
-
-    }
-
     const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
         title_ar: "",
         title_en: "",
@@ -97,8 +98,8 @@ export default function rubbush_collectors() {
         body_en: "",
         target_audience: "",
     });
-
     const [errorMsg, setErrorMsg] = useState('')
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
 
     const fetchDataList = ({
         search = searchTerm,
@@ -125,8 +126,6 @@ export default function rubbush_collectors() {
         setPage(1);
         fetchDataList({ search: val, pageNum: 1 });
     };
-
-
     const handleActiveFilter = (value: string | undefined) => {
         setTargetAudienceTypeFilter(value);
         setPage(1);
@@ -223,11 +222,11 @@ export default function rubbush_collectors() {
             fd.append("specific_collector", selectedAudience);
         }
         setErrorMsg('')
-        setIsDialogOpen(false)
+
 
         addNotificationService(fd)
             .then((response) => {
-                setIsDialogOpen(true)
+                setIsDialogOpen(false)
                 fetchDataList();
                 //@ts-ignore
                 successDialog(true);
@@ -289,7 +288,7 @@ export default function rubbush_collectors() {
             target_audience: "",
         })
     }
-    const [isDialogOpen, setIsDialogOpen] = useState(false)
+
 
     const tableHeadActionsSlot = () => {
         return (
@@ -298,21 +297,20 @@ export default function rubbush_collectors() {
                     items={[{ is_active: undefined, name: "الكل" }, ...statusList]}
                     itemName="name"
                     itemValue="is_active"
-                    // onSelected={(value) => {
-                    //     fetchDataList({ target_audience: value });
-                    // }}
                     onSelected={handleActiveFilter}
                 >
                     نوع الاشعار
                 </UIPrimaryDropdown>
-                <UIBaseDialog dismiss={isDialogOpen} confirmCloseHandler={resetForm}
+                <UIBaseDialog
+                    open={isDialogOpen}
+                    onClose={() => setIsDialogOpen(false)}
                     title="اضافة اشعار"
                     confirmHandler={() => { }}
                     confirmText="اضافة"
                     form="update-form"
                     btn={
                         <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
-                            <button className="bg-[#0094140D] p-1 rounded-lg">
+                            <button onClick={() => setIsDialogOpen(true)} className="bg-[#0094140D] p-1 rounded-lg">
                                 اضافة اشعار
                             </button>
                         </div>
@@ -463,149 +461,40 @@ export default function rubbush_collectors() {
         fetchUsersList();
         fetchCollectorsList();
     }, []);
-    useEffect(() => {
-        console.log('audience =>>', formData.target_audience)
-    }, [formData]);
+
 
     return (
         <>
             <div className="py-20">
                 <BaseDataTable
+                    items={dataList}
                     headItems={headerArr}
                     onPageChange={setPage}
                     totalPages={totalPages}
                     onSearchChange={tableSearchHandler}
                     headerActionsSlot={tableHeadActionsSlot()}
+                    renderers={{
+
+
+                        procedures: (item, index: number) => (
+                            <div className="flex justify-center gap-3">
+                                <UIDialogConfirm
+                                    danger
+                                    title="هل انت متأكد من حذف العنصر"
+                                    confirmHandler={() => {
+                                        deleteSubmit(item, index);
+                                    }}
+                                >
+                                    <button className="bg-[#F9285A0A] p-1 rounded-lg">
+                                        <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
+                                    </button>
+                                </UIDialogConfirm>
+
+                            </div>
+                        ),
+                    }}
                 >
-                    {dataList.map((item, index) => (
-                        <tr key={index}>
-                            <td className="py-2 px-4">{item.id}</td>
-                            <td className="py-2 px-4">{item.title}</td>
-                            <td className="py-2 px-4">{item.body}</td>
-                            <td className="py-2 px-4">{item.type}</td>
-                            <td className="py-2 px-4">{item.name ?? "-"}</td>
-                            <td className="py-2 px-4">{item.created_at}</td>
-                            <td className="">
-                                <div className="flex gap-3">
-                                    <UIDialogConfirm
-                                        danger
-                                        title="هل انت متأكد من حذف العنصر"
-                                        confirmHandler={() => {
-                                            deleteSubmit(item, index);
-                                        }}
-                                    >
-                                        <button className="bg-[#F9285A0A] p-1 px-2 rounded-lg">
-                                            <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
-                                        </button>
-                                    </UIDialogConfirm>
-                                    {/* <UIBaseDialog
-                                        title="تعديل الالاشاد"
-                                        confirmHandler={() => {}}
-                                        confirmText="اضافة"
-                                        form="update-form"
-                                        btn={
-                                            <button
-                                                onClick={() => {
-                                                    updateDataItem(item);
-                                                }}
-                                                className="bg-[#0094140D] p-1 rounded-lg"
-                                            >
-                                                <span className="mdi mdi-folder-edit-outline text-[#009414]"></span>
-                                            </button>
-                                        }
-                                    >
-                                        <form
-                                            onSubmit={updateSubmit}
-                                            id="update-form"
-                                        >
-                                            <div className="space-y-7">
-                                                <div className="w-full flex justify-center mb-20">
-                                                    <FileInputImg
-                                                        state="edit"
-                                                        fileUrl={item.image}
-                                                        onFileChange={(arg) => {
-                                                            setUpdateFormData(
-                                                                (prev) => ({
-                                                                    ...prev,
-                                                                    ["image"]:
-                                                                        arg?.file64 ??
-                                                                        null,
-                                                                })
-                                                            );
-                                                        }}
-                                                    ></FileInputImg>
-                                                </div>
-                                                <TextFieldNada
-                                                    name="title_ar"
-                                                    type="text"
-                                                    prependIcon="mdi mdi-notebook-edit-outline"
-                                                    iconType="mdi"
-                                                    handleChange={
-                                                        updateFormChangeHander
-                                                    }
-                                                    value={
-                                                        updateFormData.title_ar
-                                                    }
-                                                    label=" النص ( عربي ) "
-                                                    placeholder=" ادخل نص الاشعار بالغة العربية  "
-                                                ></TextFieldNada>
 
-                                                <TextFieldNada
-                                                    name="title_en"
-                                                    type="text"
-                                                    prependIcon="mdi mdi-notebook-edit-outline"
-                                                    iconType="mdi"
-                                                    handleChange={
-                                                        updateFormChangeHander
-                                                    }
-                                                    value={
-                                                        updateFormData.title_en
-                                                    }
-                                                    label=" النص ( انجليزي ) "
-                                                    placeholder=" ادخل نص الاشعار بالغة الانجليزية  "
-                                                ></TextFieldNada>
-
-                                                <TextFieldNada
-                                                    name="order"
-                                                    type="number"
-                                                    prependIcon="mdi mdi-swap-vertical"
-                                                    iconType="mdi"
-                                                    handleChange={
-                                                        updateFormChangeHander
-                                                    }
-                                                    value={updateFormData.order}
-                                                    label=" الترتيب"
-                                                    placeholder=" ادخل رقم ترتيب النص في العرض "
-                                                ></TextFieldNada>
-
-                                                <SelectInput
-                                                    value={
-                                                        updateFormData.is_active
-                                                    }
-                                                    items={statusList}
-                                                    itemName="name"
-                                                    itemValue="is_active"
-                                                    label="الحالة"
-                                                    placeholder="لختر الحالة"
-                                                    name="is_active"
-                                                    required={true}
-                                                    onChange={(value) => {
-                                                        setUpdateFormData(
-                                                            (prev) => ({
-                                                                ...prev,
-                                                                ["is_active"]:
-                                                                    value,
-                                                            })
-                                                        );
-                                                    }}
-                                                ></SelectInput>
-                                            </div>
-                                        </form>
-                                    </UIBaseDialog> */}
-                                </div>
-                            </td>
-                        </tr>
-                    ))}
                 </BaseDataTable>
             </div>
         </>

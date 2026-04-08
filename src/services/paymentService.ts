@@ -13,7 +13,7 @@ export const getPaymentService = async (query?: string) => {
                 headers: {
                     // "Content-Type": "application/json",
                 },
-            }
+            },
         );
         if (!response.ok) {
             await responseErrorServiceHandler(response, "packages");
@@ -26,15 +26,14 @@ export const getPaymentService = async (query?: string) => {
     }
 };
 
-
 export const activatePaymentService = async (id: number, is_active: number) => {
     try {
         const response = await apiCall.put("/admins/payments", id, {
             body: JSON.stringify({ is_active }),
-            headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-            },
+            // headers: {
+            //     Authorization: `Bearer ${token}`,
+            //     "Content-Type": "application/json",
+            // },
         });
         if (!response.ok) {
             await responseErrorServiceHandler(response, "update Payment");
@@ -70,7 +69,7 @@ export const deletePaymentService = async (id: number) => {
     try {
         const response = await apiCall.delete("/admins/payments", id, {
             headers: {
-                Authorization: `Bearer ${token}`,
+                // Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
         });
@@ -90,7 +89,7 @@ export const updatePaymentService = async (id: number, item) => {
         const response = await apiCall.put("/admins/payments", id, {
             body: JSON.stringify(item),
             headers: {
-                Authorization: `Bearer ${token}`,
+                // Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
         });

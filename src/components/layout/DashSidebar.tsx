@@ -45,6 +45,13 @@ export default function DashSidebar({ isOpen, toggleSidebarHandler }: Props) {
     },
     {
       icon: "mdi-image-marker-outline",
+      name: "areas",
+      text: "الاحياء",
+      path: Routes.areas,
+      iconType: "mdi",
+    },
+    {
+      icon: "mdi-image-marker-outline",
       name: "regions",
       text: "المناطق",
       path: Routes.regions,
@@ -206,7 +213,7 @@ export default function DashSidebar({ isOpen, toggleSidebarHandler }: Props) {
 
 
 
-                  
+
                   {/* @ts-ignore */}
                   {item.name === "support" && count > 0
                     ? (

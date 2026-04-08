@@ -18,25 +18,27 @@ import {
   updateBannerService,
 } from "@/services/bannersServices";
 
+interface FormDataInputErrors {
+  image: string | null;
+  title_ar: string | null;
+  title_en: string | null;
+  order: string | null;
+  type: string | null;
+}
+type FormDataType = {
+  title_ar: string;
+  title_en: string;
+  order: number;
+  link: string;
+  is_active: number;
+  image: File | null | string;
+  type: "internal" | "external" | "";
+  page_id?: string;
+};
+
 export default function rubbush_collectors() {
 
-  interface FormDataInputErrors {
-    image: string | null;
-    title_ar: string | null;
-    title_en: string | null;
-    order: string | null;
-    type: string | null;
-  }
-  type FormDataType = {
-    title_ar: string;
-    title_en: string;
-    order: number;
-    link: string;
-    is_active: number;
-    image: File | null | string;
-    type: "internal" | "external" | "";
-    page_id?: string;
-  };
+
   const [dataList, setDataList] = useState<Banner[]>([]);
   const headerArr = [
     { text: "ID", name: "id" },
@@ -58,12 +60,11 @@ export default function rubbush_collectors() {
   const [totalPages, setTotalPages] = useState(1);
   const [page, setPage] = useState(1);
   const [selectedDataItem, setSelectedDataItem] = useState<Banner | null>(null);
-
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState<boolean | undefined>(
     undefined,
   );
-
-
   const [errorMsg, setErrorMsg] = useState("");
   const [formData, setFormData] = useState<FormDataType>({
     title_ar: "",
@@ -84,9 +85,6 @@ export default function rubbush_collectors() {
     image: null,
     type: "",
   });
-
-
-
   const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
     image: "",
     title_ar: "",
@@ -275,8 +273,7 @@ export default function rubbush_collectors() {
         setErrorMsg(error?.message);
       });
   };
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+
   const tableHeadActionsSlot = () => {
     return (
       <>
@@ -436,21 +433,10 @@ export default function rubbush_collectors() {
     );
   };
 
-  const resetForm = () => {
-    setFormData({
-      title_ar: "",
-      title_en: "",
-      order: 0,
-      link: "",
-      is_active: 0,
-      image: "",
-      type: ""
-    });
-  };
+
   useEffect(() => {
     fetchDataList();
-  }, [page]); // runs every time `page` changes
-
+  }, [page]); 
   return (
     <>
       <div className="py-20">
