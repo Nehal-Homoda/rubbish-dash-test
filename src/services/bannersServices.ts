@@ -3,7 +3,7 @@ import { apiCall } from "./apiCall";
 import { ResponseData } from "@/types/shared";
 import { Banner } from "@/types/banners.interface";
 
-let token = "Bearer 160|9eiDkr7DC2EryTIiZbQbO5CoJoxE7X88IPHqcNGs7f3d3254";
+let token = "5|t91YTe8w5By7Ujmme7Z6o1OHks0JTN71mDnw4MYb5b8aabee";
 
 export const getBannersService = async (query?: string) => {
     try {
@@ -11,9 +11,10 @@ export const getBannersService = async (query?: string) => {
             `/admins/banners${decodeURIComponent(query || "")}`,
             {
                 headers: {
+                    Authorization: `Bearer ${token}`,
                     // "Content-Type": "application/json",
                 },
-            }
+            },
         );
         if (!response.ok) {
             await responseErrorServiceHandler(response, "banners");
@@ -47,7 +48,7 @@ export const deleteBannerService = async (id: number) => {
     try {
         const response = await apiCall.delete("/admins/banners", id, {
             headers: {
-                // Authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
         });
