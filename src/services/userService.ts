@@ -14,7 +14,7 @@ export const getUserService = async (query?: string) => {
                 headers: {
                     // "Content-Type": "application/json",
                 },
-            }
+            },
         );
         if (!response.ok) {
             await responseErrorServiceHandler(response, "district");
@@ -34,7 +34,7 @@ export const getDeletedUserService = async (query?: string) => {
                 headers: {
                     // "Content-Type": "application/json",
                 },
-            }
+            },
         );
         if (!response.ok) {
             await responseErrorServiceHandler(response, "user");
@@ -65,18 +65,18 @@ export const getUserByIdService = async (id: number | string) => {
 };
 export const getUserSubscriptionByIdService = async (
     id: number | string,
-    query?: string
+    query?: string,
 ) => {
     try {
         const response = await apiCall.get(
             `/admins/users/${id}/subscriptions${decodeURIComponent(
-                query || ""
+                query || "",
             )}`,
             {
                 headers: {
                     // "Content-Type": "application/json",
                 },
-            }
+            },
         );
         if (!response.ok) {
             await responseErrorServiceHandler(response, "user subscription");
@@ -149,7 +149,7 @@ export const userListByPageService = async (pageNumber: number) => {
     try {
         const response = await apiCall.get(`/admins/users?page=${pageNumber}`, {
             headers: {
-                Authorization: `Bearer ${token}`,
+                // Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
         });
@@ -167,7 +167,6 @@ export const userListByPageService = async (pageNumber: number) => {
 export const restoreUserService = async (id: number) => {
     try {
         const response = await apiCall.post(`/admins/users/${id}/restore`, {
-          
             headers: {
                 "Content-Type": "application/json",
             },

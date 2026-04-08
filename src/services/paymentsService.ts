@@ -13,7 +13,7 @@ export const getPaymentsService = async (query?: string) => {
                 headers: {
                     // "Content-Type": "application/json",
                 },
-            }
+            },
         );
         if (!response.ok) {
             await responseErrorServiceHandler(response, "payments");
@@ -65,7 +65,7 @@ export const deletePaymentService = async (id: number) => {
     try {
         const response = await apiCall.delete("/admins/payments", id, {
             headers: {
-                Authorization: `Bearer ${token}`,
+                // Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
         });

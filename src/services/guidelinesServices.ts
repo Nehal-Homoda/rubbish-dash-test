@@ -13,7 +13,7 @@ export const getGuidelinesService = async (query?: string) => {
                 headers: {
                     // "Content-Type": "application/json",
                 },
-            }
+            },
         );
         if (!response.ok) {
             await responseErrorServiceHandler(response, "guidelines");
@@ -47,7 +47,7 @@ export const deleteGuidelineService = async (id: number) => {
     try {
         const response = await apiCall.delete("/admins/guidelines", id, {
             headers: {
-                Authorization: `Bearer ${token}`,
+                // Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
         });

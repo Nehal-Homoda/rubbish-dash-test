@@ -47,7 +47,7 @@ export const deleteCategoryService = async (id: number) => {
     try {
         const response = await apiCall.delete("/admins/categories", id, {
             headers: {
-                Authorization: `Bearer ${token}`,
+                // Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
         });
