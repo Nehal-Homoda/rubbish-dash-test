@@ -20,6 +20,11 @@ import {
   getCategoryByIdService,
 } from "@/services/categoriesService";
 import { Category } from "@/types/categories.interface";
+import { Area } from "@/types/area.interface";
+import { getAreaService } from "@/services/areaServices";
+import { District } from "@/types/district.interface";
+import { getDistrictService } from "@/services/districtService";
+import MultiCheckbox from "@/components/ui/form/MultiCheckbox";
 
 
 
@@ -28,6 +33,9 @@ type FormDataType = {
   name_en: string;
   category_id: number | string | null;
   is_active: number;
+  area_id: number | string | null;
+  district_id: number | string | null;
+  available_days: string[],
   price_per_unit: number | string;
   order: number;
   days_count: number | string;
@@ -39,7 +47,10 @@ interface FormDataInputErrors {
   name_ar: string | null,
   name_en: string | null,
   category_id: string | null,
-  price_per_unit: string | null
+  area_id: string | null,
+  district_id: string | null,
+  available_days: string,
+  price_per_unit: string | null;
 
 }
 export default function rubbush_collectors() {
@@ -73,6 +84,8 @@ export default function rubbush_collectors() {
   const [categoryFilter, setCategoryFilter] = useState<number | undefined>(
     undefined
   );
+  const [areaList, setAreaList] = useState<Area[]>([]);
+  const [districtList, setDistrictList] = useState<District[]>([]);
 
   const discountArr = [
     {
@@ -110,6 +123,9 @@ export default function rubbush_collectors() {
     name_ar: "",
     name_en: "",
     category_id: null,
+    area_id: null,
+    district_id: null,
+    available_days: [],
     is_active: 0,
     price_per_unit: "",
     order: 0,
@@ -165,14 +181,20 @@ export default function rubbush_collectors() {
     name_ar: "",
     name_en: "",
     category_id: "",
-    price_per_unit: ""
+    area_id: "",
+    district_id: "",
+    price_per_unit: "",
+    available_days: ""
 
   });
   const [updateFormErrors, setUpdateFormErrors] = useState<FormDataInputErrors>({
     name_ar: "",
     name_en: "",
     category_id: "",
-    price_per_unit: ""
+    price_per_unit: "",
+    area_id: "",
+    district_id: "",
+    available_days: ""
 
   });
   const [errorMsg, setErrorMsg] = useState("");
@@ -180,6 +202,9 @@ export default function rubbush_collectors() {
     name_ar: "",
     name_en: "",
     category_id: null,
+    area_id: null,
+    district_id: null,
+    available_days: [],
     is_active: 0,
     price_per_unit: "",
     order: 0,
@@ -219,6 +244,15 @@ export default function rubbush_collectors() {
   });
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false)
+  const [districtDays, setDistrictDays] = useState([
+    "friday",
+    "tuesday",
+    "thursday",
+    "wednesday",
+    "monday",
+    "saturday",
+    "sunday",
+  ]);
 
   const fetchDataList = ({
     search = searchTerm,
@@ -314,6 +348,8 @@ export default function rubbush_collectors() {
       order: item.order ? item.order : 0,
       is_active: item.is_active ? 1 : 0,
       category_id: item.category,
+      area_id: item.area,
+      district_id: item.district,
       days_count: item.days_count ? parseInt(item.days_count) : "",
       price_per_unit: item.price_per_unit ? parseInt(item.price_per_unit) : "",
       discounts: item.discounts?.length
@@ -419,7 +455,12 @@ export default function rubbush_collectors() {
       fd.append("name_en", formData.name_en),
       //@ts-ignore
       fd.append("category_id", formData.category_id ? formData.category_id.toString() : null),
-      fd.append("is_active", formData.is_active.toString()),
+      fd.append("area_id", formData.area_id ? formData.area_id.toString() : "0"),
+      fd.append("district_id", formData.district_id ? formData.district_id.toString() : "0"),
+      formData.available_days.forEach((day, index) =>
+        fd.append(`available_days[${index}]`, day),
+      );
+    fd.append("is_active", formData.is_active.toString()),
       fd.append("price_per_unit", formData.price_per_unit.toString()),
       fd.append("order", formData.order.toString()),
       fd.append("days_count", formData.days_count.toString()),
@@ -442,6 +483,9 @@ export default function rubbush_collectors() {
           name_ar: "",
           name_en: "",
           category_id: null,
+          area_id: null,
+          district_id: null,
+          available_days: [],
           is_active: 0,
           price_per_unit: 0,
           order: 0,
@@ -522,6 +566,56 @@ export default function rubbush_collectors() {
       })
       .catch((error) => { });
   };
+
+  const fetchAreaList = ({
+    search = "",
+    is_active = undefined,
+  }: { search?: string; is_active?: boolean | undefined } = {}) => {
+    const isActive =
+      is_active != undefined
+        ? is_active
+          ? "&is_active=" + 1
+          : "&is_active=" + 0
+        : "";
+    const hasSearch = search ? "&search=" + search : "";
+
+    const query = `?page=${page}${hasSearch}${isActive}`;
+
+    getAreaService(query)
+      .then((response) => {
+        setAreaList(response.data);
+        setTotalPages(response.meta.last_page);
+      })
+      .catch(() => { });
+  };
+
+
+  const fetchDistrictList = ({
+    search = "",
+    is_active = undefined,
+    area_id = ""
+  }: { search?: string; is_active?: boolean | undefined, area_id?: string } = {}) => {
+    const isActive =
+      is_active != undefined
+        ? is_active
+          ? "&is_active=" + 1
+          : "&is_active=" + 0
+        : "";
+    const hasSearch = search ? "&search=" + search : "";
+    const areaSearch = area_id ? "&area_id=" + area_id : "";
+
+    const query = `?page=${page}${hasSearch}${isActive}${areaSearch}`;
+
+    getDistrictService(query)
+      .then((response) => {
+        setDistrictList(response.data);
+        setTotalPages(response.meta.last_page);
+
+      })
+      .catch(() => { });
+  };
+
+
 
   const tableHeadActionsSlot = () => {
     return (
@@ -625,6 +719,61 @@ export default function rubbush_collectors() {
                   ></SelectInput>
                 </div>
               </div>
+
+
+              <SelectInput
+                value={formData.area_id}
+                items={areaList}
+                itemName="name_ar"
+                itemValue="id"
+                label="الحي"
+                placeholder="اختر الحي"
+                name="area_id"
+                required={true}
+                onChange={(value) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    ["area_id"]: value,
+                  }));
+
+                }}
+              ></SelectInput>
+
+              <SelectInput
+                value={formData.district_id}
+                items={districtList}
+                itemName="name_ar"
+                itemValue="id"
+                label="المنطقة"
+                placeholder="اختر المنطقة"
+                name="area_id"
+                required={true}
+                onChange={(value) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    ["district_id"]: value,
+                  }));
+                }}
+              ></SelectInput>
+
+              <MultiCheckbox
+                errorMessage={formErrors.available_days}
+                items={districtDays}
+                value={formData.available_days}
+                label="اليوم"
+                required={true}
+                name="available_days"
+                placeholder="اختر اليوم"
+                prependIcon="mdi mdi-calendar-month-outline"
+                iconType="mdi"
+                onChange={(value) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    ["available_days"]: value,
+                  }));
+                }}
+              ></MultiCheckbox>
+
               <TextFieldNada
                 name="price_per_unit"
                 type="number"
@@ -717,10 +866,18 @@ export default function rubbush_collectors() {
     }
     // setRecyclePrice(0)
   }, [formData.price_per_unit]);
+  useEffect(() => {
+    if (formData.area_id) {
+      fetchDistrictList({ area_id: formData.area_id.toString() });
+    } else {
+      setDistrictList([]);
+    }
+  }, [formData.area_id]);
 
   useEffect(() => {
     fetchDataList();
     fetchCategories();
+    fetchAreaList()
   }, [page]);
 
   return (

@@ -88,20 +88,17 @@ export default function rubbush_collectors({ user }: Props) {
     const [selectedPackage, setSelectedPackage] = useState<PackageOffer | null>(
         null
     );
-
-
     const [totalPrice, setTotalPrice] = useState(0);
     const [searchTerm, setSearchTerm] = useState("");
-
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const [isShowDialogOpen, setIsShowDialogOpen] = useState(false)
     const [packageItem, setPackageItem] = useState<PackageOffer | null>(null);
     const [errorMessage, setErrorMessage] = useState("");
     const [paymentMethodList, setPaymentMethodList] = useState<
         Payment_methods[]
     >([]);
     const [selected, setSelected] = useState<null | Payment_methods>(null);
-
     const router = useRouter();
-
     const [addSubscriptionFormData, setAddSubscriptionFormData] = useState({
         name: "",
         phone: "",
@@ -122,8 +119,25 @@ export default function rubbush_collectors({ user }: Props) {
         address_lng: "34.1531",
         address_details: "",
     });
-
     const [errorMsg, setErrorMsg] = useState("");
+    const headerArr = [
+        { text: "ID", name: "id" },
+        { text: "تاريخ البداية", name: "starts_at" },
+        { text: "تاريخ النهاية", name: "ends_at" },
+        { text: "اسم الباقة", name: "package" },
+        { text: " سعر الباقة", name: "price_per_unit" },
+        { text: "نوع الطلب ", name: "is_request_recycle" },
+        { text: "نوع الخدمة", name: "category" },
+        { text: "الاجراءات", name: "procedures" },
+    ];
+    const statusList = [
+        { is_active: 1, name: "مفعل" },
+        { is_active: 0, name: "غير مفعل" },
+    ];
+
+    const [totalPages, setTotalPages] = useState(1);
+    const [page, setPage] = useState(1);
+
 
 
     const formSchema = Yup.object().shape({
@@ -288,24 +302,6 @@ export default function rubbush_collectors({ user }: Props) {
 
 
 
-    console.log('filter is with', filterWith)
-    const headerArr = [
-        { text: "ID", name: "id" },
-        { text: "تاريخ البداية", name: "name" },
-        { text: "تاريخ النهاية", name: "name" },
-        { text: "اسم الباقة", name: "phone" },
-        { text: " سعر الباقة", name: "has_subscription" },
-        { text: "نوع الطلب ", name: "is_request_recycle" },
-        { text: "نوع الخدمة", name: "is_request_recycle" },
-        { text: "الاجراءات", name: "" },
-    ];
-    const statusList = [
-        { is_active: 1, name: "مفعل" },
-        { is_active: 0, name: "غير مفعل" },
-    ];
-
-    const [totalPages, setTotalPages] = useState(1);
-    const [page, setPage] = useState(1);
 
     const fetchDataList = ({
         search = searchTerm,
@@ -341,33 +337,6 @@ export default function rubbush_collectors({ user }: Props) {
         setPage(1);
         fetchDataList({ search: val, pageNum: 1 });
     };
-
-
-
-
-    // const updateDataItemActive = (value: any, index: number) => {
-    //     const service = dataList.find((item, i) => {
-    //         return index == i;
-    //     });
-
-    //     if (!service) return;
-
-    //     const body = JSON.stringify({
-    //         is_active: value,
-    //     });
-
-    //     updateUserService(service.id, body)
-    //         .then((response) => {
-    //             const arr = [...dataList];
-    //             arr[index].is_active = value;
-
-    //             setDataList(arr);
-
-    //             console.log(response);
-    //         })
-    //         .catch((error) => { });
-    // };
-
 
     const fetchUserSubscription = () => {
         getUserSubscriptionByIdService(user.id.toString()).then((response) => {
@@ -500,8 +469,6 @@ export default function rubbush_collectors({ user }: Props) {
             ...prev,
             ["payment_method_id"]: item.id,
         }));
-
-        // console.log(e.target.value)
     };
 
     const deleteSubmit = (item: any, index: number) => {
@@ -538,12 +505,11 @@ export default function rubbush_collectors({ user }: Props) {
             // //     (item) => item.id.toString() == formData.district_id.toString()
             // );
             const categoryId = categoryList.find((item) => item.id.toString() == addSubscriptionFormData.category_id.toString())
-            console.log('aaaaaaaaaaaaaaa', categoryId)
 
             if (categoryId) {
                 const query = `?category_id=${categoryId.id}`
                 getPackagesService(query).then((response) => {
-                    // setpackagesList(response.data)
+
 
                     const activePackages = response.data.filter((item, index) => {
                         return item.is_active
@@ -598,12 +564,6 @@ export default function rubbush_collectors({ user }: Props) {
         }
     }, [addSubscriptionFormData]);
 
-
-
-
-
-
-
     const tableHeadActionsSlot = () => {
         return (
             <>
@@ -620,7 +580,9 @@ export default function rubbush_collectors({ user }: Props) {
                 </div> */}
 
 
-                <UIBaseDialog confirmCloseHandler={resetForm}
+                <UIBaseDialog
+                    open={isDialogOpen}
+                    onClose={() => setIsDialogOpen(false)}
                     title="اضافة اشتراك"
                     confirmHandler={() => { }}
                     confirmText="اضافة"
@@ -628,7 +590,7 @@ export default function rubbush_collectors({ user }: Props) {
 
                     btn={
                         <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
-                            <button className="bg-[#0094140D] p-1 rounded-lg">
+                            <button onClick={() => setIsDialogOpen(true)} className="bg-[#0094140D] p-1 rounded-lg">
                                 اضافة اشتراك
                             </button>
                         </div>
@@ -949,239 +911,242 @@ export default function rubbush_collectors({ user }: Props) {
         <>
             <div className="py-20">
                 <BaseDataTable
+                    items={dataList}
                     headItems={headerArr}
                     onPageChange={setPage}
                     totalPages={totalPages}
                     onSearchChange={tableSearchHandler}
-
-
                     headerActionsSlot={tableHeadActionsSlot()}
+                    renderers={{
+                        is_request_recycle: (item, index: number) => (
+                            item.is_request_recycle ? 'جمع وتدوير' : 'جمع فقط'
+                        ),
+                        price_per_unit: (item, index: number) => (
+                            <span>{item.package?.price_per_unit}</span>
+                        ),
+                        package: (item) => (
+                            <span>{item.package?.name}</span>
+                        ),
+                        category: (item, index: number) => (
+                            <span>{item.category?.name}</span>
+                        ),
+                        procedures: (item, index: number) => (
+                            <div className="flex justify-center gap-3">
+                                <UIDialogConfirm
+                                    danger
+                                    title="هل انت متأكد من حذف العنصر"
+                                    confirmHandler={() => {
+                                        deleteSubmit(item, index);
+                                    }}
+                                >
+                                    <button className="bg-[#F9285A0A] p-1 rounded-lg">
+                                        <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
+                                    </button>
+                                </UIDialogConfirm>
+                                <button
+                                    onClick={() => {
+                                        handleSelectedUserSubscription(item)
+                                        setIsShowDialogOpen(true)
+                                    }}
+                                    className="bg-blue-100 p-1 px-2 text-sm rounded-lg"
+                                >
+                                    <span className="mdi mdi-eye-outline text-blue-500"></span>
+                                </button>
+
+                            </div>
+                        ),
+
+                    }}
                 >
-                    {dataList.map((item, index) => (
-                        <tr key={index}>
-                            <td className="py-2 px-4">{item.id}</td>
-                            <td className="py-2 px-4">{item.starts_at}</td>
-                            <td className="py-2 px-4">{item.ends_at}</td>
-                            <td className="py-2 px-4">{item.package.name}</td>
-                            <td className="py-2 px-4">{item.package.price_per_unit}</td>
-                            <td className="py-2 px-4">{item.is_request_recycle ? 'جمع وتدوير' : 'جمع فقط'}</td>
-                            <td className="py-2 px-4">{item.category.name}</td>
-                            <td className="">
-                                <div className="flex justify-center items-center gap-3">
-                                    <UIBaseDialog
-                                        hideConfirmBtn
-                                        title="تفاصيل الاشتراك "
-                                        confirmHandler={() => { }}
-                                        confirmText="الغاء"
-                                        form="update-form"
-                                        btn={
-                                            <button
-                                                onClick={() => {
-                                                    handleSelectedUserSubscription(item)
-                                                }}
-                                                className="bg-blue-100 p-1 px-2 text-sm rounded-lg"
-                                            >
-                                                <span className="mdi mdi-eye-outline text-blue-500"></span>
-                                            </button>
-                                        }
-                                    >
-                                        <form className="">
-                                            <div className="grid grid-cols-12 gap-7 mt-5">
-                                                <div className="col-span-6">
-                                                    <SelectInput
-                                                        placeholder="ادخل اسم المنطقة"
-                                                        name="district_id"
-                                                        itemName="name_ar"
-                                                        itemValue="id"
-                                                        value={formData.district_id}
-                                                        items={district}
-                                                        label="اسم المنطقة"
-                                                        disabled
-                                                        onChange={(value) =>
 
-
-                                                            undefined
-                                                            // setFormData((prev) => ({
-                                                            //     ...prev,
-                                                            //     ["district_id"]: value,
-                                                            // }))
-                                                        }
-                                                    ></SelectInput>
-
-
-                                                </div>
-
-                                                <div className="col-span-6">
-                                                    <TextFieldNada
-                                                        name="address"
-                                                        type="text"
-
-                                                        value={formData.address_title}
-                                                        label=" العنوان"
-                                                        placeholder=" العنوان"
-                                                        disabled
-                                                    ></TextFieldNada>
-                                                </div>
-
-
-                                                <div className="col-span-6">
-                                                    <SelectInput
-                                                        items={packagesList}
-                                                        placeholder="ادخل نوع الباقه"
-                                                        name=""
-                                                        itemName="name_ar"
-                                                        itemValue="id"
-                                                        value={formData.package_id}
-                                                        label=" نوع الباقة"
-                                                        disabled
-                                                        onChange={(value) => { }}
-                                                    ></SelectInput>
-                                                </div>
-
-                                                <div className="col-span-6">
-                                                    <MultiCheckbox
-                                                        items={districtDays}
-                                                        value={formData.days}
-                                                        label="اليوم"
-                                                        required={true}
-                                                        name="available_days"
-                                                        placeholder="اختر اليوم"
-                                                        prependIcon="mdi mdi-calendar-month-outline"
-                                                        iconType="mdi"
-                                                        disbaled
-                                                        onChange={(value) => {
-                                                            //@ts-ignore
-                                                            setFormData((prev) => ({
-                                                                ...prev,
-                                                                ["days"]: value,
-                                                            }));
-                                                        }}
-                                                    ></MultiCheckbox>
-                                                </div>
-                                                <div className="col-span-6">
-                                                    <TextFieldNada
-                                                        type="text"
-                                                        name="start_date"
-                                                        handleChange={(e) => { }}
-                                                        value={formData.start_date}
-                                                        label="تاريخ البدأ "
-                                                        placeholder="  السعر الكلي *"
-                                                        disabled
-                                                    ></TextFieldNada>
-                                                </div>
-                                                <div className="col-span-6">
-                                                    <TextFieldNada
-                                                        type="text"
-                                                        name="start_date"
-                                                        handleChange={(e) => { }}
-                                                        value={formData.ends_at}
-                                                        label="تاريخ الانتهاء "
-                                                        placeholder=" "
-                                                        disabled
-                                                    ></TextFieldNada>
-                                                </div>
-
-
-
-                                                <div className="col-span-6">
-                                                    <SelectInput
-                                                        items={categoryList}
-                                                        placeholder="ادخل نوع الخدمة"
-                                                        name=""
-                                                        itemName="name_ar"
-                                                        itemValue="id"
-                                                        value={formData.category_id}
-                                                        label=" نوع الخدمة"
-                                                        disabled
-                                                        onChange={(value) =>
-                                                            setFormData((prev) => ({
-                                                                ...prev,
-                                                                ["category_id"]: value,
-                                                            }))
-                                                        }
-                                                    ></SelectInput>
-                                                </div>
-
-                                                <div className="col-span-6">
-                                                    <TextFieldNada
-                                                        name="price"
-                                                        type="number"
-                                                        handleChange={undefined
-                                                        }
-                                                        value={formData.price_per_unit}
-                                                        label=" سعر الباقة "
-                                                        placeholder="  سعر الباقة "
-                                                        disabled
-                                                    ></TextFieldNada>
-                                                </div>
-                                                <div className="col-span-6">
-                                                    <TextFieldNada
-                                                        name="units"
-                                                        type="number"
-                                                        handleChange={undefined
-                                                        }
-                                                        value={formData.units.toString()}
-                                                        label=" عدد الوحدات "
-                                                        placeholder=" عدد الوحدات "
-                                                        disabled
-                                                    ></TextFieldNada>
-                                                </div>
-
-
-                                                <div className="col-span-6">
-                                                    <SelectInput
-                                                        items={districtTime}
-                                                        placeholder="اختر الوقت"
-                                                        name=""
-                                                        value={formData.time_from}
-                                                        label=" الوقت"
-                                                        disabled
-                                                        onChange={(value) => {
-                                                            setFormData((prev) => ({
-                                                                ...prev,
-                                                                ["time_from"]: value,
-                                                            }));
-                                                        }}
-                                                    ></SelectInput>
-                                                </div>
-
-
-
-
-
-                                                <div className="col-span-6">
-                                                    <div className="w-[150px] ">
-                                                        {/* <img src={user.payment.payment_verification} alt="" className="w-full object-contain" /> */}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </UIBaseDialog>
-
-
-                                    <UIDialogConfirm
-                                        danger
-                                        title="هل انت متأكد من حذف العنصر"
-                                        confirmHandler={() => {
-                                            //@ts-ignore
-                                            deleteSubmit(item, index);
-                                        }}
-                                    >
-                                        <button className="bg-[#F9285A0A] p-1 rounded-lg">
-                                            {/* <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span> */}
-                                            <div className="w-4 h-4">
-                                                <img className="w-full h-full object-contain" src={trashImg.src} alt="" />
-                                            </div>
-
-                                        </button>
-                                    </UIDialogConfirm>
-                                </div>
-
-                            </td>
-
-                        </tr>
-                    ))}
                 </BaseDataTable>
+
+
+
+                <UIBaseDialog
+                    open={isShowDialogOpen}
+                    onClose={() => setIsShowDialogOpen(false)}
+                    hideConfirmBtn
+                    title="تفاصيل الاشتراك "
+                    confirmHandler={() => { }}
+                    confirmText="الغاء"
+                    form="update-form"
+
+                >
+                    <form className="">
+                        <div className="grid grid-cols-12 gap-7 mt-5">
+                            <div className="col-span-6">
+                                <SelectInput
+                                    placeholder="ادخل اسم المنطقة"
+                                    name="district_id"
+                                    itemName="name_ar"
+                                    itemValue="id"
+                                    value={formData.district_id}
+                                    items={district}
+                                    label="اسم المنطقة"
+                                    disabled
+                                    onChange={(value) =>
+
+
+                                        undefined
+                                        // setFormData((prev) => ({
+                                        //     ...prev,
+                                        //     ["district_id"]: value,
+                                        // }))
+                                    }
+                                ></SelectInput>
+
+
+                            </div>
+
+                            <div className="col-span-6">
+                                <TextFieldNada
+                                    name="address"
+                                    type="text"
+
+                                    value={formData.address_title}
+                                    label=" العنوان"
+                                    placeholder=" العنوان"
+                                    disabled
+                                ></TextFieldNada>
+                            </div>
+
+
+                            <div className="col-span-6">
+                                <SelectInput
+                                    items={packagesList}
+                                    placeholder="ادخل نوع الباقه"
+                                    name=""
+                                    itemName="name_ar"
+                                    itemValue="id"
+                                    value={formData.package_id}
+                                    label=" نوع الباقة"
+                                    disabled
+                                    onChange={(value) => { }}
+                                ></SelectInput>
+                            </div>
+
+                            <div className="col-span-6">
+                                <MultiCheckbox
+                                    items={districtDays}
+                                    value={formData.days}
+                                    label="اليوم"
+                                    required={true}
+                                    name="available_days"
+                                    placeholder="اختر اليوم"
+                                    prependIcon="mdi mdi-calendar-month-outline"
+                                    iconType="mdi"
+                                    disbaled
+                                    onChange={(value) => {
+                                        //@ts-ignore
+                                        setFormData((prev) => ({
+                                            ...prev,
+                                            ["days"]: value,
+                                        }));
+                                    }}
+                                ></MultiCheckbox>
+                            </div>
+                            <div className="col-span-6">
+                                <TextFieldNada
+                                    type="text"
+                                    name="start_date"
+                                    handleChange={(e) => { }}
+                                    value={formData.start_date}
+                                    label="تاريخ البدأ "
+                                    placeholder="  السعر الكلي *"
+                                    disabled
+                                ></TextFieldNada>
+                            </div>
+                            <div className="col-span-6">
+                                <TextFieldNada
+                                    type="text"
+                                    name="start_date"
+                                    handleChange={(e) => { }}
+                                    value={formData.ends_at}
+                                    label="تاريخ الانتهاء "
+                                    placeholder=" "
+                                    disabled
+                                ></TextFieldNada>
+                            </div>
+
+
+
+                            <div className="col-span-6">
+                                <SelectInput
+                                    items={categoryList}
+                                    placeholder="ادخل نوع الخدمة"
+                                    name=""
+                                    itemName="name_ar"
+                                    itemValue="id"
+                                    value={formData.category_id}
+                                    label=" نوع الخدمة"
+                                    disabled
+                                    onChange={(value) =>
+                                        setFormData((prev) => ({
+                                            ...prev,
+                                            ["category_id"]: value,
+                                        }))
+                                    }
+                                ></SelectInput>
+                            </div>
+
+                            <div className="col-span-6">
+                                <TextFieldNada
+                                    name="price"
+                                    type="number"
+                                    handleChange={undefined
+                                    }
+                                    value={formData.price_per_unit}
+                                    label=" سعر الباقة "
+                                    placeholder="  سعر الباقة "
+                                    disabled
+                                ></TextFieldNada>
+                            </div>
+                            <div className="col-span-6">
+                                <TextFieldNada
+                                    name="units"
+                                    type="number"
+                                    handleChange={undefined
+                                    }
+                                    value={formData.units.toString()}
+                                    label=" عدد الوحدات "
+                                    placeholder=" عدد الوحدات "
+                                    disabled
+                                ></TextFieldNada>
+                            </div>
+
+
+                            <div className="col-span-6">
+                                <SelectInput
+                                    items={districtTime}
+                                    placeholder="اختر الوقت"
+                                    name=""
+                                    value={formData.time_from}
+                                    label=" الوقت"
+                                    disabled
+                                    onChange={(value) => {
+                                        setFormData((prev) => ({
+                                            ...prev,
+                                            ["time_from"]: value,
+                                        }));
+                                    }}
+                                ></SelectInput>
+                            </div>
+
+
+
+
+
+                            <div className="col-span-6">
+                                <div className="w-[150px] ">
+                                    {/* <img src={user.payment.payment_verification} alt="" className="w-full object-contain" /> */}
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </UIBaseDialog>
+
+
             </div>
         </>
     );

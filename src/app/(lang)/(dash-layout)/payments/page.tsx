@@ -786,6 +786,15 @@ export default function rubbush_collectors() {
                 />
               </div>
             ),
+            payment_verification: (item) => (
+              <div className="w-12 h-12 max-h-[30px] bg-gray-50 rounded-full">
+                <img
+                  src={item.payment_verification}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            ),
+            
             package: (item) => (
               <div>
                 <span>{item.subscription?.package?.name || "-"}</span>
