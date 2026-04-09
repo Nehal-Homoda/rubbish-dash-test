@@ -345,8 +345,11 @@ export default function rubbush_collectors() {
       .then((response) => {
         fetchDataList();
         successDialog(true);
+        setIsUpdateDialogOpen(false)
       })
-      .catch((error) => { });
+      .catch((error) => { }).finally(() => {
+        setIsUpdateDialogOpen(false)
+      })
   };
 
   const addFormChangeHander = (
@@ -473,7 +476,6 @@ export default function rubbush_collectors() {
     setFormErrors({ ...validateResult.outputResult });
 
     if (validateResult.isInvalid) return;
-    console.log('hii')
     setErrorMsg('')
     const fd = new FormData()
     //@ts-ignore
@@ -483,10 +485,9 @@ export default function rubbush_collectors() {
     //@ts-ignore
     fd.append('total_price', userItem ? userItem.deserved_money_by_recycle : 0)
     fd.append('payment_verification', addPaymentFormData.payment_verification)
-    setIsDialogOpen(false)
     await addPaymentService(fd).then((response) => {
-      setIsDialogOpen(true)
       successDialog(true)
+      setIsDialogOpen(false)
       fetchDataList()
       setAddPaymentFormData({
         user_id: null,
@@ -512,7 +513,6 @@ export default function rubbush_collectors() {
 
   }
   const handleSelectedUser = (selectedId: any) => {
-    console.log('selected isssssssssssssssss', selectedId)
     fetchDataList({ search: selectedId })
     setAddPaymentFormData((prev) => ({
       ...prev,
@@ -553,13 +553,15 @@ export default function rubbush_collectors() {
         <UIBaseDialog
           open={isDialogOpen}
           onClose={() => setIsDialogOpen(false)}
-          title="اضافة تحويل"
           confirmHandler={() => { }}
+          title="اضافة تحويل"
           confirmText="اضافة"
           form="update-form"
           btn={
             <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
-              <button className="bg-[#0094140D] p-1 rounded-lg">
+              <button onClick={() => {
+                setIsDialogOpen(true);
+              }} className="bg-[#0094140D] p-1 rounded-lg">
                 تحويل رصيد
               </button>
             </div>
@@ -778,6 +780,24 @@ export default function rubbush_collectors() {
           onSearchChange={tableSearchHandler}
           headerActionsSlot={tableHeadActionsSlot()}
           renderers={{
+            status: (item, index: number) => {
+              return item.added_by == 'user' ? (
+                <UIPrimaryDropdown
+                  tiny={true}
+                  itemName="name"
+                  itemValue="is_active"
+                  btnColorTailwindClass={statusDropdownColor(item.status)}
+                  onSelected={(value) => {
+                    updateDataItemActive(value, index, item);
+                  }}
+                  items={statusList}
+                >
+                  {statusDropdownName(item.status)}
+                </UIPrimaryDropdown>
+              ) : (
+                <span>-</span>
+              );
+            },
             image: (item) => (
               <div className="w-12 h-12 max-h-[30px] bg-gray-50 rounded-full">
                 <img
@@ -794,7 +814,7 @@ export default function rubbush_collectors() {
                 />
               </div>
             ),
-            
+
             package: (item) => (
               <div>
                 <span>{item.subscription?.package?.name || "-"}</span>
@@ -834,71 +854,81 @@ export default function rubbush_collectors() {
 
           }}
         >
-          {/* {dataList.map((item, index) => (
-            <tr key={index}>
-              <td className="py-2 px-4">{item.id}</td>
-              <td className="py-2 px-4">{item.user_name}</td>
-              <td className="py-2 px-4">{item.subscription?.package.name}</td>
-              <td className="py-2 px-4">{item.subscription?.units ?? "-"}</td>
-              <td className="py-2 px-4">{item.total_price}</td>
-              <td className="py-2 px-4">{item.added_by == "user" ? 'مستخدم' : 'مسئول'}</td>
-              <td className="py-2 px-4">{item.type}</td>
 
-              <td className="py-2 px-4">{item.created_at}</td>
-              <td className="py-2 px-4">
-                {item.added_by == 'user' ? <UIPrimaryDropdown
-                  tiny={true}
-                  itemName="name"
-                  itemValue="is_active"
-                  btnColorTailwindClass={statusDropdownColor(item.status)}
-                  onSelected={(value) => {
-                    updateDataItemActive(value, index, item);
-                  }}
-                  items={statusList}
-                >
-                  {statusDropdownName(item.status)}
-                </UIPrimaryDropdown> : <span>-</span>}
-
-              </td>
-              
-              <td className="py-2 px-4">
-                <div className="w-10 h-10 overflow-hidden ">
-                  <img
-                    src={item.payment_method.image}
-                    alt=""
-                    className="w-full h-full object-contain "
-                  />
-                </div>
-              </td>
-              <td className="py-2 px-4">
-                <div className="w-10 h-10 overflow-hidden cursor-pointer">
-                  <img
-                    onClick={(item) => handleOpenImage(item)}
-                    src={item.payment_verification}
-                    alt=""
-                    className="w-full h-full object-contain cursor-pointer"
-                  />
-                </div>
-              </td>
-
-              <td className="">
-                <div className="flex  gap-3">
-                  <UIDialogConfirm
-                    danger
-                    title="هل انت متأكد من حذف العنصر"
-                    confirmHandler={() => {
-                      deleteSubmit(item, index);
-                    }}
-                  >
-                    <button className="bg-[#F9285A0A] p-1 px-2 rounded-lg">
-                      <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
-                    </button>
-                  </UIDialogConfirm>
-                </div>
-              </td>
-            </tr>
-          ))} */}
         </BaseDataTable>
+
+        <UIBaseDialog
+          open={isUpdateDialogOpen}
+          onClose={() => setIsUpdateDialogOpen(false)}
+          title="تعديل المدفوعات"
+          confirmHandler={() => { }}
+          confirmText="تعديل"
+          form="update-form"
+
+        >
+          <form onSubmit={updateSubmit} id="update-form">
+            <div className="space-y-7">
+              <div className="w-full flex justify-center mb-20">
+                <FileInputImg
+                  state="edit"
+                  fileUrl={selectedDataItem?.payment_verification}
+                  onFileChange={(arg) => {
+                    //@ts-ignore
+                    setUpdateFormData((prev) => ({
+                      ...prev,
+                      ["payment_verification"]: arg?.file64 ?? null,
+                    }));
+                  }}
+                ></FileInputImg>
+              </div>
+
+              <TextFieldNada
+                name="total_price"
+                type="number"
+                prependIcon="mdi mdi-notebook-edit-outline"
+                iconType="mdi"
+                handleChange={updateFormChangeHander}
+                value={updateFormData.total_price}
+                label="السعر الكلي "
+                placeholder="ادخل السعر الكلي  "
+              ></TextFieldNada>
+
+              <SelectInput
+                value={updateFormData.status}
+                items={statusList}
+                itemName="name"
+                itemValue="is_active"
+                label="الحالة"
+                placeholder="لختر الحالة"
+                name="is_active"
+                required={true}
+                onChange={(value) => {
+                  setUpdateFormData((prev) => ({
+                    ...prev,
+                    ["status"]: value,
+                  }));
+                }}
+              ></SelectInput>
+
+              <SelectInput
+                value={updateFormData.payment_method_id}
+                items={paymentMethodList}
+                itemName="name_ar"
+                itemValue="id"
+                label="طريقة الدفع"
+                placeholder=""
+                name="is_active"
+                required={true}
+                onChange={(value) => {
+                  setUpdateFormData((prev) => ({
+                    ...prev,
+                    ["payment_method_id"]: value,
+                  }));
+                }}
+              ></SelectInput>
+            </div>
+          </form>
+        </UIBaseDialog>
 
         {/* {isOpenImg && (
           <div onClick={() => setIsOpenImg(false)} className="fixed inset-0 bg-black/70 flex flex-col items-center justify-center py-10 z-50 ">
