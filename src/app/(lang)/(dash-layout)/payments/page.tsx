@@ -166,16 +166,16 @@ export default function rubbush_collectors() {
     });
   };
 
-  const handleSelectPackage = (value: any) => {
-    setAddPaymentFormData((prev) => ({
-      ...prev,
-      ["package_id"]: value,
-    }));
-    getPackageByIdService(value).then((response) => {
-      setPackageItem(response.data);
+  // const handleSelectPackage = (value: any) => {
+  //   setAddPaymentFormData((prev) => ({
+  //     ...prev,
+  //     ["package_id"]: value,
+  //   }));
+  //   getPackageByIdService(value).then((response) => {
+  //     setPackageItem(response.data);
 
-    });
-  };
+  //   });
+  // };
 
 
 
@@ -422,7 +422,7 @@ export default function rubbush_collectors() {
   const handleOpenImage = (e: any) => {
     // console.log('image is', e.target.src)
     setSelectedImg(e.target.src);
-    setIsOpenImg(true);
+    // setIsOpenImg(true);
   };
 
   const takeValue = (e: any, name: any) => {
@@ -433,10 +433,10 @@ export default function rubbush_collectors() {
       [name]: e.target.value,
     }));
     if (name == "units") {
-      if (packageItem) {
-        //@ts-ignore
-        setTotalPrice(selectedPackage.price_per_unit * addPaymentFormData.units);
-      }
+      // if (packageItem) {
+      //   //@ts-ignore
+      //   setTotalPrice(selectedPackage.price_per_unit * addPaymentFormData.units);
+      // }
     }
   };
 

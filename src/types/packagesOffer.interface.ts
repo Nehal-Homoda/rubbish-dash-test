@@ -10,6 +10,7 @@ export interface PackageOffer {
     category: string | null;
     area: string | null;
     district: string | null;
+    available_days: string[];
     created_at: string;
     discounts: PackageDiscount[];
 }

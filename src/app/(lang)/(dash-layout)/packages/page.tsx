@@ -350,6 +350,7 @@ export default function rubbush_collectors() {
       category_id: item.category,
       area_id: item.area,
       district_id: item.district,
+      available_days: item.available_days,
       days_count: item.days_count ? parseInt(item.days_count) : "",
       price_per_unit: item.price_per_unit ? parseInt(item.price_per_unit) : "",
       discounts: item.discounts?.length
