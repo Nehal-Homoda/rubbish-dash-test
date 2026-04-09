@@ -18,17 +18,22 @@ import {
 } from "@/services/ticketsServices";
 import { useRouter } from "next/navigation";
 
+
+type FormDataType = {
+  title_ar: string;
+  content: string;
+};
 export default function rubbush_collectors() {
   const [dataList, setDataList] = useState<Ticket[]>([]);
   const router = useRouter();
   const headerArr = [
     { text: "ID", name: "id" },
-    { text: " الاسم", name: "name_ar" },
-    { text: "الموضوع", name: "is_active" },
-    { text: "النوع", name: "is_active" },
-    { text: "الحالة", name: "is_active" },
-    { text: "تاريخ الانشاء", name: "is_active" },
-    { text: "الاجراءات", name: "image" },
+    { text: " الاسم", name: "created_by" },
+    { text: "الموضوع", name: "subject" },
+    { text: "النوع", name: "type" },
+    { text: "الحالة", name: "status" },
+    { text: "تاريخ الانشاء", name: "created_at" },
+    { text: "الاجراءات", name: "procedures" },
   ];
   const statusList = [
     { is_active: "open", name: "مفتوحة" },
@@ -39,10 +44,7 @@ export default function rubbush_collectors() {
   const [selectedDataItem, setSelectedDataItem] = useState<Ticket | null>(null);
   const [adminTicket, setAdminTicket] = useState<AdminTicket | null>(null);
 
-  type FormDataType = {
-    title_ar: string;
-    content: string;
-  };
+
   const [formData, setFormData] = useState<FormDataType>({
     title_ar: "",
     content: "",
@@ -62,6 +64,13 @@ export default function rubbush_collectors() {
   //  ################ FILTERATION  QUERY #################
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
+  const itemType = (item: Ticket) => {
+    if (item.created_by.type.includes("Collector")) return "جامع قمامة";
+    if (item.created_by.type.includes("User")) return "مستخدم";
+
+    return "-";
+  };
+
 
 
   const handleStatusFilter = (value: string | undefined) => {
@@ -69,9 +78,6 @@ export default function rubbush_collectors() {
     setPage(1);
     fetchDataList({ status: value, pageNum: 1 });
   };
-
-
-
   const fetchDataList = ({
     search = searchTerm,
     status = statusFilter,
@@ -94,7 +100,7 @@ export default function rubbush_collectors() {
     setSearchTerm(val);
     setPage(1);
     fetchDataList({ search: val, pageNum: 1 });
-    
+
   };
 
   const updateDataItemActive = (value: any, index: number) => {
@@ -148,36 +154,12 @@ export default function rubbush_collectors() {
       </>
     );
   };
+
   useEffect(() => {
     fetchDataList();
-  }, [page]); // runs every time `page` changes
+  }, [page]); 
 
-  const handleChangeValue = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputMessage(e.target.value);
-  };
 
-  const handleSelectedTicket = (item: any) => {
-    setAdminTicket(item);
-
-    showTicketMessagesService(item.id).then((response) => {
-      console.log(response);
-
-      setMessages(response.data.messages);
-    });
-  };
-
-  const handleSendMsg = () => {
-    if (!adminTicket) return;
-    const body = JSON.stringify({
-      content: inputMessage,
-    });
-    addTicketMessageService(adminTicket.id, body).then((response) => {
-      console.log(response);
-      setIsSent(true);
-      setAdminMessage(inputMessage);
-      setInputMessage("");
-    });
-  };
 
   useEffect(() => {
     if (!adminTicket) return;
@@ -193,192 +175,73 @@ export default function rubbush_collectors() {
     };
   }, [adminTicket]);
 
-  // const updateDataItem = (item: any) => {
-
-  // }
-  // const updateSubmit = () => {
-
-  // }
-  // const updateFormChangeHander = () => {
-
-  // }
-  const itemType = (item: Ticket) => {
-    if (item.created_by.type.includes("Collector")) return "جامع قمامة";
-    if (item.created_by.type.includes("User")) return "مستخدم";
-
-    return "-";
-  };
 
   return (
     <>
       <div className="py-20">
         <BaseDataTable
+          items={dataList}
           headItems={headerArr}
           onPageChange={setPage}
           totalPages={totalPages}
           onSearchChange={tableSearchHandler}
           headerActionsSlot={tableHeadActionsSlot()}
-        >
-          {dataList.map((item, index) => (
-            <tr key={index}>
-              <td className="py-2 px-4">{item.id}</td>
-              <td className="py-2 px-4">{item.created_by.name}</td>
-              <td className="py-2 px-4">{item.subject}</td>
-              <td className="py-2 px-4  text-nowrap">{itemType(item)}</td>
+          renderers={{
+            type: (item) => (
+              <div>
+                <span>{itemType(item)}</span>
+              </div>
+            ),
+            created_by: (item) => (
+              <div>
+                <span>{item.created_by.name}</span>
+              </div>
+            ),
+            status: (item, index: number) => (
+              <UIPrimaryDropdown
+                tiny={true}
+                itemName="name"
+                itemValue="is_active"
+                btnColorTailwindClass={
+                  item.status == "closed"
+                    ? "bg-red-100 text-red-600 hover:bg-text-red-200"
+                    : undefined
+                }
+                onSelected={(value) => {
+                  updateDataItemActive(value, index);
+                }}
+                items={statusList}
+              >
+                {item.status == "open" ? "مفتوحة" : "مغلقة"}
+              </UIPrimaryDropdown>
+            ),
 
-              <td className="py-2 px-4">
-                <UIPrimaryDropdown
-                  tiny={true}
-                  itemName="name"
-                  itemValue="is_active"
-                  btnColorTailwindClass={
-                    item.status == "closed"
-                      ? "bg-red-100 text-red-600 hover:bg-text-red-200"
-                      : undefined
-                  }
-                  onSelected={(value) => {
-                    updateDataItemActive(value, index);
+            procedures: (item, index: number) => (
+              <div className="flex justify-center gap-3">
+                <UIDialogConfirm
+                  danger
+                  title="هل انت متأكد من حذف العنصر"
+                  confirmHandler={() => {
+                    deleteSubmit(item, index);
                   }}
-                  items={statusList}
                 >
-                  {item.status == "open" ? "مفتوحة" : "مغلقة"}
-                </UIPrimaryDropdown>
-              </td>
-              <td className="py-2 px-4">{item.created_at}</td>
-              <td className="">
-                <div className="flex gap-3">
-                  <UIDialogConfirm
-                    deleteAction={true}
-                    danger
-                    title="حذف تذكرة"
-                    confirmHandler={() => {
-                      deleteSubmit(item, index);
-                    }}
-                  >
-                    <button className="bg-[#F9285A0A] p-1 rounded-lg w-4 h-4">
-                      <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
-                    </button>
-                  </UIDialogConfirm>
+                  <button className="bg-[#F9285A0A] p-1 rounded-lg">
+                    <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
+                  </button>
+                </UIDialogConfirm>
 
-                  {/* <UIBaseDialog
-                                        title="تعديل تذكرة"
-                                        confirmHandler={() => { }}
-                                        confirmText="حفظ"
-                                        form="update-form"
-                                        btn={
-                                            <button
-                                                onClick={() => {
-                                                    updateDataItem(item);
-                                                }}
-                                                className="bg-[#0094140D] p-1 rounded-lg"
-                                            >
-                                                <div className="w-4 h-4">
-                                                    <img className="w-full h-full object-contain" src={editImg.src} alt="" />
-                                                </div>
-                                            </button>
-                                        }
-                                    >
-                                        <form
-                                            onSubmit={updateSubmit}
-                                            id="update-form"
-                                        >
-                                            <div className="space-y-7">
-                                                <TextFieldNada
-                                                    name="name_ar"
-                                                    type="text"
-                                                    handleChange={
-                                                        updateFormChangeHander
-                                                    }
-                                                    value={
-                                                        undefined
-                                                    }
-                                                    label=" اسم المنطقة ( عربي ) "
-                                                    placeholder=" اسم المنطقة  "
-                                                ></TextFieldNada>
-
-
-
-
-
-                                            </div>
-                                        </form>
-                                    </UIBaseDialog> */}
-
-                  {/* <UIBaseDialog heightStyle="h-[900px]"
-                                        title="بدء محادثة"
-                                        confirmHandler={() => { handleSendMsg() }}
-                                        confirmText="ارسال"
-                                        form="update-form"
-                                        btn={
-                                            <div onClick={() => handleSelectedTicket(item)} className="bg-[#009414] py-1 px-3 rounded-xl text-center  text-white  cursor-pointer">
-                                                <span className="mdi mdi-chat-processing-outline"></span>
-                                            </div>
-                                        }
-                                    >
-                                        <div className="flex flex-col justify-between h-full ">
-
-                                            <div className="" >
-                                                <div className="text-right px-4 py-5">
-                                                    <span className="font-bold">{adminTicket && adminTicket.created_by.name}</span>
-                                                </div>
-                                                <div className="flex justify-between items-center gap-1">
-                                                    <div className="bg-gray-100 w-full h-0.5 mt-3">
-
-                                                    </div>
-                                                    <span className="">اليوم</span>
-                                                    <div className="bg-gray-100 w-full h-0.5 mt-3">
-
-                                                    </div>
-                                                    <div>
-
-                                                    </div>
-
-                                                </div>
-                                            </div>
-
-
-                                            <div className="h-[500px] overflow-y-auto px-4 mt-3">
-
-                                                {messages.map((item, index) => (
-                                                    item.sender.type.includes('Admin') ?
-                                                        <div className=" bg-[#009414]  text-white text-right mb-4  px-3 py-4 rounded-lg">
-                                                            {item.content}
-                                                        </div> :
-
-                                                        <div className="text-left text-[#38433bf6] bg-[#ADAAAA1F] mb-4 px-3 py-4  rounded-lg ">
-                                                            {item.content}
-                                                        </div>
-                                                ))}
-
-
-
-                                            </div>
-
-
-                                            <div className="">
-                                                <div className="p-4   bg-white">
-                                                    <input value={inputMessage} onChange={(e) => handleChangeValue(e)} className="w-full border rounded px-3 py-2" type="text" placeholder="اكتب رسالتك هنا" />
-                                                </div>
-                                            </div>
-
-
-
-
-
-
-                                        </div>
-                                    </UIBaseDialog> */}
-
-                  <div
-                    onClick={() => router.push(`/support/startChat?id=${item.id}`)}
-                    className="bg-[#009414] py-1 px-3 rounded-xl text-center  text-white  cursor-pointer"
-                  >
-                    <span className="mdi mdi-chat-processing-outline"></span>
-                  </div>
+                <div
+                  onClick={() => router.push(`/support/startChat?id=${item.id}`)}
+                  className="bg-[#009414] py-1 px-3 rounded-xl text-center  text-white  cursor-pointer"
+                >
+                  <span className="mdi mdi-chat-processing-outline"></span>
                 </div>
-              </td>
-            </tr>
-          ))}
+
+              </div>
+            ),
+          }}
+        >
+
         </BaseDataTable>
       </div>
     </>

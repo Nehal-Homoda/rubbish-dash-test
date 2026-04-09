@@ -47,7 +47,7 @@ export const deleteCollectorService = async (id: number) => {
     try {
         const response = await apiCall.delete("/admins/collectors", id, {
             headers: {
-                Authorization: `Bearer ${token}`,
+                // Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
         });

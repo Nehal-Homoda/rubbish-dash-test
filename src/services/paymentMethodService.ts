@@ -24,19 +24,15 @@ export const getPaymentMethodService = async () => {
     }
 };
 
-
-
-
-
 export const activatePaymentMethodService = async (
     id: number,
-    is_active: number
+    is_active: number,
 ) => {
     try {
         const response = await apiCall.put("/admins/payment_methods", id, {
             body: JSON.stringify({ is_active }),
             headers: {
-                Authorization: `Bearer ${token}`,
+                // Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
         });
@@ -74,7 +70,7 @@ export const deletePaymentMethodService = async (id: number) => {
     try {
         const response = await apiCall.delete("/admins/payment_methods", id, {
             headers: {
-                Authorization: `Bearer ${token}`,
+                // Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
         });
@@ -88,12 +84,15 @@ export const deletePaymentMethodService = async (id: number) => {
         throw new Error(error.message);
     }
 };
-export const updatePaymentMethodService = async (id: number, item:Payment_methods) => {
+export const updatePaymentMethodService = async (
+    id: number,
+    item: Payment_methods,
+) => {
     try {
         const response = await apiCall.put("/admins/payment_methods", id, {
             body: JSON.stringify(item),
             headers: {
-                Authorization: `Bearer ${token}`,
+                // Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
         });
@@ -101,7 +100,7 @@ export const updatePaymentMethodService = async (id: number, item:Payment_method
             await responseErrorServiceHandler(response, "update Payment");
         }
         const data = await response.json();
-        console.log("response data =>>>>", data) ;
+        console.log("response data =>>>>", data);
         return data;
     } catch (error: any) {
         throw new Error(error.message);

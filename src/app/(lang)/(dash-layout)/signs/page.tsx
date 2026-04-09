@@ -9,581 +9,608 @@ import { successDialog, validateAllInputs } from "@/utils/shared";
 import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
 import FileInputImg from "@/components/ui/form/FileInputImg";
 import { Banner } from "@/types/banners.interface";
-import * as Yup from "yup"
-
+import * as Yup from "yup";
+import { ToggleSwitch } from "flowbite-react";
 import {
-    addBannerService,
-    deleteBannerService,
-    getBannersService,
-    updateBannerService,
+  addBannerService,
+  deleteBannerService,
+  getBannersService,
+  updateBannerService,
 } from "@/services/bannersServices";
 
+interface FormDataInputErrors {
+  image: string | null;
+  title_ar: string | null;
+  title_en: string | null;
+  order: string | null;
+  type: string | null;
+}
+type FormDataType = {
+  title_ar: string;
+  title_en: string;
+  order: number;
+  link: string;
+  is_active: number;
+  image: File | null | string;
+  type: "internal" | "external" | "";
+  page_id?: string;
+};
+
 export default function rubbush_collectors() {
-    const [dataList, setDataList] = useState<Banner[]>([]);
-    const headerArr = [
-        { text: "ID", name: "id" },
-        { text: " الصورة ", name: "image" },
-        { text: " URL", name: "name_ar" },
-        { text: "العنوان", name: "is_active" },
-        { text: "الحالة", name: "is_active" },
-        { text: "الترتيب", name: "is_active" },
-        { text: "الاجراءات", name: "image" },
-    ];
-    const statusList = [
-        { is_active: 1, name: "مفعل" },
-        { is_active: 0, name: "غير مفعل" },
-    ];
-    const [totalPages, setTotalPages] = useState(1);
-    const [page, setPage] = useState(1);
-    const [selectedDataItem, setSelectedDataItem] = useState<Banner | null>(
-        null
-    );
 
-    const [activeFilter, setActiveFilter] = useState<boolean | undefined>(undefined);
-    type FormDataType = {
-        title_ar: string;
-        title_en: string;
-        order: number;
-        link: string;
-        is_active: number;
-        image: File | null | string;
-    };
 
-    const [errorMsg, setErrorMsg] = useState("");
+  const [dataList, setDataList] = useState<Banner[]>([]);
+  const headerArr = [
+    { text: "ID", name: "id" },
+    { text: " الصورة ", name: "image" },
+    { text: " URL", name: "link" },
+    { text: "العنوان", name: "title_ar" },
+    { text: "الحالة", name: "is_active" },
+    { text: "الترتيب", name: "order" },
+    { text: "الاجراءات", name: "procedures" },
+  ];
+  const statusList = [
+    { is_active: 1, name: "مفعل" },
+    { is_active: 0, name: "غير مفعل" },
+  ];
+  const typeList = [
+    { type: "external", name: "رابط خارجي" },
+    { type: "internal", name: "رابط داخلي" },
+  ];
+  const [totalPages, setTotalPages] = useState(1);
+  const [page, setPage] = useState(1);
+  const [selectedDataItem, setSelectedDataItem] = useState<Banner | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  // const [activeFilter, setActiveFilter] = useState<boolean | undefined>(
+  //   undefined,
+  // );
+  const [errorMsg, setErrorMsg] = useState("");
+  const [switch1, setSwitch1] = useState(false);
+  const [formData, setFormData] = useState<FormDataType>({
+    title_ar: "",
+    title_en: "",
+    order: 0,
+    link: "",
+    is_active: 0,
+    image: null,
+    type: "",
+  });
+  const [updateFormData, setUpdateFormData] = useState<FormDataType>({
+    title_ar: "",
+    title_en: "",
+    order: 0,
+    link: "",
+    is_active: 0,
+    image: null,
+    type: "",
+  });
+  const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
+    image: "",
+    title_ar: "",
+    title_en: "",
+    order: "",
+    type: "",
+  });
 
-    const [formData, setFormData] = useState<FormDataType>({
-        title_ar: "",
-        title_en: "",
-        order: 0,
-        link: "",
-        is_active: 0,
-        image: null,
+  const formSchema = Yup.object().shape({
+    image: Yup.string().required("الصورة مطلوبه"),
+    title_ar: Yup.string().required("العنوان باللغه العربيه مطلوب"),
+    title_en: Yup.string().required("العنوان باللغه الانجليزيه مطلوب"),
+    order: Yup.string().required("الترتيب مطلوب"),
+  });
+
+  const fetchDataList = ({
+    search = "",
+    is_active = undefined,
+    pageNum = page,
+  }: {
+    search?: string;
+    is_active?: boolean | undefined;
+    pageNum?: number;
+  } = {}) => {
+    console.log(is_active);
+    const isActive =
+      is_active != undefined
+        ? is_active
+          ? "&is_active=" + 1
+          : "&is_active=" + 0
+        : "";
+    const hasSearch = search ? "&search=" + search : "";
+
+    const query = `?page=${pageNum}${hasSearch}${isActive}`;
+
+    getBannersService(query)
+      .then((response) => {
+        setDataList(response.data);
+        setTotalPages(response.meta.last_page);
+      })
+      .catch(() => { });
+  };
+
+  const handleActiveFilter = (value: boolean | undefined) => {
+    setPage(1);
+    fetchDataList({ is_active: value, pageNum: 1 });
+  };
+  const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    fetchDataList({ search: e.target.value });
+  };
+
+  const updateDataItemActive = (value: any, index: number) => {
+    const service = dataList.find((item, i) => {
+      return index == i;
     });
 
-    const [updateFormData, setUpdateFormData] = useState<FormDataType>({
-        title_ar: "",
-        title_en: "",
-        order: 0,
-        link: "",
-        is_active: 0,
-        image: null,
+    if (!service) return;
+
+    const body = JSON.stringify({
+      is_active: value,
     });
 
+    updateBannerService(service.id, body)
+      .then((response) => {
+        const arr = [...dataList];
+        arr[index].is_active = value;
 
-    interface FormDataInputErrors {
-        image: string | null,
-    }
+        setDataList(arr);
 
-    const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
-        image: "",
+        console.log(response);
+      })
+      .catch((error) => { });
+  };
+
+  const deleteSubmit = (item: Banner, selectedIndex: number) => {
+    deleteBannerService(item.id)
+      .then((response) => {
+        const updatedArr = [...dataList];
+        updatedArr.splice(selectedIndex, 1);
+        setDataList(updatedArr);
+        successDialog(true);
+      })
+      .catch((error) => { });
+  };
+
+  const updateDataItem = (item: Banner) => {
+    setSelectedDataItem(item);
+    setUpdateFormData({
+      title_ar: item.title_ar,
+      title_en: item.title_en,
+      order: item.order,
+      link: item.link,
+      is_active: item.is_active ? 1 : 0,
+      image: item.image,
+      type: "",
+    });
+  };
+
+  const updateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!selectedDataItem) return;
+
+    const body = JSON.stringify({
+      ...updateFormData,
     });
 
-    const formSchema = Yup.object().shape({
-        image: Yup.string().required('الصورة مطلوبه'),
-    })
-
-    const fetchDataList = ({
-        search = "",
-        is_active = undefined,
-        pageNum = page
-    }: { search?: string; is_active?: boolean | undefined; pageNum?: number } = {}) => {
-        console.log(is_active);
-        const isActive =
-            is_active != undefined
-                ? is_active
-                    ? "&is_active=" + 1
-                    : "&is_active=" + 0
-                : "";
-        const hasSearch = search ? "&search=" + search : "";
-
-        const query = `?page=${pageNum}${hasSearch}${isActive}`;
-
-        getBannersService(query).then((response) => {
-            setDataList(response.data);
-            setTotalPages(response.meta.last_page);
-        })
-            .catch(() => {
-
-            })
-    };
-
-
-    const handleActiveFilter = (value: boolean | undefined) => {
-        // setPage(1)
-        // setActiveFilter(value)
-        setPage(1);
-        fetchDataList({ is_active: value, pageNum: 1 });
-
-
-    }
-    const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-        fetchDataList({ search: e.target.value });
-    };
-
-    const updateDataItemActive = (value: any, index: number) => {
-        const service = dataList.find((item, i) => {
-            return index == i;
-        });
-
-        if (!service) return;
-
-        const body = JSON.stringify({
-            is_active: value,
-        });
-
-        updateBannerService(service.id, body)
-            .then((response) => {
-                const arr = [...dataList];
-                arr[index].is_active = value;
-
-                setDataList(arr);
-
-                console.log(response);
-            })
-            .catch((error) => { });
-    };
-
-    const deleteSubmit = (item: Banner, selectedIndex: number) => {
-        deleteBannerService(item.id)
-            .then((response) => {
-                const updatedArr = [...dataList];
-                updatedArr.splice(selectedIndex, 1);
-                setDataList(updatedArr);
-                successDialog(true);
-            })
-            .catch((error) => { });
-    };
-
-
-
-    const updateDataItem = (item: Banner) => {
-        setSelectedDataItem(item);
-        setUpdateFormData({
-            title_ar: item.title_ar,
-            title_en: item.title_en,
-            order: item.order,
-            link: item.link,
-            is_active: item.is_active ? 1 : 0,
-            image: item.image,
-        });
-    };
-
-    const updateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-
-        if (!selectedDataItem) return;
-
-        const body = JSON.stringify({
-            ...updateFormData,
-        });
-        setIsDialogOpen(false)
-        updateBannerService(selectedDataItem.id, body)
-            .then((response) => {
-                setIsDialogOpen(true)
-                fetchDataList();
-                successDialog(true);
-            })
-            .catch((error) => {
-                 setIsDialogOpen(false)
-             });
-    };
-
-    const addFormChangeHander = (
-        e: React.ChangeEvent<HTMLInputElement>,
-        index?: number
-    ) => {
-        setFormData((prev) => ({
-            ...prev,
-            [e.target.name]: e.target.value,
-        }));
-
-        console.log(e.target.name, e.target.value);
-    };
-    const updateFormChangeHander = (
-        e: React.ChangeEvent<HTMLInputElement>,
-        index?: number
-    ) => {
-        setUpdateFormData((prev) => ({
-            ...prev,
-            [e.target.name]: e.target.value,
-        }));
-
-        console.log(e.target.name, e.target.value);
-    };
-
-    const createSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-
-        e.preventDefault();
-
-
-        const validateResult = await validateAllInputs<FormDataType>(
-            formSchema,
-            formData
-        );
-        if (!validateResult) return;
-
-        setFormErrors({ ...validateResult.outputResult });
-
-        if (validateResult.isInvalid) return;
-
-
-        setErrorMsg('')
-        const fd = new FormData();
-        fd.append("title_ar", formData.title_ar);
-        fd.append("title_en", formData.title_en);
-        fd.append("order", formData.order.toString());
-        fd.append("link", formData.link);
-        fd.append("is_active", formData.is_active.toString());
-        if (formData.image) {
-            fd.append("image", formData.image);
-        }
-        setIsDialogOpen(false)
-        addBannerService(fd)
-            .then((response) => {
-                setIsDialogOpen(true)
-                fetchDataList();
-                //@ts-ignore
-                successDialog(true);
-                setFormData({
-                    title_ar: "",
-                    title_en: "",
-                    order: 0,
-                    link: "",
-                    is_active: 0,
-                    image: null,
-                });
-            })
-            .catch((error) => {
-                setIsDialogOpen(false)
-                console.log('error is', error?.message)
-                setErrorMsg(error?.message)
-            });
-    };
-    const [isDialogOpen, setIsDialogOpen] = useState(false)
-
-
-    const tableHeadActionsSlot = () => {
-        return (
-            <>
-                <UIPrimaryDropdown
-                    items={[{ is_active: undefined, name: "الكل" }, ...statusList]}
-                    itemName="name"
-                    itemValue="is_active"
-                    // onSelected={(value) => {
-                    //     fetchDataList({ is_active: value });
-                    // }}
-                    onSelected={handleActiveFilter}
-                >
-                    الحالة
-                </UIPrimaryDropdown>
-                <UIBaseDialog dismiss={isDialogOpen}
-                    confirmCloseHandler={resetForm}
-                    title="اضافة لافتة"
-                    confirmHandler={() => { }}
-                    confirmText="اضافة"
-                    form="update-form"
-                    btn={
-                        <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
-                            <button className="bg-[#0094140D] p-1 rounded-lg">
-                                اضافة لافتة
-                            </button>
-                        </div>
-                    }
-                >
-                    <form onSubmit={createSubmit} id="update-form">
-                        {errorMsg && (
-                            <div className="mb-6 text-start border border-red-800 bg-red-100 px-3 py-3 rounded-lg">
-                                <span className="text-red-800 error-alert">
-                                    {" "}
-                                    {errorMsg}
-                                </span>
-                            </div>
-                        )}
-                        <div className="space-y-7">
-                            <div className="w-full flex justify-center mb-20">
-                                <FileInputImg
-                                    errorMessage={formErrors.image || ''}
-                                    state="edit"
-                                    onFileChange={(arg) => {
-                                        setFormData((prev) => ({
-                                            ...prev,
-                                            ["image"]: arg?.file ?? null,
-                                        }));
-                                    }}
-                                ></FileInputImg>
-                            </div>
-                            <TextFieldNada
-                                name="title_ar"
-                                type="text"
-                                prependIcon="mdi mdi-notebook-edit-outline"
-                                iconType="mdi"
-                                handleChange={addFormChangeHander}
-                                value={formData.title_ar}
-                                label=" النص ( عربي ) "
-                                placeholder=" ادخل نص اللافتة بالغة العربية  "
-                            ></TextFieldNada>
-
-                            <TextFieldNada
-                                name="title_en"
-                                type="text"
-                                prependIcon="mdi mdi-notebook-edit-outline"
-                                iconType="mdi"
-                                handleChange={addFormChangeHander}
-                                value={formData.title_en}
-                                label=" النص ( انجليزي ) "
-                                placeholder=" ادخل نص اللافتة بالغة الانجليزية  "
-                            ></TextFieldNada>
-
-                            <TextFieldNada
-                                name="link"
-                                type="text"
-                                prependIcon="mdi mdi-notebook-edit-outline"
-                                iconType="mdi"
-                                handleChange={addFormChangeHander}
-                                value={formData.link}
-                                label=" الرابط"
-                                placeholder=" ادخل الرابط الخاص باللافتة  "
-                            ></TextFieldNada>
-
-                            <TextFieldNada
-                                name="order"
-                                type="number"
-                                prependIcon="mdi mdi-swap-vertical"
-                                iconType="mdi"
-                                handleChange={addFormChangeHander}
-                                value={formData.order}
-                                label=" الترتيب"
-                                placeholder=" ادخل رقم ترتيب النص في العرض "
-                            ></TextFieldNada>
-
-                            <SelectInput
-                                value={formData.is_active}
-                                items={statusList}
-                                itemName="name"
-                                itemValue="is_active"
-                                label="الحالة"
-                                placeholder="لختر الحالة"
-                                name="is_active"
-                                required={true}
-                                onChange={(value) => {
-                                    setFormData((prev) => ({
-                                        ...prev,
-                                        ["is_active"]: value,
-                                    }));
-                                }}
-                            ></SelectInput>
-                        </div>
-                    </form>
-                </UIBaseDialog>
-            </>
-        );
-    };
-
-    const resetForm = () => {
-        setFormData({
-            title_ar: "",
-            title_en: "",
-            order: 0,
-            link: "",
-            is_active: 0,
-            image: "",
-        })
-    }
-    useEffect(() => {
+    updateBannerService(selectedDataItem.id, body)
+      .then((response) => {
+        setIsDialogOpen(false);
         fetchDataList();
-    }, [page]); // runs every time `page` changes
+        successDialog(true);
+      })
+      .catch((error) => {
+        setIsDialogOpen(false);
+      });
+  };
 
-    return (
-        <>
-            <div className="py-20">
-                <BaseDataTable
-                    headItems={headerArr}
-                    onPageChange={setPage}
-                    totalPages={totalPages}
-                    onSearchChange={tableSearchHandler}
-                    headerActionsSlot={tableHeadActionsSlot()}
-                >
-                    {dataList.map((item, index) => (
-                        <tr key={index}>
-                            <td className="py-2 px-4">{item.id}</td>
+  const addFormChangeHander = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index?: number,
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
 
-                            <td className="py-2 px-4">
-                                <div className="w-[100px] max-h-[20px] h-10 bg-gray-50 rounded-md">
-                                    <img
-                                        src={item.image}
-                                        alt=""
-                                        className="w-full h-full object-contain"
-                                    />
-                                </div>
-                            </td>
-                            <td className="py-2 px-4">{item.link}</td>
-                            <td className="py-2 px-4">{item.title}</td>
-                            <td className="py-2 px-4">
-                                <UIPrimaryDropdown
-                                    tiny={true}
-                                    itemName="name"
-                                    itemValue="is_active"
-                                    btnColorTailwindClass={
-                                        !item.is_active
-                                            ? "bg-red-100 text-red-600 hover:bg-text-red-200"
-                                            : undefined
-                                    }
-                                    onSelected={(value) => {
-                                        updateDataItemActive(value, index);
-                                    }}
-                                    items={statusList}
-                                >
-                                    {item.is_active ? "مفعل" : "غير مفعل"}
-                                </UIPrimaryDropdown>
-                            </td>
-                            <td className="py-2 px-4">{item.order}</td>
-                            <td className="">
-                                <div className="flex justify-center gap-3">
-                                    <UIDialogConfirm
-                                        danger
-                                        title="هل انت متأكد من حذف العنصر"
-                                        confirmHandler={() => {
-                                            deleteSubmit(item, index);
-                                        }}
-                                    >
-                                        <button className="bg-[#F9285A0A] p-1 rounded-lg">
-                                            <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
-                                        </button>
-                                    </UIDialogConfirm>
-                                    <UIBaseDialog dismiss={isDialogOpen}
+    console.log(e.target.name, e.target.value);
+  };
+  const updateFormChangeHander = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index?: number,
+  ) => {
+    setUpdateFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
 
-                                        title="تعديل اللافتة"
-                                        confirmHandler={() => { }}
-                                        confirmText="تعديل"
-                                        form="update-form"
-                                        btn={
-                                            <button
-                                                onClick={() => {
-                                                    updateDataItem(item);
-                                                }}
-                                                className="bg-[#0094140D] p-1 rounded-lg"
-                                            >
-                                                <span className="mdi mdi-folder-edit-outline text-[#009414]"></span>
-                                            </button>
-                                        }
-                                    >
-                                        <form
-                                            onSubmit={updateSubmit}
-                                            id="update-form"
-                                        >
-                                            <div className="space-y-7">
-                                                <div className="w-full flex justify-center mb-20">
-                                                    {/* <FileInputImg
-                                                        state="edit"
-                                                        fileUrl={item.image}
-                                                        onFileChange={(arg) => {
-                                                            setUpdateFormData(
-                                                                (prev) => ({
-                                                                    ...prev,
-                                                                    ["image"]:
-                                                                        arg?.file64 ??
-                                                                        null,
-                                                                })
-                                                            );
-                                                        }}
-                                                    ></FileInputImg> */}
-                                                    <FileInputImg
-                                                        state="edit"
-                                                        fileUrl={item.image}
-                                                        onFileChange={(arg) => {
-                                                            setUpdateFormData((prev) => ({
-                                                                ...prev,
-                                                                ["image"]: arg?.file64 ?? null,
-                                                            }));
-                                                        }}
-                                                    ></FileInputImg>
-                                                </div>
-                                                <TextFieldNada
-                                                    name="title_ar"
-                                                    type="text"
-                                                    prependIcon="mdi mdi-notebook-edit-outline"
-                                                    iconType="mdi"
-                                                    handleChange={
-                                                        updateFormChangeHander
-                                                    }
-                                                    value={
-                                                        updateFormData.title_ar
-                                                    }
-                                                    label=" النص ( عربي ) "
-                                                    placeholder=" ادخل نص اللافتة بالغة العربية  "
-                                                ></TextFieldNada>
+    console.log(e.target.name, e.target.value);
+  };
 
-                                                <TextFieldNada
-                                                    name="title_en"
-                                                    type="text"
-                                                    prependIcon="mdi mdi-notebook-edit-outline"
-                                                    iconType="mdi"
-                                                    handleChange={
-                                                        updateFormChangeHander
-                                                    }
-                                                    value={
-                                                        updateFormData.title_en
-                                                    }
-                                                    label=" النص ( انجليزي ) "
-                                                    placeholder=" ادخل نص اللافتة بالغة الانجليزية  "
-                                                ></TextFieldNada>
+  const createSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    console.log("wdjiqwodjqwoi");
+    e.preventDefault();
 
-                                                <TextFieldNada
-                                                    name="link"
-                                                    type="text"
-                                                    prependIcon="mdi mdi-notebook-edit-outline"
-                                                    iconType="mdi"
-                                                    handleChange={
-                                                        updateFormChangeHander
-                                                    }
-                                                    value={updateFormData.link}
-                                                    label=" الرابط"
-                                                    placeholder=" ادخل الرابط الخاص باللافتة  "
-                                                ></TextFieldNada>
-
-                                                <TextFieldNada
-                                                    name="order"
-                                                    type="number"
-                                                    prependIcon="mdi mdi-swap-vertical"
-                                                    iconType="mdi"
-                                                    handleChange={
-                                                        updateFormChangeHander
-                                                    }
-                                                    value={updateFormData.order}
-                                                    label=" الترتيب"
-                                                    placeholder=" ادخل رقم ترتيب النص في العرض "
-                                                ></TextFieldNada>
-
-                                                <SelectInput
-                                                    value={
-                                                        updateFormData.is_active
-                                                    }
-                                                    items={statusList}
-                                                    itemName="name"
-                                                    itemValue="is_active"
-                                                    label="الحالة"
-                                                    placeholder="لختر الحالة"
-                                                    name="is_active"
-                                                    required={true}
-                                                    onChange={(value) => {
-                                                        setUpdateFormData(
-                                                            (prev) => ({
-                                                                ...prev,
-                                                                ["is_active"]:
-                                                                    value,
-                                                            })
-                                                        );
-                                                    }}
-                                                ></SelectInput>
-                                            </div>
-                                        </form>
-                                    </UIBaseDialog>
-                                </div>
-                            </td>
-                        </tr>
-                    ))}
-                </BaseDataTable>
-            </div>
-        </>
+    const validateResult = await validateAllInputs<FormDataType>(
+      formSchema,
+      formData,
     );
+    if (!validateResult) return;
+
+    setFormErrors({ ...validateResult.outputResult });
+
+    if (validateResult.isInvalid) return;
+
+    setErrorMsg("");
+    const fd = new FormData();
+    fd.append("title_ar", formData.title_ar);
+    fd.append("title_en", formData.title_en);
+    fd.append("order", formData.order.toString());
+    fd.append("link", formData.link);
+    fd.append("is_active", formData.is_active.toString());
+    if (formData.image) {
+      fd.append("image", formData.image);
+    }
+    setIsDialogOpen(false);
+    addBannerService(fd)
+      .then((response) => {
+        setIsAddDialogOpen(false);
+        fetchDataList();
+        //@ts-ignore
+        successDialog(true);
+        setFormData({
+          title_ar: "",
+          title_en: "",
+          order: 0,
+          link: "",
+          is_active: 0,
+          image: null,
+          type: "",
+        });
+      })
+      .catch((error) => {
+        setIsDialogOpen(false);
+        console.log("error is", error?.message);
+        setErrorMsg(error?.message);
+      });
+  };
+
+  const handleCheckSubscription = (value: boolean, name: string) => {
+    setSwitch1(!switch1);
+    if (name == 'add') {
+      setFormData((prev) => ({
+        ...prev,
+        ["has_recycle"]: value ? 1 : 0,
+      }));
+    }
+
+
+    if (name == 'edit') {
+      setUpdateFormData((prev) => ({
+        ...prev,
+        ["has_recycle"]: value ? 1 : null,
+      }));
+    }
+
+  };
+
+  const tableHeadActionsSlot = () => {
+    return (
+      <>
+        <UIPrimaryDropdown
+          items={[{ is_active: undefined, name: "الكل" }, ...statusList]}
+          itemName="name"
+          itemValue="is_active"
+          // onSelected={(value) => {
+          //     fetchDataList({ is_active: value });
+          // }}
+          onSelected={handleActiveFilter}
+        >
+          الحالة
+        </UIPrimaryDropdown>
+        <UIBaseDialog
+          open={isAddDialogOpen}
+          onClose={() => setIsAddDialogOpen(false)}
+          title="اضافة لافتة"
+          confirmText="اضافة"
+          form="add-form"
+          confirmHandler={() => { }}
+          btn={
+            <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
+              <button
+                onClick={() => setIsAddDialogOpen(true)}
+                className="bg-[#0094140D] p-1 rounded-lg"
+              >
+                اضافة لافتة
+              </button>
+            </div>
+          }
+        >
+          <form onSubmit={createSubmit} id="add-form">
+            {errorMsg && (
+              <div className="mb-6 text-start border border-red-800 bg-red-100 px-3 py-3 rounded-lg">
+                <span className="text-red-800 error-alert"> {errorMsg}</span>
+              </div>
+            )}
+            <div className="space-y-7">
+              <div className="w-full flex justify-center mb-20">
+                <FileInputImg
+                  errorMessage={formErrors.image || ""}
+                  state="edit"
+                  onFileChange={(arg) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      ["image"]: arg?.file ?? null,
+                    }));
+                  }}
+                ></FileInputImg>
+              </div>
+              <TextFieldNada
+                name="title_ar"
+                type="text"
+                prependIcon="mdi mdi-notebook-edit-outline"
+                iconType="mdi"
+                handleChange={addFormChangeHander}
+                value={formData.title_ar}
+                label=" النص ( عربي ) "
+                placeholder=" ادخل نص اللافتة بالغة العربية  "
+                errorMessage={formErrors.title_ar || ""}
+              ></TextFieldNada>
+
+              <TextFieldNada
+                name="title_en"
+                type="text"
+                prependIcon="mdi mdi-notebook-edit-outline"
+                iconType="mdi"
+                handleChange={addFormChangeHander}
+                value={formData.title_en}
+                label=" النص ( انجليزي ) "
+                placeholder=" ادخل نص اللافتة بالغة الانجليزية  "
+                errorMessage={formErrors.title_en || ""}
+              ></TextFieldNada>
+
+              <SelectInput
+                value={formData.type}
+                items={typeList}
+                itemName="name"
+                itemValue="type"
+                label="نوع الرابط"
+                placeholder="اختر نوع الرابط"
+                name="type"
+                required={true}
+                onChange={(value) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    ["type"]: value,
+                  }));
+                }}
+              ></SelectInput>
+
+              {formData.type === "external" && (
+                <TextFieldNada
+                  name="link"
+                  type="text"
+                  prependIcon="mdi mdi-notebook-edit-outline"
+                  iconType="mdi"
+                  handleChange={addFormChangeHander}
+                  value={formData.link}
+                  label=" الرابط"
+                  placeholder=" ادخل الرابط الخاص باللافتة  "
+                  required={false}
+                ></TextFieldNada>
+              )}
+              {formData.type === "internal" && (
+                <SelectInput
+                  value={formData.type}
+                  items={typeList}
+                  itemName="name"
+                  itemValue="id"
+                  label="الصفحة المستهدفة"
+                  placeholder="اختر الصفحة"
+                  name="type"
+                  required={true}
+                  onChange={(value) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      page_id: value,
+                    }));
+                  }}
+                ></SelectInput>
+              )}
+
+              <TextFieldNada
+                name="order"
+                type="number"
+                prependIcon="mdi mdi-swap-vertical"
+                iconType="mdi"
+                handleChange={addFormChangeHander}
+                value={formData.order}
+                label=" الترتيب"
+                placeholder=" ادخل رقم ترتيب النص في العرض "
+                errorMessage={formErrors.order || ""}
+              ></TextFieldNada>
+
+              <SelectInput
+                value={formData.is_active}
+                items={statusList}
+                itemName="name"
+                itemValue="is_active"
+                label="الحالة"
+                placeholder="لختر الحالة"
+                name="is_active"
+                required={true}
+                onChange={(value) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    ["is_active"]: value,
+                  }));
+                }}
+              ></SelectInput>
+
+
+              <ToggleSwitch
+                checked={switch1}
+                label="اعلان"
+                onChange={(value) => handleCheckSubscription(value, 'add')}
+              />
+            </div>
+          </form>
+        </UIBaseDialog>
+      </>
+    );
+  };
+
+
+  useEffect(() => {
+    fetchDataList();
+  }, [page]);
+  return (
+    <>
+      <div className="py-20">
+        <BaseDataTable
+          headItems={headerArr}
+          items={dataList}
+          onPageChange={setPage}
+          totalPages={totalPages}
+          onSearchChange={tableSearchHandler}
+          headerActionsSlot={tableHeadActionsSlot()}
+          renderers={{
+            image: (item) => (
+              <div className="w-12 h-12">
+                <img
+                  src={item.image}
+                  className="w-full h-full object-cover rounded-full"
+                />
+              </div>
+            ),
+            is_active: (item, index: number) => (
+              <UIPrimaryDropdown
+                tiny
+                itemName="name"
+                itemValue="is_active"
+                btnColorTailwindClass={
+                  !item.is_active
+                    ? "bg-red-100 text-red-600 hover:bg-red-200"
+                    : undefined
+                }
+                items={statusList}
+                onSelected={(value) => updateDataItemActive(value, index)}
+              >
+                {item.is_active ? "مفعل" : "غير مفعل"}
+              </UIPrimaryDropdown>
+            ),
+            procedures: (item, index: number) => (
+              <div className="flex justify-center gap-3">
+                <UIDialogConfirm
+                  danger
+                  title="هل انت متأكد من حذف العنصر"
+                  confirmHandler={() => {
+                    deleteSubmit(item, index);
+                  }}
+                >
+                  <button className="bg-[#F9285A0A] p-1 rounded-lg">
+                    <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
+                  </button>
+                </UIDialogConfirm>
+                <button
+                  onClick={() => {
+                    updateDataItem(item);
+                    setIsDialogOpen(true);
+                  }}
+                  className="bg-[#0094140D] p-1 rounded-lg"
+                >
+                  <span className="mdi mdi-folder-edit-outline text-[#009414]"></span>
+                </button>
+              </div>
+            ),
+          }}
+        ></BaseDataTable>
+
+        <UIBaseDialog
+          open={isDialogOpen}
+          onClose={() => setIsDialogOpen(false)}
+          title="تعديل اللافتة"
+          confirmHandler={() => { }}
+          confirmText="تعديل"
+          form="update-form"
+        >
+          <form onSubmit={updateSubmit} id="update-form">
+            <div className="space-y-7">
+              <div className="w-full flex justify-center mb-20">
+                <FileInputImg
+                  state="edit"
+                  fileUrl={updateFormData.image as string}
+                  onFileChange={(arg) => {
+                    setUpdateFormData((prev) => ({
+                      ...prev,
+                      ["image"]: arg?.file64 ?? null,
+                    }));
+                  }}
+                ></FileInputImg>
+              </div>
+              <TextFieldNada
+                name="title_ar"
+                type="text"
+                prependIcon="mdi mdi-notebook-edit-outline"
+                iconType="mdi"
+                handleChange={updateFormChangeHander}
+                value={updateFormData.title_ar}
+                label=" النص ( عربي ) "
+                placeholder=" ادخل نص اللافتة بالغة العربية  "
+              ></TextFieldNada>
+
+              <TextFieldNada
+                name="title_en"
+                type="text"
+                prependIcon="mdi mdi-notebook-edit-outline"
+                iconType="mdi"
+                handleChange={updateFormChangeHander}
+                value={updateFormData.title_en}
+                label=" النص ( انجليزي ) "
+                placeholder=" ادخل نص اللافتة بالغة الانجليزية  "
+              ></TextFieldNada>
+
+              <TextFieldNada
+                name="link"
+                type="text"
+                prependIcon="mdi mdi-notebook-edit-outline"
+                iconType="mdi"
+                handleChange={updateFormChangeHander}
+                value={updateFormData.link}
+                label=" الرابط"
+                placeholder=" ادخل الرابط الخاص باللافتة  "
+              ></TextFieldNada>
+
+              <TextFieldNada
+                name="order"
+                type="number"
+                prependIcon="mdi mdi-swap-vertical"
+                iconType="mdi"
+                handleChange={updateFormChangeHander}
+                value={updateFormData.order}
+                label=" الترتيب"
+                placeholder=" ادخل رقم ترتيب النص في العرض "
+              ></TextFieldNada>
+
+              <SelectInput
+                value={updateFormData.is_active}
+                items={statusList}
+                itemName="name"
+                itemValue="is_active"
+                label="الحالة"
+                placeholder="لختر الحالة"
+                name="is_active"
+                required={true}
+                onChange={(value) => {
+                  setUpdateFormData((prev) => ({
+                    ...prev,
+                    ["is_active"]: value,
+                  }));
+                }}
+              ></SelectInput>
+            </div>
+          </form>
+        </UIBaseDialog>
+      </div>
+    </>
+  );
 }

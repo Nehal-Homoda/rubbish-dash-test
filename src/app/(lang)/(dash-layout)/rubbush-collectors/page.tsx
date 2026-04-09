@@ -5,7 +5,6 @@ import BaseDataTable from "@/components/data-tables/BaseDataTable";
 import UIPrimaryDropdown from "@/components/ui/UIPrimaryDropdown";
 import UIBaseDialog from "@/components/ui/UIBaseDialog";
 import MultiCheckbox from "@/components/ui/form/MultiCheckbox";
-import SelectInput from "@/components/ui/form/SelectInput";
 import { successDialog, validateAllInputs } from "@/utils/shared";
 import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
 import FileInputImg from "@/components/ui/form/FileInputImg";
@@ -23,9 +22,6 @@ import { District } from "@/types/district.interface";
 import { useLocalePath } from "@/utils/lang";
 import editImg from '@/assets/images/icons/edit.png'
 
-
-
-
 interface FormDataInputErrors {
     name: string | null,
     phone: string,
@@ -33,8 +29,6 @@ interface FormDataInputErrors {
     district_id: string,
     image: string | null,
 }
-
-
 interface FormDataInputs {
     name: string | null,
     phone: string,
@@ -42,20 +36,33 @@ interface FormDataInputs {
     district_id: string[],
     image: string | null,
 }
+type FormDataType = {
+    name: string;
+    phone: string;
+    password?: string;
+    district_id: string[];
+    image: File | null | string;
+};
+type UpdateFormDataType = {
+    name: string;
+    phone: string;
+    password: string;
+    district_id: string[];
+    image: null | string;
+};
 export default function rubbush_collectors() {
     const [dataList, setDataList] = useState<Collector[]>([]);
     const [distrects, setDistrects] = useState<District[]>([]);
-
     const headerArr = [
         { text: "ID", name: "id" },
         { text: " الصورة", name: "image" },
-        { text: " الاسم", name: "image" },
-        { text: "رقم التليفون", name: "name_ar" },
-        { text: " المناطق", name: "no_of_subscriptions" },
-        { text: " تم التجميع", name: "no_of_subscriptions" },
-        { text: " تعذر التجميع", name: "no_of_subscriptions" },
+        { text: " الاسم", name: "name" },
+        { text: "رقم التليفون", name: "phone" },
+        { text: " المناطق", name: "districts" },
+        { text: " تم التجميع", name: "count_collected" },
+        { text: " تعذر التجميع", name: "count_not_collected" },
         { text: "الحالة", name: "is_active" },
-        { text: "الاجراءات", name: "image" },
+        { text: "الاجراءات", name: "procedures" },
     ];
     const statusList = [
         { is_active: 1, name: "مفعل" },
@@ -63,34 +70,15 @@ export default function rubbush_collectors() {
     ];
     const [totalPages, setTotalPages] = useState(1);
     const [page, setPage] = useState(1);
-    const [selectedDataItem, setSelectedDataItem] = useState<Collector | null>(
-        null
-    );
 
     // ################### FILTER SECTION ####################
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState<boolean | undefined>(undefined);
     const [regionFilter, setRegionFilter] = useState<string | undefined>(undefined)
-
-
-
-
     const localePath = useLocalePath()
     const router = useRouter();
-    type FormDataType = {
-        name: string;
-        phone: string;
-        password?: string;
-        district_id: string[];
-        image: File | null | string;
-    };
-    type UpdateFormDataType = {
-        name: string;
-        phone: string;
-        password: string;
-        district_id: string[];
-        image: null | string;
-    };
+    const [errorMsg, setErrorMsg] = useState("");
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [formData, setFormData] = useState<FormDataType>({
         name: "",
         phone: "",
@@ -98,14 +86,6 @@ export default function rubbush_collectors() {
         district_id: [],
         image: null,
     });
-
-    // const [updateFormData, setUpdateFormData] = useState<UpdateFormDataType>({
-    //     name: "",
-    //     phone: "",
-    //     password: "",
-    //     district_id: [],
-    //     image: null,
-    // });
     const formSchema = Yup.object().shape({
         name: Yup.string().required(),
         phone: Yup.string()
@@ -127,10 +107,6 @@ export default function rubbush_collectors() {
         district_id: "",
         image: ""
     });
-
-
-    const [errorMsg, setErrorMsg] = useState("");
-
     const fetchDataList = ({
         search = searchTerm,
         district_id = regionFilter,
@@ -222,8 +198,6 @@ export default function rubbush_collectors() {
             })
             .catch((error) => { });
     };
-
-
     const addFormChangeHander = (
         e: React.ChangeEvent<HTMLInputElement>,
         index?: number
@@ -236,67 +210,6 @@ export default function rubbush_collectors() {
         console.log(e.target.name, e.target.value);
     };
 
-    const resetForm = () => {
-        setFormData({
-            name: "",
-            district_id: [],
-            image: "",
-            phone: "",
-            password: ""
-        })
-    }
-
-    const [isDialogOpen, setIsDialogOpen] = useState(false)
-
-
-    // const updateDataItem = (item: Collector) => {
-    //     setSelectedDataItem(item);
-    //     setUpdateFormData({
-    //         name: item.name,
-    //         phone: item.phone,
-    //         district_id: item.districts.map((dist) => dist.id.toString()),
-    //         image: item.image || null,
-    //         password: '',
-    //     });
-    // };
-
-    // const updateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    //     e.preventDefault();
-
-    //     if (!selectedDataItem) return;
-
-    //     const form = { ...updateFormData }
-
-    //     if (!form.password) {
-    //         //@ts-ignore
-    //         delete form.password
-    //     }
-
-    //     const body = JSON.stringify({
-    //         ...form,
-    //     });
-
-    //     updateCollectorService(selectedDataItem.id, body)
-    //         .then((response) => {
-    //             fetchDataList();
-    //             successDialog(true);
-    //         })
-    //         .catch((error) => { });
-    // };
-
-
-    // const updateFormChangeHander = (
-    //     e: React.ChangeEvent<HTMLInputElement>,
-    //     index?: number
-    // ) => {
-    //     setUpdateFormData((prev) => ({
-    //         ...prev,
-    //         [e.target.name]: e.target.value,
-    //     }));
-
-    //     console.log(e.target.name, e.target.value);
-    // };
-
     const createSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setErrorMsg('')
@@ -305,11 +218,9 @@ export default function rubbush_collectors() {
             formSchema,
             formData
         );
-        console.log("validate", validateResult);
         if (!validateResult) return;
         //@ts-ignore
         setFormErrors({ ...validateResult.outputResult });
-        console.log("form error", formErrors);
         if (validateResult.isInvalid) return;
 
         const fd = new FormData();
@@ -324,11 +235,10 @@ export default function rubbush_collectors() {
         formData.district_id.forEach((item, index) => {
             fd.append(`district_id[${index}]`, item);
         });
-        setIsDialogOpen(false)
 
         addCollectorService(fd)
             .then((response) => {
-                setIsDialogOpen(true)
+                setIsDialogOpen(false)
                 fetchDataList();
                 //@ts-ignore
                 successDialog(true);
@@ -341,9 +251,8 @@ export default function rubbush_collectors() {
                 });
             })
             .catch((error) => {
-                setIsDialogOpen(false)
+
                 setErrorMsg(error?.message);
-                console.log("error message is", errorMsg);
 
 
             });
@@ -355,7 +264,6 @@ export default function rubbush_collectors() {
             })
             .catch((error) => { });
     };
-
     const tableHeadActionsSlot = () => {
         return (
             <>
@@ -363,9 +271,6 @@ export default function rubbush_collectors() {
                     items={[{ is_active: undefined, name: "الكل" }, ...statusList]}
                     itemName="name"
                     itemValue="is_active"
-                    // onSelected={(value) => {
-                    //     fetchDataList({ is_active: value });
-                    // }}
                     onSelected={handleActiveFilter}
                 >
                     الحالة
@@ -374,21 +279,20 @@ export default function rubbush_collectors() {
                     items={[{ id: undefined, name_ar: "الكل" }, ...distrects]}
                     itemName="name_ar"
                     itemValue="id"
-                    // onSelected={(value) => {
-                    //     fetchDataList({ distrect_id: value });
-                    // }}
                     onSelected={handleRegionFilter}
                 >
                     المنطقة
                 </UIPrimaryDropdown>
-                <UIBaseDialog confirmCloseHandler={resetForm} dismiss={isDialogOpen}
+                <UIBaseDialog
+                    open={isDialogOpen}
+                    onClose={() => setIsDialogOpen(false)}
                     title="اضافة جامع القمامة"
                     confirmHandler={() => { }}
                     confirmText="اضافة"
                     form="update-form"
                     btn={
                         <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
-                            <button className="bg-[#0094140D] p-1 rounded-lg">
+                            <button onClick={() => setIsDialogOpen(true)} className="bg-[#0094140D] p-1 rounded-lg">
                                 اضافة جامع القمامة
                             </button>
                         </div>
@@ -471,186 +375,79 @@ export default function rubbush_collectors() {
     useEffect(() => {
         fetchDataList();
         fetchDistrects();
-    }, [page]); // runs every time `page` changes
+    }, [page]);
 
     return (
         <>
             <div className="py-20">
                 <BaseDataTable
+                    items={dataList}
                     headItems={headerArr}
                     onPageChange={setPage}
                     totalPages={totalPages}
                     onSearchChange={tableSearchHandler}
                     headerActionsSlot={tableHeadActionsSlot()}
-                >
-                    {dataList.map((item, index) => (
-                        <tr key={index}>
-                            <td className="py-2 px-4">{item.id}</td>
-                            <td className="py-2 px-4">
-                                <div className="w-[3rem] aspect-square bg-gray-50 rounded-full overflow-hidden">
-                                    {item.image && (
-                                        <img
-                                            src={item.image}
-                                            alt=""
-                                            className="w-full h-full object-cover"
-                                        />
-                                    )}
-                                </div>
-                            </td>
-                            <td className="py-2 px-4">{item.name}</td>
-                            <td className="py-2 px-4">{item.phone}</td>
-                            <td className="py-2 px-4">
-                                {!!item.districts && item.districts.length
-                                    ? item.districts
-                                        .map((dist) => dist.name)
-                                        .join(" | ")
-                                    : "-"}
-                            </td>
-                            <td className="py-2 px-4">
-                                {item.count_collected}
-                            </td>
-                            <td className="py-2 px-4">
-                                {item.count_not_collected}
-                            </td>
+                    renderers={{
+                        districts: (item, index) => (
+                            <div className="flex flex-wrap gap-2">
+                                {item.districts?.map((district: any, index: number) => (
+                                    <span
+                                        key={index}
+                                        className="bg-gray-100 px-2 py-1 rounded-md text-sm"
+                                    >
+                                        {district.name}
+                                    </span>
+                                ))}
+                            </div>
+                        ),
+                        image: (item) => (
+                            <div className="w-[3rem] h-[3rem]   rounded-full overflow-hidden">
+                                <img
+                                    src={item.image}
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                        ),
+                        is_active: (item, index: number) => (
+                            <UIPrimaryDropdown
+                                tiny
+                                itemName="name"
+                                itemValue="is_active"
+                                btnColorTailwindClass={
+                                    !item.is_active
+                                        ? "bg-red-100 text-red-600 hover:bg-red-200"
+                                        : undefined
+                                }
+                                items={statusList}
+                                onSelected={(value) => updateDataItemActive(value, index)}
+                            >
+                                {item.is_active ? "مفعل" : "غير مفعل"}
+                            </UIPrimaryDropdown>
+                        ),
+                        procedures: (item, index: number) => (
+                            <div className="flex justify-center gap-3">
 
-                            <td className="py-2 px-4">
-                                <UIPrimaryDropdown
-                                    tiny={true}
-                                    itemName="name"
-                                    itemValue="is_active"
-                                    btnColorTailwindClass={
-                                        !item.is_active
-                                            ? "bg-red-100 text-red-600 hover:bg-text-red-200"
-                                            : undefined
-                                    }
-                                    onSelected={(value) => {
-                                        updateDataItemActive(value, index);
+                                <button onClick={() => { router.push(localePath('/rubbush-collectors/details/profile?id=' + item.id)) }} className="bg-blue-100 p-1 px-2 rounded-lg">
+                                    <div className="w-4 h-4 cursor-pointer">
+                                        <img className="w-full h-full object-contain" src={editImg.src} alt="" />
+                                    </div>
+                                </button>
+                                <UIDialogConfirm
+                                    danger
+                                    title="هل انت متأكد من حذف العنصر"
+                                    confirmHandler={() => {
+                                        deleteSubmit(item, index);
                                     }}
-                                    items={statusList}
                                 >
-                                    {item.is_active ? "مفعل" : "غير مفعل"}
-                                </UIPrimaryDropdown>
-                            </td>
-                            <td className="">
-                                <div className="flex  gap-3">
-                                    <button onClick={() => { router.push(localePath('/rubbush-collectors/details/profile?id=' + item.id)) }} className="bg-blue-100 p-1 px-2 rounded-lg">
-                                        <div className="w-4 h-4 cursor-pointer">
-                                            <img className="w-full h-full object-contain" src={editImg.src} alt="" />
-                                        </div>
+                                    <button className="bg-[#F9285A0A] p-1 rounded-lg">
+                                        <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
                                     </button>
+                                </UIDialogConfirm>
+                            </div>
+                        ),
+                    }}
+                >
 
-
-                                    <UIDialogConfirm
-                                        danger
-                                        title="هل انت متأكد من حذف العنصر"
-                                        confirmHandler={() => {
-                                            deleteSubmit(item, index);
-                                        }}
-                                    >
-                                        <button className="bg-[#F9285A0A] p-1 px-2 rounded-lg">
-                                            <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
-                                        </button>
-                                    </UIDialogConfirm>
-                                    {/* <UIBaseDialog
-                                        title="تعديل منطقه"
-                                        confirmHandler={() => {}}
-                                        confirmText="اضافة"
-                                        form="update-form"
-                                        btn={
-                                            <button
-                                                onClick={() => {
-                                                    updateDataItem(item);
-                                                }}
-                                                className="bg-[#0094140D] p-1 px-2 rounded-lg"
-                                            >
-                                                <span className="mdi mdi-folder-edit-outline text-[#009414]"></span>
-                                            </button>
-                                        }
-                                    >
-                                        <form
-                                            onSubmit={updateSubmit}
-                                            id="update-form"
-                                        >
-                                            <div className="space-y-7">
-                                                <div className="w-full flex justify-center mb-20">
-                                                    <FileInputImg
-                                                        state="edit"
-                                                        fileUrl={
-                                                            updateFormData.image ??
-                                                            ""
-                                                        }
-                                                        onFileChange={(arg) => {
-                                                            setUpdateFormData(
-                                                                (prev) => ({
-                                                                    ...prev,
-                                                                    ["image"]:
-                                                                        arg?.file64 ??
-                                                                        null,
-                                                                })
-                                                            );
-                                                        }}
-                                                    ></FileInputImg>
-                                                </div>
-                                                <TextFieldNada
-                                                    name="name"
-                                                    type="text"
-                                                    handleChange={
-                                                        updateFormChangeHander
-                                                    }
-                                                    value={updateFormData.name}
-                                                    label=" اسم  "
-                                                    placeholder=" اسم الجامع القمامة  "
-                                                ></TextFieldNada>
-                                                <TextFieldNada
-                                                    name="phone"
-                                                    type="text"
-                                                    handleChange={
-                                                        updateFormChangeHander
-                                                    }
-                                                    value={updateFormData.phone}
-                                                    label=" رقم الموبايل "
-                                                    placeholder=" رقم موبايل الجامع القمامة  "
-                                                ></TextFieldNada>
-                                                <TextFieldNada
-                                                    name="password"
-                                                    type="password"
-                                                    handleChange={
-                                                        updateFormChangeHander
-                                                    }
-                                                    value={
-                                                        updateFormData.password
-                                                    }
-                                                    label=" كلمة المرور"
-                                                    placeholder=" ادخل كلمة المرور "
-                                                ></TextFieldNada>
-                                                <MultiCheckbox
-                                                    items={distrects}
-                                                    itemName="name_ar"
-                                                    itemValue="id"
-                                                    onChange={(value) => {
-                                                        setUpdateFormData(
-                                                            (prev) => ({
-                                                                ...prev,
-                                                                ["district_id"]:
-                                                                    value,
-                                                            })
-                                                        );
-                                                    }}
-                                                    label="المنطقة"
-                                                    placeholder="ا خترالمنطقة"
-                                                    name="district_id"
-                                                    required
-                                                    value={
-                                                        updateFormData.district_id
-                                                    }
-                                                ></MultiCheckbox>
-                                            </div>
-                                        </form>
-                                    </UIBaseDialog> */}
-                                </div>
-                            </td>
-                        </tr>
-                    ))}
                 </BaseDataTable>
             </div>
         </>

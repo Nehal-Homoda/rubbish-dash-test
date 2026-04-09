@@ -7,23 +7,21 @@ import {
 import { Setting } from "@/types/setting.interface";
 import { successDialog } from "@/utils/shared";
 import React, { useEffect, useState } from "react";
-
+type FormDataType = {
+    ios_version: string;
+    android_version: string;
+    vodafone_cash_number: number | string;
+    instapay_number: string;
+    recycle_price_by_kilo: number | string
+};
 export default function settings() {
     const [settingData, setSettingData] = useState<Setting | null>(null);
-
-    type FormDataType = {
-        ios_version: string;
-        android_version: string;
-        vodafone_cash_number: number;
-        instapay_number: string;
-        recycle_price_by_kilo:number
-    };
     const [formData, setFormData] = useState<FormDataType>({
         ios_version: "",
         android_version: "",
         vodafone_cash_number: 0,
         instapay_number: '',
-        recycle_price_by_kilo:0
+        recycle_price_by_kilo: 0
     });
     const fetchSettingData = () => {
         getSettingService()
@@ -31,14 +29,18 @@ export default function settings() {
                 setSettingData(response.data);
 
                 setFormData({
-                    android_version: response.data.android_version,
-                    ios_version: response.data.ios_version,
-                    vodafone_cash_number: parseInt(response.data.wallet_number),
-                    instapay_number: response.data.instapay_number,
-                    recycle_price_by_kilo:response.data.recycle_price_by_kilo
+                    android_version: response.data.android_version || "",
+                    ios_version: response.data.ios_version || "",
+                    vodafone_cash_number: response.data.wallet_number
+                        ? response.data.wallet_number.toString()
+                        : "0",
+                    instapay_number: response.data.instapay_number || "",
+                    recycle_price_by_kilo: response.data.recycle_price_by_kilo != null
+                        ? response.data.recycle_price_by_kilo.toString()
+                        : "0",
                 });
             })
-            .catch(() => {});
+            .catch(() => { });
     };
     const addFormChangeHander = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData((prev) => ({
@@ -59,22 +61,22 @@ export default function settings() {
                 fetchSettingData();
                 successDialog(true);
             })
-            .catch((error) => {});
+            .catch((error) => { });
     };
 
     const resetHandler = () => {
         setFormData({
-            android_version: settingData?.android_version ?? "",
-            ios_version: settingData?.ios_version ?? "",
-            vodafone_cash_number: parseInt(settingData?.wallet_number ?? ""),
-            instapay_number: settingData?.instapay_number ?? "",
-            recycle_price_by_kilo:settingData?.recycle_price_by_kilo ?? 0
+            android_version: settingData?.android_version || "",
+            ios_version: settingData?.ios_version || "",
+            vodafone_cash_number: settingData?.wallet_number ? settingData.wallet_number.toString() : '0',
+            instapay_number: settingData?.instapay_number || "",
+            recycle_price_by_kilo: settingData?.recycle_price_by_kilo ? settingData?.recycle_price_by_kilo : '0'
         });
     };
 
 
     useEffect(() => {
-      fetchSettingData();
+        fetchSettingData();
     }, [])
 
     return (
@@ -85,7 +87,7 @@ export default function settings() {
                     className="px-7 py-10 shadow-[0_0_1rem_#00000015] rounded-xl  space-y-10"
                 >
                     <h5 className="text-lg font-bold">
-                      الاعدادات الفنية
+                        الاعدادات الفنية
                     </h5>
                     <TextFieldNada
                         name="ios_version"

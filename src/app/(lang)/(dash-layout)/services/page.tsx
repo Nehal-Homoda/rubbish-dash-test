@@ -1,17 +1,13 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { District } from "@/types/district.interface";
 import TextFieldNada from "@/components/ui/form/TextFieldNada";
 import BaseDataTable from "@/components/data-tables/BaseDataTable";
 import UIPrimaryDropdown from "@/components/ui/UIPrimaryDropdown";
 import UIBaseDialog from "@/components/ui/UIBaseDialog";
-import MultiCheckbox from "@/components/ui/form/MultiCheckbox";
 import SelectInput from "@/components/ui/form/SelectInput";
 import { successDialog, validateAllInputs } from "@/utils/shared";
 import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
-import * as Yup from "yup"
-
-
+import * as Yup from "yup";
 import {
   addCategoryService,
   deleteCategoryService,
@@ -20,7 +16,6 @@ import {
 } from "@/services/categoriesService";
 import { Category } from "@/types/categories.interface";
 import FileInputImg from "@/components/ui/form/FileInputImg";
-import { useRouter } from "next/navigation";
 import { ToggleSwitch } from "flowbite-react";
 
 export default function rubbush_collectors() {
@@ -32,7 +27,7 @@ export default function rubbush_collectors() {
     { text: " عدد الاشتراكات", name: "no_of_subscriptions" },
     { text: "اعادة تدوير", name: "has_recycle" },
     { text: "الحالة", name: "is_active" },
-    { text: "الاجراءات", name: "image" },
+    { text: "الاجراءات", name: "procedures" },
   ];
   const statusList = [
     { is_active: 1, name: "مفعل" },
@@ -43,17 +38,59 @@ export default function rubbush_collectors() {
   const [selectedDataItem, setSelectedDataItem] = useState<Category | null>(
     null
   );
-
   const [activeFilter, setActiveFilter] = useState<boolean | undefined>(undefined);
   const [searchTerm, setSearchTerm] = useState<string | undefined>(undefined)
-  const router = useRouter();
-
-  const [isRecycled, setIsRecycled] = useState(false)
-
   const [switch1, setSwitch1] = useState(false);
+  const [addressSwicth, setAddressSwicth] = useState(false)
+  type FormDataType = {
+    name_ar: string;
+    name_en: string;
+    order: number;
+    is_active: number;
+    image: File | null | string;
+    has_recycle: number | null;
+    has_detailed_address: number;
+    discount_value_percentage: number | string;
+  };
+  interface FormDataInputErrors {
+    name_ar: string | null,
+    name_en: string | null,
+
+  }
+  const [formData, setFormData] = useState<FormDataType>({
+    name_ar: "",
+    name_en: "",
+    order: 0,
+    is_active: 0,
+    image: null,
+    has_recycle: 0,
+    has_detailed_address: 0,
+    discount_value_percentage: switch1 ? 0 : '',
+  });
+  const formSchema = Yup.object().shape({
+    name_ar: Yup.string().required('الاسم باللغه العربيه مطلوب'),
+    name_en: Yup.string().required('الاسم باللغه الانجليزيه مطلوب'),
+  })
+  const [updateFormData, setUpdateFormData] = useState<FormDataType>({
+    name_ar: "",
+    name_en: "",
+    order: 0,
+    is_active: 0,
+    image: null,
+    has_recycle: 0,
+    has_detailed_address: 0,
+    discount_value_percentage: 0,
+  });
+  const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
+    name_ar: "",
+    name_en: "",
+  });
+  const [errorMsg, setErrorMsg] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false)
+
 
   const handleCheckSubscription = (value: boolean, name: string) => {
-
     setSwitch1(!switch1);
     if (name == 'add') {
       setFormData((prev) => ({
@@ -66,76 +103,29 @@ export default function rubbush_collectors() {
     if (name == 'edit') {
       setUpdateFormData((prev) => ({
         ...prev,
-        ["has_recycle"]: value ? 1 : 0,
+        ["has_recycle"]: value ? 1 : null,
       }));
     }
 
   };
+  const handleCheckDetails = (value: boolean, name: string) => {
+    setAddressSwicth(!addressSwicth)
+    if (name == 'add') {
+      setFormData((prev) => ({
+        ...prev,
+        ["has_detailed_address"]: value ? 1 : 0,
+      }));
+    }
 
-  type FormDataType = {
-    name_ar: string;
-    name_en: string;
-    order: number;
-    is_active: number;
-    image: File | null | string;
-    has_recycle: number;
-    discount_value_percentage: number | string;
+
+    if (name == 'edit') {
+      setUpdateFormData((prev) => ({
+        ...prev,
+        ["has_detailed_address"]: value ? 1 : 0,
+      }));
+    }
+
   };
-  const [formData, setFormData] = useState<FormDataType>({
-    name_ar: "",
-    name_en: "",
-    order: 0,
-    is_active: 0,
-    image: null,
-    has_recycle: 0,
-    discount_value_percentage: switch1 ? 0 : '',
-  });
-
-  const formSchema = Yup.object().shape({
-    name_ar: Yup.string().required('الاسم باللغه العربيه مطلوب'),
-    name_en: Yup.string().required('الاسم باللغه الانجليزيه مطلوب'),
-
-
-  })
-
-  const [updateFormData, setUpdateFormData] = useState<FormDataType>({
-    name_ar: "",
-    name_en: "",
-    order: 0,
-    is_active: 0,
-    image: null,
-    has_recycle: 0,
-    discount_value_percentage: 0,
-  });
-
-  interface FormDataInputErrors {
-    name_ar: string | null,
-    name_en: string | null,
-
-  }
-
-  const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
-    name_ar: "",
-    name_en: "",
-
-
-  });
-
-
-  const [updateFormErrors, setUpdateFormErrors] = useState<FormDataInputErrors>({
-    name_ar: "",
-    name_en: "",
-
-
-  });
-
-
-
-  // const discountList = [
-  //   { id: 1, discount: "2-5" },
-  //   { id: 2, discount: "10-15" },
-  //   { id: 3, discount: "20-25" },
-  // ];
 
   const fetchDataList = ({
     search = searchTerm,
@@ -221,6 +211,7 @@ export default function rubbush_collectors() {
       is_active: item.is_active ? 1 : 0,
       image: null,
       has_recycle: item.has_recycle,
+      has_detailed_address: item.has_detailed_address,
       discount_value_percentage: item.has_recycle ? Number(item.discount_value_percentage) : 0,
     });
   };
@@ -237,34 +228,19 @@ export default function rubbush_collectors() {
     setFormErrors({ ...validateResult.outputResult });
 
     if (validateResult.isInvalid) return;
-
-
     if (!selectedDataItem) return;
-
     const body = JSON.stringify({
       ...updateFormData,
     });
-    setIsDialogOpen(false)
-
     updateCategoryService(selectedDataItem.id, body)
       .then((response) => {
-        setIsDialogOpen(true)
-
-        // setUpdateFormData({
-        //   name_ar: "",
-        //   name_en: "",
-        //   order: 0,
-        //   is_active: 0,
-        //   image: null,
-        //   has_recycle: 0,
-        //   discount_value_percentage: 0,
-        // })
+        setIsUpdateDialogOpen(false)
         fetchDataList();
         successDialog(true);
       })
       .catch((error) => {
-         setIsDialogOpen(false)
-       });
+        setIsUpdateDialogOpen(false)
+      });
   };
 
   const addFormChangeHander = (
@@ -289,14 +265,8 @@ export default function rubbush_collectors() {
 
     console.log(e.target.name, e.target.value);
   };
-
-  const [errorMsg, setErrorMsg] = useState("");
-
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-
   const createSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     setErrorMsg('')
     const validateResult = await validateAllInputs<FormDataType>(
       formSchema,
@@ -305,7 +275,6 @@ export default function rubbush_collectors() {
     if (!validateResult) return;
 
     setFormErrors({ ...validateResult.outputResult });
-
     if (validateResult.isInvalid) return;
 
     setIsDialogOpen(false)
@@ -315,7 +284,8 @@ export default function rubbush_collectors() {
     fd.append("name_en", formData.name_en);
     fd.append("order", formData.order.toString());
     fd.append("is_active", formData.is_active.toString());
-    fd.append("has_recycle", formData.has_recycle.toString())
+    fd.append("has_recycle", formData.has_recycle!.toString())
+    fd.append("has_detailed_address", formData.has_detailed_address.toString())
     if (formData.image) {
       fd.append("image", formData.image);
     }
@@ -325,7 +295,7 @@ export default function rubbush_collectors() {
 
     addCategoryService(fd)
       .then((response) => {
-        setIsDialogOpen(true)
+
         fetchDataList();
 
         //@ts-ignore
@@ -337,6 +307,7 @@ export default function rubbush_collectors() {
           is_active: 0,
           image: null,
           has_recycle: 0,
+          has_detailed_address: 0,
           discount_value_percentage: 0,
         });
       })
@@ -345,23 +316,6 @@ export default function rubbush_collectors() {
         setIsDialogOpen(false)
       });
   };
-
-  const resetForm = () => {
-    setFormData({
-      image: "",
-      is_active: 0,
-      name_ar: "",
-      name_en: "",
-      order: 0,
-      has_recycle: 0,
-      discount_value_percentage: 0,
-    });
-  };
-
-
-
-
-
   const tableHeadActionsSlot = () => {
     return (
       <>
@@ -376,16 +330,18 @@ export default function rubbush_collectors() {
         >
           الحالة
         </UIPrimaryDropdown>
+
+
         <UIBaseDialog
-          dismiss={isDialogOpen}
-          confirmCloseHandler={resetForm}
+          open={isDialogOpen}
+          onClose={() => setIsDialogOpen(false)}
           title="اضافة خدمة"
           confirmHandler={() => { }}
           confirmText="اضافة"
           form="update-form"
           btn={
             <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
-              <button className="bg-[#0094140D] p-1 rounded-lg">
+              <button onClick={() => setIsDialogOpen(true)} className="bg-[#0094140D] p-1 rounded-lg">
                 اضافة خدمة
               </button>
             </div>
@@ -449,12 +405,20 @@ export default function rubbush_collectors() {
                 }}
               ></SelectInput>
 
-              <div className="py-6 ">
+
+              <div className="grid grid-cols-2 py-6 ">
+
                 <ToggleSwitch
                   checked={switch1}
                   label="اعادة تدوير"
                   onChange={(value) => handleCheckSubscription(value, 'add')}
                 />
+                <ToggleSwitch
+                  checked={addressSwicth}
+                  label="عرض تفاصيل العنوان"
+                  onChange={(value) => handleCheckDetails(value, 'add')}
+                />
+
               </div>
 
               {switch1 && (
@@ -474,184 +438,184 @@ export default function rubbush_collectors() {
     <>
       <div className="py-20">
         <BaseDataTable
+          items={dataList}
           headItems={headerArr}
           onPageChange={setPage}
           totalPages={totalPages}
           onSearchChange={tableSearchHandler}
           headerActionsSlot={tableHeadActionsSlot()}
-        >
-          {dataList.map((item, index) => (
-            <tr key={index}>
-              <td className="py-2 px-4">{item.id}</td>
+          renderers={{
+            image: (item) => (
+              <div className="w-12 h-12 max-h-[30px] bg-gray-50 rounded-md">
+                <img
+                  src={item.image}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            ),
 
-              <td className="py-2 px-4">
-                <div className="w-[100px] aspect-[3/1.5] max-h-[30px] bg-gray-50 rounded-md">
-                  {item.image && (
-                    <img
-                      src={item.image}
-                      alt=""
-                      className="w-full h-full object-contain"
-                    />
-                  )}
+            has_recycle: (item, index: number) => (
+              item.has_recycle ?
+                <div className="bg-[#009414] text-white rounded-full w-7 h-7 overflow-hidden flex justify-center items-center">
+                  <span className="mdi mdi-check"></span>
                 </div>
-              </td>
-              <td className="py-2 px-4">{item.name_ar}</td>
-              <td className="py-2 px-4">{item.no_of_subscriptions}</td>
+                :
+                <div className="bg-[#F9285A] text-white rounded-full w-7 h-7 overflow-hidden flex justify-center items-center">
+                  <span className="mdi mdi-close"></span>
+                </div>
+            ),
 
 
-              <td className="py-2 px-4">
-                {item.has_recycle ?
-
-                  <div className="bg-[#009414] text-white rounded-full w-7 h-7 overflow-hidden flex justify-center items-center">
-                    <span className="mdi mdi-check"></span>
-                  </div>
-
-                  :
-                  <div className="bg-[#F9285A] text-white rounded-full w-7 h-7 overflow-hidden flex justify-center items-center">
-                    <span className="mdi mdi-close"></span>
-                  </div>
+            is_active: (item, index: number) => (
+              <UIPrimaryDropdown
+                tiny
+                itemName="name"
+                itemValue="is_active"
+                btnColorTailwindClass={
+                  !item.is_active
+                    ? "bg-red-100 text-red-600 hover:bg-red-200"
+                    : undefined
                 }
-              </td>
+                items={statusList}
+                onSelected={(value) => updateDataItemActive(value, index)}
+              >
+                {item.is_active ? "مفعل" : "غير مفعل"}
+              </UIPrimaryDropdown>
+            ),
 
-              <td className="py-2 px-4">
-                <UIPrimaryDropdown
-                  tiny={true}
-                  itemName="name"
-                  itemValue="is_active"
-                  btnColorTailwindClass={
-                    !item.is_active
-                      ? "bg-red-100 text-red-600 hover:bg-text-red-200"
-                      : undefined
-                  }
-                  onSelected={(value) => {
-                    updateDataItemActive(value, index);
+            procedures: (item, index: number) => (
+              <div className="flex justify-center gap-3">
+                <UIDialogConfirm
+                  danger
+                  title="هل انت متأكد من حذف العنصر"
+                  confirmHandler={() => {
+                    deleteSubmit(item, index);
                   }}
-                  items={statusList}
                 >
-                  {item.is_active ? "مفعل" : "غير مفعل"}
-                </UIPrimaryDropdown>
-              </td>
-              <td className="">
-                <div className="flex  gap-3">
-                  <UIDialogConfirm
-                    danger
-                    title="هل انت متأكد من حذف العنصر"
-                    confirmHandler={() => {
-                      deleteSubmit(item, index);
-                    }}
-                  >
-                    <button className="bg-[#F9285A0A] p-1 rounded-lg">
-                      <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
-                    </button>
-                  </UIDialogConfirm>
-                  <UIBaseDialog
-                    dismiss={isDialogOpen}
-                    title="تعديل خدمة"
-                    confirmHandler={() => { }}
-                    confirmText="تعديل"
-                    form="update-form"
-                    btn={
-                      <button
-                        onClick={() => {
-                          updateDataItem(item);
-                        }}
-                        className="bg-[#0094140D] p-1 rounded-lg"
-                      >
-                        <span className="mdi mdi-folder-edit-outline text-[#009414]"></span>
-                      </button>
-                    }
-                  >
-                    <form onSubmit={updateSubmit} id="update-form">
-                      <div className="space-y-7">
-                        <div className="w-full flex justify-center mb-20">
-                          <FileInputImg
-                            state="edit"
-                            fileUrl={item.image ? item.image : ''}
-                            onFileChange={(arg) => {
-                              setUpdateFormData((prev) => ({
-                                ...prev,
-                                ["image"]: arg?.file64 ?? null,
-                              }));
-                            }}
-                          ></FileInputImg>
-                        </div>
+                  <button className="bg-[#F9285A0A] p-1 rounded-lg">
+                    <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
+                  </button>
+                </UIDialogConfirm>
+                <button
+                  onClick={() => {
+                    updateDataItem(item);
+                    setIsUpdateDialogOpen(true);
+                  }}
+                  className="bg-[#0094140D] p-1 rounded-lg"
+                >
+                  <span className="mdi mdi-folder-edit-outline text-[#009414]"></span>
+                </button>
+              </div>
+            ),
+          }}
 
-                        <TextFieldNada
-                          name="name_ar"
-                          type="text"
-                          handleChange={updateFormChangeHander}
-                          value={updateFormData.name_ar}
-                          label=" اسم الخدمة ( عربي ) "
-                          placeholder=" اسم الخدمة  "
-                          errorMessage={formErrors.name_ar || ''}
-                        ></TextFieldNada>
-
-                        <TextFieldNada
-                          name="name_en"
-                          type="text"
-                          handleChange={updateFormChangeHander}
-                          value={updateFormData.name_en}
-                          label=" اسم الخدمة ( انجليزي ) "
-                          placeholder=" اسم الخدمة  "
-                          errorMessage={formErrors.name_en || ''}
-                        ></TextFieldNada>
-
-                        <SelectInput
-                          value={updateFormData.is_active}
-                          items={statusList}
-                          itemName="name"
-                          itemValue="is_active"
-                          label="الحالة"
-                          placeholder="لختر الحالة"
-                          name="is_active"
-                          required={true}
-                          onChange={(value) => {
-                            setUpdateFormData((prev) => ({
-                              ...prev,
-                              ["is_active"]: value,
-                            }));
-                          }}
-                        ></SelectInput>
-
-                        <div className="py-6 ">
-                          <ToggleSwitch
-                            checked={updateFormData.has_recycle ? true : false}
-                            label="اعادة تدوير"
-                            onChange={(value) => handleCheckSubscription(value, 'edit')}
-                          />
-                        </div>
-
-                        {updateFormData.has_recycle && (
-                          // <SelectInput
-                          //   placeholder="اختر نسبة الخصم"
-                          //   onChange={(value) =>
-                          //     setUpdateFormData((prev) => ({
-                          //       ...prev,
-                          //       ["discount_rate_id"]: value,
-                          //     }))
-                          //   }
-                          //   value={updateFormData.discount_rate_id}
-                          //   name="discount"
-                          //   items={discountList}
-                          //   itemName="discount"
-                          //   itemValue="id"
-                          //   label="نسبة الخصم"
-                          //   prependIcon="mdi mdi-ticket-percent-outline"
-                          // ></SelectInput>
-
-
-                          <TextFieldNada isPercentage={true} prependIcon="mdi mdi-ticket-percent-outline text-gray-400 " handleChange={updateFormChangeHander} name="discount_value_percentage" label="نسبة الخصم" placeholder="ادخل نسبة الخصم" type="number" value={updateFormData.discount_value_percentage} />
-                        )}
-                      </div>
-                    </form>
-                  </UIBaseDialog>
-                </div>
-              </td>
-
-
-            </tr>
-          ))}
+        >
         </BaseDataTable>
+
+
+        <UIBaseDialog
+          open={isUpdateDialogOpen}
+          onClose={() => setIsUpdateDialogOpen(false)}
+          title="تعديل خدمة"
+          confirmHandler={() => { }}
+          confirmText="تعديل"
+          form="update-form"
+        >
+          <form onSubmit={updateSubmit} id="update-form">
+            <div className="space-y-7">
+              <div className="w-full flex justify-center mb-20">
+                <FileInputImg
+                  state="edit"
+                  fileUrl={updateFormData.image as string}
+                  onFileChange={(arg) => {
+                    setUpdateFormData((prev) => ({
+                      ...prev,
+                      ["image"]: arg?.file64 ?? null,
+                    }));
+                  }}
+                ></FileInputImg>
+              </div>
+
+              <TextFieldNada
+                name="name_ar"
+                type="text"
+                handleChange={updateFormChangeHander}
+                value={updateFormData.name_ar}
+                label=" اسم الخدمة ( عربي ) "
+                placeholder=" اسم الخدمة  "
+                errorMessage={formErrors.name_ar || ''}
+              ></TextFieldNada>
+
+              <TextFieldNada
+                name="name_en"
+                type="text"
+                handleChange={updateFormChangeHander}
+                value={updateFormData.name_en}
+                label=" اسم الخدمة ( انجليزي ) "
+                placeholder=" اسم الخدمة "
+                errorMessage={formErrors.name_en || ''}
+              ></TextFieldNada>
+
+              <SelectInput
+                value={updateFormData.is_active}
+                items={statusList}
+                itemName="name"
+                itemValue="is_active"
+                label="الحالة"
+                placeholder="اختر الحالة"
+                name="is_active"
+                required={true}
+                onChange={(value) => {
+                  setUpdateFormData((prev) => ({
+                    ...prev,
+                    ["is_active"]: value,
+                  }));
+                }}
+              ></SelectInput>
+
+
+              <div className="grid grid-cols-2 py-6 ">
+
+
+                <ToggleSwitch className="col-span-1"
+                  checked={updateFormData.has_recycle ? true : false}
+                  label="اعادة تدوير"
+                  onChange={(value) => handleCheckSubscription(value, 'edit')}
+                />
+
+
+                <ToggleSwitch className="col-span-1"
+                  checked={updateFormData.has_detailed_address ? true : false}
+                  label="عرض تفاصيل العنوان"
+                  onChange={(value) => handleCheckDetails(value, 'edit')}
+                />
+
+              </div>
+
+              {updateFormData.has_recycle && (
+                // <SelectInput
+                //   placeholder="اختر نسبة الخصم"
+                //   onChange={(value) =>
+                //     setUpdateFormData((prev) => ({
+                //       ...prev,
+                //       ["discount_rate_id"]: value,
+                //     }))
+                //   }
+                //   value={updateFormData.discount_rate_id}
+                //   name="discount"
+                //   items={discountList}
+                //   itemName="discount"
+                //   itemValue="id"
+                //   label="نسبة الخصم"
+                //   prependIcon="mdi mdi-ticket-percent-outline"
+                // ></SelectInput>
+
+
+                <TextFieldNada isPercentage={true} prependIcon="mdi mdi-ticket-percent-outline text-gray-400 " handleChange={updateFormChangeHander} name="discount_value_percentage" label="نسبة الخصم" placeholder="ادخل نسبة الخصم" type="number" value={updateFormData.discount_value_percentage} />
+              )}
+            </div>
+          </form>
+        </UIBaseDialog>
       </div >
     </>
   );

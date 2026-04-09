@@ -10,7 +10,7 @@ export const districtListService = async () => {
     try {
         const response = await apiCall.get(`/admins/districts`, {
             headers: {
-                Authorization: `Bearer ${token}`,
+                // Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
         });
@@ -28,7 +28,7 @@ export const paymentMethodListService = async () => {
     try {
         const response = await apiCall.get(`/admins/payment_methods`, {
             headers: {
-                Authorization: `Bearer ${token}`,
+                // Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
         });
@@ -47,7 +47,7 @@ export const subscriptionListService = async () => {
     try {
         const response = await apiCall.get(`admins/subscriptions`, {
             headers: {
-                Authorization: `Bearer ${token}`,
+                // Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
         });
@@ -65,7 +65,7 @@ export const statisticsHomeService = async () => {
     try {
         const response = await apiCall.get(`/admins/home/section-one`, {
             headers: {
-                Authorization: `Bearer ${token}`,
+                // Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
         });
@@ -83,7 +83,7 @@ export const collectorsHomeService = async () => {
     try {
         const response = await apiCall.get(`/admins/home/section-two`, {
             headers: {
-                Authorization: `Bearer ${token}`,
+                // Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
         });
@@ -101,7 +101,7 @@ export const paymentsHomeService = async () => {
     try {
         const response = await apiCall.get(`/admins/home/section-four`, {
             headers: {
-                Authorization: `Bearer ${token}`,
+                // Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
         });
@@ -122,10 +122,10 @@ export const chartStatisticsHomeService = async (query?: string) => {
             `/admins/home/section-three${decodeURIComponent(query || "")}`,
             {
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    // Authorization: `Bearer ${token}`,
                     "Content-Type": "application/json",
                 },
-            }
+            },
         );
         if (!response.ok) {
             await responseErrorServiceHandler(response, "statistics");
@@ -144,10 +144,10 @@ export const showTicketMessagesCountService = async () => {
             `/admins/tickets/open-tickets-count`,
             {
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    // Authorization: `Bearer ${token}`,
                     "Content-Type": "application/json",
                 },
-            }
+            },
         );
         if (!response.ok) {
             await responseErrorServiceHandler(response, "show messages");

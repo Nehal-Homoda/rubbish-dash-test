@@ -27,15 +27,31 @@ import { Payment_methods } from "@/types/paymentMethod.interface";
 import { RadioGroup } from "@headlessui/react";
 import moment from "moment";
 import * as Yup from "yup";
-import { validateAllInputs } from "@/utils/shared";
+import { successDialog, validateAllInputs } from "@/utils/shared";
 
 
 
+interface FormDataInputErrors {
+    name: string | null;
+    phone: string;
+    days: string;
+    time_from: string;
+
+
+}
+type FormDataType = {
+    name: string;
+    phone: string;
+    days: string[];
+    time_from: string;
+
+
+};
 
 
 export default function page() {
     const [district, setDistrict] = useState<Region[]>([]);
-    const [selectedDate, setSelectedDate] = useState();
+    // const [selectedDate, setSelectedDate] = useState();
     const [packagesList, setpackagesList] = useState<PackageOffer[]>([]);
     const [categoryList, setCategoryList] = useState<Category[]>([]);
     const [selectedPackage, setSelectedPackage] = useState<PackageOffer | null>(
@@ -83,34 +99,25 @@ export default function page() {
         // }
     };
 
-
-    interface FormDataInputErrors {
-        name: string | null;
-        phone: string;
-        days: string;
-        time_from: string;
-
-
-    }
-    type FormDataType = {
-        name: string;
-        phone: string;
-        days: string[];
-        time_from: string;
-
-
-    };
-
     const formSchema = Yup.object().shape({
-        name: Yup.string().required(),
-        phone: Yup.string().required(),
-        days: Yup.array()
-            .of(Yup.string())
-            .min(1, "Select at least one day")
-            .required("Available days are required"),
-        time_from: Yup.string().required("Time is  required"),
+        name: Yup.string().required("Name is required"),
+        phone: Yup.string().required("Phone is required"),
 
+        days: Yup.array().when("has_subscription", {
+            is: 1,
+            then: (schema) =>
+                schema
+                    .of(Yup.string())
+                    .min(1, "Select at least one day")
+                    .required("Days required"),
+            otherwise: (schema) => schema.notRequired(),
+        }),
 
+        time_from: Yup.string().when("has_subscription", {
+            is: 1,
+            then: (schema) => schema.required("Time is required"),
+            otherwise: (schema) => schema.notRequired(),
+        }),
     });
 
     const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
@@ -121,14 +128,51 @@ export default function page() {
 
 
     });
+    const [switch1, setSwitch1] = useState(false);
+    const [formData, setFormData] = useState({
+        name: "",
+        phone: "",
+        password: "default-password",
+        district_id: "",
+        has_subscription: 0,
+        package_id: "",
+        is_request_recycle: 0,
 
+        payment_method_id: "",
+        days: [],
+        start_date: "",
 
-    //   const form = {
-    //     name: "",
-    //     phone: "",
-    //     password: "",
-    //   };
+        end_date: "",
+        time_from: "",
+        units: 1,
+        category_id: "",
+        payment_verification: "",
+        address_title: "",
+        address_lat: "34.1531",
+        address_lng: "34.1531",
+        address_details: "",
+    });
+    const [categoryDiscount, setCategoryDiscount] = useState(0)
+    const [unitsDiscount, setUnitsDiscount] = useState(0)
+    const [packagePrice, setPackagePrice] = useState(0)
+    const serviceTypeList = [{ is_request_recycle: 0, name: 'جمع' }, { is_request_recycle: 1, name: 'جمع وتدوير' }]
+    const [districtAvailableDays, setDistrictAvailableDays] = useState([
+        { title: 'السبت ', slug: 'saturday' },
+        { title: ' الاحد', slug: 'sunday' },
+        { title: 'الاتنين ', slug: 'monday' },
+        { title: 'الثلاثاء ', slug: 'tuesday' },
+        { title: 'الاربعاء ', slug: 'wednesday' },
+        { title: 'الخميس ', slug: 'thursday' },
+        { title: 'الجمعه ', slug: 'friday' },
 
+    ]);
+    const maxEndDate = packageItem && formData.start_date
+        ? moment(formData.start_date).add(30, 'days').format('YYYY-MM-DD')
+        : undefined;
+    //@ts-ignore
+    const takeUploadedImg = (img) => {
+        console.log(img);
+    };
     const fetchDistrict = () => {
         districtListService().then((response) => {
 
@@ -146,6 +190,7 @@ export default function page() {
     };
     //@ts-ignore
     const handleAddUserSubmit = async (e) => {
+
         e.preventDefault();
         setErrorMessage("");
 
@@ -186,9 +231,9 @@ export default function page() {
                 fd.append(`days[${index}]`, day)
             );
         }
-
         addUserService(fd)
             .then((response) => {
+                successDialog(true)
                 router.push("/users");
             })
             .catch((error) => {
@@ -223,92 +268,102 @@ export default function page() {
         });
     };
 
-    const [switch1, setSwitch1] = useState(false);
-    const [formData, setFormData] = useState({
-        name: "",
-        phone: "",
-        password: "default-password",
-        district_id: "",
-        has_subscription: 0,
-        package_id: "",
-        is_request_recycle: 0,
-
-        payment_method_id: "",
-        days: [],
-        start_date: "",
-
-        end_date: "",
-        time_from: "",
-        units: 1,
-        category_id: "",
-        payment_verification: "",
-        address_title: "",
-        address_lat: "34.1531",
-        address_lng: "34.1531",
-        address_details: "",
-    });
-
-    const [categoryDiscount, setCategoryDiscount] = useState(0)
-    const [packagePrice, setPackagePrice] = useState(0)
-
-
-    //@ts-ignore
-    const takeUploadedImg = (img) => {
-        console.log(img);
-    };
-
-    useEffect(() => {
-        if (packageItem && !!formData.is_request_recycle) {
+    const getRecyclingPrice = () => {
+        if (packageItem)
             setPackagePrice(Number(packageItem.price_per_unit) - (Number(packageItem.price_per_unit) * (Number((categoryDiscount) / 100))))
-            console.log('hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii i have extra discount')
+    }
 
-        }
-        else {
-            setPackagePrice(Number(packageItem?.price_per_unit))
-        }
-
-
-
-    }, [packageItem, !!formData.is_request_recycle])
-
-
-
-    useEffect(() => {
-        if (packageItem && !!formData.is_request_recycle) {
-            setTotalPrice(Number(packagePrice) * formData.units);
-        }
-        else {
-            setTotalPrice(Number(packageItem?.price_per_unit) * formData.units);
-
-        }
-    }, [formData.units ,formData.is_request_recycle]);
-
-    useEffect(() => {
-        if (packageItem && !!formData.is_request_recycle) {
-            setTotalPrice(Number(packagePrice) * formData.units);
-        }
-        else {
-            setTotalPrice(Number(packageItem?.price_per_unit) * formData.units);
-
-        }
-    }, [packagePrice , formData.is_request_recycle]);
-
-    useEffect(() => {
+    const getUnitsDiscountPrice = () => {
         if (packageItem) {
-            setFormData((prev) => ({
-                ...prev,
-                ['end_date']: moment(formData.start_date).add(packageItem.days_count, 'days').format('YYYY-MM-DD')
-            }))
+
+            if (formData.units == 1) {
+                const x = packageItem?.discounts.find((item, index) => {
+                    return item.min_units == 1
+                })
+
+                if (!x) return
+                setUnitsDiscount(parseFloat(x.discount_rate))
+                setPackagePrice(Number(packageItem.price_per_unit) - (Number(packageItem.price_per_unit) * (Number((unitsDiscount) / 100))))
+            }
+
+            else if (formData.units >= 2 && formData.units <= 5) {
+
+                const x = packageItem?.discounts.find((item, index) => {
+                    return item.min_units == 2
+                })
+                if (!x) return
+                setUnitsDiscount(parseFloat(x.discount_rate))
+                setPackagePrice(Number(packageItem.price_per_unit) - (Number(packageItem.price_per_unit) * (Number((unitsDiscount) / 100))))
+                console.log('discount between 2 and 5')
+
+            }
+            else if (formData.units >= 6 && formData.units <= 9) {
+
+                const x = packageItem?.discounts.find((item, index) => {
+                    return item.min_units == 6
+                })
+                if (!x) return
+                setUnitsDiscount(parseFloat(x.discount_rate))
+                setPackagePrice(Number(packageItem.price_per_unit) - (Number(packageItem.price_per_unit) * (Number((unitsDiscount) / 100))))
+                console.log('discount between 6 and 9')
+
+            }
+            else if (formData.units >= 10 && formData.units <= 15) {
+
+                const x = packageItem?.discounts.find((item, index) => {
+                    return item.min_units == 10
+                })
+                if (!x) return
+                setUnitsDiscount(parseFloat(x.discount_rate))
+                setPackagePrice(Number(packageItem.price_per_unit) - (Number(packageItem.price_per_unit) * (Number((unitsDiscount) / 100))))
+
+            }
+            else if (formData.units >= 16 && formData.units <= 19) {
+
+                const x = packageItem?.discounts.find((item, index) => {
+                    return item.min_units == 16
+                })
+                if (!x) return
+                setUnitsDiscount(parseFloat(x.discount_rate))
+                setPackagePrice(Number(packageItem.price_per_unit) - (Number(packageItem.price_per_unit) * (Number((unitsDiscount) / 100))))
+
+            }
+            else if (formData.units >= 20) {
+
+                const x = packageItem?.discounts.find((item, index) => {
+                    return item.min_units == 20
+                })
+                if (!x) return
+                setUnitsDiscount(parseFloat(x.discount_rate))
+                setPackagePrice(Number(packageItem.price_per_unit) - (Number(packageItem.price_per_unit) * (Number((unitsDiscount) / 100))))
+
+            }
+            else {
+                const x = packageItem?.discounts.find((item, index) => {
+                    return item.min_units == 1
+                })
+
+                if (!x) return
+                setUnitsDiscount(parseFloat(x.discount_rate))
+                setPackagePrice(Number(packageItem.price_per_unit) - (Number(packageItem.price_per_unit) * (Number((unitsDiscount) / 100))))
+
+
+            }
+
         }
-    }, [packageItem])
-    useEffect(() => {
+        else {
+            return
+        }
+    }
+
+    const getBothDiscountPrice = () => {
         if (packageItem) {
-            setFormData((prev) => ({
-                ...prev,
-                ['end_date']: moment(formData.start_date).add(packageItem.days_count, 'days').format('YYYY-MM-DD')
-            }))
+            getUnitsDiscountPrice()
+            const recyclingPrice = Number(packageItem.price_per_unit) - (Number(packageItem.price_per_unit) * (Number((categoryDiscount) / 100)))
+            setPackagePrice(recyclingPrice - (recyclingPrice * ((unitsDiscount) / 100)))
+
         }
-    }, [formData.start_date])
+    }
 
     //@ts-ignore
     const handleSelectPackage = (value) => {
@@ -354,13 +409,67 @@ export default function page() {
         })
         if (!obj) return
         setCategoryDiscount(obj.discount_value_percentage)
-        console.log('discount is', obj.discount_value_percentage)
-
-
-
     }
 
-    const serviceTypeList = [{ is_request_recycle: 0, name: 'جمع' }, { is_request_recycle: 1, name: 'جمع وتدوير' }]
+    useEffect(() => {
+
+        if (packageItem && !!formData.is_request_recycle) {
+            console.log('is recycle and have discount of units')
+            getBothDiscountPrice()
+
+        }
+
+
+        else {
+            console.log('is not recycle but have discount of units')
+
+            getUnitsDiscountPrice()
+        }
+
+    }, [packageItem, formData.is_request_recycle, formData.category_id, formData.units])
+
+
+    //😏chatgpt as setPackagePrice is asynchronous 
+    useEffect(() => {
+        if (unitsDiscount != null && formData.is_request_recycle) {
+            getBothDiscountPrice()
+
+        } else {
+            getUnitsDiscountPrice()
+        }
+    }, [unitsDiscount, formData.is_request_recycle]);
+
+    useEffect(() => {
+        if (packageItem) {
+            setTotalPrice(Number(packagePrice) * formData.units);
+        }
+        else {
+            //@ts-ignore
+            setTotalPrice(Number(packageItem?.price_per_unit) * formData.units);
+
+        }
+    }, [formData.units, packagePrice]);
+
+
+
+    useEffect(() => {
+        if (packageItem) {
+            setFormData((prev) => ({
+                ...prev,
+                ['end_date']: moment(formData.start_date).add(packageItem.days_count, 'days').format('YYYY-MM-DD')
+            }))
+        }
+    }, [packageItem])
+    useEffect(() => {
+        if (packageItem) {
+            setFormData((prev) => ({
+                ...prev,
+                ['end_date']: moment(formData.start_date).add(packageItem.days_count, 'days').format('YYYY-MM-DD')
+            }))
+        }
+    }, [formData.start_date])
+
+
 
     useEffect(() => {
         fetchDistrict();
@@ -368,55 +477,6 @@ export default function page() {
         fetchPackages();
         fetchCategories();
     }, []);
-
-
-
-    // useEffect(() => {
-    //     if (formData.district_id) {
-    //         const ca = district.find(
-    //             (item) => item.id.toString() == formData.district_id.toString()
-    //         );
-
-    //         const daysObj = {
-    //             saturday: 'السبت',
-    //             sunday: 'الاحد',
-    //             monday: 'الاتنين',
-    //             tuesday: 'الثلاثاء',
-    //             wednesday: 'الاربعاء',
-    //             thursday: 'الخميس'
-    //         }
-
-    //         if (ca && districtAvailableDays) {
-    //             const updatedArr = ca?.available_days.map((item: string) => ({
-
-    //                 item,
-    //                 title: daysObj[item] || item
-
-    //             }))
-
-    //             //@ts-ignore
-    //             setDistrictAvailableDays(updatedArr)
-
-    //         }
-
-
-
-
-
-
-
-
-
-
-
-    //         // if (ca) {
-    //         //     setDistrictAvailableDays(ca.available_days);
-    //         //     setDistrictTime(ca.available_times);
-    //         // }
-    //     }
-    // }, [formData]);
-
-
 
 
     useEffect(() => {
@@ -450,22 +510,6 @@ export default function page() {
             }
         }
     }, [formData.district_id, district]);
-
-    const [districtAvailableDays, setDistrictAvailableDays] = useState([
-        { title: 'السبت ', slug: 'saturday' },
-        { title: ' الاحد', slug: 'sunday' },
-        { title: 'الاتنين ', slug: 'monday' },
-        { title: 'الثلاثاء ', slug: 'tuesday' },
-        { title: 'الاربعاء ', slug: 'wednesday' },
-        { title: 'الخميس ', slug: 'thursday' },
-        { title: 'الجمعه ', slug: 'friday' },
-
-    ]);
-
-    const maxEndDate = packageItem && formData.start_date
-        ? moment(formData.start_date).add(30, 'days').format('YYYY-MM-DD')
-        : undefined;
-
 
 
     return (
@@ -618,12 +662,14 @@ export default function page() {
                                             handleChange={(e) =>
                                                 takeValue(e, "units")
                                             }
+
                                             value={
                                                 packagePrice.toString()
 
                                             }
                                             label=" سعر الباقة "
                                             placeholder="  سعر الباقة "
+
                                         ></TextFieldNada>
                                     </div>
 

@@ -7,7 +7,6 @@ import UIBaseDialog from "@/components/ui/UIBaseDialog";
 import SelectInput from "@/components/ui/form/SelectInput";
 import { successDialog, validateAllInputs } from "@/utils/shared";
 import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
-
 import FileInputImg from "@/components/ui/form/FileInputImg";
 import { Guideline } from "@/types/guidelines.interface";
 import {
@@ -33,7 +32,13 @@ interface FormDataInputErrors {
     order: string;
     image: string;
 }
-
+type FormDataType = {
+    title_ar: string;
+    title_en: string;
+    order: number;
+    is_active: number;
+    image: File | null | string;
+};
 
 
 
@@ -43,10 +48,10 @@ export default function rubbush_collectors() {
     const headerArr = [
         { text: "ID", name: "id" },
         { text: " الصورة ", name: "image" },
-        { text: " النص", name: "name_ar" },
+        { text: " النص", name: "title" },
         { text: "الحالة", name: "is_active" },
-        { text: "الترتيب", name: "is_active" },
-        { text: "الاجراءات", name: "image" },
+        { text: "الترتيب", name: "order" },
+        { text: "الاجراءات", name: "procedures" },
     ];
     const statusList = [
         { is_active: 1, name: "مفعل" },
@@ -57,13 +62,6 @@ export default function rubbush_collectors() {
     const [selectedDataItem, setSelectedDataItem] = useState<Guideline | null>(
         null
     );
-    type FormDataType = {
-        title_ar: string;
-        title_en: string;
-        order: number;
-        is_active: number;
-        image: File | null | string;
-    };
     const [formData, setFormData] = useState<FormDataType>({
         title_ar: "",
         title_en: "",
@@ -71,7 +69,6 @@ export default function rubbush_collectors() {
         is_active: 0,
         image: null,
     });
-
     const formSchema = Yup.object().shape({
         title_ar: Yup.string().required(),
         title_en: Yup.string().required(),
@@ -92,8 +89,6 @@ export default function rubbush_collectors() {
         image: "",
     });
     const [errorMsg, setErrorMsg] = useState("");
-
-
     const [updateFormData, setUpdateFormData] = useState<FormDataType>({
         title_ar: "",
         title_en: "",
@@ -104,6 +99,8 @@ export default function rubbush_collectors() {
 
     const [searchTerm, setSearchTerm] = useState("");
     const [activeFilter, setActiveFilter] = useState<boolean | undefined>(undefined);
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false)
 
     const fetchDataList = ({
         search = searchTerm,
@@ -129,10 +126,6 @@ export default function rubbush_collectors() {
 
             })
     };
-
-
-
-
     const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
         setSearchTerm(val);
@@ -145,9 +138,6 @@ export default function rubbush_collectors() {
         setPage(1);
         fetchDataList({ is_active: value, pageNum: 1 });
     };
-
-
-
 
     const updateDataItemActive = (value: any, index: number) => {
         const service = dataList.find((item, i) => {
@@ -214,17 +204,18 @@ export default function rubbush_collectors() {
         const body = JSON.stringify({
             ...updateFormData,
         });
-        setIsDialogOpen(false)
+
 
         updateGuidelineService(selectedDataItem.id, body)
             .then((response) => {
-                setIsDialogOpen(true)
+                setIsUpdateDialogOpen(false)
                 fetchDataList();
                 successDialog(true);
             })
-            .catch((error) => { 
-                 setIsDialogOpen(false)
-                setErrorMsg(error?.message) });
+            .catch((error) => {
+                setIsUpdateDialogOpen(false)
+                setErrorMsg(error?.message)
+            });
     };
 
     const addFormChangeHander = (
@@ -267,10 +258,8 @@ export default function rubbush_collectors() {
             formSchema,
             formData
         );
-        console.log('validate', validateResult)
         if (!validateResult) return
         setFormErrors({ ...validateResult.outputResult });
-        console.log('form error', formErrors)
         if (validateResult.isInvalid) return;
 
         const fd = new FormData();
@@ -281,10 +270,9 @@ export default function rubbush_collectors() {
         if (formData.image) {
             fd.append("image", formData.image);
         }
-setIsDialogOpen(false)
         addGuidelineService(fd)
             .then((response) => {
-                setIsDialogOpen(true)
+                setIsDialogOpen(false)
                 fetchDataList();
                 //@ts-ignore
                 successDialog(true);
@@ -301,10 +289,6 @@ setIsDialogOpen(false)
                 setErrorMsg(error.message)
             });
     };
-    const [isDialogOpen, setIsDialogOpen] = useState(false)
-
-
-
 
     const tableHeadActionsSlot = () => {
         return (
@@ -320,14 +304,16 @@ setIsDialogOpen(false)
                 >
                     الحالة
                 </UIPrimaryDropdown>
-                <UIBaseDialog dismiss={isDialogOpen} confirmCloseHandler={resetForm}
+                <UIBaseDialog
+                    open={isDialogOpen}
+                    onClose={() => setIsDialogOpen(false)}
                     title="اضافة ارشاد"
                     confirmHandler={() => { }}
                     confirmText="اضافة"
                     form="update-form"
                     btn={
                         <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
-                            <button className="bg-[#0094140D] p-1 rounded-lg">
+                            <button onClick={() => setIsDialogOpen(true)} className="bg-[#0094140D] p-1 rounded-lg">
                                 اضافة ارشاد
                             </button>
                         </div>
@@ -421,172 +407,172 @@ setIsDialogOpen(false)
         <>
             <div className="py-20">
                 <BaseDataTable
+                    items={dataList}
                     headItems={headerArr}
                     onPageChange={setPage}
                     totalPages={totalPages}
                     onSearchChange={tableSearchHandler}
                     headerActionsSlot={tableHeadActionsSlot()}
-                >
-                    {dataList.map((item, index) => (
-                        <tr key={index}>
-                            <td className="py-2 px-4">{item.id}</td>
-
-                            <td className="py-2 px-4">
-                                <div className="w-[100px] max-h-[50px] aspect-[3/1.5] bg-gray-50 rounded-md">
-                                    <img
-                                        src={item.image}
-                                        alt=""
-                                        className="w-full h-full object-contain"
-                                    />
-                                </div>
-                            </td>
-                            <td className="py-2 px-4">{item.title}</td>
-                            <td className="py-2 px-4">
-                                <UIPrimaryDropdown
-                                    tiny={true}
-                                    itemName="name"
-                                    itemValue="is_active"
-                                    btnColorTailwindClass={
-                                        !item.is_active
-                                            ? "bg-red-100 text-red-600 hover:bg-text-red-200"
-                                            : undefined
-                                    }
-                                    onSelected={(value) => {
-                                        updateDataItemActive(value, index);
+                    renderers={{
+                        image: (item) => (
+                            <div className="w-12 h-12 max-h-[30px] bg-gray-50 rounded-md">
+                                <img
+                                    src={item.image}
+                                    className="w-full h-full object-contain"
+                                />
+                            </div>
+                        ),
+                        is_active: (item, index: number) => (
+                            <UIPrimaryDropdown
+                                tiny
+                                itemName="name"
+                                itemValue="is_active"
+                                btnColorTailwindClass={
+                                    !item.is_active
+                                        ? "bg-red-100 text-red-600 hover:bg-red-200"
+                                        : undefined
+                                }
+                                items={statusList}
+                                onSelected={(value) => updateDataItemActive(value, index)}
+                            >
+                                {item.is_active ? "مفعل" : "غير مفعل"}
+                            </UIPrimaryDropdown>
+                        ),
+                        procedures: (item, index: number) => (
+                            <div className="flex justify-center gap-3">
+                                <UIDialogConfirm
+                                    danger
+                                    title="هل انت متأكد من حذف العنصر"
+                                    confirmHandler={() => {
+                                        deleteSubmit(item, index);
                                     }}
-                                    items={statusList}
                                 >
-                                    {item.is_active ? "مفعل" : "غير مفعل"}
-                                </UIPrimaryDropdown>
-                            </td>
-                            <td className="py-2 px-4">{item.order}</td>
-                            <td className="">
-                                <div className="flex justify-center gap-3">
-                                    <UIDialogConfirm
-                                        danger
-                                        title="هل انت متأكد من حذف العنصر"
-                                        confirmHandler={() => {
-                                            deleteSubmit(item, index);
-                                        }}
-                                    >
-                                        <button className="bg-[#F9285A0A] p-1 rounded-lg">
-                                            <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
-                                        </button>
-                                    </UIDialogConfirm>
-                                    <UIBaseDialog dismiss={isDialogOpen}
-                                        title="تعديل الارشاد"
-                                        confirmHandler={() => { }}
-                                        confirmText="تعديل"
-                                        form="update-form"
-                                        btn={
-                                            <button
-                                                onClick={() => {
-                                                    updateDataItem(item);
-                                                }}
-                                                className="bg-[#0094140D] p-1 rounded-lg"
-                                            >
-                                                <span className="mdi mdi-folder-edit-outline text-[#009414]"></span>
-                                            </button>
-                                        }
-                                    >
-                                        <form
-                                            onSubmit={updateSubmit}
-                                            id="update-form"
-                                        >
+                                    <button className="bg-[#F9285A0A] p-1 rounded-lg">
+                                        <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
+                                    </button>
+                                </UIDialogConfirm>
 
-                                            {errorMsg && (
-                                                <div className="mb-6 text-start border border-red-800 bg-red-100 px-3 py-3 rounded-lg">
-                                                    <span className="text-red-800 error-alert">
-                                                        {" "}
-                                                        {errorMsg}
-                                                    </span>
-                                                </div>
-                                            )}
-                                            <div className="space-y-7">
-                                                <div className="w-full flex justify-center mb-20">
-                                                    <FileInputImg
+                                <button
+                                    onClick={() => {
+                                        updateDataItem(item);
+                                        setIsUpdateDialogOpen(true)
+                                    }}
+                                    className="bg-[#0094140D] p-1 rounded-lg"
+                                >
+                                    <span className="mdi mdi-folder-edit-outline text-[#009414]"></span>
+                                </button>
 
-                                                        state="edit"
-                                                        fileUrl={item.image}
-                                                        onFileChange={(arg) => {
-                                                            setUpdateFormData(
-                                                                (prev) => ({
-                                                                    ...prev,
-                                                                    ["image"]:
-                                                                        arg?.file64 ??
-                                                                        null,
-                                                                })
-                                                            );
-                                                        }}
-                                                    ></FileInputImg>
-                                                </div>
-                                                <TextFieldNada
-                                                    errorMessage={updateFormErrors.title_ar || ''}
-                                                    name="title_ar"
-                                                    type="text"
-                                                    prependIcon="mdi mdi-notebook-edit-outline"
-                                                    iconType="mdi"
-                                                    handleChange={
-                                                        updateFormChangeHander
-                                                    }
-                                                    value={updateFormData.title_ar}
-                                                    label=" النص ( عربي ) "
-                                                    placeholder=" ادخل نص الارشاد بالغة العربية  "
-                                                ></TextFieldNada>
+                            </div>
+                        ),
 
-                                                <TextFieldNada
-                                                    errorMessage={updateFormErrors.title_en || ''}
-                                                    name="title_en"
-                                                    type="text"
-                                                    prependIcon="mdi mdi-notebook-edit-outline"
-                                                    iconType="mdi"
-                                                    handleChange={
-                                                        updateFormChangeHander
-                                                    }
-                                                    value={updateFormData.title_en}
-                                                    label=" النص ( انجليزي ) "
-                                                    placeholder=" ادخل نص الارشاد بالغة الانجليزية  "
-                                                ></TextFieldNada>
+                    }}
+                >
 
-                                                <TextFieldNada
-                                                    name="order"
-                                                    type="number"
-                                                    prependIcon="mdi mdi-swap-vertical"
-                                                    iconType="mdi"
-                                                    handleChange={
-                                                        updateFormChangeHander
-                                                    }
-                                                    value={updateFormData.order}
-                                                    label=" الترتيب"
-                                                    placeholder=" ادخل رقم ترتيب النص في العرض "
-                                                ></TextFieldNada>
-
-                                                <SelectInput
-                                                    value={updateFormData.is_active}
-                                                    items={statusList}
-                                                    itemName="name"
-                                                    itemValue="is_active"
-                                                    label="الحالة"
-                                                    placeholder="لختر الحالة"
-                                                    name="is_active"
-                                                    required={true}
-                                                    onChange={(value) => {
-                                                        setUpdateFormData((prev) => ({
-                                                            ...prev,
-                                                            ["is_active"]:
-                                                                value,
-                                                        }));
-                                                    }}
-                                                ></SelectInput>
-                                            </div>
-                                        </form>
-                                    </UIBaseDialog>
-                                </div>
-                            </td>
-                        </tr>
-                    ))}
                 </BaseDataTable>
             </div>
+
+
+            <UIBaseDialog
+                open={isUpdateDialogOpen}
+                onClose={() => setIsUpdateDialogOpen(false)}
+                title="تعديل الارشاد"
+                confirmHandler={() => { }}
+                confirmText="تعديل"
+                form="update-form"
+
+            >
+                <form
+                    onSubmit={updateSubmit}
+                    id="update-form"
+                >
+
+                    {errorMsg && (
+                        <div className="mb-6 text-start border border-red-800 bg-red-100 px-3 py-3 rounded-lg">
+                            <span className="text-red-800 error-alert">
+                                {" "}
+                                {errorMsg}
+                            </span>
+                        </div>
+                    )}
+                    <div className="space-y-7">
+                        <div className="w-full flex justify-center mb-20">
+                            <FileInputImg
+
+                                state="edit"
+                                fileUrl={updateFormData.image as string}
+                                onFileChange={(arg) => {
+                                    setUpdateFormData(
+                                        (prev) => ({
+                                            ...prev,
+                                            ["image"]:
+                                                arg?.file64 ??
+                                                null,
+                                        })
+                                    );
+                                }}
+                            ></FileInputImg>
+                        </div>
+                        <TextFieldNada
+                            errorMessage={updateFormErrors.title_ar || ''}
+                            name="title_ar"
+                            type="text"
+                            prependIcon="mdi mdi-notebook-edit-outline"
+                            iconType="mdi"
+                            handleChange={
+                                updateFormChangeHander
+                            }
+                            value={updateFormData.title_ar}
+                            label=" النص ( عربي ) "
+                            placeholder=" ادخل نص الارشاد بالغة العربية  "
+                        ></TextFieldNada>
+
+                        <TextFieldNada
+                            errorMessage={updateFormErrors.title_en || ''}
+                            name="title_en"
+                            type="text"
+                            prependIcon="mdi mdi-notebook-edit-outline"
+                            iconType="mdi"
+                            handleChange={
+                                updateFormChangeHander
+                            }
+                            value={updateFormData.title_en}
+                            label=" النص ( انجليزي ) "
+                            placeholder=" ادخل نص الارشاد بالغة الانجليزية  "
+                        ></TextFieldNada>
+
+                        <TextFieldNada
+                            name="order"
+                            type="number"
+                            prependIcon="mdi mdi-swap-vertical"
+                            iconType="mdi"
+                            handleChange={
+                                updateFormChangeHander
+                            }
+                            value={updateFormData.order}
+                            label=" الترتيب"
+                            placeholder=" ادخل رقم ترتيب النص في العرض "
+                        ></TextFieldNada>
+
+                        <SelectInput
+                            value={updateFormData.is_active}
+                            items={statusList}
+                            itemName="name"
+                            itemValue="is_active"
+                            label="الحالة"
+                            placeholder="لختر الحالة"
+                            name="is_active"
+                            required={true}
+                            onChange={(value) => {
+                                setUpdateFormData((prev) => ({
+                                    ...prev,
+                                    ["is_active"]:
+                                        value,
+                                }));
+                            }}
+                        ></SelectInput>
+                    </div>
+                </form>
+            </UIBaseDialog>
         </>
     );
 }

@@ -7,11 +7,14 @@ let token = "Bearer 160|9eiDkr7DC2EryTIiZbQbO5CoJoxE7X88IPHqcNGs7f3d3254";
 
 export const getPackagesService = async (query?: string) => {
     try {
-        const response = await apiCall.get(`/admins/packages${decodeURIComponent(query || "")}`, {
-            headers: {
-                // "Content-Type": "application/json",
+        const response = await apiCall.get(
+            `/admins/packages${decodeURIComponent(query || "")}`,
+            {
+                headers: {
+                    // "Content-Type": "application/json",
+                },
             },
-        });
+        );
         if (!response.ok) {
             await responseErrorServiceHandler(response, "packages");
         }
@@ -22,7 +25,7 @@ export const getPackagesService = async (query?: string) => {
         throw new Error(error.message);
     }
 };
-export const getPackageByIdService = async (id:number) => {
+export const getPackageByIdService = async (id: number) => {
     try {
         const response = await apiCall.get(`/admins/packages/${id}`, {
             headers: {
@@ -62,7 +65,7 @@ export const deletePackageService = async (id: number) => {
     try {
         const response = await apiCall.delete("/admins/packages", id, {
             headers: {
-                Authorization: `Bearer ${token}`,
+                // Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
         });

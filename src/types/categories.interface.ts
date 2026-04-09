@@ -8,4 +8,5 @@ export interface Category {
   no_of_subscriptions: number;
   has_recycle: number;
   discount_value_percentage: number;
+  has_detailed_address:number
 }

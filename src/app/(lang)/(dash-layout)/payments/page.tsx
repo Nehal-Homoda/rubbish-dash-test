@@ -35,32 +35,53 @@ import { User } from "@/types/auth.interface";
 import { getUserByIdService, getUserService } from "@/services/userService";
 import { AppUser } from "@/types/user.interface";
 
+
+type FormDataType = {
+  name_ar: string;
+  name_en: string;
+  order: number;
+  is_active: number;
+  available_days: string[];
+  available_times: string[];
+};
+
+interface FormDataInputErrors {
+  user_id: string | null,
+  // payment_method_id: string | null,
+  total_price: string | null,
+  receiving_number: string | null,
+  payment_verification: string | null
+
+
+}
+
 export default function rubbush_collectors() {
   const [dataList, setDataList] = useState<Payment[]>([]);
   const [paymentMethodList, setPaymentMethodList] = useState<Payment_methods[]>(
     []
   );
+  const [userItem, setUserItem] = useState<AppUser | null>(null)
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false)
   const headerArr = [
     { text: "ID", name: "id" },
-    { text: " اسم المستخدم", name: "name_ar" },
-    { text: " اسم الباقة", name: "name_ar" },
-    { text: " عدد الوحدات", name: "name_ar" },
-    { text: " السعر الكلي", name: "name_ar" },
+    { text: " اسم المستخدم", name: "user_name" },
+    { text: " اسم الباقة", name: "package" },
+    { text: " عدد الوحدات", name: "" },
+    { text: " السعر الكلي", name: "total_price" },
     { text: " تمت الاضافة بواسطة", name: "added_by" },
     { text: " نوع الدفع", name: "type" },
-    { text: " تاريخ الدفع", name: "name_ar" },
-    { text: "الحالة", name: "is_active" },
-    { text: "طريقة الدفع", name: "is_active" },
-    { text: "صورة التحويل", name: "image" },
-    { text: "الاجراءات", name: "image" },
+    { text: " تاريخ الدفع", name: "created_at" },
+    { text: "الحالة", name: "status" },
+    { text: "طريقة الدفع", name: "payment_method" },
+    { text: "صورة التحويل", name: "payment_verification" },
+    { text: "الاجراءات", name: "procedures" },
   ];
   const statusList = [
-
     { is_active: "pending", name: "قيد الانتظار" },
     { is_active: "accepted", name: "مقبولة" },
     { is_active: "rejected", name: "مرفوضة" },
   ];
-
   const status = [
     { status: "pending", name: "قيد الانتظار" },
     { status: "accepted", name: "مقبولة" },
@@ -68,40 +89,18 @@ export default function rubbush_collectors() {
   ];
   const [totalPages, setTotalPages] = useState(1);
   const [page, setPage] = useState(1);
-  const [districtDays, setDistrictDays] = useState<string[]>([]);
-  const [districtTime, setDistrictTime] = useState<string[]>([]);
   const [selectedDataItem, setSelectedDataItem] = useState<Payment | null>(
     null
   );
-
-
   const [userList, setUserList] = useState<AppUser[]>([])
-
-
   const [categoryList, setCategoryList] = useState<Category[]>([]);
   const [packagesList, setpackagesList] = useState<PackageOffer[]>([]);
-  const [packageItem, setPackageItem] = useState<PackageOffer | null>(null);
-
-  const [isOpenImg, setIsOpenImg] = useState(false);
   const [selectedImg, setSelectedImg] = useState("");
-
   const [totalPrice, setTotalPrice] = useState(0);
-
   const [selected, setSelected] = useState<null | Payment_methods>(null);
-
-
   const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
   const [searchTerm, setSearchTerm] = useState("");
-
-
-  type FormDataType = {
-    name_ar: string;
-    name_en: string;
-    order: number;
-    is_active: number;
-    available_days: string[];
-    available_times: string[];
-  };
+  const [errorMsg, setErrorMsg] = useState("");
   const [formData, setFormData] = useState<FormDataType>({
     name_ar: "",
     name_en: "",
@@ -126,18 +125,6 @@ export default function rubbush_collectors() {
     user_id: null,
     payment_verification: null,
   });
-
-  const [userItem, setUserItem] = useState<AppUser | null>(null)
-
-
-  const fetchPaymentMethodList = () => {
-    paymentMethodListService().then((response) => {
-      console.log("payment list", response);
-      setPaymentMethodList(response.data);
-    });
-  };
-
-
   const [districtAvailableDays, setDistrictAvailableDays] = useState([
     { title: 'السبت ', slug: 'saturday' },
     { title: ' الاحد', slug: 'sunday' },
@@ -150,6 +137,22 @@ export default function rubbush_collectors() {
   ]);
 
 
+  const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
+    user_id: "",
+    // payment_method_id: "",
+    total_price: "",
+    receiving_number: "",
+    payment_verification: ""
+
+  });
+
+
+  const fetchPaymentMethodList = () => {
+    paymentMethodListService().then((response) => {
+      console.log("payment list", response);
+      setPaymentMethodList(response.data);
+    });
+  };
   const fetchCategories = () => {
     getCategoriesService().then((response) => {
       setCategoryList(response.data);
@@ -175,7 +178,6 @@ export default function rubbush_collectors() {
   };
 
 
-  const [errorMsg, setErrorMsg] = useState("");
 
 
   const handleSelecteditem = (item: any) => {
@@ -188,16 +190,6 @@ export default function rubbush_collectors() {
 
 
   };
-
-
-
-
-
-
-
-
-
-
 
   const fetchDataList = ({
     search = searchTerm,
@@ -241,8 +233,6 @@ export default function rubbush_collectors() {
 
 
   };
-
-
   const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setSearchTerm(val);
@@ -355,8 +345,11 @@ export default function rubbush_collectors() {
       .then((response) => {
         fetchDataList();
         successDialog(true);
+        setIsUpdateDialogOpen(false)
       })
-      .catch((error) => { });
+      .catch((error) => { }).finally(() => {
+        setIsUpdateDialogOpen(false)
+      })
   };
 
   const addFormChangeHander = (
@@ -447,12 +440,6 @@ export default function rubbush_collectors() {
     }
   };
 
-
-
-
-
-
-
   const resetForm = () => {
     setAddPaymentFormData({
       user_id: null,
@@ -476,25 +463,6 @@ export default function rubbush_collectors() {
     payment_verification: Yup.string().required('صورة التحويل مطلوب'),
   })
 
-  interface FormDataInputErrors {
-    user_id: string | null,
-    // payment_method_id: string | null,
-    total_price: string | null,
-    receiving_number: string | null,
-    payment_verification: string | null
-
-
-  }
-
-  const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
-    user_id: "",
-    // payment_method_id: "",
-    total_price: "",
-    receiving_number: "",
-    payment_verification: ""
-
-  });
-
   const handleAddPayment = async (e: any) => {
     e.preventDefault()
 
@@ -508,7 +476,6 @@ export default function rubbush_collectors() {
     setFormErrors({ ...validateResult.outputResult });
 
     if (validateResult.isInvalid) return;
-    console.log('hii')
     setErrorMsg('')
     const fd = new FormData()
     //@ts-ignore
@@ -518,10 +485,9 @@ export default function rubbush_collectors() {
     //@ts-ignore
     fd.append('total_price', userItem ? userItem.deserved_money_by_recycle : 0)
     fd.append('payment_verification', addPaymentFormData.payment_verification)
-    setIsDialogOpen(false)
     await addPaymentService(fd).then((response) => {
-      setIsDialogOpen(true)
       successDialog(true)
+      setIsDialogOpen(false)
       fetchDataList()
       setAddPaymentFormData({
         user_id: null,
@@ -546,10 +512,7 @@ export default function rubbush_collectors() {
     }))
 
   }
-
-
   const handleSelectedUser = (selectedId: any) => {
-    console.log('selected isssssssssssssssss', selectedId)
     fetchDataList({ search: selectedId })
     setAddPaymentFormData((prev) => ({
       ...prev,
@@ -583,30 +546,22 @@ export default function rubbush_collectors() {
 
   }, [])
 
-  // useEffect(() => {
-  //   if (userItem) {
-  //     setTotalPrice(Number(userItem.deserved_money_by_recycle))
-  //   }
-
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-
-
-  // }, [userItem])
 
   const tableHeadActionsSlot = () => {
     return (
       <>
-
         <UIBaseDialog
-          dismiss={isDialogOpen}
-          confirmCloseHandler={resetForm}
-          title="اضافة تحويل"
+          open={isDialogOpen}
+          onClose={() => setIsDialogOpen(false)}
           confirmHandler={() => { }}
+          title="اضافة تحويل"
           confirmText="اضافة"
           form="update-form"
           btn={
             <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
-              <button className="bg-[#0094140D] p-1 rounded-lg">
+              <button onClick={() => {
+                setIsDialogOpen(true);
+              }} className="bg-[#0094140D] p-1 rounded-lg">
                 تحويل رصيد
               </button>
             </div>
@@ -810,36 +765,24 @@ export default function rubbush_collectors() {
     );
   };
 
-
-
-
   useEffect(() => {
     fetchDataList();
-  }, [page]); // runs every time `page` changes
+  }, [page]);
 
   return (
     <>
       <div className="py-20 relative ">
         <BaseDataTable
+          items={dataList}
           headItems={headerArr}
           onPageChange={setPage}
           totalPages={totalPages}
           onSearchChange={tableSearchHandler}
           headerActionsSlot={tableHeadActionsSlot()}
-        >
-          {dataList.map((item, index) => (
-            <tr key={index}>
-              <td className="py-2 px-4">{item.id}</td>
-              <td className="py-2 px-4">{item.user_name}</td>
-              <td className="py-2 px-4">{item.subscription?.package.name}</td>
-              <td className="py-2 px-4">{item.subscription?.units ?? "-"}</td>
-              <td className="py-2 px-4">{item.total_price}</td>
-              <td className="py-2 px-4">{item.added_by == "user" ? 'مستخدم' : 'مسئول'}</td>
-              <td className="py-2 px-4">{item.type}</td>
-
-              <td className="py-2 px-4">{item.created_at}</td>
-              <td className="py-2 px-4">
-                {item.added_by == 'user' ? <UIPrimaryDropdown
+          renderers={{
+            status: (item, index: number) => {
+              return item.added_by == 'user' ? (
+                <UIPrimaryDropdown
                   tiny={true}
                   itemName="name"
                   itemValue="is_active"
@@ -850,148 +793,144 @@ export default function rubbush_collectors() {
                   items={statusList}
                 >
                   {statusDropdownName(item.status)}
-                </UIPrimaryDropdown> : <span>-</span>}
+                </UIPrimaryDropdown>
+              ) : (
+                <span>-</span>
+              );
+            },
+            image: (item) => (
+              <div className="w-12 h-12 max-h-[30px] bg-gray-50 rounded-full">
+                <img
+                  src={item.image}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            ),
+            payment_verification: (item) => (
+              <div className="w-12 h-12 max-h-[30px] bg-gray-50 rounded-full">
+                <img
+                  src={item.payment_verification}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            ),
 
-              </td>
-              {/* <td className="py-2 px-4">
-                                {item.subscription?.package.name ?? '-'}
-                            </td> */}
-              {/* <td className="py-2 px-4">
-                                {item.payment_method?.name_ar ?? "-"}
-                            </td> */}
-              <td className="py-2 px-4">
-                <div className="w-10 h-10 overflow-hidden ">
-                  <img
-                    src={item.payment_method.image}
-                    alt=""
-                    className="w-full h-full object-contain "
-                  />
-                </div>
-              </td>
-              <td className="py-2 px-4">
-                <div className="w-10 h-10 overflow-hidden cursor-pointer">
-                  <img
-                    onClick={(item) => handleOpenImage(item)}
-                    src={item.payment_verification}
-                    alt=""
-                    className="w-full h-full object-contain cursor-pointer"
-                  />
-                </div>
-              </td>
+            package: (item) => (
+              <div>
+                <span>{item.subscription?.package?.name || "-"}</span>
+              </div>
+            )
+            ,
+            payment_method: (item) => (
+              <div>
+                <span>{item.payment_method?.name_ar}</span>
+              </div>
+            ),
 
-              <td className="">
-                <div className="flex  gap-3">
-                  <UIDialogConfirm
-                    danger
-                    title="هل انت متأكد من حذف العنصر"
-                    confirmHandler={() => {
-                      deleteSubmit(item, index);
-                    }}
-                  >
-                    <button className="bg-[#F9285A0A] p-1 px-2 rounded-lg">
-                      <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
-                    </button>
-                  </UIDialogConfirm>
+            procedures: (item, index: number) => (
+              <div className="flex justify-center gap-3">
+                <UIDialogConfirm
+                  danger
+                  title="هل انت متأكد من حذف العنصر"
+                  confirmHandler={() => {
+                    deleteSubmit(item, index);
+                  }}
+                >
+                  <button className="bg-[#F9285A0A] p-1 rounded-lg">
+                    <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
+                  </button>
+                </UIDialogConfirm>
+                <button
+                  onClick={() => {
+                    updateDataItem(item);
+                    setIsUpdateDialogOpen(true);
+                  }}
+                  className="bg-[#0094140D] p-1 rounded-lg"
+                >
+                  <span className="mdi mdi-folder-edit-outline text-[#009414]"></span>
+                </button>
+              </div>
+            ),
 
-                  <UIBaseDialog
-                    title="تعديل المدفوعات"
-                    confirmHandler={() => { }}
-                    confirmText="تعديل"
-                    form="update-form"
-                    btn={
-                      <button
-                        onClick={() => {
-                          updateDataItem(item);
-                        }}
-                        className="bg-[#0094140D] p-1 rounded-lg"
-                      >
-                        <span className="mdi mdi-folder-edit-outline text-[#009414]"></span>
-                      </button>
-                    }
-                  >
-                    <form onSubmit={updateSubmit} id="update-form">
-                      <div className="space-y-7">
-                        <div className="w-full flex justify-center mb-20">
-                          <FileInputImg
-                            state="edit"
-                            fileUrl={item.payment_verification}
-                            onFileChange={(arg) => {
-                              //@ts-ignore
-                              setUpdateFormData((prev) => ({
-                                ...prev,
-                                ["payment_verification"]: arg?.file64 ?? null,
-                              }));
-                            }}
-                          ></FileInputImg>
-                        </div>
+          }}
+        >
 
-                        <TextFieldNada
-                          name="total_price"
-                          type="number"
-                          prependIcon="mdi mdi-notebook-edit-outline"
-                          iconType="mdi"
-                          handleChange={updateFormChangeHander}
-                          value={updateFormData.total_price}
-                          label="السعر الكلي "
-                          placeholder="ادخل السعر الكلي  "
-                        ></TextFieldNada>
-
-                        <SelectInput
-                          value={updateFormData.status}
-                          items={statusList}
-                          itemName="name"
-                          itemValue="is_active"
-                          label="الحالة"
-                          placeholder="لختر الحالة"
-                          name="is_active"
-                          required={true}
-                          onChange={(value) => {
-                            setUpdateFormData((prev) => ({
-                              ...prev,
-                              ["status"]: value,
-                            }));
-                          }}
-                        ></SelectInput>
-
-                        <SelectInput
-                          value={updateFormData.payment_method_id}
-                          items={paymentMethodList}
-                          itemName="name_ar"
-                          itemValue="id"
-                          label="طريقة الدفع"
-                          placeholder=""
-                          name="is_active"
-                          required={true}
-                          onChange={(value) => {
-                            setUpdateFormData((prev) => ({
-                              ...prev,
-                              ["payment_method_id"]: value,
-                            }));
-                          }}
-                        ></SelectInput>
-                      </div>
-                    </form>
-                  </UIBaseDialog>
-
-                  {/* {!!item.payment_verification && (
-                                        <a
-                                            href={item.payment_verification}
-                                            target="_blank"
-                                            className="bg-green-100 p-1 px-2 rounded-lg"
-                                        >
-                                            <span className="mdi mdi-download text-green-600"></span>
-                                        </a>
-                                    )} */}
-                </div>
-              </td>
-
-
-
-            </tr>
-          ))}
         </BaseDataTable>
 
-        {isOpenImg && (
+        <UIBaseDialog
+          open={isUpdateDialogOpen}
+          onClose={() => setIsUpdateDialogOpen(false)}
+          title="تعديل المدفوعات"
+          confirmHandler={() => { }}
+          confirmText="تعديل"
+          form="update-form"
+
+        >
+          <form onSubmit={updateSubmit} id="update-form">
+            <div className="space-y-7">
+              <div className="w-full flex justify-center mb-20">
+                <FileInputImg
+                  state="edit"
+                  fileUrl={selectedDataItem?.payment_verification}
+                  onFileChange={(arg) => {
+                    //@ts-ignore
+                    setUpdateFormData((prev) => ({
+                      ...prev,
+                      ["payment_verification"]: arg?.file64 ?? null,
+                    }));
+                  }}
+                ></FileInputImg>
+              </div>
+
+              <TextFieldNada
+                name="total_price"
+                type="number"
+                prependIcon="mdi mdi-notebook-edit-outline"
+                iconType="mdi"
+                handleChange={updateFormChangeHander}
+                value={updateFormData.total_price}
+                label="السعر الكلي "
+                placeholder="ادخل السعر الكلي  "
+              ></TextFieldNada>
+
+              <SelectInput
+                value={updateFormData.status}
+                items={statusList}
+                itemName="name"
+                itemValue="is_active"
+                label="الحالة"
+                placeholder="لختر الحالة"
+                name="is_active"
+                required={true}
+                onChange={(value) => {
+                  setUpdateFormData((prev) => ({
+                    ...prev,
+                    ["status"]: value,
+                  }));
+                }}
+              ></SelectInput>
+
+              <SelectInput
+                value={updateFormData.payment_method_id}
+                items={paymentMethodList}
+                itemName="name_ar"
+                itemValue="id"
+                label="طريقة الدفع"
+                placeholder=""
+                name="is_active"
+                required={true}
+                onChange={(value) => {
+                  setUpdateFormData((prev) => ({
+                    ...prev,
+                    ["payment_method_id"]: value,
+                  }));
+                }}
+              ></SelectInput>
+            </div>
+          </form>
+        </UIBaseDialog>
+
+        {/* {isOpenImg && (
           <div onClick={() => setIsOpenImg(false)} className="fixed inset-0 bg-black/70 flex flex-col items-center justify-center py-10 z-50 ">
             <div className="relative bg-transparent max-w-full max-h-full ">
               <img
@@ -1009,7 +948,7 @@ export default function rubbush_collectors() {
               </button>
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </>
   );

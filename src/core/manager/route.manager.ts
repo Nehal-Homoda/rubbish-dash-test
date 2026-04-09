@@ -2,6 +2,7 @@ const ROUTES = {
   home: "/",
   services: "/services",
   regions: "/regions",
+  areas: "/areas",
   users: "/users",
   deletedUsers: "/deleted-users",
   packages: "/packages",
@@ -13,6 +14,7 @@ const ROUTES = {
   signs: "/signs",
   support: "/support",
   settings: "/settings",
+  
 };
 
 export default ROUTES;

@@ -14,7 +14,7 @@ export const getPaymentsService = async (query?: string) => {
                 headers: {
                     // "Content-Type": "application/json",
                 },
-            }
+            },
         );
         if (!response.ok) {
             await responseErrorServiceHandler(response, "payments");
@@ -66,7 +66,7 @@ export const deleteSubscriptionService = async (id: number) => {
     try {
         const response = await apiCall.delete("/admins/subscriptions", id, {
             headers: {
-                Authorization: `Bearer ${token}`,
+                // Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
         });
@@ -98,17 +98,23 @@ export const showSubscriptionService = async (id: number) => {
         throw new Error(error.message);
     }
 };
-export const updateSubscriptionStatusService = async (id: number, status: 'reject' | 'accept' | 'pending') => {
+export const updateSubscriptionStatusService = async (
+    id: number,
+    status: "reject" | "accept" | "pending",
+) => {
     try {
-        const response = await apiCall.post(`/admins/subscriptions/${id}/${status}`, {
-            headers: {
-                "Content-Type": "application/json",
+        const response = await apiCall.post(
+            `/admins/subscriptions/${id}/${status}`,
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                },
             },
-        });
+        );
         if (!response.ok) {
             await responseErrorServiceHandler(response, "update payment");
         }
-        const data = (await response.json());
+        const data = await response.json();
         console.log("response data =>>>>", data);
         return data;
     } catch (error: any) {
