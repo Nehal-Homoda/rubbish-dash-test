@@ -22,6 +22,7 @@ import { Payment_methods } from "@/types/paymentMethod.interface";
 import { paymentMethodListService } from "@/services/sharedService";
 import { getPackagesService } from "@/services/packagesOffersService";
 import * as XLSX from "xlsx";
+//@ts-ignore
 import { saveAs } from "file-saver";
 
 type FormDataType = {
@@ -171,7 +172,7 @@ export default function rubbush_collectors() {
       .catch((error) => { });
   };
 
-  const deleteSubmit = (item: District, selectedIndex: number) => {
+  const deleteSubmit = (item: any, selectedIndex: number) => {
     deleteUserService(item.id)
       .then((response) => {
         const updatedArr = [...dataList];
