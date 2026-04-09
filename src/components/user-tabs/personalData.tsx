@@ -10,30 +10,14 @@ import { successDialog } from "@/utils/shared";
 
 type Props = {
     user: Users | null;
-    // confirmHandler: () => void
 };
 export default function personalData({ user }: Props) {
-    useEffect(() => {
-        console.log("user", user);
-    });
-
     const [formData, setFormData] = useState({
         name: "",
         phone: "",
     });
-
     const router = useRouter();
-
     const [errorMsg, setErrorMsg] = useState("");
-    useEffect(() => {
-        setFormData({
-            //@ts-ignore
-            name: user.name,
-            //@ts-ignore
-            phone: user.phone,
-        });
-    }, []);
-
     const updateUser = () => {
         setErrorMsg('')
         const body = JSON.stringify({
@@ -50,9 +34,6 @@ export default function personalData({ user }: Props) {
             setErrorMsg(error?.message)
         })
     };
-
-
-
     const reset = () => {
         setFormData({
             //@ts-ignore
@@ -62,6 +43,17 @@ export default function personalData({ user }: Props) {
         });
     };
 
+    useEffect(() => {
+        setFormData({
+            //@ts-ignore
+            name: user.name,
+            //@ts-ignore
+            phone: user.phone,
+        });
+    }, []);
+    useEffect(() => {
+        console.log("user", user);
+    });
     return (
         <div className="container">
 

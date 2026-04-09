@@ -8,12 +8,14 @@ export interface PackageOffer {
     order: number | null;
     no_of_subscriptions: number;
     category: string | null;
+    area: string | null;
+    district: string | null;
     created_at: string;
-    discounts:PackageDiscount[];
+    discounts: PackageDiscount[];
 }
 
 export interface PackageDiscount {
     min_units: number;
-    max_units: number |string;
-    discount_rate: string ;
+    max_units: number | string;
+    discount_rate: string;
 }

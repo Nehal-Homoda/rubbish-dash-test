@@ -12,9 +12,7 @@ import { getQueryParam } from "@/utils/shared";
 import AddNewSubscription from "@/components/user-tabs/AddNewSubscription";
 import SubscriptionDataList from "@/components/user-tabs/SubscriptionDataList";
 
-// type Props = {
-//   params: { id: number }
-// }
+
 
 type Btn = {
     name: string;
@@ -22,9 +20,7 @@ type Btn = {
 };
 
 export default function page() {
-    const id = () => {
-        return getQueryParam("id") || "";
-    };
+
     const [user, setUser] = useState<Users | null>(null);
     const [selectedBtn, setSelectedBtn] = useState<Btn | null>(null);
     const [type, setType] = useState("personal-data");
@@ -44,8 +40,10 @@ export default function page() {
         { name: "المدفوعات", type: "payment" },
     ];
 
-    const userRubbish = [{ title: 'الوزن', number: user?.all_recycle_weights  ? user?.all_recycle_weights :0 }, { title: 'الرصيد', number: user?.deserved_money_by_recycle }]
-
+    const userRubbish = [{ title: 'الوزن', number: user?.all_recycle_weights ? user?.all_recycle_weights : 0 }, { title: 'الرصيد', number: user?.deserved_money_by_recycle }]
+    const id = () => {
+        return getQueryParam("id") || "";
+    };
     //@ts-ignore
     const handleChangeBtnType = (item) => {
         setType(item);

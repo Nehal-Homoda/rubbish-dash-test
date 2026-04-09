@@ -18,6 +18,8 @@ import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
 import { getCollectorsService } from "@/services/collectorsService";
 import { Collector } from "@/types/collectors.interface";
 import * as Yup from "yup";
+import { getAreaService } from "@/services/areaServices";
+import { Area } from "@/types/area.interface";
 
 interface FormDataInputs {
   name_ar: string;
@@ -39,6 +41,8 @@ type FormDataType = {
   collector_id: string[];
   available_days: string[];
   available_times: string[];
+  area_id: string;
+
 };
 type FromToTimeType = {
   from: string;
@@ -58,11 +62,7 @@ export default function rubbush_collectors() {
     { is_active: 1, name: "مفعل" },
     { is_active: 0, name: "غير مفعل" },
   ];
-  const districts = [
-    { id: 1, name: "حي اول" },
-    { id: 2, name: "حي ثان" },
-    { id: 3, name: "حي ثالث" },
-  ];
+
   const [totalPages, setTotalPages] = useState(1);
   const [page, setPage] = useState(1);
   const [districtDays, setDistrictDays] = useState([
@@ -86,6 +86,8 @@ export default function rubbush_collectors() {
     null,
   );
   const [collectors, setCollectors] = useState<Collector[]>([]);
+  const [areaList, setAreaList] = useState<Area[]>([]);
+
   const formSchema = Yup.object().shape({
     name_ar: Yup.string().required(),
     name_en: Yup.string().required(),
@@ -120,6 +122,7 @@ export default function rubbush_collectors() {
     collector_id: [],
     available_days: [],
     available_times: [],
+    area_id: ""
   });
 
   const [updateFormData, setUpdateFormData] = useState<FormDataType>({
@@ -130,6 +133,7 @@ export default function rubbush_collectors() {
     collector_id: [],
     available_days: [],
     available_times: [],
+    area_id: ""
   });
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -199,6 +203,27 @@ export default function rubbush_collectors() {
       })
       .catch(() => { });
   };
+  const fetchAreaList = ({
+    search = "",
+    is_active = undefined,
+  }: { search?: string; is_active?: boolean | undefined } = {}) => {
+    const isActive =
+      is_active != undefined
+        ? is_active
+          ? "&is_active=" + 1
+          : "&is_active=" + 0
+        : "";
+    const hasSearch = search ? "&search=" + search : "";
+
+    const query = `?page=${page}${hasSearch}${isActive}`;
+
+    getAreaService(query)
+      .then((response) => {
+        setAreaList(response.data);
+        setTotalPages(response.meta.last_page);
+      })
+      .catch(() => { });
+  };
 
   const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     fetchDataList({ search: e.target.value });
@@ -249,6 +274,7 @@ export default function rubbush_collectors() {
       is_active: item.is_active ? 1 : 0,
       available_days: item.available_days,
       available_times: item.available_times,
+      area_id: item.area_id
     });
 
     const ar = item.available_times.map((item) => {
@@ -335,6 +361,10 @@ export default function rubbush_collectors() {
     formData.available_times.forEach((time, index) =>
       fd.append(`available_times[${index}]`, time),
     );
+    formData.collector_id.forEach((collector, index) =>
+      fd.append(`collector_id[${index}]`, collector),
+    );
+    fd.append('area_id', formData.area_id.toString())
     fd.append("is_active", formData.is_active.toString());
 
     addDistrictService(fd)
@@ -351,6 +381,7 @@ export default function rubbush_collectors() {
           collector_id: [],
           available_days: [],
           available_times: [],
+          area_id: ""
         });
         setDynamicFromToTime([{ from: "", to: "" }]);
       })
@@ -411,18 +442,18 @@ export default function rubbush_collectors() {
               ></TextFieldNada>
 
               <SelectInput
-                value={formData.is_active}
-                items={districts}
-                itemName="name"
+                value={formData.area_id}
+                items={areaList}
+                itemName="name_ar"
                 itemValue="id"
                 label="الحي"
                 placeholder="اختر الحي"
-                name="is_active"
+                name="area_id"
                 required={true}
                 onChange={(value) => {
                   setFormData((prev) => ({
                     ...prev,
-                    ["is_active"]: value,
+                    ["area_id"]: value,
                   }));
                 }}
               ></SelectInput>
@@ -571,10 +602,10 @@ export default function rubbush_collectors() {
   useEffect(() => {
     fetchDataList();
     fetchCollectors();
+    fetchAreaList()
   }, [page]);
 
   useEffect(() => {
-    console.log(dynamicFromToTime);
     const ar = dynamicFromToTime.map((item) => `${item.from}-${item.to}`);
     setFormData((prev) => ({
       ...prev,
@@ -674,6 +705,23 @@ export default function rubbush_collectors() {
                 placeholder=" اسم المنطقة  "
                 errorMessage={updateFormErrors.name_en || ""}
               ></TextFieldNada>
+
+              <SelectInput
+                value={formData.is_active}
+                items={areaList}
+                itemName="name_ar"
+                itemValue="id"
+                label="الحي"
+                placeholder="اختر الحي"
+                name="is_active"
+                required={true}
+                onChange={(value) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    ["is_active"]: value,
+                  }));
+                }}
+              ></SelectInput>
 
               {/* <SelectInput
                                                     value={

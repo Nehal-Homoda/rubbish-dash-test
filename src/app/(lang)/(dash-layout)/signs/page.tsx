@@ -10,7 +10,7 @@ import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
 import FileInputImg from "@/components/ui/form/FileInputImg";
 import { Banner } from "@/types/banners.interface";
 import * as Yup from "yup";
-
+import { ToggleSwitch } from "flowbite-react";
 import {
   addBannerService,
   deleteBannerService,
@@ -62,10 +62,11 @@ export default function rubbush_collectors() {
   const [selectedDataItem, setSelectedDataItem] = useState<Banner | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [activeFilter, setActiveFilter] = useState<boolean | undefined>(
-    undefined,
-  );
+  // const [activeFilter, setActiveFilter] = useState<boolean | undefined>(
+  //   undefined,
+  // );
   const [errorMsg, setErrorMsg] = useState("");
+  const [switch1, setSwitch1] = useState(false);
   const [formData, setFormData] = useState<FormDataType>({
     title_ar: "",
     title_en: "",
@@ -75,7 +76,6 @@ export default function rubbush_collectors() {
     image: null,
     type: "",
   });
-
   const [updateFormData, setUpdateFormData] = useState<FormDataType>({
     title_ar: "",
     title_en: "",
@@ -274,6 +274,25 @@ export default function rubbush_collectors() {
       });
   };
 
+  const handleCheckSubscription = (value: boolean, name: string) => {
+    setSwitch1(!switch1);
+    if (name == 'add') {
+      setFormData((prev) => ({
+        ...prev,
+        ["has_recycle"]: value ? 1 : 0,
+      }));
+    }
+
+
+    if (name == 'edit') {
+      setUpdateFormData((prev) => ({
+        ...prev,
+        ["has_recycle"]: value ? 1 : null,
+      }));
+    }
+
+  };
+
   const tableHeadActionsSlot = () => {
     return (
       <>
@@ -426,6 +445,13 @@ export default function rubbush_collectors() {
                   }));
                 }}
               ></SelectInput>
+
+
+              <ToggleSwitch
+                checked={switch1}
+                label="اعلان"
+                onChange={(value) => handleCheckSubscription(value, 'add')}
+              />
             </div>
           </form>
         </UIBaseDialog>
@@ -436,7 +462,7 @@ export default function rubbush_collectors() {
 
   useEffect(() => {
     fetchDataList();
-  }, [page]); 
+  }, [page]);
   return (
     <>
       <div className="py-20">

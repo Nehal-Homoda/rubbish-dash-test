@@ -21,6 +21,8 @@ import { AppUser } from "@/types/user.interface";
 import { Payment_methods } from "@/types/paymentMethod.interface";
 import { paymentMethodListService } from "@/services/sharedService";
 import { getPackagesService } from "@/services/packagesOffersService";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 type FormDataType = {
   name: "";
@@ -206,9 +208,38 @@ export default function rubbush_collectors() {
       setpackagesList(response.data);
     });
   };
-  const handleExport = async () => {
+  const handleExport = () => {
+    if (checkedList.length === 0) {
+      alert("الرجاء تحديد صفوف للتصدير");
+      return;
+    }
 
+    const selectedRows = dataList.filter((item) => checkedList.includes(item.id));
+
+    const data = selectedRows.map((item) => ({
+      "ID": item.id,
+      "الاسم": item.name,
+      "رقم الهاتف": item.phone,
+      "الاشتراك": item.has_subscription ? "مشترك" : "غير مشترك",
+      "نوع الاشتراك": item.subscription_name || "-",
+      "نوع الطلب": item.is_request_recycle ? "جمع وتدوير" : "جمع فقط",
+      "الحالة": item.is_active ? "مفعل" : "غير مفعل",
+      "ميعاد التجديد": item.renewal_date || "-",
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Users");
+
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+
+    saveAs(new Blob([excelBuffer]), "users.xlsx");
   };
+
+
 
 
   useEffect(() => {
