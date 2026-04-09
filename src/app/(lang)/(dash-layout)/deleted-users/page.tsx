@@ -125,72 +125,7 @@ export default function page() {
   return (
     <div>
       <div className="py-20">
-        <BaseDataTable
-          headItems={headerArr}
-          onPageChange={setPage}
-          totalPages={totalPages}
-          onSearchChange={tableSearchHandler}
-          headerActionsSlot={tableHeadActionsSlot()}
-        >
-          {dataList.map((item, index) => (
-            <tr key={index}>
-              <td className="py-2 px-4">{item.id}</td>
-              <td className="py-2 px-4">{item.name}</td>
-              <td className="py-2 px-4">{item.phone}</td>
 
-
-
-              <td className="py-2 px-4">
-                <div className={` rounded-lg py-1 text-center ${item.has_subscription ? 'text-[#31D000] bg-[#31D00012] ' : ' bg-red-100 text-red-600 hover:bg-text-red-200'} `}>
-                  <span> {item.has_subscription ? "مشترك" : "غير مشترك"}</span>
-                </div>
-              </td>
-
-              <td className="py-2 px-4">
-                <div className=" w-7 h-7 rounded-full overflow-hidden">
-                  <img
-                    className="w-full h-full object-contain"
-                    src={item.image}
-                    alt=""
-                  />
-                </div>
-              </td>
-
-
-
-
-
-
-              <td className="py-2 px-4">{item.created_at}</td>
-
-
-
-
-              <td className="">
-                <div className="flex  gap-3">
-                  <button onClick={() => handleRestoreUser(item.id)} className="border border-green-700 text-green-700 p-1 px-2 rounded-lg">
-                    <div className=" cursor-pointer">
-                      {/* <img className="w-full h-full object-contain" src={editImg.src} alt="" /> */}
-
-                      <span>Restore</span>
-                    </div>
-                  </button>
-
-
-                </div>
-              </td>
-
-
-
-
-
-
-
-
-
-            </tr>
-          ))}
-        </BaseDataTable>
       </div>
 
 

@@ -8,7 +8,7 @@ import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
 import { Visit } from "@/types/visits.interface";
 import {
     deleteVisitsService,
-    
+
     getVisitsService,
     updateVisitsService,
 } from "@/services/visitService";
@@ -177,14 +177,18 @@ export default function page() {
         <>
             <div className="">
                 <BaseDataTable
+                    items={dataList}
                     headItems={headerArr}
                     showSearch={false}
                     onPageChange={setPage}
                     totalPages={totalPages}
                     onSearchChange={tableSearchHandler}
                     headerActionsSlot={tableHeadActionsSlot()}
+                    renderers={{
+
+                    }}
                 >
-                    {dataList.map((item, index) => (
+                    {/* {dataList.map((item, index) => (
                         <tr key={index}>
                             <td className="py-2 px-4">{item.id}</td>
 
@@ -290,7 +294,7 @@ export default function page() {
                                 </div>
                             </td>
                         </tr>
-                    ))}
+                    ))} */}
                 </BaseDataTable>
             </div>
         </>
