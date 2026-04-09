@@ -19,7 +19,7 @@ export default function page() {
     { text: " الاشتراك", name: "has_subscription" },
     { text: "الصورة الشخصية", name: "image" },
     { text: "تاريخ الحذف", name: "created_at" },
-    { text: "الاجراءات", name: "" },
+    { text: "الاجراءات", name: "procedures" },
   ];
   const statusList = [
     { is_active: 1, name: "مفعل" },
@@ -125,7 +125,49 @@ export default function page() {
   return (
     <div>
       <div className="py-20">
+        <BaseDataTable
+          items={dataList}
+          headItems={headerArr}
+          onPageChange={setPage}
+          totalPages={totalPages}
+          onSearchChange={tableSearchHandler}
+          headerActionsSlot={tableHeadActionsSlot()}
+          renderers={{
+            image: (item) => (
+              <div className="w-12 h-12 max-h-[30px] bg-gray-50 rounded-md">
+                <img
+                  src={item.image}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            ),
 
+            has_subscription: (item: Users) => (
+              <div
+                className={`rounded-lg py-1 text-center ${item.has_subscription
+                  ? "text-[#31D000] bg-[#31D00012]"
+                  : "bg-red-100 text-red-600 hover:bg-red-200"
+                  }`}
+              >
+                {item.has_subscription ? "مشترك" : "غير مشترك"}
+              </div>
+            ),
+            procedures: (item, index: number) => (
+              <div className="">
+                <button onClick={() => handleRestoreUser(item.id)} className="border border-green-700 text-green-700 p-1 px-2 rounded-lg">
+                  <div className=" cursor-pointer">
+
+                    <span>Restore</span>
+                  </div>
+                </button>
+
+              </div>
+            ),
+
+
+          }}
+        >
+        </BaseDataTable>
       </div>
 
 

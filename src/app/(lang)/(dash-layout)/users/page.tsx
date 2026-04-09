@@ -195,7 +195,6 @@ export default function rubbush_collectors() {
     console.log(is_active);
     const isActive = is_active ? "&status=" + is_active : "";
     const hasSearch = search ? "&search=" + search : "";
-
     const query = `?page=${pageNum}${hasSearch}${isActive}`;
 
     getUserService(query)
