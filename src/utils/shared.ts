@@ -156,7 +156,9 @@ export const responseErrorServiceHandler = async (
 ) => {
     console.log(response.status);
     if (response.status === 401) {
+        window.location.href = "/auth/login";
         throw new Error("unauthorized");
+
     }
 
     const contentType = response.headers.get("content-type");
