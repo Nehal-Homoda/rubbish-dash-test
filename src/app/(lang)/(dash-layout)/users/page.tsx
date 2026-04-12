@@ -301,7 +301,7 @@ export default function rubbush_collectors() {
           الاشتراك
         </UIPrimaryDropdown>
 
-        <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
+        <div className="bg-[#009414] py-2 text-nowrap rounded-xl text-center  text-white px-3">
           <button
             onClick={() => router.push("/users/add-user")}
             className="bg-[#0094140D] p-1 rounded-lg"
