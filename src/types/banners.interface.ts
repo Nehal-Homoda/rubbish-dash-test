@@ -7,4 +7,7 @@ export interface Banner {
     image: string;
     order: any;
     is_active: number;
+    is_ad: number | null;
+    ad_image: string;
+    category_id: string;
 }

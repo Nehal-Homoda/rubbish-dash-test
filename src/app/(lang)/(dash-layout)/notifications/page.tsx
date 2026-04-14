@@ -60,6 +60,8 @@ export default function rubbush_collectors() {
         { is_active: "all_collectors", name: "كل جامعي القمامة" },
         { is_active: "specific_user", name: "مستخدم محدد" },
         { is_active: "specific_collector", name: "جامع قمامة محدد" },
+        { is_active: "subscribed_users", name: " المشتركين" },
+        { is_active: "not_subscribed_users", name: "غير المشتركين" },
     ];
     const [totalPages, setTotalPages] = useState(1);
     const [page, setPage] = useState(1);
@@ -278,16 +280,6 @@ export default function rubbush_collectors() {
             })
             .catch(() => { });
     };
-
-    const resetForm = () => {
-        setFormData({
-            title_ar: "",
-            title_en: "",
-            body_ar: "",
-            body_en: "",
-            target_audience: "",
-        })
-    }
 
 
     const tableHeadActionsSlot = () => {
