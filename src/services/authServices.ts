@@ -14,7 +14,6 @@ export const loginService = async (form: FormData) => {
             await responseErrorServiceHandler(response, "login");
         }
         const data = (await response.json()) as AuthResponse;
-        console.log("response data =>>>>", data);
         return data;
     } catch (error: any) {
         throw new Error(error.message);

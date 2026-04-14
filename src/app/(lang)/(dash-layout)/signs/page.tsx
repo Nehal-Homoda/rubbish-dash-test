@@ -17,13 +17,14 @@ import {
   getBannersService,
   updateBannerService,
 } from "@/services/bannersServices";
+import { Category } from "@/types/categories.interface";
+import { getCategoriesService } from "@/services/categoriesService";
 
 interface FormDataInputErrors {
   image: string | null;
   title_ar: string | null;
   title_en: string | null;
   order: string | null;
-  type: string | null;
 }
 type FormDataType = {
   title_ar: string;
@@ -32,13 +33,13 @@ type FormDataType = {
   link: string;
   is_active: number;
   image: File | null | string;
-  type: "internal" | "external" | "";
   page_id?: string;
+  category_id: string;
+  is_ad: number | null;
+  ad_image: File | null | string
 };
 
 export default function rubbush_collectors() {
-
-
   const [dataList, setDataList] = useState<Banner[]>([]);
   const headerArr = [
     { text: "ID", name: "id" },
@@ -67,6 +68,9 @@ export default function rubbush_collectors() {
   // );
   const [errorMsg, setErrorMsg] = useState("");
   const [switch1, setSwitch1] = useState(false);
+  const [categoryList, setCategoryList] = useState<Category[]>([]);
+  const [type, setType] = useState<"internal" | "external" | "">("");
+
   const [formData, setFormData] = useState<FormDataType>({
     title_ar: "",
     title_en: "",
@@ -74,7 +78,9 @@ export default function rubbush_collectors() {
     link: "",
     is_active: 0,
     image: null,
-    type: "",
+    category_id: "",
+    is_ad: 0,
+    ad_image: ""
   });
   const [updateFormData, setUpdateFormData] = useState<FormDataType>({
     title_ar: "",
@@ -83,14 +89,16 @@ export default function rubbush_collectors() {
     link: "",
     is_active: 0,
     image: null,
-    type: "",
+    category_id: "",
+    is_ad: 0,
+    ad_image: "",
+
   });
   const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
     image: "",
     title_ar: "",
     title_en: "",
     order: "",
-    type: "",
   });
 
   const formSchema = Yup.object().shape({
@@ -179,7 +187,9 @@ export default function rubbush_collectors() {
       link: item.link,
       is_active: item.is_active ? 1 : 0,
       image: item.image,
-      type: "",
+      category_id: item.category_id,
+      is_ad: item.is_ad ? 1 : 0,
+      ad_image: item.ad_image,
     });
   };
 
@@ -250,6 +260,13 @@ export default function rubbush_collectors() {
     if (formData.image) {
       fd.append("image", formData.image);
     }
+    if (formData.is_ad) {
+      fd.append('is_ad', formData.is_ad.toString())
+    }
+    if (formData.ad_image) {
+
+      fd.append('ad_image', formData.ad_image)
+    }
     setIsDialogOpen(false);
     addBannerService(fd)
       .then((response) => {
@@ -264,7 +281,10 @@ export default function rubbush_collectors() {
           link: "",
           is_active: 0,
           image: null,
-          type: "",
+          category_id: "",
+          is_ad: 0,
+          ad_image: ""
+
         });
       })
       .catch((error) => {
@@ -279,7 +299,7 @@ export default function rubbush_collectors() {
     if (name == 'add') {
       setFormData((prev) => ({
         ...prev,
-        ["has_recycle"]: value ? 1 : 0,
+        ["is_ad"]: value ? 1 : 0,
       }));
     }
 
@@ -287,11 +307,29 @@ export default function rubbush_collectors() {
     if (name == 'edit') {
       setUpdateFormData((prev) => ({
         ...prev,
-        ["has_recycle"]: value ? 1 : null,
+        ["is_ad"]: value ? 1 : null,
       }));
     }
 
   };
+
+
+  const fetchCategories = () => {
+    getCategoriesService().then((response) => {
+      const activeCategories = response.data.filter((item, index) => {
+        return item.is_active
+      })
+
+      setCategoryList(activeCategories);
+    });
+  };
+
+  const handleSelectedCategory = (value: any) => {
+    setFormData((prev) => ({
+      ...prev,
+      ["category_id"]: value,
+    }))
+  }
 
   const tableHeadActionsSlot = () => {
     return (
@@ -369,7 +407,7 @@ export default function rubbush_collectors() {
               ></TextFieldNada>
 
               <SelectInput
-                value={formData.type}
+                value={type}
                 items={typeList}
                 itemName="name"
                 itemValue="type"
@@ -378,14 +416,11 @@ export default function rubbush_collectors() {
                 name="type"
                 required={true}
                 onChange={(value) => {
-                  setFormData((prev) => ({
-                    ...prev,
-                    ["type"]: value,
-                  }));
+                  setType(value)
                 }}
               ></SelectInput>
 
-              {formData.type === "external" && (
+              {type === "external" && (
                 <TextFieldNada
                   name="link"
                   type="text"
@@ -398,24 +433,25 @@ export default function rubbush_collectors() {
                   required={false}
                 ></TextFieldNada>
               )}
-              {formData.type === "internal" && (
+              {type === "internal" && (
                 <SelectInput
-                  value={formData.type}
-                  items={typeList}
-                  itemName="name"
+                  value={formData.category_id}
+                  items={categoryList}
+                  itemName="name_ar"
                   itemValue="id"
-                  label="الصفحة المستهدفة"
-                  placeholder="اختر الصفحة"
+                  label=" نوع الخدمة"
+                  placeholder="ادخل نوع الخدمة"
                   name="type"
                   required={true}
                   onChange={(value) => {
                     setFormData((prev) => ({
                       ...prev,
-                      page_id: value,
+                      category_id: value,
                     }));
                   }}
                 ></SelectInput>
               )}
+
 
               <TextFieldNada
                 name="order"
@@ -435,7 +471,7 @@ export default function rubbush_collectors() {
                 itemName="name"
                 itemValue="is_active"
                 label="الحالة"
-                placeholder="لختر الحالة"
+                placeholder="اختر الحالة"
                 name="is_active"
                 required={true}
                 onChange={(value) => {
@@ -452,6 +488,23 @@ export default function rubbush_collectors() {
                 label="اعلان"
                 onChange={(value) => handleCheckSubscription(value, 'add')}
               />
+
+
+              {switch1 && (
+                <div className="w-full flex justify-center mb-20">
+                  <FileInputImg
+                    errorMessage={formErrors.image || ""}
+                    state="add"
+                    onFileChange={(arg) => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        ["ad_image"]: arg?.file ?? null,
+                      }));
+                    }}
+                  ></FileInputImg>
+                </div>
+
+              )}
             </div>
           </form>
         </UIBaseDialog>
@@ -459,9 +512,9 @@ export default function rubbush_collectors() {
     );
   };
 
-
   useEffect(() => {
     fetchDataList();
+    fetchCategories()
   }, [page]);
   return (
     <>
@@ -569,16 +622,39 @@ export default function rubbush_collectors() {
                 placeholder=" ادخل نص اللافتة بالغة الانجليزية  "
               ></TextFieldNada>
 
-              <TextFieldNada
-                name="link"
-                type="text"
-                prependIcon="mdi mdi-notebook-edit-outline"
-                iconType="mdi"
-                handleChange={updateFormChangeHander}
-                value={updateFormData.link}
-                label=" الرابط"
-                placeholder=" ادخل الرابط الخاص باللافتة  "
-              ></TextFieldNada>
+
+
+              {updateFormData.link && (
+                <TextFieldNada
+                  name="link"
+                  type="text"
+                  prependIcon="mdi mdi-notebook-edit-outline"
+                  iconType="mdi"
+                  handleChange={addFormChangeHander}
+                  value={updateFormData.link}
+                  label=" الرابط"
+                  placeholder=" ادخل الرابط الخاص باللافتة  "
+                  required={false}
+                ></TextFieldNada>
+              )}
+              {updateFormData.category_id && (
+                <SelectInput
+                  value={formData.category_id}
+                  items={categoryList}
+                  itemName="name_ar"
+                  itemValue="id"
+                  label=" نوع الخدمة"
+                  placeholder="ادخل نوع الخدمة"
+                  name="type"
+                  required={true}
+                  onChange={(value) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      category_id: value,
+                    }));
+                  }}
+                ></SelectInput>
+              )}
 
               <TextFieldNada
                 name="order"
@@ -597,7 +673,7 @@ export default function rubbush_collectors() {
                 itemName="name"
                 itemValue="is_active"
                 label="الحالة"
-                placeholder="لختر الحالة"
+                placeholder="اختر الحالة"
                 name="is_active"
                 required={true}
                 onChange={(value) => {
@@ -607,6 +683,34 @@ export default function rubbush_collectors() {
                   }));
                 }}
               ></SelectInput>
+
+
+
+
+              <ToggleSwitch className="col-span-1"
+                checked={updateFormData.is_ad ? true : false}
+                label="اعلان"
+                onChange={(value) => handleCheckSubscription(value, 'edit')}
+              />
+
+
+              {updateFormData.is_ad && (
+                <div className="w-full flex justify-center mb-20">
+                  <FileInputImg
+                    errorMessage={formErrors.image || ""}
+                    state="edit"
+                    onFileChange={(arg) => {
+                      setUpdateFormData((prev) => ({
+                        ...prev,
+                        ["ad_image"]: arg?.file ?? null,
+                      }));
+                    }}
+                  ></FileInputImg>
+                </div>
+
+              )}
+
+
             </div>
           </form>
         </UIBaseDialog>

@@ -3,7 +3,7 @@ import { apiCall } from "./apiCall";
 import { ResponseData } from "@/types/shared";
 import { Area } from "@/types/area.interface";
 
-let token = "Bearer 160|9eiDkr7DC2EryTIiZbQbO5CoJoxE7X88IPHqcNGs7f3d3254";
+// let token = "Bearer 160|9eiDkr7DC2EryTIiZbQbO5CoJoxE7X88IPHqcNGs7f3d3254";
 
 export const getAreaService = async (query?: string) => {
     try {
