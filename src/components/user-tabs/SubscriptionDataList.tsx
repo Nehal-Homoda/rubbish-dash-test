@@ -49,20 +49,19 @@ interface FormDataInputErrors {
 }
 
 interface FormDataInputs {
-    address_title: string | null,
     district_id: string | null,
-    has_subscription: number,
-    package_id: string | null,
-    payment_method_id: string | null,
+    category_id: string | null,
     days: string[],
+    address_title: string | null,
     start_date: string | null,
     ends_at: string | null,
     time_from: string | null,
+    has_subscription: number,
+    package_id: string | null,
+    payment_method_id: string | null,
+    price_per_unit: string | null,
     units: number,
-    category_id: string | null,
     payment_verification: string | null,
-
-
 }
 
 
@@ -102,7 +101,6 @@ export default function rubbush_collectors({ user }: Props) {
         district_id: "",
         has_subscription: 0,
         package_id: "",
-
         payment_method_id: "",
         days: [],
         start_date: "",
@@ -171,6 +169,10 @@ export default function rubbush_collectors({ user }: Props) {
         category_id: "",
         price_per_unit: "",
         units: 1,
+        payment_verification: "",
+        has_subscription: 0,
+        payment_method_id: ""
+
 
     });
     const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
@@ -282,6 +284,7 @@ export default function rubbush_collectors({ user }: Props) {
         setErrorMessage("");
         const validateResult = await validateAllInputs<FormDataInputs>(
             formSchema,
+            //@ts-ignore
             addSubscriptionFormData
         );
         if (!validateResult) return;
@@ -326,7 +329,7 @@ export default function rubbush_collectors({ user }: Props) {
             });
     };
 
-   
+
 
     const handleSelectedUserSubscription = (item: any) => {
         console.log('selected subscription item iss', item)
@@ -467,6 +470,7 @@ export default function rubbush_collectors({ user }: Props) {
     const updateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!selectedDataItem) return;
+
 
         const validateResult = await validateAllInputs<FormDataInputs>(
             formSchema,
