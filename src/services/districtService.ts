@@ -14,7 +14,7 @@ export const getDistrictService = async (query?: string) => {
                 headers: {
                     // "Content-Type": "application/json",
                 },
-            }
+            },
         );
         if (!response.ok) {
             await responseErrorServiceHandler(response, "district");
@@ -62,6 +62,20 @@ export const deleteDistrictService = async (id: number) => {
         throw new Error(error.message);
     }
 };
+export const showDistrictService = async (id: number) => {
+    try {
+        const response = await apiCall.get(`/admins/districts/${id}`);
+        if (!response.ok) {
+            await responseErrorServiceHandler(response, "show district");
+        }
+        const data = await response.json();
+        console.log("response data =>>>>", data);
+        return data;
+    } catch (error: any) {
+        throw new Error(error.message);
+    }
+};
+
 export const updateDistrictService = async (id: number, body: string) => {
     try {
         const response = await apiCall.put("/admins/districts", id, {

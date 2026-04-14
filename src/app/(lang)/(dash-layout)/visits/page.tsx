@@ -14,8 +14,9 @@ import {
   getVisitsService,
   updateVisitsService,
 } from "@/services/visitService";
+//@ts-ignore
+import "react-datepicker/dist/react-datepicker.css";
 import DatePicker from "react-datepicker";
-// import "react-datepicker/dist/react-datepicker.css";
 import moment, { months } from "moment";
 import { District } from "@/types/district.interface";
 import { getDistrictService } from "@/services/districtService";
@@ -96,7 +97,7 @@ export default function rubbush_collectors() {
   const [endDate, setEndDate] = useState<Date>();
   const [isShowDialogOpen, setIsShowDialogOpen] = useState<boolean>(false);
   const [distrects, setDistrects] = useState<District[]>([]);
-  const [collector, setCollector] = useState<Collector[]>([]);
+  const [collectors, setCollectors] = useState<Collector[]>([]);
 
   const fetchDataList = ({
     search = searchTerm,
@@ -134,13 +135,13 @@ export default function rubbush_collectors() {
     const hasDateTo = end_date
       ? "&to_date=" + moment(end_date).format("YYYY-MM-DD")
       : "";
-    const query = `?page=${pageNum}${hasSearch}${statusParam}${category}${isArchive}${hasDateFrom}${hasDateTo}${category}${district}`;
+    const query = `?page=${pageNum}${hasSearch}${statusParam}${category}${isArchive}${hasDateFrom}${hasDateTo}${district}${collector}`;
     getVisitsService(query)
       .then((response) => {
         setDataList(response.data);
         setTotalPages(response.meta.last_page);
       })
-      .catch(() => {});
+      .catch(() => { });
   };
 
   const fetchDistrects = () => {
@@ -148,39 +149,35 @@ export default function rubbush_collectors() {
       .then((response) => {
         setDistrects(response.data);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const fetchCollectors = () => {
-    getCollectorsService().then((response) => {
-      setCollector(response.data);
-    });
+    getCollectorsService()
+      .then((response) => {
+        setCollectors(response.data || []);
+      })
+      .catch(() => { });
   };
 
   const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setSearchTerm(val);
     setPage(1);
-    fetchDataList({ search: val, pageNum: 1 });
-    // fetchDataList({ search: e.target.value });
   };
   const handleStatusFilter = (value: string | undefined) => {
     setStatusFilter(value);
     setPage(1);
-    fetchDataList({ status: value, pageNum: 1 });
   };
 
   const handleArchiveFilter = (item: any) => {
-    console.log("item is", item);
     setCurrentType(item.archive);
     setArchiveFilter(item.archive);
     setPage(1);
-    fetchDataList({ archive: item.archive, pageNum: 1 });
   };
   const handleCategoryFilter = (value: number | undefined) => {
     setCategoryFilter(value);
     setPage(1);
-    fetchDataList({ category_id: value, pageNum: 1 });
   };
 
   const updateDataItemActive = (value: any, index: number) => {
@@ -203,7 +200,7 @@ export default function rubbush_collectors() {
 
         console.log(response);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const deleteSubmit = (item: Visit, selectedIndex: number) => {
@@ -214,7 +211,7 @@ export default function rubbush_collectors() {
         setDataList(updatedArr);
         successDialog(true);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const updateDataItem = (item: Visit) => {
@@ -239,7 +236,7 @@ export default function rubbush_collectors() {
         fetchDataList();
         successDialog(true);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const updateFormChangeHander = (
@@ -267,16 +264,21 @@ export default function rubbush_collectors() {
     return statusList.find((item) => item.is_active === name)?.name ?? "";
   };
 
+
+
   const handleDateRange = (date: [Date | null, Date | null]) => {
     const [start, end] = date;
+
     setStartDate(start ?? undefined);
     setEndDate(end ?? undefined);
-    if (!startDate && !endDate) return;
-    //@ts-ignore
-    if (start > end) return;
-    fetchDataList({ from_date: start, end_date: end, pageNum: 1 });
-    setStartDate(undefined);
-    setEndDate(undefined);
+
+    if (!start || !end) return;
+
+    fetchDataList({
+      from_date: start,
+      end_date: end,
+      pageNum: 1,
+    });
   };
   const tableHeadActionsSlot = () => {
     return (
@@ -319,8 +321,8 @@ export default function rubbush_collectors() {
           المنطقة
         </UIPrimaryDropdown>
         <UIPrimaryDropdown
-          items={[{ id: undefined, name_ar: "الكل" }, ...collector]}
-          itemName="name_ar"
+          items={[{ id: undefined, name: "الكل" }, ...collectors]}
+          itemName="name"
           itemValue="id"
           onSelected={handleCollectorFilter}
         >
@@ -352,28 +354,48 @@ export default function rubbush_collectors() {
       .then((response) => {
         setCategories(response.data);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const handleRegionFilter = (value: number | undefined) => {
     setPage(1);
     setDistrictFilter(value);
-    setPage(1);
-    fetchDataList({ district_id: value, pageNum: 1 });
   };
   const handleCollectorFilter = (value: number | undefined) => {
     setPage(1);
     setCollectorFilter(value);
-    setPage(1);
-    fetchDataList({ collector_id: value, pageNum: 1 });
   };
 
   useEffect(() => {
-    fetchDataList();
-    fetchCategories();
-    fetchDistrects();
-    fetchCollectors();
-  }, [page]);
+    fetchDataList({
+      search: searchTerm,
+      status: statusFilter,
+      category_id: categoryFilter,
+      collector_id: collectorFilter,
+      district_id: districtFilter,
+      archive: archiveFilter,
+      pageNum: page,
+    });
+  }, [
+    page,
+    searchTerm,
+    statusFilter,
+    categoryFilter,
+    collectorFilter,
+    districtFilter,
+    archiveFilter,
+    startDate,
+    endDate,
+  ]);
+
+  useEffect(() => {
+    fetchDistrects()
+    fetchCategories()
+    fetchCollectors()
+
+  }, [])
+
+
 
   return (
     <>
@@ -432,7 +454,7 @@ export default function rubbush_collectors() {
           onClose={() => setIsShowDialogOpen(false)}
           hideConfirmBtn
           title="تفاصيل الزيارة "
-          confirmHandler={() => {}}
+          confirmHandler={() => { }}
           confirmText="اضافة"
           form="update-form"
         >

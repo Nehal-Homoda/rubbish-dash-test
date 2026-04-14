@@ -10,13 +10,7 @@ import {
     getUserSubscriptionByIdService,
 } from "@/services/userService";
 import * as Yup from 'yup'
-import trashImg from '@/assets/images/icons/trash.png'
-
-
-
 import BaseDataTable from "@/components/data-tables/BaseDataTable";
-
-import { useRouter } from "next/navigation";
 import { Category, Users } from "@/types/auth.interface";
 import { Subscription } from "@/types/user.interface";
 import UIBaseDialog from "../ui/UIBaseDialog";
@@ -26,7 +20,7 @@ import { Region } from "@/types/regions.interface";
 import { districtListService, paymentMethodListService } from "@/services/sharedService";
 import TextFieldNada from "../ui/form/TextFieldNada";
 import moment from "moment";
-import { addSubscriptionService, deleteSubscriptionService, showSubscriptionService } from "@/services/subscriptionService";
+import { addSubscriptionService, deleteSubscriptionService, showSubscriptionService, updateSubscriptionService } from "@/services/subscriptionService";
 import { getPackageByIdService, getPackagesService } from "@/services/packagesOffersService";
 import { PackageOffer } from "@/types/packagesOffer.interface";
 import MultiCheckbox from "../ui/form/MultiCheckbox";
@@ -36,7 +30,7 @@ import FileInput from "@/components/ui/form/FileInput";
 import { Payment_methods } from "@/types/paymentMethod.interface";
 import { successDialog, validateAllInputs } from "@/utils/shared";
 import UIDialogConfirm from "../ui/UIDialogConfirm";
-
+import editImg from "@/assets/images/icons/edit.png";
 
 interface FormDataInputErrors {
     district_id: string | null,
@@ -45,6 +39,7 @@ interface FormDataInputErrors {
     payment_method_id: string | null,
     days: string,
     start_date: string | null,
+    ends_at: string | null,
     time_from: string | null,
     units: string | null,
     category_id: string | null,
@@ -61,6 +56,7 @@ interface FormDataInputs {
     payment_method_id: string | null,
     days: string[],
     start_date: string | null,
+    ends_at: string | null,
     time_from: string | null,
     units: number,
     category_id: string | null,
@@ -89,6 +85,7 @@ export default function rubbush_collectors({ user }: Props) {
         null
     );
     const [totalPrice, setTotalPrice] = useState(0);
+    const [updateTotalPrice, setUpdateTotalPrice] = useState(0);
     const [searchTerm, setSearchTerm] = useState("");
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [isShowDialogOpen, setIsShowDialogOpen] = useState(false)
@@ -98,7 +95,6 @@ export default function rubbush_collectors({ user }: Props) {
         Payment_methods[]
     >([]);
     const [selected, setSelected] = useState<null | Payment_methods>(null);
-    const router = useRouter();
     const [addSubscriptionFormData, setAddSubscriptionFormData] = useState({
         name: "",
         phone: "",
@@ -110,6 +106,7 @@ export default function rubbush_collectors({ user }: Props) {
         payment_method_id: "",
         days: [],
         start_date: "",
+        ends_at: "",
         time_from: "",
         units: 1,
         category_id: "",
@@ -134,12 +131,77 @@ export default function rubbush_collectors({ user }: Props) {
         { is_active: 1, name: "مفعل" },
         { is_active: 0, name: "غير مفعل" },
     ];
-
     const [totalPages, setTotalPages] = useState(1);
     const [page, setPage] = useState(1);
+    const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
+    const [districtAvailableDays, setDistrictAvailableDays] = useState([
+        { title: 'السبت ', slug: 'saturday' },
+        { title: ' الاحد', slug: 'sunday' },
+        { title: 'الاتنين ', slug: 'monday' },
+        { title: 'الثلاثاء ', slug: 'tuesday' },
+        { title: 'الاربعاء ', slug: 'wednesday' },
+        { title: 'الخميس ', slug: 'thursday' },
+        { title: 'الجمعه ', slug: 'friday' },
 
+    ]);
+    const [selectedDataItem, setSelectedDataItem] = useState<Subscription | null>(
+        null,
+    );
+    const [formData, setFormData] = useState({
+        district_id: "",
+        package_id: "",
+        days: [],
+        address_title: "",
+        start_date: "",
+        ends_at: "",
+        time_from: "",
+        category_id: "",
+        price_per_unit: "",
+        units: 1,
 
+    });
+    const [updateFormData, setUpdateFormData] = useState({
+        district_id: "",
+        package_id: "",
+        days: [],
+        address_title: "",
+        start_date: "",
+        ends_at: "",
+        time_from: "",
+        category_id: "",
+        price_per_unit: "",
+        units: 1,
 
+    });
+    const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
+        district_id: "",
+        has_subscription: "",
+        package_id: "",
+        payment_method_id: "",
+        days: "",
+        start_date: "",
+        ends_at: "",
+        time_from: "",
+        units: "",
+        category_id: "",
+        payment_verification: "",
+        address_title: "",
+    });
+    const [updateFormErrors, setUpdateFormErrors] = useState<FormDataInputErrors>({
+        district_id: "",
+        has_subscription: "",
+        package_id: "",
+        payment_method_id: "",
+        days: "",
+        start_date: "",
+        ends_at: "",
+        time_from: "",
+        units: "",
+        category_id: "",
+        payment_verification: "",
+        address_title: "",
+
+    });
     const formSchema = Yup.object().shape({
         district_id: Yup.string().required(),
         has_subscription: Yup.number().required(),
@@ -156,127 +218,6 @@ export default function rubbush_collectors({ user }: Props) {
 
 
     });
-
-
-    const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
-        district_id: "",
-        has_subscription: "",
-        package_id: "",
-        payment_method_id: "",
-        days: "",
-        start_date: "",
-        time_from: "",
-        units: "",
-        category_id: "",
-        payment_verification: "",
-        address_title: "",
-
-    });
-
-
-    const [districtAvailableDays, setDistrictAvailableDays] = useState([
-        { title: 'السبت ', slug: 'saturday' },
-        { title: ' الاحد', slug: 'sunday' },
-        { title: 'الاتنين ', slug: 'monday' },
-        { title: 'الثلاثاء ', slug: 'tuesday' },
-        { title: 'الاربعاء ', slug: 'wednesday' },
-        { title: 'الخميس ', slug: 'thursday' },
-        { title: 'الجمعه ', slug: 'friday' },
-
-    ]);
-    //@ts-ignore
-    const takeValue = (e, name) => {
-        console.log(e.target.value);
-        setAddSubscriptionFormData((prev) => ({
-            ...prev,
-            [name]: e.target.value,
-        }));
-        if (name == "units") {
-            if (packageItem && selectedPackage) {
-                // setFormData((prev)=>({
-                //   ...prev,
-
-                // }))
-                //@ts-ignore
-                setTotalPrice(packageItem.price_per_unit * addSubscriptionFormData.units);
-            }
-        }
-    };
-
-    const fetchPaymentList = () => {
-        paymentMethodListService().then((response) => {
-            setPaymentMethodList(response.data);
-        });
-    };
-
-    //@ts-ignore
-    const handleAddUserSubmit = async (e) => {
-        e.preventDefault();
-        if (!user) return;
-        setErrorMessage("");
-        const validateResult = await validateAllInputs<FormDataInputs>(
-            formSchema,
-            addSubscriptionFormData
-        );
-        console.log("validate", validateResult);
-        if (!validateResult) return;
-        setFormErrors({ ...validateResult.outputResult });
-        console.log("form error", formErrors);
-        if (validateResult.isInvalid) return;
-
-        const t = addSubscriptionFormData.time_from.split("-");
-        const fd = new FormData();
-        fd.append("user_id", user.id.toString());
-
-        fd.append("district_id", addSubscriptionFormData.district_id);
-        fd.append("category_id", addSubscriptionFormData.category_id);
-        fd.append("start_date", addSubscriptionFormData.start_date);
-        fd.append("address_title", addSubscriptionFormData.address_title);
-        fd.append("time_from", t[0]);
-        fd.append("time_to", t[1]);
-        //@ts-ignore
-        fd.append("has_subscription", addSubscriptionFormData.has_subscription);
-        //@ts-ignore
-        fd.append("units", addSubscriptionFormData.units);
-        fd.append("package_id", addSubscriptionFormData.package_id);
-        fd.append("payment_method_id", addSubscriptionFormData.payment_method_id);
-        fd.append("payment_verification", addSubscriptionFormData.payment_verification);
-        fd.append("address_lat", "34.1531");
-        fd.append("address_lng", "34.1531");
-        addSubscriptionFormData.days.forEach((day, index) => fd.append(`days[${index}]`, day));
-
-        addSubscriptionService(fd)
-            .then((response) => {
-
-                console.log('jjjjjjjjjjjjjj', response)
-                // router.push("/users");
-
-                successDialog(true)
-                window.location.reload();
-                // getNewUser(response.data)
-            })
-            .catch((error) => {
-                setErrorMessage(error.message);
-                console.log('error msg', error.message)
-            });
-    };
-
-
-
-    const [formData, setFormData] = useState({
-        district_id: "",
-        package_id: "",
-        days: [],
-        address_title: "",
-        start_date: "",
-        ends_at: "",
-        time_from: "",
-        category_id: "",
-        price_per_unit: "",
-        units: 1,
-
-    });
-
 
     const getDays = (day: string[]) => {
         const x = day.map((item, index) => {
@@ -299,10 +240,6 @@ export default function rubbush_collectors({ user }: Props) {
         return x
 
     }
-
-
-
-
     const fetchDataList = ({
         search = searchTerm,
         pageNum = page,
@@ -338,11 +275,58 @@ export default function rubbush_collectors({ user }: Props) {
         fetchDataList({ search: val, pageNum: 1 });
     };
 
-    const fetchUserSubscription = () => {
-        getUserSubscriptionByIdService(user.id.toString()).then((response) => {
-            setDataList(response.data)
-        })
-    }
+    //@ts-ignore
+    const handleAddUserSubmit = async (e) => {
+        e.preventDefault();
+        if (!user) return;
+        setErrorMessage("");
+        const validateResult = await validateAllInputs<FormDataInputs>(
+            formSchema,
+            addSubscriptionFormData
+        );
+        if (!validateResult) return;
+        setFormErrors({ ...validateResult.outputResult });
+        console.log("form error", formErrors);
+        if (validateResult.isInvalid) return;
+
+        const t = addSubscriptionFormData.time_from.split("-");
+        const fd = new FormData();
+        fd.append('status', 'active')
+        fd.append("user_id", user.id.toString());
+        fd.append("district_id", addSubscriptionFormData.district_id);
+        fd.append("category_id", addSubscriptionFormData.category_id);
+        fd.append("start_date", addSubscriptionFormData.start_date);
+        fd.append("ends_at", addSubscriptionFormData.ends_at);
+        fd.append("address_title", addSubscriptionFormData.address_title);
+        fd.append("time_from", t[0]);
+        fd.append("time_to", t[1]);
+        //@ts-ignore
+        fd.append("has_subscription", addSubscriptionFormData.has_subscription);
+        //@ts-ignore
+        fd.append("units", addSubscriptionFormData.units);
+        fd.append("package_id", addSubscriptionFormData.package_id);
+        fd.append("payment_method_id", addSubscriptionFormData.payment_method_id);
+        fd.append("payment_verification", addSubscriptionFormData.payment_verification);
+        fd.append("address_lat", "34.1531");
+        fd.append("address_lng", "34.1531");
+        addSubscriptionFormData.days.forEach((day, index) => fd.append(`days[${index}]`, day));
+
+        addSubscriptionService(fd)
+            .then((response) => {
+
+                // router.push("/users");
+
+                successDialog(true)
+                window.location.reload();
+                // getNewUser(response.data)
+            })
+            .catch((error) => {
+                setErrorMessage(error.message);
+                console.log('error msg', error.message)
+            });
+    };
+
+   
 
     const handleSelectedUserSubscription = (item: any) => {
         console.log('selected subscription item iss', item)
@@ -396,58 +380,30 @@ export default function rubbush_collectors({ user }: Props) {
         })
     }
 
-
     //@ts-ignore
-    const takeUploadedImg = (img) => {
-
-        setAddSubscriptionFormData(prev => ({
+    const takeValue = (e, name) => {
+        console.log(e.target.value);
+        setAddSubscriptionFormData((prev) => ({
             ...prev,
-            ['payment_verification']: img.file
-        }))
-        console.log(img);
+            [name]: e.target.value,
+        }));
+        if (name == "units") {
+            if (packageItem && selectedPackage) {
+                // setFormData((prev)=>({
+                //   ...prev,
+
+                // }))
+                //@ts-ignore
+                setTotalPrice(packageItem.price_per_unit * addSubscriptionFormData.units);
+            }
+        }
     };
 
-    const resetForm = () => {
-        setAddSubscriptionFormData({
-            name: "",
-            phone: "",
-            password: "default-password",
-            district_id: "",
-            has_subscription: 0,
-            package_id: "",
-
-            payment_method_id: "",
-            days: [],
-            start_date: "",
-            time_from: "",
-            units: 1,
-            category_id: "",
-            payment_verification: "",
-            address_title: "",
-            address_lat: "34.1531",
-            address_lng: "34.1531",
-            address_details: "",
-        })
-
-
-    }
-
-    useEffect(() => {
-        if (packageItem) {
-            setTotalPrice(Number(packageItem.price_per_unit) * addSubscriptionFormData.units);
-        }
-    }, [addSubscriptionFormData.units]);
-
-
-
-
-    useEffect(() => {
-        if (packageItem) {
-            setTotalPrice(Number(packageItem.price_per_unit) * addSubscriptionFormData.units);
-        }
-    }, [packageItem]);
-
-
+    const fetchPaymentList = () => {
+        paymentMethodListService().then((response) => {
+            setPaymentMethodList(response.data);
+        });
+    };
 
     //@ts-ignore
     const handleSelectPackage = (value) => {
@@ -463,13 +419,97 @@ export default function rubbush_collectors({ user }: Props) {
 
     //@ts-ignore
     const handleSelecteditem = (item) => {
-        console.log("itemssssss", item);
         setSelected(item);
         setAddSubscriptionFormData((prev) => ({
             ...prev,
             ["payment_method_id"]: item.id,
         }));
     };
+
+
+    const updateDataItem = (item: Subscription) => {
+        setSelectedDataItem(item);
+
+        const price = Number(item.package.price_per_unit);
+        const units = Number(item.units);
+
+        setUpdateFormData({
+            address: item.address.title,
+            district_id: item.district.id.toString(),
+            package_id: item.package.id.toString(),
+            //@ts-ignore
+            days: Array.isArray(item.days) ? item.days : [],
+            address_title: item.address.title,
+            start_date: moment(item.starts_at).format("YYYY-MM-DD"),
+            ends_at: moment(item.ends_at).format("YYYY-MM-DD"),
+            time_from: item.time_from,
+            price_per_unit: price.toString(),
+            category_id: item.category.id.toString(),
+            units: units,
+
+        });
+
+
+        setUpdateTotalPrice(price * units);
+    };
+
+    const updateFormChangeHander = (
+        e: React.ChangeEvent<HTMLInputElement>,
+        index?: number,
+    ) => {
+        setUpdateFormData((prev) => ({
+            ...prev,
+            [e.target.name]: e.target.value,
+        }));
+
+    };
+
+    const updateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (!selectedDataItem) return;
+
+        const validateResult = await validateAllInputs<FormDataInputs>(
+            formSchema,
+            updateFormData
+        );
+        if (!validateResult) return;
+
+        setUpdateFormErrors({ ...validateResult.outputResult });
+        if (validateResult.isInvalid) return;
+
+        const t = updateFormData.time_from.split("-");
+
+        const fd = new FormData();
+
+        fd.append('status', 'active');
+        fd.append("user_id", user.id.toString());
+        fd.append("district_id", updateFormData.district_id);
+        fd.append("category_id", updateFormData.category_id);
+        fd.append("start_date", updateFormData.start_date);
+        fd.append("ends_at", updateFormData.ends_at);
+        fd.append("address_title", updateFormData.address_title);
+        fd.append("time_from", t[0]);
+        fd.append("time_to", t[1]);
+        fd.append("units", updateFormData.units.toString());
+        fd.append("package_id", updateFormData.package_id);
+
+
+        updateFormData.days.forEach((day, index) => {
+            fd.append(`days[${index}]`, day);
+        });
+
+        updateSubscriptionService(selectedDataItem.id, fd)
+            .then(() => {
+                fetchDataList();
+                successDialog(true);
+                setIsUpdateDialogOpen(false);
+            })
+            .catch((error) => {
+                console.log("update error", error?.response?.data);
+                setErrorMsg(error?.message);
+            });
+    };
+
 
     const deleteSubmit = (item: any, index: number) => {
         deleteSubscriptionService(item.id)
@@ -483,103 +523,18 @@ export default function rubbush_collectors({ user }: Props) {
 
 
     }
+    //@ts-ignore
+    const takeUploadedImg = (img) => {
 
-
-    useEffect(() => {
-        if (formData.district_id) {
-            const ca = district.find(
-                (item) => item.id.toString() == formData.district_id.toString()
-            );
-
-            if (ca) {
-                setDistrictDays(ca.available_days);
-                setDistrictTime(ca.available_times);
-            }
-        }
-    }, [formData]);
-
-
-    useEffect(() => {
-        if (addSubscriptionFormData.category_id) {
-            // // const ca = district.find(
-            // //     (item) => item.id.toString() == formData.district_id.toString()
-            // );
-            const categoryId = categoryList.find((item) => item.id.toString() == addSubscriptionFormData.category_id.toString())
-
-            if (categoryId) {
-                const query = `?category_id=${categoryId.id}`
-                getPackagesService(query).then((response) => {
-
-
-                    const activePackages = response.data.filter((item, index) => {
-                        return item.is_active
-                    })
-
-                    setpackagesList(activePackages);
-                    console.log('responsssssssssssssssssssse is', response)
-
-                })
-
-
-            }
-        }
-    }, [addSubscriptionFormData]);
-
-    useEffect(() => {
-        fetchDistrict()
-        fetchPackagesList()
-        fetchCategories()
-        fetchPaymentList()
-    }, [])
-
-
-
-    useEffect(() => {
-        if (addSubscriptionFormData.district_id) {
-            const ca = district.find(
-                (item) => item.id.toString() == addSubscriptionFormData.district_id.toString()
-            );
-
-            if (ca) {
-                // Assuming ca.available_days is an array like ['sunday', 'monday']
-                const dayMap = {
-                    saturday: 'السبت',
-                    sunday: 'الاحد',
-                    monday: 'الاتنين',
-                    tuesday: 'الثلاثاء',
-                    wednesday: 'الاربعاء',
-                    thursday: 'الخميس',
-                    friday: 'الجمعه'
-                };
-                const updatedDays = ca.available_days.map((slug: string) => ({
-                    slug,
-                    //@ts-ignore
-                    title: dayMap[slug] || slug
-                }));
-
-                setDistrictAvailableDays(updatedDays);
-                setDistrictTime(ca.available_times)
-
-            }
-        }
-    }, [addSubscriptionFormData]);
-
+        setAddSubscriptionFormData(prev => ({
+            ...prev,
+            ['payment_verification']: img.file
+        }))
+        console.log(img);
+    };
     const tableHeadActionsSlot = () => {
         return (
             <>
-
-
-
-
-
-
-                {/* <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
-                    <button onClick={() => router.push('/users/add-subscription')} className="bg-[#0094140D] p-1 rounded-lg">
-                        اضافة اشتراك
-                    </button>
-                </div> */}
-
-
                 <UIBaseDialog
                     open={isDialogOpen}
                     onClose={() => setIsDialogOpen(false)}
@@ -699,7 +654,7 @@ export default function rubbush_collectors({ user }: Props) {
                                 ></TextFieldNada>
                             </div>
 
-                            <div className="col-span-6">
+                            <div className="col-span-12">
                                 <TextFieldNada
 
                                     name="price"
@@ -720,8 +675,22 @@ export default function rubbush_collectors({ user }: Props) {
                                     handleChange={(e) => takeValue(e, "start_date")}
                                     value={addSubscriptionFormData.start_date}
                                     label="تاريخ البدأ "
-                                    placeholder="  السعر الكلي *"
+                                    placeholder="تاريخ البدأ"
                                 ></TextFieldNada>
+                            </div>
+
+                            <div className="col-span-6">
+
+                                <TextFieldNada
+                                    errorMessage={formErrors.ends_at || ''}
+                                    name="ends_at"
+                                    type="date"
+                                    handleChange={(e) => takeValue(e, "ends_at")}
+                                    value={addSubscriptionFormData.ends_at}
+                                    label="تاريخ الانتهاء "
+                                    placeholder="تاريخ الانتهاء"
+                                ></TextFieldNada>
+
                             </div>
 
 
@@ -858,13 +827,113 @@ export default function rubbush_collectors({ user }: Props) {
                         </div> */}
                     </form>
                 </UIBaseDialog>
-
-
-
-
             </>
         );
     };
+
+    useEffect(() => {
+        if (packageItem) {
+            setTotalPrice(Number(packageItem.price_per_unit) * addSubscriptionFormData.units);
+        }
+    }, [addSubscriptionFormData.units]);
+
+    useEffect(() => {
+        if (packageItem) {
+            setTotalPrice(Number(packageItem.price_per_unit) * addSubscriptionFormData.units);
+        }
+    }, [packageItem]);
+
+    useEffect(() => {
+        if (updateFormData.package_id) {
+            getPackageByIdService(Number(updateFormData.package_id)).then((res) => {
+                const price = Number(res.data.price_per_unit);
+                setUpdateTotalPrice(price * updateFormData.units);
+            });
+        }
+    }, [updateFormData.units]);
+
+
+
+    useEffect(() => {
+        if (formData.district_id) {
+            const ca = district.find(
+                (item) => item.id.toString() == formData.district_id.toString()
+            );
+
+            if (ca) {
+                setDistrictDays(ca.available_days);
+                setDistrictTime(ca.available_times);
+            }
+        }
+    }, [formData]);
+
+
+    useEffect(() => {
+        if (addSubscriptionFormData.category_id) {
+            // // const ca = district.find(
+            // //     (item) => item.id.toString() == formData.district_id.toString()
+            // );
+            const categoryId = categoryList.find((item) => item.id.toString() == addSubscriptionFormData.category_id.toString())
+
+            if (categoryId) {
+                const query = `?category_id=${categoryId.id}`
+                getPackagesService(query).then((response) => {
+
+
+                    const activePackages = response.data.filter((item, index) => {
+                        return item.is_active
+                    })
+
+                    setpackagesList(activePackages);
+                    console.log('responsssssssssssssssssssse is', response)
+
+                })
+
+
+            }
+        }
+    }, [addSubscriptionFormData]);
+
+    useEffect(() => {
+        fetchDistrict()
+        fetchPackagesList()
+        fetchCategories()
+        fetchPaymentList()
+    }, [])
+
+
+
+    useEffect(() => {
+        if (addSubscriptionFormData.district_id) {
+            const ca = district.find(
+                (item) => item.id.toString() == addSubscriptionFormData.district_id.toString()
+            );
+
+            if (ca) {
+                // Assuming ca.available_days is an array like ['sunday', 'monday']
+                const dayMap = {
+                    saturday: 'السبت',
+                    sunday: 'الاحد',
+                    monday: 'الاتنين',
+                    tuesday: 'الثلاثاء',
+                    wednesday: 'الاربعاء',
+                    thursday: 'الخميس',
+                    friday: 'الجمعه'
+                };
+                const updatedDays = ca.available_days.map((slug: string) => ({
+                    slug,
+                    //@ts-ignore
+                    title: dayMap[slug] || slug
+                }));
+
+                setDistrictAvailableDays(updatedDays);
+                setDistrictTime(ca.available_times)
+
+            }
+        }
+    }, [addSubscriptionFormData]);
+
+
     useEffect(() => {
         fetchDataList()
 
@@ -931,7 +1000,7 @@ export default function rubbush_collectors({ user }: Props) {
                             <span>{item.category?.name}</span>
                         ),
                         procedures: (item, index: number) => (
-                            <div className="flex justify-center gap-3">
+                            <div className="flex justify-center items-center gap-3">
                                 <UIDialogConfirm
                                     danger
                                     title="هل انت متأكد من حذف العنصر"
@@ -943,6 +1012,17 @@ export default function rubbush_collectors({ user }: Props) {
                                         <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
                                     </button>
                                 </UIDialogConfirm>
+
+                                <button
+                                    onClick={() => {
+                                        updateDataItem(item);
+                                        setIsUpdateDialogOpen(true)
+
+                                    }}
+                                    className="bg-[#0094140D] p-1 rounded-lg"
+                                >
+                                    <span className="mdi mdi-folder-edit-outline text-[#009414]"></span>
+                                </button>
                                 <button
                                     onClick={() => {
                                         handleSelectedUserSubscription(item)
@@ -952,6 +1032,8 @@ export default function rubbush_collectors({ user }: Props) {
                                 >
                                     <span className="mdi mdi-eye-outline text-blue-500"></span>
                                 </button>
+
+
 
                             </div>
                         ),
@@ -1060,7 +1142,7 @@ export default function rubbush_collectors({ user }: Props) {
                             <div className="col-span-6">
                                 <TextFieldNada
                                     type="text"
-                                    name="start_date"
+                                    name="ends_at"
                                     handleChange={(e) => { }}
                                     value={formData.ends_at}
                                     label="تاريخ الانتهاء "
@@ -1147,7 +1229,208 @@ export default function rubbush_collectors({ user }: Props) {
                 </UIBaseDialog>
 
 
-            </div>
+
+
+                <UIBaseDialog
+                    open={isUpdateDialogOpen}
+                    onClose={() => setIsUpdateDialogOpen(false)}
+                    title="تعديل الاشتراك "
+                    confirmHandler={() => { }}
+                    confirmText="حفظ"
+                    form="update-form"
+
+                >
+                    <form onSubmit={updateSubmit} className="">
+                        <div className="grid grid-cols-12 gap-7 mt-5">
+                            <div className="col-span-6">
+                                <SelectInput
+                                    placeholder="ادخل اسم المنطقة"
+                                    name="district_id"
+                                    itemName="name_ar"
+                                    itemValue="id"
+                                    value={updateFormData.district_id}
+                                    items={district}
+                                    label="اسم المنطقة"
+                                    onChange={(value) => {
+                                        setUpdateFormData((prev) => ({
+                                            ...prev,
+                                            ["district_id"]: value,
+                                        }));
+                                    }}
+                                ></SelectInput>
+                            </div>
+
+                            <div className="col-span-6">
+                                <TextFieldNada
+                                    name="address_title"
+                                    type="text"
+                                    value={updateFormData.address_title}
+                                    label=" العنوان"
+                                    placeholder=" العنوان"
+                                    handleChange={updateFormChangeHander}
+
+                                ></TextFieldNada>
+                            </div>
+
+
+
+                            <div className="col-span-6">
+                                <SelectInput
+                                    items={categoryList}
+                                    placeholder="ادخل نوع الخدمة"
+                                    name=""
+                                    itemName="name_ar"
+                                    itemValue="id"
+                                    value={updateFormData.category_id}
+                                    label=" نوع الخدمة"
+                                    onChange={(value) =>
+                                        setUpdateFormData((prev) => ({
+                                            ...prev,
+                                            ["category_id"]: value,
+                                        }))
+                                    }
+                                ></SelectInput>
+                            </div>
+
+                            <div className="col-span-6">
+                                <SelectInput
+                                    items={packagesList}
+                                    placeholder="ادخل نوع الباقه"
+                                    name=""
+                                    itemName="name_ar"
+                                    itemValue="id"
+                                    value={updateFormData.package_id}
+                                    label=" نوع الباقة"
+                                    onChange={(value) => {
+                                        setUpdateFormData((prev) => ({
+                                            ...prev,
+                                            package_id: value,
+                                        }));
+                                        getPackageByIdService(value).then((res) => {
+                                            const price = Number(res.data.price_per_unit);
+
+                                            setUpdateFormData((prev) => ({
+                                                ...prev,
+                                                package_id: value,
+                                                price_per_unit: price.toString(),
+                                            }));
+                                            setUpdateTotalPrice(price * updateFormData.units);
+                                        });
+                                    }}
+                                ></SelectInput>
+                            </div>
+
+                            <div className="col-span-6">
+                                <TextFieldNada
+                                    name="price"
+                                    type="number"
+                                    value={updateFormData.price_per_unit}
+                                    label=" سعر الباقة "
+                                    placeholder="  سعر الباقة "
+                                    handleChange={updateFormChangeHander}
+                                ></TextFieldNada>
+                            </div>
+
+
+
+
+                            <div className="col-span-6">
+                                <TextFieldNada
+                                    name="units"
+                                    type="number"
+                                    value={updateFormData.units.toString()}
+                                    label=" عدد الوحدات "
+                                    placeholder=" عدد الوحدات "
+                                    handleChange={updateFormChangeHander}
+                                ></TextFieldNada>
+                            </div>
+
+                            <div className="col-span-12">
+                                <TextFieldNada
+                                    name="total_price"
+                                    type="number"
+                                    handleChange={(e) => takeValue(e, "price")}
+                                    value={updateTotalPrice.toString()}
+                                    label="السعر الكلي "
+                                    placeholder="  السعر الكلي "
+                                ></TextFieldNada>
+                            </div>
+
+                            <div className="col-span-6">
+                                <TextFieldNada
+                                    type="date"
+                                    name="start_date"
+                                    value={updateFormData.start_date}
+                                    label="تاريخ البدأ "
+                                    placeholder="تاريخ البدأ"
+                                    handleChange={updateFormChangeHander}
+                                ></TextFieldNada>
+                            </div>
+
+
+                            <div className="col-span-6">
+                                <TextFieldNada
+                                    type="date"
+                                    name="ends_at"
+                                    value={updateFormData.ends_at}
+                                    label="تاريخ الانتهاء "
+                                    placeholder=" "
+                                    handleChange={updateFormChangeHander}
+                                ></TextFieldNada>
+                            </div>
+
+                            <div className="col-span-6">
+                                <MultiCheckbox
+                                    items={districtDays}
+                                    value={updateFormData.days}
+                                    label="اليوم"
+                                    required={true}
+                                    name="available_days"
+                                    placeholder="اختر اليوم"
+                                    prependIcon="mdi mdi-calendar-month-outline"
+                                    iconType="mdi"
+                                    onChange={(value) => {
+                                        //@ts-ignore
+                                        setUpdateFormData((prev) => ({
+                                            ...prev,
+                                            ["days"]: value,
+                                        }));
+                                    }}
+                                ></MultiCheckbox>
+                            </div>
+
+
+                            <div className="col-span-6">
+                                <SelectInput
+                                    items={districtTime}
+                                    placeholder="اختر الوقت"
+                                    name=""
+                                    value={updateFormData.time_from}
+                                    label=" الوقت"
+                                    onChange={(value) => {
+                                        setUpdateFormData((prev) => ({
+                                            ...prev,
+                                            ["time_from"]: value,
+                                        }));
+                                    }}
+                                ></SelectInput>
+                            </div>
+
+
+
+
+
+                            <div className="col-span-6">
+                                <div className="w-[150px] ">
+                                    {/* <img src={user.payment.payment_verification} alt="" className="w-full object-contain" /> */}
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </UIBaseDialog>
+
+
+            </div >
         </>
     );
 }

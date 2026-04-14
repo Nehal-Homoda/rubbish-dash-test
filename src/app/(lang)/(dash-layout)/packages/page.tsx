@@ -23,10 +23,8 @@ import { Category } from "@/types/categories.interface";
 import { Area } from "@/types/area.interface";
 import { getAreaService } from "@/services/areaServices";
 import { District } from "@/types/district.interface";
-import { getDistrictService } from "@/services/districtService";
+import { getDistrictService, showDistrictService } from "@/services/districtService";
 import MultiCheckbox from "@/components/ui/form/MultiCheckbox";
-
-
 
 type FormDataType = {
   name_ar: string;
@@ -244,15 +242,7 @@ export default function rubbush_collectors() {
   });
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false)
-  const [districtDays, setDistrictDays] = useState([
-    "friday",
-    "tuesday",
-    "thursday",
-    "wednesday",
-    "monday",
-    "saturday",
-    "sunday",
-  ]);
+  const [districtDays, setDistrictDays] = useState<District[]>([]);
 
   const fetchDataList = ({
     search = searchTerm,
@@ -753,7 +743,16 @@ export default function rubbush_collectors() {
                   setFormData((prev) => ({
                     ...prev,
                     ["district_id"]: value,
+                    ["available_days"]: []
                   }));
+
+                  if (value) {
+                    showDistrictService(value).then((res) => {
+                      setDistrictDays(res.data.available_days || []);
+                    });
+                  } else {
+                    setDistrictDays([]);
+                  }
                 }}
               ></SelectInput>
 

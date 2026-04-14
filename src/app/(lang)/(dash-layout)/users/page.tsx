@@ -46,6 +46,9 @@ export default function rubbush_collectors() {
   const [subscriptionFilter, setSubscriptionFilter] = useState<
     boolean | undefined
   >(undefined);
+  const [isEndingSubscriptionFilter, setIsEndingSubscriptionFilter] = useState<
+    boolean | undefined
+  >(undefined);
   const [typeFilter, setTypeFilter] = useState<boolean | undefined>(undefined);
   const [userList, setUserList] = useState<AppUser[]>([]);
   const [userItem, setUserItem] = useState<AppUser | null>(null);
@@ -72,6 +75,10 @@ export default function rubbush_collectors() {
     { is_active: 1, name: "مفعل" },
     { is_active: 0, name: "غير مفعل" },
   ];
+  const endingSoonList = [
+    { is_subscription_ending_soon: 1, name: "مفعل" },
+    { is_subscription_ending_soon: 0, name: "غير مفعل" },
+  ];
   const [totalPages, setTotalPages] = useState(1);
   const [page, setPage] = useState(1);
   const [selectedDataItem, setSelectedDataItem] = useState<Users | null>(null);
@@ -95,12 +102,14 @@ export default function rubbush_collectors() {
     search = searchTerm,
     is_active = activeFilter,
     is_subscription = subscriptionFilter,
+    is_subscription_ending_soon = isEndingSubscriptionFilter,
     is_request_recycle = typeFilter,
     pageNum = page,
   }: {
     search?: string;
     is_active?: boolean | undefined;
     is_subscription?: boolean | undefined;
+    is_subscription_ending_soon?: boolean | undefined;
     is_request_recycle?: boolean | undefined;
     pageNum?: number;
   } = {}) => {
@@ -110,6 +119,10 @@ export default function rubbush_collectors() {
       is_subscription != undefined
         ? "&is_subscription=" + (is_subscription ? 1 : 0)
         : "";
+    const isEndingSubscribe =
+      is_subscription_ending_soon != undefined
+        ? "&is_subscription_ending_soon=" + (is_subscription_ending_soon ? 1 : 0)
+        : "";
     const isRecycle =
       is_request_recycle != undefined
         ? "&is_request_recycle=" + (is_request_recycle ? 1 : 0)
@@ -117,7 +130,7 @@ export default function rubbush_collectors() {
 
     const hasSearch = search ? "&search=" + search : "";
 
-    const query = `?page=${pageNum}${hasSearch}${isActive}${isSubscribe}${isRecycle}`;
+    const query = `?page=${pageNum}${hasSearch}${isActive}${isSubscribe}${isRecycle}${isEndingSubscribe}`;
 
     getUserService(query).then((response) => {
       //@ts-ignore
@@ -137,6 +150,15 @@ export default function rubbush_collectors() {
     // setActiveFilter(value);
     setPage(1);
     fetchDataList({ is_active: value, pageNum: 1 });
+  };
+
+
+  const handleEndingSoonFilter = (value: boolean | undefined) => {
+    setPage(1);
+    fetchDataList({
+      is_subscription_ending_soon: value,
+      pageNum: 1,
+    });
   };
   const handleTypeFilter = (value: boolean | undefined) => {
     setTypeFilter(value);
@@ -287,6 +309,14 @@ export default function rubbush_collectors() {
           onSelected={handleActiveFilter}
         >
           الحالة
+        </UIPrimaryDropdown>
+        <UIPrimaryDropdown
+          items={[{ is_subscription_ending_soon: undefined, name: "الكل" }, ...endingSoonList]}
+          itemName="name"
+          itemValue="is_subscription_ending_soon"
+          onSelected={handleEndingSoonFilter}
+        >
+          اقترب علي الانتهاء
         </UIPrimaryDropdown>
 
         <UIPrimaryDropdown

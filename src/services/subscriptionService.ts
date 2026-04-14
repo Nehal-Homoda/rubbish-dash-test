@@ -2,7 +2,7 @@ import { responseErrorServiceHandler } from "@/utils/shared";
 import { apiCall } from "./apiCall";
 import { ResponseData } from "@/types/shared";
 import { Payment } from "@/types/payments.interface";
-import { Users } from "@/types/auth.interface";
+import { Subscription, Users } from "@/types/auth.interface";
 
 let token = "Bearer 160|9eiDkr7DC2EryTIiZbQbO5CoJoxE7X88IPHqcNGs7f3d3254";
 
@@ -92,6 +92,25 @@ export const showSubscriptionService = async (id: number) => {
             await responseErrorServiceHandler(response, "delete payment");
         }
         const data = await response.json();
+        console.log("response data =>>>>", data);
+        return data;
+    } catch (error: any) {
+        throw new Error(error.message);
+    }
+};
+
+export const updateSubscriptionService = async (id: number, formData: FormData) => {
+    try {
+        const response = await apiCall.post(`/admins/subscriptions/${id}`, {
+            body: formData,
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        if (!response.ok) {
+            await responseErrorServiceHandler(response, "update user");
+        }
+        const data = (await response.json()) as ResponseData<Subscription>;
         console.log("response data =>>>>", data);
         return data;
     } catch (error: any) {
