@@ -178,7 +178,6 @@ export default function rubbush_collectors({ user }: Props) {
     });
     const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
         district_id: "",
-        has_subscription: "",
         package_id: "",
         payment_method_id: "",
         days: "",
