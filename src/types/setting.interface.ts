@@ -20,5 +20,6 @@ export interface Setting {
     twitter: any;
     recycle_price_by_kilo: number;
     grace_period_visits: number;
+    ticket_auto_reply_enabled: number;
     ticket_auto_reply_message_ar: string;
 }

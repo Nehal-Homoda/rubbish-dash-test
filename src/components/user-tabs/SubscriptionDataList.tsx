@@ -170,7 +170,7 @@ export default function rubbush_collectors({ user }: Props) {
         category_id: "",
         price_per_unit: "",
         units: 1,
-        payment_verification: "",
+        payment_verification: null,
         has_subscription: 0,
         payment_method_id: ""
 
@@ -214,8 +214,8 @@ export default function rubbush_collectors({ user }: Props) {
             .required("Available days are required"),
         units: Yup.number().required(),
         category_id: Yup.number().required(),
-        payment_verification: Yup.string().required(),
         address_title: Yup.string().required(),
+        // payment_verification: Yup.string().required('صورة التحويل مطلوب'),
 
 
     });
@@ -434,6 +434,7 @@ export default function rubbush_collectors({ user }: Props) {
 
         const price = Number(item.package.price_per_unit);
         const units = Number(item.units);
+
         setUpdateFormData({
             address: item.address.title,
             district_id: item.district.id.toString(),
@@ -448,8 +449,9 @@ export default function rubbush_collectors({ user }: Props) {
             category_id: item.category.id.toString(),
             units: units,
             payment_method_id: item.payment.payment_method?.id.toString() || "",
-            payment_verification: item.payment.payment_verification || ""
+            payment_verification: null
         });
+
         const selectedPayment = paymentMethodList.find(
             (pm) => pm.id === item.payment.payment_method?.id
         );
@@ -479,7 +481,6 @@ export default function rubbush_collectors({ user }: Props) {
         if (!validateResult) return;
 
         setUpdateFormErrors({ ...validateResult.outputResult });
-        console.log('results',{...validateResult.outputResult})
         console.log('neeed show update form errors', updateFormErrors)
         if (validateResult.isInvalid) return;
 
@@ -1263,11 +1264,6 @@ export default function rubbush_collectors({ user }: Props) {
                     confirmHandler={() => { }}
                     confirmText="حفظ"
                     form="update-form"
-
-
-
-
-
                 >
                     <form onSubmit={updateSubmit} className="" id="update-form">
                         <div className="grid grid-cols-12 gap-7 mt-5">
@@ -1504,7 +1500,7 @@ export default function rubbush_collectors({ user }: Props) {
                             <div className="col-span-6">
 
                                 <FileInputImg
-                                    errorMessage={formErrors.payment_verification || ''}
+                                    errorMessage={updateFormErrors.payment_verification || ''}
                                     state="edit"
                                     fileUrl={selectedDataItem?.payment.payment_verification}
                                     onFileChange={(arg) => {
