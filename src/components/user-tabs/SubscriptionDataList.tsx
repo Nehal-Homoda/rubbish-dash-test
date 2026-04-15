@@ -499,7 +499,10 @@ export default function rubbush_collectors({ user }: Props) {
         fd.append("time_to", t[1]);
         fd.append("units", updateFormData.units.toString());
         fd.append("package_id", updateFormData.package_id);
-        fd.append('payment_verification', updateFormData.payment_verification)
+        if (updateFormData.payment_verification) {
+
+            fd.append('payment_verification', updateFormData.payment_verification)
+        }
 
 
         updateFormData.days.forEach((day, index) => {
