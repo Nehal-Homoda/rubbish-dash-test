@@ -56,6 +56,12 @@ export default function settings() {
             .catch(() => { });
     };
     const [TicketAutoReplyEnabled, setTicketAutoReplyEnabled] = useState(false);
+
+
+
+    const [iosForceUpdate, setIosForceUpdate] = useState(false);
+    const [androidForceUpdate, setAndroidForceUpdate] = useState(false);
+
     const addFormChangeHander = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData((prev) => ({
             ...prev,
@@ -99,6 +105,20 @@ export default function settings() {
         setFormData((prev) => ({
             ...prev,
             ["ticket_auto_reply_enabled"]: value ? 1 : 0,
+        }));
+    };
+    const handleCheckForceAndroidUpdate = (value: boolean) => {
+        setAndroidForceUpdate(!androidForceUpdate)
+        setFormData((prev) => ({
+            ...prev,
+            ["force_update_android_version"]: value ? 1 : 0,
+        }));
+    };
+    const handleCheckForceIosUpdate = (value: boolean) => {
+        setIosForceUpdate(!iosForceUpdate)
+        setFormData((prev) => ({
+            ...prev,
+            ["force_update_android_version"]: value ? 1 : 0,
         }));
     };
 
@@ -181,6 +201,21 @@ export default function settings() {
                             placeholder=""
                         ></TextFieldNada>
                     }
+
+
+
+
+                    <ToggleSwitch
+                        checked={androidForceUpdate}
+                        label="تحديث Android"
+                        onChange={(value) => handleCheckForceAndroidUpdate(value)}
+                    />
+                    <ToggleSwitch
+                        checked={iosForceUpdate}
+                        label="تحديث IOS"
+                        onChange={(value) => handleCheckForceIosUpdate(value)}
+                    />
+
 
 
                     {/* <TextFieldNada

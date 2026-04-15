@@ -5,8 +5,6 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from 'next/navigation'
 import {
-
-    updateUserService,
     getUserSubscriptionByIdService,
 } from "@/services/userService";
 import * as Yup from 'yup'
@@ -215,9 +213,6 @@ export default function rubbush_collectors({ user }: Props) {
         units: Yup.number().required(),
         category_id: Yup.number().required(),
         address_title: Yup.string().required(),
-        // payment_verification: Yup.string().required('صورة التحويل مطلوب'),
-
-
     });
 
     const getDays = (day: string[]) => {
@@ -330,8 +325,6 @@ export default function rubbush_collectors({ user }: Props) {
                 console.log('error msg', error.message)
             });
     };
-
-
 
     const handleSelectedUserSubscription = (item: any) => {
         console.log('selected subscription item iss', item)
@@ -503,8 +496,6 @@ export default function rubbush_collectors({ user }: Props) {
 
             fd.append('payment_verification', updateFormData.payment_verification)
         }
-
-
         updateFormData.days.forEach((day, index) => {
             fd.append(`days[${index}]`, day);
         });
