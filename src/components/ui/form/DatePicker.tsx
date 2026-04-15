@@ -1,15 +1,15 @@
 import { Datepicker } from "flowbite-react";
 
 import React from "react";
-type Props={
-  selectedDate:Date
-  sendSelectedDate:()=>void
+type Props = {
+  selectedDate: Date
+  sendSelectedDate: () => void
 }
-export default function DatePicker({selectedDate,sendSelectedDate}:Props) {
+export default function DatePicker({ selectedDate, sendSelectedDate }: Props) {
   return (
     <div>
-      <div className="w-full">
-      <Datepicker datepicker-format="yyyy-MM-dd" value={selectedDate} onChange={sendSelectedDate} title="Flowbite Datepicker" />
+      <div className="w-full ">
+        <Datepicker datepicker-format="yyyy-MM-dd" value={selectedDate} onChange={sendSelectedDate} title="Flowbite Datepicker" />
       </div>
     </div>
   );

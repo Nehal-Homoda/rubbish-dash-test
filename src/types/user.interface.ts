@@ -35,23 +35,24 @@ export interface PaymentMethod {
     is_active: boolean;
 }
 
-
-
 export interface Subscription {
     id: number;
     uid: string;
     units: number;
+    floor_number: any;
     time_from: string;
     time_to: string;
     days: string[];
     status: string;
     starts_at: string;
     ends_at: string;
+    grace_period_visits_consumed: number;
     created_at: string;
-    is_request_recycle?: boolean;
+    is_request_recycle: boolean;
     district: District;
     package: Package;
     category: Category;
+    payment: Payment;
     address: Address;
 }
 
