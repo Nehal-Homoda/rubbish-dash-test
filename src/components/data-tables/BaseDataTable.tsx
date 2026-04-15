@@ -100,7 +100,7 @@ export default function DataTable({
 
   return (
     <div className="base-data-table relative px-7 py-10 shadow-[0_0_1rem_#00000015] sm:rounded-xl">
-      <div className="w-full flex flex-col-reverse lg:flex-row flex-grow-0 flex-shrink-0 lg:items-center lg:justify-between gap-4 mb-3">
+      <div className="w-full flex flex-col-reverse lg:flex-row lg:items-center lg:justify-between gap-4 mb-3">
         {showSearch && (
           <input
             type="search"

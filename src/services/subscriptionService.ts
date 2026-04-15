@@ -99,19 +99,39 @@ export const showSubscriptionService = async (id: number) => {
     }
 };
 
-export const updateSubscriptionService = async (id: number, formData: FormData) => {
+// export const updateSubscriptionService = async (id: number, formData: FormData) => {
+//     try {
+//         const response = await apiCall.put(`/admins/subscriptions/${id}`, {
+//             body: formData,
+//             headers: {
+//                 "Content-Type": "application/json",
+//             },
+//         });
+//         if (!response.ok) {
+//             await responseErrorServiceHandler(response, "update user");
+//         }
+//         const data = (await response.json()) as ResponseData<Subscription>;
+//         console.log("response data =>>>>", data);
+//         return data;
+//     } catch (error: any) {
+//         throw new Error(error.message);
+//     }
+// };
+
+export const updateSubscriptionService = async (
+    id: number,
+    formData: FormData,
+) => {
     try {
-        const response = await apiCall.post(`/admins/subscriptions/${id}`, {
+        const response = await apiCall.put(`/admins/subscriptions`, id, {
             body: formData,
-            headers: {
-                "Content-Type": "application/json",
-            },
         });
+
         if (!response.ok) {
-            await responseErrorServiceHandler(response, "update user");
+            await responseErrorServiceHandler(response, "update subscription");
         }
+
         const data = (await response.json()) as ResponseData<Subscription>;
-        console.log("response data =>>>>", data);
         return data;
     } catch (error: any) {
         throw new Error(error.message);

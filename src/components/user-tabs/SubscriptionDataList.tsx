@@ -11,7 +11,7 @@ import {
 } from "@/services/userService";
 import * as Yup from 'yup'
 import BaseDataTable from "@/components/data-tables/BaseDataTable";
-import { Category, Users } from "@/types/auth.interface";
+import { Category, Payment, Users } from "@/types/auth.interface";
 import { Subscription } from "@/types/user.interface";
 import UIBaseDialog from "../ui/UIBaseDialog";
 import UserSubscription from "@/components/user-tabs/userSubscription";
@@ -31,10 +31,11 @@ import { Payment_methods } from "@/types/paymentMethod.interface";
 import { successDialog, validateAllInputs } from "@/utils/shared";
 import UIDialogConfirm from "../ui/UIDialogConfirm";
 import editImg from "@/assets/images/icons/edit.png";
+import { PaymentMethod } from "@/types/payment.interface";
+import FileInputImg from "../ui/form/FileInputImg";
 
 interface FormDataInputErrors {
     district_id: string | null,
-    has_subscription: string,
     package_id: string | null,
     payment_method_id: string | null,
     days: string,
@@ -191,7 +192,6 @@ export default function rubbush_collectors({ user }: Props) {
     });
     const [updateFormErrors, setUpdateFormErrors] = useState<FormDataInputErrors>({
         district_id: "",
-        has_subscription: "",
         package_id: "",
         payment_method_id: "",
         days: "",
@@ -206,7 +206,7 @@ export default function rubbush_collectors({ user }: Props) {
     });
     const formSchema = Yup.object().shape({
         district_id: Yup.string().required(),
-        has_subscription: Yup.number().required(),
+        // has_subscription: Yup.number().required(),
         package_id: Yup.string().required(),
         payment_method_id: Yup.string().required(),
         days: Yup.array()
@@ -312,8 +312,11 @@ export default function rubbush_collectors({ user }: Props) {
         fd.append("payment_verification", addSubscriptionFormData.payment_verification);
         fd.append("address_lat", "34.1531");
         fd.append("address_lng", "34.1531");
-        addSubscriptionFormData.days.forEach((day, index) => fd.append(`days[${index}]`, day));
+        addSubscriptionFormData.days.forEach((day, index) => {
+            fd.append(`days[${index}]`, day)
+        }
 
+        );
         addSubscriptionService(fd)
             .then((response) => {
 
@@ -341,9 +344,6 @@ export default function rubbush_collectors({ user }: Props) {
 
     const fetchDistrict = () => {
         districtListService().then((response) => {
-            // setDistrict(response.data);
-
-
             //@ts-ignore
             const activeDistricts = response.data.filter((item, index) => {
                 return item.is_active
@@ -435,7 +435,6 @@ export default function rubbush_collectors({ user }: Props) {
 
         const price = Number(item.package.price_per_unit);
         const units = Number(item.units);
-
         setUpdateFormData({
             address: item.address.title,
             district_id: item.district.id.toString(),
@@ -449,10 +448,13 @@ export default function rubbush_collectors({ user }: Props) {
             price_per_unit: price.toString(),
             category_id: item.category.id.toString(),
             units: units,
-
+            payment_method_id: item.payment.payment_method?.id.toString() || "",
+            payment_verification: item.payment.payment_verification || ""
         });
-
-
+        const selectedPayment = paymentMethodList.find(
+            (pm) => pm.id === item.payment.payment_method?.id
+        );
+        setSelected(selectedPayment || null);
         setUpdateTotalPrice(price * units);
     };
 
@@ -471,7 +473,6 @@ export default function rubbush_collectors({ user }: Props) {
         e.preventDefault();
         if (!selectedDataItem) return;
 
-
         const validateResult = await validateAllInputs<FormDataInputs>(
             formSchema,
             updateFormData
@@ -479,6 +480,8 @@ export default function rubbush_collectors({ user }: Props) {
         if (!validateResult) return;
 
         setUpdateFormErrors({ ...validateResult.outputResult });
+        console.log('results',{...validateResult.outputResult})
+        console.log('neeed show update form errors', updateFormErrors)
         if (validateResult.isInvalid) return;
 
         const t = updateFormData.time_from.split("-");
@@ -496,6 +499,7 @@ export default function rubbush_collectors({ user }: Props) {
         fd.append("time_to", t[1]);
         fd.append("units", updateFormData.units.toString());
         fd.append("package_id", updateFormData.package_id);
+        fd.append('payment_verification', updateFormData.payment_verification)
 
 
         updateFormData.days.forEach((day, index) => {
@@ -545,7 +549,7 @@ export default function rubbush_collectors({ user }: Props) {
                     title="اضافة اشتراك"
                     confirmHandler={() => { }}
                     confirmText="اضافة"
-                    form="update-form"
+                    form="add-form"
 
                     btn={
                         <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
@@ -555,7 +559,7 @@ export default function rubbush_collectors({ user }: Props) {
                         </div>
                     }
                 >
-                    <form onSubmit={handleAddUserSubmit} id="update-form" >
+                    <form onSubmit={handleAddUserSubmit} id="add-form" >
                         {errorMessage && (
                             <div className="mb-5">
                                 <span className="text-red-800">
@@ -837,15 +841,12 @@ export default function rubbush_collectors({ user }: Props) {
 
     useEffect(() => {
         if (packageItem) {
-            setTotalPrice(Number(packageItem.price_per_unit) * addSubscriptionFormData.units);
+            setTotalPrice(
+                Number(packageItem.price_per_unit) *
+                addSubscriptionFormData.units
+            );
         }
-    }, [addSubscriptionFormData.units]);
-
-    useEffect(() => {
-        if (packageItem) {
-            setTotalPrice(Number(packageItem.price_per_unit) * addSubscriptionFormData.units);
-        }
-    }, [packageItem]);
+    }, [packageItem, addSubscriptionFormData.units]);
 
     useEffect(() => {
         if (updateFormData.package_id) {
@@ -856,20 +857,18 @@ export default function rubbush_collectors({ user }: Props) {
         }
     }, [updateFormData.units]);
 
+    // useEffect(() => {
+    //     if (formData.district_id) {
+    //         const ca = district.find(
+    //             (item) => item.id.toString() == formData.district_id.toString()
+    //         );
 
-
-    useEffect(() => {
-        if (formData.district_id) {
-            const ca = district.find(
-                (item) => item.id.toString() == formData.district_id.toString()
-            );
-
-            if (ca) {
-                setDistrictDays(ca.available_days);
-                setDistrictTime(ca.available_times);
-            }
-        }
-    }, [formData]);
+    //         if (ca) {
+    //             setDistrictDays(ca.available_days);
+    //             setDistrictTime(ca.available_times);
+    //         }
+    //     }
+    // }, [formData]);
 
 
     useEffect(() => {
@@ -889,22 +888,12 @@ export default function rubbush_collectors({ user }: Props) {
                     })
 
                     setpackagesList(activePackages);
-                    console.log('responsssssssssssssssssssse is', response)
+
 
                 })
-
-
             }
         }
     }, [addSubscriptionFormData]);
-
-    useEffect(() => {
-        fetchDistrict()
-        fetchPackagesList()
-        fetchCategories()
-        fetchPaymentList()
-    }, [])
-
 
 
     useEffect(() => {
@@ -936,48 +925,81 @@ export default function rubbush_collectors({ user }: Props) {
             }
         }
     }, [addSubscriptionFormData]);
+    useEffect(() => {
+        if (updateFormData.district_id) {
+            const ca = district.find(
+                (item) => item.id.toString() == updateFormData.district_id.toString()
+            );
+
+            if (ca) {
+                // Assuming ca.available_days is an array like ['sunday', 'monday']
+                const dayMap = {
+                    saturday: 'السبت',
+                    sunday: 'الاحد',
+                    monday: 'الاتنين',
+                    tuesday: 'الثلاثاء',
+                    wednesday: 'الاربعاء',
+                    thursday: 'الخميس',
+                    friday: 'الجمعه'
+                };
+                const updatedDays = ca.available_days.map((slug: string) => ({
+                    slug,
+                    //@ts-ignore
+                    title: dayMap[slug] || slug
+                }));
+
+                setDistrictAvailableDays(updatedDays);
+                setDistrictTime(ca.available_times)
+
+            }
+        }
+    }, [updateFormData]);
 
 
     useEffect(() => {
         fetchDataList()
+        fetchDistrict()
+        fetchPackagesList()
+        fetchCategories()
+        fetchPaymentList()
 
 
     }, []);
 
-    useEffect(() => {
-        if (selectedUserSubscription) {
-            const startDate = moment(selectedUserSubscription.starts_at).format(
-                "YYYY-MM-DD"
-            );
-            const reDate = moment(selectedUserSubscription.created_at).format("YYYY-MM-DD");
+    // useEffect(() => {
+    //     if (selectedUserSubscription) {
+    //         const startDate = moment(selectedUserSubscription.starts_at).format(
+    //             "YYYY-MM-DD"
+    //         );
+    //         const reDate = moment(selectedUserSubscription.created_at).format("YYYY-MM-DD");
 
-            // const x = paymentMethodList.find(
-            //     (item) => item.id == user.payment.id
-            // );
-            setFormData({
-                district_id: selectedUserSubscription.district.id.toString(),
-                package_id: selectedUserSubscription.package.id.toString(),
-                address_title: selectedUserSubscription.address.title,
-                //@ts-ignore
-                days: getDays(selectedUserSubscription.days),
-                // renew_date: reDate,
+    //         // const x = paymentMethodList.find(
+    //         //     (item) => item.id == user.payment.id
+    //         // );
+    //         setFormData({
+    //             district_id: selectedUserSubscription.district.id.toString(),
+    //             package_id: selectedUserSubscription.package.id.toString(),
+    //             address_title: selectedUserSubscription.address.title,
+    //             //@ts-ignore
+    //             days: selectedUserSubscription.days || [],
+    //             // renew_date: reDate,
 
-                price_per_unit:
-                    selectedUserSubscription.package.price_per_unit.toString(),
-                start_date: selectedUserSubscription.starts_at,
-                ends_at: selectedUserSubscription.ends_at,
-                time_from:
-                    selectedUserSubscription.time_from +
-                    "-" +
-                    selectedUserSubscription.time_to,
-                units: selectedUserSubscription.units,
-                category_id: selectedUserSubscription.category.id.toString(),
-                // payment_verification: user.payment.payment_verification,
-                // address_title: user.subscription.address.title,
-                // address_details: user.subscription.address.detail,
-            });
-        }
-    }, [selectedUserSubscription]);
+    //             price_per_unit:
+    //                 selectedUserSubscription.package.price_per_unit.toString(),
+    //             start_date: selectedUserSubscription.starts_at,
+    //             ends_at: selectedUserSubscription.ends_at,
+    //             time_from:
+    //                 selectedUserSubscription.time_from +
+    //                 "-" +
+    //                 selectedUserSubscription.time_to,
+    //             units: selectedUserSubscription.units,
+    //             category_id: selectedUserSubscription.category.id.toString(),
+    //             // payment_verification: user.payment.payment_verification,
+    //             // address_title: user.subscription.address.title,
+    //             // address_details: user.subscription.address.detail,
+    //         });
+    //     }
+    // }, [selectedUserSubscription]);
 
 
     return (
@@ -1056,10 +1078,10 @@ export default function rubbush_collectors({ user }: Props) {
                     title="تفاصيل الاشتراك "
                     confirmHandler={() => { }}
                     confirmText="الغاء"
-                    form="update-form"
+                    form="show-form"
 
                 >
-                    <form className="">
+                    <form className="" id="show-form">
                         <div className="grid grid-cols-12 gap-7 mt-5">
                             <div className="col-span-6">
                                 <SelectInput
@@ -1243,11 +1265,16 @@ export default function rubbush_collectors({ user }: Props) {
                     confirmText="حفظ"
                     form="update-form"
 
+
+
+
+
                 >
-                    <form onSubmit={updateSubmit} className="">
+                    <form onSubmit={updateSubmit} className="" id="update-form">
                         <div className="grid grid-cols-12 gap-7 mt-5">
                             <div className="col-span-6">
                                 <SelectInput
+                                    errorMessage={updateFormErrors.district_id || ''}
                                     placeholder="ادخل اسم المنطقة"
                                     name="district_id"
                                     itemName="name_ar"
@@ -1266,6 +1293,7 @@ export default function rubbush_collectors({ user }: Props) {
 
                             <div className="col-span-6">
                                 <TextFieldNada
+                                    errorMessage={updateFormErrors.address_title || ''}
                                     name="address_title"
                                     type="text"
                                     value={updateFormData.address_title}
@@ -1280,6 +1308,7 @@ export default function rubbush_collectors({ user }: Props) {
 
                             <div className="col-span-6">
                                 <SelectInput
+                                    errorMessage={updateFormErrors.category_id || ''}
                                     items={categoryList}
                                     placeholder="ادخل نوع الخدمة"
                                     name=""
@@ -1298,6 +1327,7 @@ export default function rubbush_collectors({ user }: Props) {
 
                             <div className="col-span-6">
                                 <SelectInput
+                                    errorMessage={updateFormErrors.package_id || ''}
                                     items={packagesList}
                                     placeholder="ادخل نوع الباقه"
                                     name=""
@@ -1326,6 +1356,7 @@ export default function rubbush_collectors({ user }: Props) {
 
                             <div className="col-span-6">
                                 <TextFieldNada
+
                                     name="price"
                                     type="number"
                                     value={updateFormData.price_per_unit}
@@ -1334,9 +1365,6 @@ export default function rubbush_collectors({ user }: Props) {
                                     handleChange={updateFormChangeHander}
                                 ></TextFieldNada>
                             </div>
-
-
-
 
                             <div className="col-span-6">
                                 <TextFieldNada
@@ -1362,6 +1390,7 @@ export default function rubbush_collectors({ user }: Props) {
 
                             <div className="col-span-6">
                                 <TextFieldNada
+                                    errorMessage={updateFormErrors.start_date || ''}
                                     type="date"
                                     name="start_date"
                                     value={updateFormData.start_date}
@@ -1374,6 +1403,7 @@ export default function rubbush_collectors({ user }: Props) {
 
                             <div className="col-span-6">
                                 <TextFieldNada
+                                    errorMessage={updateFormErrors.ends_at || ''}
                                     type="date"
                                     name="ends_at"
                                     value={updateFormData.ends_at}
@@ -1385,7 +1415,10 @@ export default function rubbush_collectors({ user }: Props) {
 
                             <div className="col-span-6">
                                 <MultiCheckbox
-                                    items={districtDays}
+                                    errorMessage={updateFormErrors.days || ''}
+                                    items={districtAvailableDays}
+                                    itemName="title"
+                                    itemValue="slug"
                                     value={updateFormData.days}
                                     label="اليوم"
                                     required={true}
@@ -1406,6 +1439,7 @@ export default function rubbush_collectors({ user }: Props) {
 
                             <div className="col-span-6">
                                 <SelectInput
+                                    errorMessage={updateFormErrors.time_from || ''}
                                     items={districtTime}
                                     placeholder="اختر الوقت"
                                     name=""
@@ -1420,9 +1454,69 @@ export default function rubbush_collectors({ user }: Props) {
                                 ></SelectInput>
                             </div>
 
+                            <div className="col-span-12">
+                                <RadioGroup
+                                    value={selected}
+                                    onChange={(e: any) => {
+                                        setSelected(e);
+                                        setUpdateFormData((prev) => ({
+                                            ...prev,
+                                            payment_method_id: e.id,
+                                        }));
+                                    }}
+                                >
+                                    <div className="grid grid-cols-2 gap-7">
+                                        {paymentMethodList.map((item, index) => (
+                                            <RadioGroup.Option
+                                                key={index}
+                                                value={item}
+                                                className={({ active, checked }) =>
+                                                    `${checked ? "border border-[#009414]" : ""}
+                                             relative flex cursor-pointer rounded-lg px-5 py-4 ring-1 ring-gray-100`
+                                                }
+                                            >
+                                                {({ checked }) => (
+                                                    <div className="flex justify-between w-full">
+                                                        <div className="flex items-center gap-4">
+                                                            <img
+                                                                src={item.image}
+                                                                className="w-10 h-10 object-contain"
+                                                            />
+                                                            <span>{item.name_ar}</span>
+                                                        </div>
+
+                                                        {checked && (
+                                                            <div className="w-4 h-4 rounded-full bg-[#009414]" />
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </RadioGroup.Option>
+                                        ))}
+                                    </div>
+                                </RadioGroup>
 
 
+                                {formErrors.payment_method_id && (
+                                    <p className="text-red-500 text-sm mt-2">
+                                        {formErrors.payment_method_id}
+                                    </p>
+                                )}
+                            </div>
+                            <div className="col-span-6">
 
+                                <FileInputImg
+                                    errorMessage={formErrors.payment_verification || ''}
+                                    state="edit"
+                                    fileUrl={selectedDataItem?.payment.payment_verification}
+                                    onFileChange={(arg) => {
+                                        //@ts-ignore
+                                        setUpdateFormData((prev) => ({
+                                            ...prev,
+                                            ["payment_verification"]: arg?.file64 ?? null,
+                                        }));
+                                    }}
+                                ></FileInputImg>
+                            </div>
 
                             <div className="col-span-6">
                                 <div className="w-[150px] ">

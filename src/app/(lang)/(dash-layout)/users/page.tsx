@@ -58,7 +58,6 @@ export default function rubbush_collectors() {
   );
   const [checkedList, setCheckedList] = useState<number[]>([]);
   const router = useRouter();
-
   const headerArr = [
     { text: "ID", name: "id" },
     { text: "اسم المستخدم", name: "name" },

@@ -252,7 +252,10 @@ input[type="number"] {
     font-family: Cairo, sans-serif !important;
 }
 .react-datepicker-wrapper input:focus {
-   
     border: none;
     outline: none;
+}
+
+.react-datepicker-wrapper {
+    min-width: 120px;
 }
