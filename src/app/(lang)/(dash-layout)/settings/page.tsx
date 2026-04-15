@@ -7,6 +7,7 @@ import {
 import { Setting } from "@/types/setting.interface";
 import { successDialog } from "@/utils/shared";
 import React, { useEffect, useState } from "react";
+import { ToggleSwitch } from "flowbite-react";
 type FormDataType = {
     ios_version: string;
     android_version: string;
@@ -15,6 +16,7 @@ type FormDataType = {
     recycle_price_by_kilo: number | string
     grace_period_visits: number | string;
     ticket_auto_reply_message_ar: string;
+    ticket_auto_reply_enabled: number | string
 };
 export default function settings() {
     const [settingData, setSettingData] = useState<Setting | null>(null);
@@ -25,6 +27,7 @@ export default function settings() {
         instapay_number: '',
         recycle_price_by_kilo: 0,
         grace_period_visits: 0,
+        ticket_auto_reply_enabled: 0,
         ticket_auto_reply_message_ar: ""
     });
     const fetchSettingData = () => {
@@ -43,6 +46,7 @@ export default function settings() {
                         ? response.data.recycle_price_by_kilo.toString()
                         : "0",
                     ticket_auto_reply_message_ar: response.data.ticket_auto_reply_message_ar || "",
+                    ticket_auto_reply_enabled: response.data.ticket_auto_reply_enabled || 0,
                     grace_period_visits:
                         response.data.grace_period_visits != null
                             ? response.data.grace_period_visits.toString()
@@ -51,6 +55,7 @@ export default function settings() {
             })
             .catch(() => { });
     };
+    const [TicketAutoReplyEnabled, setTicketAutoReplyEnabled] = useState(false);
     const addFormChangeHander = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData((prev) => ({
             ...prev,
@@ -80,9 +85,21 @@ export default function settings() {
             vodafone_cash_number: settingData?.wallet_number ? settingData.wallet_number.toString() : '0',
             instapay_number: settingData?.instapay_number || "",
             recycle_price_by_kilo: settingData?.recycle_price_by_kilo ? settingData?.recycle_price_by_kilo : '0',
+            ticket_auto_reply_enabled: settingData?.ticket_auto_reply_enabled ? settingData?.ticket_auto_reply_enabled : 0,
             ticket_auto_reply_message_ar: settingData?.ticket_auto_reply_message_ar || "",
             grace_period_visits: settingData?.grace_period_visits ? settingData?.grace_period_visits : '0'
+
         });
+    };
+
+
+    const handleCheckAutoReply = (value: boolean) => {
+
+        setTicketAutoReplyEnabled(!TicketAutoReplyEnabled)
+        setFormData((prev) => ({
+            ...prev,
+            ["ticket_auto_reply_enabled"]: value ? 1 : 0,
+        }));
     };
 
 
@@ -148,14 +165,24 @@ export default function settings() {
                         label="مدة فترة السماح"
                         placeholder=""
                     ></TextFieldNada>
-                    <TextFieldNada
-                        name="ticket_auto_reply_message_ar"
-                        type="text"
-                        handleChange={addFormChangeHander}
-                        value={formData.ticket_auto_reply_message_ar}
-                        label="رسالة الدعم"
-                        placeholder=""
-                    ></TextFieldNada>
+
+                    <ToggleSwitch
+                        checked={TicketAutoReplyEnabled}
+                        label="اظهار رسالة الدعم"
+                        onChange={(value) => handleCheckAutoReply(value)}
+                    />
+                    {TicketAutoReplyEnabled &&
+                        <TextFieldNada
+                            name="ticket_auto_reply_message_ar"
+                            type="text"
+                            handleChange={addFormChangeHander}
+                            value={formData.ticket_auto_reply_message_ar}
+                            label="رسالة الدعم"
+                            placeholder=""
+                        ></TextFieldNada>
+                    }
+
+
                     {/* <TextFieldNada
                         name="name_en"
                         type="text"

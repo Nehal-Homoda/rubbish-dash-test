@@ -25,6 +25,7 @@ interface FormDataInputErrors {
   title_ar: string | null;
   title_en: string | null;
   order: string | null;
+  ad_image: string | null
 }
 type FormDataType = {
   title_ar: string;
@@ -70,7 +71,7 @@ export default function rubbush_collectors() {
   const [switch1, setSwitch1] = useState(false);
   const [categoryList, setCategoryList] = useState<Category[]>([]);
   const [type, setType] = useState<"internal" | "external" | "">("");
-
+  const [TicketAutoReplyEnabled, setTicketAutoReplyEnabled] = useState(false);
   const [formData, setFormData] = useState<FormDataType>({
     title_ar: "",
     title_en: "",
@@ -99,6 +100,7 @@ export default function rubbush_collectors() {
     title_ar: "",
     title_en: "",
     order: "",
+    ad_image: ""
   });
 
   const formSchema = Yup.object().shape({
@@ -106,6 +108,7 @@ export default function rubbush_collectors() {
     title_ar: Yup.string().required("العنوان باللغه العربيه مطلوب"),
     title_en: Yup.string().required("العنوان باللغه الانجليزيه مطلوب"),
     order: Yup.string().required("الترتيب مطلوب"),
+    ad_image: Yup.string().required("الصورة مطلوبه")
   });
 
   const fetchDataList = ({
@@ -259,6 +262,9 @@ export default function rubbush_collectors() {
     fd.append("is_active", formData.is_active.toString());
     if (formData.image) {
       fd.append("image", formData.image);
+    }
+    if (formData.category_id) {
+      fd.append('category_id', formData.category_id.toString())
     }
     if (formData.is_ad) {
       fd.append('is_ad', formData.is_ad.toString())
@@ -639,7 +645,7 @@ export default function rubbush_collectors() {
               )}
               {updateFormData.category_id && (
                 <SelectInput
-                  value={formData.category_id}
+                  value={updateFormData.category_id}
                   items={categoryList}
                   itemName="name_ar"
                   itemValue="id"
@@ -648,7 +654,7 @@ export default function rubbush_collectors() {
                   name="type"
                   required={true}
                   onChange={(value) => {
-                    setFormData((prev) => ({
+                    setUpdateFormData((prev) => ({
                       ...prev,
                       category_id: value,
                     }));
@@ -697,7 +703,8 @@ export default function rubbush_collectors() {
               {updateFormData.is_ad && (
                 <div className="w-full flex justify-center mb-20">
                   <FileInputImg
-                    errorMessage={formErrors.image || ""}
+                    fileUrl={updateFormData.ad_image as string}
+                    errorMessage={formErrors.ad_image || ""}
                     state="edit"
                     onFileChange={(arg) => {
                       setUpdateFormData((prev) => ({
