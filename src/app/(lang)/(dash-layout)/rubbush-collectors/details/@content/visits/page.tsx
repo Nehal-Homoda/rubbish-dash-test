@@ -14,6 +14,17 @@ import {
 } from "@/services/visitService";
 
 
+type FormDataType = {
+    name_ar: string;
+    name_en: string;
+    category_id: number | string;
+    is_active: number;
+    price_per_unit: number | string;
+    order: number;
+    days_count: number | string;
+};
+
+
 export default function page() {
     const [dataList, setDataList] = useState<Visit[]>([]);
     const headerArr = [
@@ -37,15 +48,7 @@ export default function page() {
     const [selectedDataItem, setSelectedDataItem] = useState<Visit | null>(
         null
     );
-    type FormDataType = {
-        name_ar: string;
-        name_en: string;
-        category_id: number | string;
-        is_active: number;
-        price_per_unit: number | string;
-        order: number;
-        days_count: number | string;
-    };
+
 
     const [updateFormData, setUpdateFormData] = useState<FormDataType>({
         name_ar: "",
@@ -167,7 +170,10 @@ export default function page() {
     };
 
     const tableHeadActionsSlot = () => {
-        return <></>;
+        return <>
+
+
+        </>;
     };
     useEffect(() => {
         fetchDataList();
