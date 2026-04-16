@@ -118,13 +118,10 @@ export const showSubscriptionService = async (id: number) => {
 //     }
 // };
 
-export const updateSubscriptionService = async (
-    id: number,
-    formData: FormData,
-) => {
+export const updateSubscriptionService = async (id: number, body: string) => {
     try {
         const response = await apiCall.put(`/admins/subscriptions`, id, {
-            body: formData,
+            body: body,
         });
 
         if (!response.ok) {
