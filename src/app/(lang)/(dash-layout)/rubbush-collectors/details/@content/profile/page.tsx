@@ -14,6 +14,17 @@ import { getQueryParam, successDialog, validateAllInputs } from "@/utils/shared"
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
+
+
+
+type UpdateFormDataType = {
+    name: string;
+    phone: string;
+    password?: string;
+    district_id: string[];
+    image: File | null | string;
+};
+
 export default function page() {
     const id = () => {
         return getQueryParam('id') || '';
@@ -26,13 +37,7 @@ export default function page() {
         name: "",
     });
 
-    type UpdateFormDataType = {
-        name: string;
-        phone: string;
-        password?: string;
-        district_id: string[];
-        image: null | string;
-    };
+
     const [updateFormData, setUpdateFormData] = useState<UpdateFormDataType>({
         name: "",
         phone: "",
@@ -60,8 +65,6 @@ export default function page() {
                 console.log(error.message);
             });
     };
-
-
     const formSchema = Yup.object().shape({
         name: Yup.string().required('الاسم مطلوب'),
 
@@ -124,7 +127,7 @@ export default function page() {
             phone: collector.phone,
             password: "",
             district_id: collector.districts?.map((item) => item.id.toString()),
-            image: null,
+            image: collector.image || '',
         });
     };
     useEffect(() => {
@@ -155,7 +158,7 @@ export default function page() {
                         <FileInputImg
                             state="edit"
                             //@ts-ignore
-                            fileUrl={collector.image}
+                            fileUrl={updateFormData.image as string}
                             onFileChange={(arg) => {
                                 setUpdateFormData((prev) => ({
                                     ...prev,

@@ -33,7 +33,7 @@ type FormDataType = {
   is_active: number;
   area_id: number | string | null;
   district_id: number | string | null;
-  available_days: string[],
+  days: string[],
   price_per_unit: number | string;
   order: number;
   days_count: number | string;
@@ -47,7 +47,7 @@ interface FormDataInputErrors {
   category_id: string | null,
   area_id: string | null,
   district_id: string | null,
-  available_days: string,
+  days: string,
   price_per_unit: string | null;
 
 }
@@ -123,7 +123,7 @@ export default function rubbush_collectors() {
     category_id: null,
     area_id: null,
     district_id: null,
-    available_days: [],
+    days: [],
     is_active: 0,
     price_per_unit: "",
     order: 0,
@@ -182,7 +182,7 @@ export default function rubbush_collectors() {
     area_id: "",
     district_id: "",
     price_per_unit: "",
-    available_days: ""
+    days: ""
 
   });
   const [updateFormErrors, setUpdateFormErrors] = useState<FormDataInputErrors>({
@@ -192,7 +192,7 @@ export default function rubbush_collectors() {
     price_per_unit: "",
     area_id: "",
     district_id: "",
-    available_days: ""
+    days: ""
 
   });
   const [errorMsg, setErrorMsg] = useState("");
@@ -202,7 +202,7 @@ export default function rubbush_collectors() {
     category_id: null,
     area_id: null,
     district_id: null,
-    available_days: [],
+    days: [],
     is_active: 0,
     price_per_unit: "",
     order: 0,
@@ -340,7 +340,7 @@ export default function rubbush_collectors() {
       category_id: item.category,
       area_id: item.area,
       district_id: item.district,
-      available_days: item.available_days,
+      days: item.days,
       days_count: item.days_count ? parseInt(item.days_count) : "",
       price_per_unit: item.price_per_unit ? parseInt(item.price_per_unit) : "",
       discounts: item.discounts?.length
@@ -448,8 +448,8 @@ export default function rubbush_collectors() {
       fd.append("category_id", formData.category_id ? formData.category_id.toString() : null),
       fd.append("area_id", formData.area_id ? formData.area_id.toString() : "0"),
       fd.append("district_id", formData.district_id ? formData.district_id.toString() : "0"),
-      formData.available_days.forEach((day, index) =>
-        fd.append(`available_days[${index}]`, day),
+      formData.days.forEach((day, index) =>
+        fd.append(`days[${index}]`, day),
       );
     fd.append("is_active", formData.is_active.toString()),
       fd.append("price_per_unit", formData.price_per_unit.toString()),
@@ -476,7 +476,7 @@ export default function rubbush_collectors() {
           category_id: null,
           area_id: null,
           district_id: null,
-          available_days: [],
+          days: [],
           is_active: 0,
           price_per_unit: 0,
           order: 0,
@@ -743,7 +743,7 @@ export default function rubbush_collectors() {
                   setFormData((prev) => ({
                     ...prev,
                     ["district_id"]: value,
-                    ["available_days"]: []
+                    ["days"]: []
                   }));
 
                   if (value) {
@@ -757,19 +757,19 @@ export default function rubbush_collectors() {
               ></SelectInput>
 
               <MultiCheckbox
-                errorMessage={formErrors.available_days}
+                errorMessage={formErrors.days}
                 items={districtDays}
-                value={formData.available_days}
+                value={formData.days}
                 label="اليوم"
                 required={true}
-                name="available_days"
+                name="days"
                 placeholder="اختر اليوم"
                 prependIcon="mdi mdi-calendar-month-outline"
                 iconType="mdi"
                 onChange={(value) => {
                   setFormData((prev) => ({
                     ...prev,
-                    ["available_days"]: value,
+                    ["days"]: value,
                   }));
                 }}
               ></MultiCheckbox>

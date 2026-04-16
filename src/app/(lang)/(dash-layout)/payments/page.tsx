@@ -328,7 +328,7 @@ export default function rubbush_collectors() {
       //@ts-ignore
       user_id: item.user_id || null,
       //@ts-ignore
-      payment_verification: null,
+      payment_verification: item.payment_verification,
     });
   };
 
@@ -871,7 +871,8 @@ export default function rubbush_collectors() {
               <div className="w-full flex justify-center mb-20">
                 <FileInputImg
                   state="edit"
-                  fileUrl={selectedDataItem?.payment_verification}
+                  //@ts-ignore
+                  fileUrl={updateFormData.payment_verification}
                   onFileChange={(arg) => {
                     //@ts-ignore
                     setUpdateFormData((prev) => ({
