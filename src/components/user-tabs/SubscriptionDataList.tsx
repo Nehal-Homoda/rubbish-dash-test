@@ -107,11 +107,11 @@ export default function rubbush_collectors({ user }: Props) {
         time_from: "",
         units: 1,
         category_id: "",
-        payment_verification: "",
         address_title: "",
         address_lat: "34.1531",
         address_lng: "34.1531",
         address_details: "",
+        payment_verification: "",
     });
     const [errorMsg, setErrorMsg] = useState("");
     const headerArr = [
@@ -184,8 +184,8 @@ export default function rubbush_collectors({ user }: Props) {
         time_from: "",
         units: "",
         category_id: "",
-        payment_verification: "",
         address_title: "",
+        payment_verification: "",
     });
     const [updateFormErrors, setUpdateFormErrors] = useState<FormDataInputErrors>({
         district_id: "",
@@ -197,22 +197,20 @@ export default function rubbush_collectors({ user }: Props) {
         time_from: "",
         units: "",
         category_id: "",
-        payment_verification: "",
         address_title: "",
+        payment_verification: "",
 
     });
+
     const formSchema = Yup.object().shape({
         district_id: Yup.string().required(),
-        // has_subscription: Yup.number().required(),
         package_id: Yup.string().required(),
         payment_method_id: Yup.string().required(),
-        days: Yup.array()
-            .of(Yup.string())
-            .min(1, "Select at least one day")
-            .required("Available days are required"),
+        days: Yup.array().min(1, "Select at least one day").required(),
         units: Yup.number().required(),
         category_id: Yup.number().required(),
         address_title: Yup.string().required(),
+        payment_verification: Yup.string().required("صورة التحويل مطلوبه"),
     });
 
     const getDays = (day: string[]) => {
@@ -442,7 +440,7 @@ export default function rubbush_collectors({ user }: Props) {
             category_id: item.category.id.toString(),
             units: units,
             payment_method_id: item.payment.payment_method?.id.toString() || "",
-            payment_verification: null
+            payment_verification: item.payment.payment_verification || null
         });
 
         const selectedPayment = paymentMethodList.find(
@@ -724,7 +722,6 @@ export default function rubbush_collectors({ user }: Props) {
                                 <SelectInput
                                     disabled={!addSubscriptionFormData.district_id}
                                     errorMessage={formErrors.time_from || ''}
-
                                     items={districtTime}
                                     placeholder="اختر الوقت"
                                     name=""
@@ -803,6 +800,13 @@ export default function rubbush_collectors({ user }: Props) {
                                         ))}
                                     </div>
                                 </RadioGroup>
+
+
+                                {formErrors.payment_method_id && (
+                                    <p className="text-red-500 text-sm mt-2">
+                                        {formErrors.payment_method_id}
+                                    </p>
+                                )}
                             </div>
 
 
@@ -1485,9 +1489,9 @@ export default function rubbush_collectors({ user }: Props) {
                                 </RadioGroup>
 
 
-                                {formErrors.payment_method_id && (
+                                {updateFormErrors.payment_method_id && (
                                     <p className="text-red-500 text-sm mt-2">
-                                        {formErrors.payment_method_id}
+                                        {updateFormErrors.payment_method_id}
                                     </p>
                                 )}
                             </div>
@@ -1496,12 +1500,12 @@ export default function rubbush_collectors({ user }: Props) {
                                 <FileInputImg
                                     errorMessage={updateFormErrors.payment_verification || ''}
                                     state="edit"
-                                    fileUrl={selectedDataItem?.payment.payment_verification}
+                                    fileUrl={updateFormData.payment_verification}
                                     onFileChange={(arg) => {
                                         //@ts-ignore
                                         setUpdateFormData((prev) => ({
                                             ...prev,
-                                            ["payment_verification"]: arg?.file64 ?? null,
+                                            ["payment_verification"]: arg?.file ?? null,
                                         }));
                                     }}
                                 ></FileInputImg>

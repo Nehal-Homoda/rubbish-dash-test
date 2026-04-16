@@ -209,7 +209,7 @@ export default function rubbush_collectors() {
       name_en: item.name_en,
       order: item.order,
       is_active: item.is_active ? 1 : 0,
-      image: null,
+      image: item.image,
       has_recycle: item.has_recycle,
       has_detailed_address: item.has_detailed_address,
       discount_value_percentage: item.has_recycle ? Number(item.discount_value_percentage) : 0,

@@ -102,13 +102,21 @@ export default function rubbush_collectors() {
     order: "",
     ad_image: ""
   });
+  const [updateFormErrors, setUpdateFormErrors] = useState<FormDataInputErrors>({
+    image: "",
+    title_ar: "",
+    title_en: "",
+    order: "",
+    ad_image: ""
+  });
 
   const formSchema = Yup.object().shape({
-    image: Yup.string().required("الصورة مطلوبه"),
+    image: Yup.mixed().required("الصورة مطلوبه"),
     title_ar: Yup.string().required("العنوان باللغه العربيه مطلوب"),
     title_en: Yup.string().required("العنوان باللغه الانجليزيه مطلوب"),
     order: Yup.string().required("الترتيب مطلوب"),
-    ad_image: Yup.string().required("الصورة مطلوبه")
+    ad_image: Yup.mixed().nullable('صورة الاعلان'),
+    // ad_image: Yup.string().required("صورة الاعلان")
   });
 
   const fetchDataList = ({
@@ -192,14 +200,21 @@ export default function rubbush_collectors() {
       image: item.image,
       category_id: item.category_id,
       is_ad: item.is_ad ? 1 : 0,
-      ad_image: item.ad_image,
+      ad_image: item.ad_image || '',
     });
   };
 
-  const updateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const updateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     if (!selectedDataItem) return;
+    const validateResult = await validateAllInputs<FormDataType>(
+      formSchema,
+      updateFormData,
+    );
+    if (!validateResult) return;
+    setUpdateFormErrors({ ...validateResult.outputResult });
+    console.log('update formdata error', updateFormErrors)
+    if (validateResult.isInvalid) return;
 
     const body = JSON.stringify({
       ...updateFormData,
@@ -596,6 +611,7 @@ export default function rubbush_collectors() {
             <div className="space-y-7">
               <div className="w-full flex justify-center mb-20">
                 <FileInputImg
+                  errorMessage={updateFormErrors.image || ''}
                   state="edit"
                   fileUrl={updateFormData.image as string}
                   onFileChange={(arg) => {
@@ -698,13 +714,11 @@ export default function rubbush_collectors() {
                 label="اعلان"
                 onChange={(value) => handleCheckSubscription(value, 'edit')}
               />
-
-
               {updateFormData.is_ad && (
                 <div className="w-full flex justify-center mb-20">
                   <FileInputImg
+                    errorMessage={updateFormErrors.ad_image || ""}
                     fileUrl={updateFormData.ad_image as string}
-                    errorMessage={formErrors.ad_image || ""}
                     state="edit"
                     onFileChange={(arg) => {
                       setUpdateFormData((prev) => ({
