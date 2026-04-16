@@ -69,7 +69,6 @@ export default function page() {
     const updateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         if (!collector) return;
-
         setErrorMsg('')
         const validateResult = await validateAllInputs(
             formSchema,
@@ -155,6 +154,7 @@ export default function page() {
                     {collector && <div className="mb-16">
                         <FileInputImg
                             state="edit"
+                            //@ts-ignore
                             fileUrl={collector.image}
                             onFileChange={(arg) => {
                                 setUpdateFormData((prev) => ({

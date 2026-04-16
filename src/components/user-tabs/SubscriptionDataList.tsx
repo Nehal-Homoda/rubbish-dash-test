@@ -46,6 +46,20 @@ interface FormDataInputErrors {
     address_title: string | null,
 
 }
+interface updateFormDataInputErrors {
+    district_id: string | null,
+    package_id: string | null,
+    payment_method_id: string | null,
+    start_date: string | null,
+    ends_at: string | null,
+    time_from: string | null,
+    units: string | null,
+    category_id: string | null,
+    address_title: string | null,
+    // payment_verification: string | null,
+    // days: string,
+
+}
 
 interface FormDataInputs {
     district_id: string | null,
@@ -187,18 +201,18 @@ export default function rubbush_collectors({ user }: Props) {
         address_title: "",
         payment_verification: "",
     });
-    const [updateFormErrors, setUpdateFormErrors] = useState<FormDataInputErrors>({
+    const [updateFormErrors, setUpdateFormErrors] = useState<updateFormDataInputErrors>({
         district_id: "",
         package_id: "",
         payment_method_id: "",
-        days: "",
         start_date: "",
         ends_at: "",
         time_from: "",
         units: "",
         category_id: "",
         address_title: "",
-        payment_verification: "",
+        // days: "",
+        // payment_verification: "",
 
     });
 
@@ -211,6 +225,16 @@ export default function rubbush_collectors({ user }: Props) {
         category_id: Yup.number().required(),
         address_title: Yup.string().required(),
         payment_verification: Yup.string().required("صورة التحويل مطلوبه"),
+    });
+    const updateFormSchema = Yup.object().shape({
+        district_id: Yup.string().required(),
+        package_id: Yup.string().required(),
+        payment_method_id: Yup.string().required(),
+        units: Yup.number().required(),
+        category_id: Yup.number().required(),
+        address_title: Yup.string().required(),
+        // days: Yup.array().min(1, "Select at least one day").required(),
+        // payment_verification: Yup.string().required("صورة التحويل مطلوبه"),
     });
 
     const getDays = (day: string[]) => {
@@ -324,9 +348,9 @@ export default function rubbush_collectors({ user }: Props) {
             });
     };
 
-    const handleSelectedUserSubscription = (item: any) => {
+    const handleSelectedUserSubscription = async (item: any) => {
         console.log('selected subscription item iss', item)
-        showSubscriptionService(item.id).then((response) => {
+        await showSubscriptionService(item.id).then((response) => {
             setSelectedUserSubscription(response.data)
         })
 
@@ -466,7 +490,7 @@ export default function rubbush_collectors({ user }: Props) {
         if (!selectedDataItem) return;
 
         const validateResult = await validateAllInputs<FormDataInputs>(
-            formSchema,
+            updateFormSchema,
             updateFormData
         );
         if (!validateResult) return;
@@ -477,28 +501,10 @@ export default function rubbush_collectors({ user }: Props) {
 
         const t = updateFormData.time_from.split("-");
 
-        const fd = new FormData();
-
-        fd.append('status', 'active');
-        fd.append("user_id", user.id.toString());
-        fd.append("district_id", updateFormData.district_id);
-        fd.append("category_id", updateFormData.category_id);
-        fd.append("start_date", updateFormData.start_date);
-        fd.append("ends_at", updateFormData.ends_at);
-        fd.append("address_title", updateFormData.address_title);
-        fd.append("time_from", t[0]);
-        fd.append("time_to", t[1]);
-        fd.append("units", updateFormData.units.toString());
-        fd.append("package_id", updateFormData.package_id);
-        if (updateFormData.payment_verification) {
-
-            fd.append('payment_verification', updateFormData.payment_verification)
-        }
-        updateFormData.days.forEach((day, index) => {
-            fd.append(`days[${index}]`, day);
+        const body = JSON.stringify({
+            ...updateFormData,
         });
-
-        updateSubscriptionService(selectedDataItem.id, fd)
+        updateSubscriptionService(selectedDataItem.id, body)
             .then(() => {
                 fetchDataList();
                 successDialog(true);
@@ -1087,7 +1093,7 @@ export default function rubbush_collectors({ user }: Props) {
                                     name="district_id"
                                     itemName="name_ar"
                                     itemValue="id"
-                                    value={formData.district_id}
+                                    value={selectedUserSubscription?.district.id}
                                     items={district}
                                     label="اسم المنطقة"
                                     disabled
@@ -1110,7 +1116,7 @@ export default function rubbush_collectors({ user }: Props) {
                                     name="address"
                                     type="text"
 
-                                    value={formData.address_title}
+                                    value={selectedUserSubscription?.address.title}
                                     label=" العنوان"
                                     placeholder=" العنوان"
                                     disabled
@@ -1125,7 +1131,7 @@ export default function rubbush_collectors({ user }: Props) {
                                     name=""
                                     itemName="name_ar"
                                     itemValue="id"
-                                    value={formData.package_id}
+                                    value={selectedUserSubscription?.package.id}
                                     label=" نوع الباقة"
                                     disabled
                                     onChange={(value) => { }}
@@ -1135,7 +1141,7 @@ export default function rubbush_collectors({ user }: Props) {
                             <div className="col-span-6">
                                 <MultiCheckbox
                                     items={districtDays}
-                                    value={formData.days}
+                                    value={selectedUserSubscription?.days || []}
                                     label="اليوم"
                                     required={true}
                                     name="available_days"
@@ -1157,9 +1163,9 @@ export default function rubbush_collectors({ user }: Props) {
                                     type="text"
                                     name="start_date"
                                     handleChange={(e) => { }}
-                                    value={formData.start_date}
+                                    value={selectedUserSubscription?.starts_at}
                                     label="تاريخ البدأ "
-                                    placeholder="  السعر الكلي *"
+                                    placeholder=" تاريخ البدأ "
                                     disabled
                                 ></TextFieldNada>
                             </div>
@@ -1168,7 +1174,7 @@ export default function rubbush_collectors({ user }: Props) {
                                     type="text"
                                     name="ends_at"
                                     handleChange={(e) => { }}
-                                    value={formData.ends_at}
+                                    value={selectedUserSubscription?.ends_at}
                                     label="تاريخ الانتهاء "
                                     placeholder=" "
                                     disabled
@@ -1184,7 +1190,7 @@ export default function rubbush_collectors({ user }: Props) {
                                     name=""
                                     itemName="name_ar"
                                     itemValue="id"
-                                    value={formData.category_id}
+                                    value={selectedUserSubscription?.category.id}
                                     label=" نوع الخدمة"
                                     disabled
                                     onChange={(value) =>
@@ -1202,7 +1208,7 @@ export default function rubbush_collectors({ user }: Props) {
                                     type="number"
                                     handleChange={undefined
                                     }
-                                    value={formData.price_per_unit}
+                                    value={selectedUserSubscription?.package.price_per_unit}
                                     label=" سعر الباقة "
                                     placeholder="  سعر الباقة "
                                     disabled
@@ -1214,7 +1220,7 @@ export default function rubbush_collectors({ user }: Props) {
                                     type="number"
                                     handleChange={undefined
                                     }
-                                    value={formData.units.toString()}
+                                    value={selectedUserSubscription?.units.toString()}
                                     label=" عدد الوحدات "
                                     placeholder=" عدد الوحدات "
                                     disabled
@@ -1227,7 +1233,7 @@ export default function rubbush_collectors({ user }: Props) {
                                     items={districtTime}
                                     placeholder="اختر الوقت"
                                     name=""
-                                    value={formData.time_from}
+                                    value={selectedUserSubscription?.time_from}
                                     label=" الوقت"
                                     disabled
                                     onChange={(value) => {
@@ -1406,28 +1412,7 @@ export default function rubbush_collectors({ user }: Props) {
                                 ></TextFieldNada>
                             </div>
 
-                            <div className="col-span-6">
-                                <MultiCheckbox
-                                    errorMessage={updateFormErrors.days || ''}
-                                    items={districtAvailableDays}
-                                    itemName="title"
-                                    itemValue="slug"
-                                    value={updateFormData.days}
-                                    label="اليوم"
-                                    required={true}
-                                    name="available_days"
-                                    placeholder="اختر اليوم"
-                                    prependIcon="mdi mdi-calendar-month-outline"
-                                    iconType="mdi"
-                                    onChange={(value) => {
-                                        //@ts-ignore
-                                        setUpdateFormData((prev) => ({
-                                            ...prev,
-                                            ["days"]: value,
-                                        }));
-                                    }}
-                                ></MultiCheckbox>
-                            </div>
+
 
 
                             <div className="col-span-6">
@@ -1495,21 +1480,7 @@ export default function rubbush_collectors({ user }: Props) {
                                     </p>
                                 )}
                             </div>
-                            <div className="col-span-6">
 
-                                <FileInputImg
-                                    errorMessage={updateFormErrors.payment_verification || ''}
-                                    state="edit"
-                                    fileUrl={updateFormData.payment_verification}
-                                    onFileChange={(arg) => {
-                                        //@ts-ignore
-                                        setUpdateFormData((prev) => ({
-                                            ...prev,
-                                            ["payment_verification"]: arg?.file ?? null,
-                                        }));
-                                    }}
-                                ></FileInputImg>
-                            </div>
 
                             <div className="col-span-6">
                                 <div className="w-[150px] ">
@@ -1525,7 +1496,6 @@ export default function rubbush_collectors({ user }: Props) {
         </>
     );
 }
-
 
 
 
