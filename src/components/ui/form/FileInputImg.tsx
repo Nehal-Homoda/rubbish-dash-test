@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import placeholder_img from "@/assets/images/photo-placeholder.png";
 
 interface FileInputProps {
@@ -7,7 +7,7 @@ interface FileInputProps {
     title?: string;
     fileUrl?: string;
     state: "edit" | "add" | "addToTable";
-    onFileChange: (args?: { file?: File; file64?: string }) => void;
+    onFileChange: (args?: { file: File | null; file64: string | null }) => void;
     handleRemoveImage?: () => void;
     disabled?: boolean;
 }
@@ -19,7 +19,7 @@ export default function FileInputImg({
     state = "add",
     onFileChange,
     disabled,
-    handleRemoveImage = () => { },
+    handleRemoveImage,
 }: FileInputProps) {
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -34,12 +34,17 @@ export default function FileInputImg({
                 : "";
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
+        const file = e.target.files?.[0] || null;
 
         if (!file) {
             setFileName("");
             setFileType(null);
-            onFileChange(undefined);
+
+            onFileChange({
+                file: null,
+                file64: null,
+            });
+
             return;
         }
 
@@ -60,7 +65,10 @@ export default function FileInputImg({
 
             reader.readAsDataURL(file);
         } else {
-            onFileChange(undefined);
+            onFileChange({
+                file: null,
+                file64: null,
+            });
         }
 
         if (inputRef.current) {
@@ -72,7 +80,11 @@ export default function FileInputImg({
         setFileName("");
         setFileType(null);
 
-        onFileChange(undefined);
+        onFileChange({
+            file: null,
+            file64: null,
+        });
+
         handleRemoveImage?.();
 
         if (inputRef.current) {
@@ -86,8 +98,8 @@ export default function FileInputImg({
 
             <div
                 className={`relative ${state === "add"
-                    ? "border-2 border-dashed rounded-lg"
-                    : "rounded-2xl shadow-[0_0_0.5625rem_0.4375rem_rgb(0,0,0,0.07)] text-center"
+                        ? "border-2 border-dashed rounded-lg"
+                        : "rounded-2xl shadow-[0_0_0.5625rem_0.4375rem_rgb(0,0,0,0.07)] text-center"
                     } w-fit`}
             >
                 <input
