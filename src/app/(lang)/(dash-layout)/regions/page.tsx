@@ -42,11 +42,34 @@ type FormDataType = {
   available_days: string[];
   available_times: string[];
   area_id: string;
-
 };
 type FromToTimeType = {
   from: string;
   to: string;
+};
+
+type TimeRowError = {
+  from?: string;
+  to?: string;
+};
+
+const mapTimeErrors = (errors: any) => {
+  const mapped: TimeRowError[] = [];
+
+  Object.keys(errors || {}).forEach((key) => {
+    const match = key.match(/available_times\[(\d+)\]/);
+
+    if (match) {
+      const index = Number(match[1]);
+
+      if (!mapped[index]) mapped[index] = {};
+
+      mapped[index].from = errors[key];
+      mapped[index].to = errors[key];
+    }
+  });
+
+  return mapped;
 };
 
 export default function rubbush_collectors() {
@@ -62,6 +85,8 @@ export default function rubbush_collectors() {
     { is_active: 1, name: "مفعل" },
     { is_active: 0, name: "غير مفعل" },
   ];
+  const [timeErrors, setTimeErrors] = useState<TimeRowError[]>([]);
+  const [timeErrorsUpdate, setTimeErrorsUpdate] = useState<TimeRowError[]>([]);
 
   const [totalPages, setTotalPages] = useState(1);
   const [page, setPage] = useState(1);
@@ -95,7 +120,20 @@ export default function rubbush_collectors() {
       .of(Yup.string())
       .min(1, "Select at least one day")
       .required("Available days are required"),
-    available_times: Yup.array().required("available times are required"),
+    available_times: Yup.array()
+      .of(
+        Yup.string()
+          .required("Time is required")
+          .test("valid-time-range", "Invalid time range", (value) => {
+            if (!value) return false;
+
+            const [from, to] = value.split("-");
+
+            return !!from && !!to;
+          }),
+      )
+      .min(1, "Select at least one time range")
+      .required("available times are required"),
   });
 
   const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
@@ -122,7 +160,7 @@ export default function rubbush_collectors() {
     collector_id: [],
     available_days: [],
     available_times: [],
-    area_id: ""
+    area_id: "",
   });
 
   const [updateFormData, setUpdateFormData] = useState<FormDataType>({
@@ -133,7 +171,7 @@ export default function rubbush_collectors() {
     collector_id: [],
     available_days: [],
     available_times: [],
-    area_id: ""
+    area_id: "",
   });
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -201,7 +239,7 @@ export default function rubbush_collectors() {
           setDistrictTime(item.available_times);
         });
       })
-      .catch(() => { });
+      .catch(() => {});
   };
   const fetchAreaList = ({
     search = "",
@@ -222,7 +260,7 @@ export default function rubbush_collectors() {
         setAreaList(response.data);
         setTotalPages(response.meta.last_page);
       })
-      .catch(() => { });
+      .catch(() => {});
   };
 
   const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -249,7 +287,7 @@ export default function rubbush_collectors() {
 
         console.log(response);
       })
-      .catch((error) => { });
+      .catch((error) => {});
   };
 
   const deleteSubmit = (item: District, selectedIndex: number) => {
@@ -260,10 +298,11 @@ export default function rubbush_collectors() {
         setDataList(updatedArr);
         successDialog(true);
       })
-      .catch((error) => { });
+      .catch((error) => {});
   };
 
   const updateDataItem = (item: District) => {
+    console.log("item of ditrict", item);
     setSelectedDataItem(item);
     setDynamicFromToTimeUpdate([]);
     setUpdateFormData({
@@ -274,7 +313,7 @@ export default function rubbush_collectors() {
       is_active: item.is_active ? 1 : 0,
       available_days: item.available_days,
       available_times: item.available_times,
-      area_id: item.area_id
+      area_id: item.area.id.toString(),
     });
 
     const ar = item.available_times.map((item) => {
@@ -299,22 +338,22 @@ export default function rubbush_collectors() {
     );
     if (!validateResult) return;
     setUpdateFormErrors({ ...validateResult.outputResult });
+    setTimeErrorsUpdate(mapTimeErrors(validateResult.outputResult));
     if (validateResult.isInvalid) return;
 
     const body = JSON.stringify({
       ...updateFormData,
     });
-    setIsDialogOpen(false);
 
     updateDistrictService(selectedDataItem.id, body)
       .then((response) => {
         fetchDataList();
         successDialog(true);
-        setIsDialogOpen(true);
+        setIsUpdateDialogOpen(false);
       })
       .catch((error) => {
         setErrorMsg(error?.message);
-        setIsDialogOpen(false);
+        setIsUpdateDialogOpen(false);
       });
   };
 
@@ -349,6 +388,8 @@ export default function rubbush_collectors() {
     );
     if (!validateResult) return;
     setFormErrors({ ...validateResult.outputResult });
+    setTimeErrors(mapTimeErrors(validateResult.outputResult));
+    console.log(validateResult.outputResult);
     if (validateResult.isInvalid) return;
 
     const fd = new FormData();
@@ -364,7 +405,7 @@ export default function rubbush_collectors() {
     formData.collector_id.forEach((collector, index) =>
       fd.append(`collector_id[${index}]`, collector),
     );
-    fd.append('area_id', formData.area_id.toString())
+    fd.append("area_id", formData.area_id.toString());
     fd.append("is_active", formData.is_active.toString());
 
     addDistrictService(fd)
@@ -381,13 +422,12 @@ export default function rubbush_collectors() {
           collector_id: [],
           available_days: [],
           available_times: [],
-          area_id: ""
+          area_id: "",
         });
         setDynamicFromToTime([{ from: "", to: "" }]);
       })
       .catch((error) => {
         setErrorMsg(error?.message);
-
       });
   };
 
@@ -398,12 +438,15 @@ export default function rubbush_collectors() {
           open={isDialogOpen}
           onClose={() => setIsDialogOpen(false)}
           title="اضافة منطقه"
-          confirmHandler={() => { }}
+          confirmHandler={() => {}}
           confirmText="اضافة"
           form="update-form"
           btn={
             <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
-              <button onClick={() => setIsDialogOpen(true)} className="bg-[#0094140D] p-1 rounded-lg">
+              <button
+                onClick={() => setIsDialogOpen(true)}
+                className="bg-[#0094140D] p-1 rounded-lg"
+              >
                 اضافة منطقة
               </button>
             </div>
@@ -519,7 +562,6 @@ export default function rubbush_collectors() {
                 >
                   <div className="col-span-5">
                     <TextFieldNada
-                      errorMessage={formErrors.available_times}
                       name="available_times"
                       type="time"
                       handleChange={
@@ -537,11 +579,16 @@ export default function rubbush_collectors() {
                       value={dynamicFromToTime[index].from}
                       label="من "
                       placeholder=""
+                      errorMessage={
+                        timeErrors[index]?.from ||
+                        formErrors.available_times ||
+                        ""
+                      }
                     ></TextFieldNada>
                   </div>
                   <div className="col-span-5">
                     <TextFieldNada
-                      errorMessage={formErrors.available_times}
+                      
                       name="available_times"
                       type="time"
                       handleChange={
@@ -559,6 +606,11 @@ export default function rubbush_collectors() {
                       value={dynamicFromToTime[index].to}
                       label="الي "
                       placeholder=" "
+                      errorMessage={
+                        timeErrors[index]?.to ||
+                        formErrors.available_times ||
+                        ""
+                      }
                     ></TextFieldNada>
                   </div>
                   <div className="col-span-1">
@@ -602,7 +654,7 @@ export default function rubbush_collectors() {
   useEffect(() => {
     fetchDataList();
     fetchCollectors();
-    fetchAreaList()
+    fetchAreaList();
   }, [page]);
 
   useEffect(() => {
@@ -667,22 +719,18 @@ export default function rubbush_collectors() {
                 >
                   <span className="mdi mdi-folder-edit-outline text-[#009414]"></span>
                 </button>
-
-
               </div>
             ),
           }}
         ></BaseDataTable>
 
-
         <UIBaseDialog
           open={isUpdateDialogOpen}
           onClose={() => setIsUpdateDialogOpen(false)}
           title="تعديل منطقه"
-          confirmHandler={() => { }}
+          confirmHandler={() => {}}
           confirmText="حفظ"
           form="update-form"
-
         >
           <form onSubmit={updateSubmit} id="update-form">
             <div className="space-y-7">
@@ -707,18 +755,18 @@ export default function rubbush_collectors() {
               ></TextFieldNada>
 
               <SelectInput
-                value={formData.is_active}
+                value={updateFormData.area_id}
                 items={areaList}
                 itemName="name_ar"
                 itemValue="id"
                 label="الحي"
                 placeholder="اختر الحي"
-                name="is_active"
+                name="area_id"
                 required={true}
                 onChange={(value) => {
-                  setFormData((prev) => ({
+                  setUpdateFormData((prev) => ({
                     ...prev,
-                    ["is_active"]: value,
+                    ["area_id"]: value,
                   }));
                 }}
               ></SelectInput>
@@ -805,7 +853,7 @@ export default function rubbush_collectors() {
                 >
                   <div className="col-span-5">
                     <TextFieldNada
-                      name="price"
+                      name="available_times"
                       type="time"
                       handleChange={
                         (e) => {
@@ -821,15 +869,17 @@ export default function rubbush_collectors() {
                       }
                       value={dynamicFromToTimeUpdate[index].from}
                       label="من "
-                      placeholder="  السعر الكلي *"
+                      placeholder="  من"
+                      errorMessage={
+                        timeErrorsUpdate[index]?.from ||
+                        updateFormErrors.available_times ||
+                        ""
+                      }
                     ></TextFieldNada>
                   </div>
                   <div className="col-span-5">
                     <TextFieldNada
-                      errorMessage={
-                        updateFormErrors.available_times || ""
-                      }
-                      name="price"
+                      name="available_times"
                       type="time"
                       handleChange={
                         (e) => {
@@ -846,6 +896,11 @@ export default function rubbush_collectors() {
                       value={dynamicFromToTimeUpdate[index].to}
                       label="الي "
                       placeholder="الوقت"
+                      errorMessage={
+                        timeErrorsUpdate[index]?.to ||
+                        updateFormErrors.available_times ||
+                        ""
+                      }
                     ></TextFieldNada>
                   </div>
                   <div className="col-span-1">
