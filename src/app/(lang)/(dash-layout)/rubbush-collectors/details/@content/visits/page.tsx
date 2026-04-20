@@ -48,8 +48,6 @@ export default function page() {
     const [selectedDataItem, setSelectedDataItem] = useState<Visit | null>(
         null
     );
-
-
     const [updateFormData, setUpdateFormData] = useState<FormDataType>({
         name_ar: "",
         name_en: "",
