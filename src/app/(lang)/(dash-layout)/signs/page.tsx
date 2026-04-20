@@ -8,6 +8,7 @@ import SelectInput from "@/components/ui/form/SelectInput";
 import { successDialog, validateAllInputs } from "@/utils/shared";
 import UIDialogConfirm from "@/components/ui/UIDialogConfirm";
 import FileInputImg from "@/components/ui/form/FileInputImg";
+
 import { Banner } from "@/types/banners.interface";
 import * as Yup from "yup";
 import { ToggleSwitch } from "flowbite-react";
@@ -25,7 +26,7 @@ interface FormDataInputErrors {
   title_ar: string | null;
   title_en: string | null;
   order: string | null;
-  ad_image: string | null
+  ad_image: string | null;
 }
 type FormDataType = {
   title_ar: string;
@@ -37,7 +38,7 @@ type FormDataType = {
   page_id?: string;
   category_id: string;
   is_ad: number | null;
-  ad_image: File | null | string
+  ad_image: File | null | string;
 };
 
 export default function rubbush_collectors() {
@@ -81,7 +82,7 @@ export default function rubbush_collectors() {
     image: null,
     category_id: "",
     is_ad: 0,
-    ad_image: ""
+    ad_image: "",
   });
   const [updateFormData, setUpdateFormData] = useState<FormDataType>({
     title_ar: "",
@@ -93,31 +94,37 @@ export default function rubbush_collectors() {
     category_id: "",
     is_ad: 0,
     ad_image: "",
-
   });
   const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
     image: "",
     title_ar: "",
     title_en: "",
     order: "",
-    ad_image: ""
+    ad_image: "",
   });
-  const [updateFormErrors, setUpdateFormErrors] = useState<FormDataInputErrors>({
-    image: "",
-    title_ar: "",
-    title_en: "",
-    order: "",
-    ad_image: ""
-  });
+  const [updateFormErrors, setUpdateFormErrors] = useState<FormDataInputErrors>(
+    {
+      image: "",
+      title_ar: "",
+      title_en: "",
+      order: "",
+      ad_image: "",
+    },
+  );
 
   const formSchema = Yup.object().shape({
-    image: Yup.mixed().required("الصورة مطلوبه"),
-    title_ar: Yup.string().required("العنوان باللغه العربيه مطلوب"),
-    title_en: Yup.string().required("العنوان باللغه الانجليزيه مطلوب"),
-    order: Yup.string().required("الترتيب مطلوب"),
-    ad_image: Yup.mixed().nullable('صورة الاعلان'),
-    // ad_image: Yup.string().required("صورة الاعلان")
-  });
+image: Yup.mixed().test(
+  "image-required",
+  "الصورة مطلوبة",
+  (value) =>
+    value instanceof File ||
+    (typeof value === "string" && value.trim() !== "")
+),
+
+  title_ar: Yup.string().required("العنوان باللغه العربيه مطلوب"),
+  title_en: Yup.string().required("العنوان باللغه الانجليزيه مطلوب"),
+  order: Yup.number().required("الترتيب مطلوب"),
+});
 
   const fetchDataList = ({
     search = "",
@@ -144,7 +151,7 @@ export default function rubbush_collectors() {
         setDataList(response.data);
         setTotalPages(response.meta.last_page);
       })
-      .catch(() => { });
+      .catch(() => {});
   };
 
   const handleActiveFilter = (value: boolean | undefined) => {
@@ -175,7 +182,7 @@ export default function rubbush_collectors() {
 
         console.log(response);
       })
-      .catch((error) => { });
+      .catch((error) => {});
   };
 
   const deleteSubmit = (item: Banner, selectedIndex: number) => {
@@ -186,22 +193,26 @@ export default function rubbush_collectors() {
         setDataList(updatedArr);
         successDialog(true);
       })
-      .catch((error) => { });
+      .catch((error) => {});
   };
 
   const updateDataItem = (item: Banner) => {
     setSelectedDataItem(item);
+        console.log("IMAGE BEFORE VALIDATION:", updateFormData.image);
+
     setUpdateFormData({
       title_ar: item.title_ar,
       title_en: item.title_en,
       order: item.order,
       link: item.link,
       is_active: item.is_active ? 1 : 0,
-      image: item.image,
+      image: item.image ||"",
       category_id: item.category_id,
       is_ad: item.is_ad ? 1 : 0,
-      ad_image: item.ad_image || '',
+      ad_image: item.ad_image || "",
     });
+        console.log("IMAGE BEFORE VALIDATION:", updateFormData.image);
+
   };
 
   const updateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -213,14 +224,20 @@ export default function rubbush_collectors() {
     );
     if (!validateResult) return;
     setUpdateFormErrors({ ...validateResult.outputResult });
-    console.log('update formdata error', updateFormErrors)
+    console.log("update formdata error", updateFormErrors);
     if (validateResult.isInvalid) return;
 
-    const body = JSON.stringify({
-      ...updateFormData,
-    });
+    // const body = JSON.stringify({
+    //   ...updateFormData,
+    // });
 
-    updateBannerService(selectedDataItem.id, body)
+     const body: any = { ...updateFormData };
+
+    if (typeof body.image === "string" && !body.image.startsWith("data:")) {
+      delete body.image;
+    }
+
+    updateBannerService(selectedDataItem.id, JSON.stringify(body))
       .then((response) => {
         setIsDialogOpen(false);
         fetchDataList();
@@ -279,14 +296,13 @@ export default function rubbush_collectors() {
       fd.append("image", formData.image);
     }
     if (formData.category_id) {
-      fd.append('category_id', formData.category_id.toString())
+      fd.append("category_id", formData.category_id.toString());
     }
     if (formData.is_ad) {
-      fd.append('is_ad', formData.is_ad.toString())
+      fd.append("is_ad", formData.is_ad.toString());
     }
     if (formData.ad_image) {
-
-      fd.append('ad_image', formData.ad_image)
+      fd.append("ad_image", formData.ad_image);
     }
     setIsDialogOpen(false);
     addBannerService(fd)
@@ -304,8 +320,7 @@ export default function rubbush_collectors() {
           image: null,
           category_id: "",
           is_ad: 0,
-          ad_image: ""
-
+          ad_image: "",
         });
       })
       .catch((error) => {
@@ -317,29 +332,26 @@ export default function rubbush_collectors() {
 
   const handleCheckSubscription = (value: boolean, name: string) => {
     setSwitch1(!switch1);
-    if (name == 'add') {
+    if (name == "add") {
       setFormData((prev) => ({
         ...prev,
         ["is_ad"]: value ? 1 : 0,
       }));
     }
 
-
-    if (name == 'edit') {
+    if (name == "edit") {
       setUpdateFormData((prev) => ({
         ...prev,
         ["is_ad"]: value ? 1 : null,
       }));
     }
-
   };
-
 
   const fetchCategories = () => {
     getCategoriesService().then((response) => {
       const activeCategories = response.data.filter((item, index) => {
-        return item.is_active
-      })
+        return item.is_active;
+      });
 
       setCategoryList(activeCategories);
     });
@@ -349,8 +361,8 @@ export default function rubbush_collectors() {
     setFormData((prev) => ({
       ...prev,
       ["category_id"]: value,
-    }))
-  }
+    }));
+  };
 
   const tableHeadActionsSlot = () => {
     return (
@@ -372,7 +384,7 @@ export default function rubbush_collectors() {
           title="اضافة لافتة"
           confirmText="اضافة"
           form="add-form"
-          confirmHandler={() => { }}
+          confirmHandler={() => {}}
           btn={
             <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
               <button
@@ -393,7 +405,7 @@ export default function rubbush_collectors() {
             <div className="space-y-7">
               <div className="w-full flex justify-center mb-20">
                 <FileInputImg
-                  errorMessage={formErrors.image || ""}
+                errorMessage={formErrors.image || ''}
                   state="edit"
                   onFileChange={(arg) => {
                     setFormData((prev) => ({
@@ -437,7 +449,7 @@ export default function rubbush_collectors() {
                 name="type"
                 required={true}
                 onChange={(value) => {
-                  setType(value)
+                  setType(value);
                 }}
               ></SelectInput>
 
@@ -473,7 +485,6 @@ export default function rubbush_collectors() {
                 ></SelectInput>
               )}
 
-
               <TextFieldNada
                 name="order"
                 type="number"
@@ -503,13 +514,11 @@ export default function rubbush_collectors() {
                 }}
               ></SelectInput>
 
-
               <ToggleSwitch
                 checked={switch1}
                 label="اعلان"
-                onChange={(value) => handleCheckSubscription(value, 'add')}
+                onChange={(value) => handleCheckSubscription(value, "add")}
               />
-
 
               {switch1 && (
                 <div className="w-full flex justify-center mb-20">
@@ -524,7 +533,6 @@ export default function rubbush_collectors() {
                     }}
                   ></FileInputImg>
                 </div>
-
               )}
             </div>
           </form>
@@ -535,7 +543,7 @@ export default function rubbush_collectors() {
 
   useEffect(() => {
     fetchDataList();
-    fetchCategories()
+    fetchCategories();
   }, [page]);
   return (
     <>
@@ -603,7 +611,7 @@ export default function rubbush_collectors() {
           open={isDialogOpen}
           onClose={() => setIsDialogOpen(false)}
           title="تعديل اللافتة"
-          confirmHandler={() => { }}
+          confirmHandler={() => {}}
           confirmText="تعديل"
           form="update-form"
         >
@@ -611,13 +619,14 @@ export default function rubbush_collectors() {
             <div className="space-y-7">
               <div className="w-full flex justify-center mb-20">
                 <FileInputImg
-                  errorMessage={updateFormErrors.image || ''}
+                 showCloseButton={false}
+                  errorMessage={updateFormErrors.image || ""}
                   state="edit"
                   fileUrl={updateFormData.image as string}
                   onFileChange={(arg) => {
                     setUpdateFormData((prev) => ({
                       ...prev,
-                      ["image"]: arg?.file64 ?? null,
+                      ["image"]: arg?.file64 ?? prev.image,
                     }));
                   }}
                 ></FileInputImg>
@@ -643,8 +652,6 @@ export default function rubbush_collectors() {
                 label=" النص ( انجليزي ) "
                 placeholder=" ادخل نص اللافتة بالغة الانجليزية  "
               ></TextFieldNada>
-
-
 
               {updateFormData.link && (
                 <TextFieldNada
@@ -706,13 +713,11 @@ export default function rubbush_collectors() {
                 }}
               ></SelectInput>
 
-
-
-
-              <ToggleSwitch className="col-span-1"
+              <ToggleSwitch
+                className="col-span-1"
                 checked={updateFormData.is_ad ? true : false}
                 label="اعلان"
-                onChange={(value) => handleCheckSubscription(value, 'edit')}
+                onChange={(value) => handleCheckSubscription(value, "edit")}
               />
               {updateFormData.is_ad && (
                 <div className="w-full flex justify-center mb-20">
@@ -723,15 +728,12 @@ export default function rubbush_collectors() {
                     onFileChange={(arg) => {
                       setUpdateFormData((prev) => ({
                         ...prev,
-                        ["ad_image"]: arg?.file ?? null,
+                        ["ad_image"]: arg?.file64 ?? null,
                       }));
                     }}
                   ></FileInputImg>
                 </div>
-
               )}
-
-
             </div>
           </form>
         </UIBaseDialog>

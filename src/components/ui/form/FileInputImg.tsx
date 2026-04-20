@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useState, useEffect } from "react";
 import placeholder_img from "@/assets/images/photo-placeholder.png";
 
 interface FileInputProps {
@@ -7,9 +7,13 @@ interface FileInputProps {
     title?: string;
     fileUrl?: string;
     state: "edit" | "add" | "addToTable";
-    onFileChange: (args?: { file: File | null; file64: string | null }) => void;
+    onFileChange: (args?: { file?: File; file64?: string } | null) => void;
     handleRemoveImage?: () => void;
     disabled?: boolean;
+
+    // NEW CONTROLS
+    showCloseButton?: boolean;
+    showEditButton?: boolean;
 }
 
 export default function FileInputImg({
@@ -19,45 +23,54 @@ export default function FileInputImg({
     state = "add",
     onFileChange,
     disabled,
-    handleRemoveImage,
+    handleRemoveImage = () => {},
+
+    showCloseButton = true,  // default ON
+    showEditButton = true,   // default ON
 }: FileInputProps) {
-    const inputRef = useRef<HTMLInputElement>(null);
-
     const [fileName, setFileName] = useState("");
-    const [fileType, setFileType] = useState<string | null>(null);
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
 
-    const imageUrl =
-        fileUrl && fileUrl.length > 0
-            ? fileUrl
-            : state === "edit"
-                ? placeholder_img.src
-                : "";
+    const resetImgUrlToPlaceholder = () => {
+        onFileChange(null);
+
+        if (fileUrl) {
+            setImageUrl(fileUrl);
+            return;
+        }
+
+        if (state === "edit") {
+            setImageUrl(placeholder_img.src);
+            return;
+        }
+
+        setImageUrl(null);
+    };
+
+    useEffect(() => {
+        resetImgUrlToPlaceholder();
+    }, []);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0] || null;
 
         if (!file) {
             setFileName("");
-            setFileType(null);
-
-            onFileChange({
-                file: null,
-                file64: null,
-            });
-
+            resetImgUrlToPlaceholder();
+            onFileChange?.(null);
             return;
         }
 
         setFileName(file.name);
-        setFileType(file.type);
 
         if (file.type.startsWith("image/")) {
             const reader = new FileReader();
 
             reader.onload = () => {
                 const base64 = reader.result as string;
+                setImageUrl(base64);
 
-                onFileChange({
+                onFileChange?.({
                     file,
                     file64: base64,
                 });
@@ -65,93 +78,65 @@ export default function FileInputImg({
 
             reader.readAsDataURL(file);
         } else {
-            onFileChange({
-                file: null,
-                file64: null,
-            });
-        }
-
-        if (inputRef.current) {
-            inputRef.current.value = "";
+            resetImgUrlToPlaceholder();
+            onFileChange?.(null);
         }
     };
 
     const removeImage = () => {
         setFileName("");
-        setFileType(null);
+        setImageUrl(placeholder_img.src);
 
-        onFileChange({
-            file: null,
-            file64: null,
-        });
-
-        handleRemoveImage?.();
-
-        if (inputRef.current) {
-            inputRef.current.value = "";
-        }
+        onFileChange?.(null);
+        handleRemoveImage();
     };
 
     return (
         <div>
-            {title && <p className="text-foreground mb-5">{title}</p>}
+            {title && <p className="mb-5">{title}</p>}
 
-            <div
-                className={`relative ${state === "add"
-                        ? "border-2 border-dashed rounded-lg"
-                        : "rounded-2xl shadow-[0_0_0.5625rem_0.4375rem_rgb(0,0,0,0.07)] text-center"
-                    } w-fit`}
-            >
+            <div className="relative w-fit rounded-2xl shadow-md">
+                {/* INPUT */}
                 <input
-                    ref={inputRef}
                     disabled={disabled}
                     type="file"
-                    className="size-full w-full absolute top-0 left-0 right-0 z-10 opacity-0 cursor-pointer"
+                    className="absolute inset-0 opacity-0 z-10 cursor-pointer"
                     onChange={handleFileChange}
-                    accept="image/*"
+                    accept="image/*,application/pdf"
                 />
 
-                <div
-                    className={`relative flex items-center justify-center ${state === "add" ? "w-80 h-24" : "w-36 h-28"
-                        } gap-1`}
-                >
-                    {imageUrl ? (
+                {/* IMAGE */}
+                <div className="relative flex items-center justify-center w-36 h-28">
+                    {imageUrl && (
                         <img
                             src={imageUrl}
-                            alt={fileName || "image"}
-                            className={`w-full h-full object-contain ${state === "edit" ? "rounded-2xl" : ""
-                                }`}
+                            className="w-full h-full object-contain rounded-2xl"
                         />
-                    ) : (
-                        state === "add" && (
-                            <>
-                                <i className="fa-regular fa-image text-foreground/50 text-lg" />
-                                <span className="text-foreground/50 text-sm">
-                                    ارفاق صورة
-                                </span>
-                            </>
-                        )
                     )}
                 </div>
 
-                {state === "edit" && (
-                    <>
-                        <button
-                            type="button"
-                            onClick={removeImage}
-                            className="absolute -top-2 -right-2 w-7 h-7 z-20 bg-surface-light-800 rounded-full"
-                        >
-                            <i className="mdi mdi-window-close"></i>
-                        </button>
+                {/* BUTTONS */}
 
-                        <button
-                            type="button"
-                            onClick={() => inputRef.current?.click()}
-                            className="absolute -bottom-2 -left-2 w-7 h-7 bg-surface-light-800 rounded-full"
-                        >
-                            <span className="mdi mdi-pencil"></span>
-                        </button>
-                    </>
+                {/* ❌ CLOSE BUTTON (controlled) */}
+                {state === "edit" && showCloseButton && (
+                    <button
+                        type="button"
+                        onClick={removeImage}
+                        className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-gray-200 z-20"
+                    >
+                        <i className="mdi mdi-window-close"></i>
+                    </button>
+                )}
+
+                {/* ✏️ EDIT BUTTON (independent) */}
+                {state === "edit" && showEditButton && (
+                    <button
+                        type="button"
+                        onClick={() => document.querySelector("input")?.click()}
+                        className="absolute -bottom-2 -left-2 w-7 h-7 rounded-full bg-gray-200"
+                    >
+                        <i className="mdi mdi-pencil"></i>
+                    </button>
                 )}
             </div>
 

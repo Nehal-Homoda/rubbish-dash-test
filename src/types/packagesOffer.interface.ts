@@ -9,10 +9,16 @@ export interface PackageOffer {
     no_of_subscriptions: number;
     category: string | null;
     area: string | null;
-    district: string | null;
+   district: District;
     days: string[];
     created_at: string;
     discounts: PackageDiscount[];
+}
+export interface District {
+  id: number
+  name_ar: string
+  name_en: string
+  available_days: string[]
 }
 
 export interface PackageDiscount {

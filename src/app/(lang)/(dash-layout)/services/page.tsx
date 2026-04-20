@@ -36,12 +36,14 @@ export default function rubbush_collectors() {
   const [totalPages, setTotalPages] = useState(1);
   const [page, setPage] = useState(1);
   const [selectedDataItem, setSelectedDataItem] = useState<Category | null>(
-    null
+    null,
   );
-  const [activeFilter, setActiveFilter] = useState<boolean | undefined>(undefined);
-  const [searchTerm, setSearchTerm] = useState<string | undefined>(undefined)
+  const [activeFilter, setActiveFilter] = useState<boolean | undefined>(
+    undefined,
+  );
+  const [searchTerm, setSearchTerm] = useState<string | undefined>(undefined);
   const [switch1, setSwitch1] = useState(false);
-  const [addressSwicth, setAddressSwicth] = useState(false)
+  const [addressSwicth, setAddressSwicth] = useState(false);
   type FormDataType = {
     name_ar: string;
     name_en: string;
@@ -53,9 +55,8 @@ export default function rubbush_collectors() {
     discount_value_percentage: number | string;
   };
   interface FormDataInputErrors {
-    name_ar: string | null,
-    name_en: string | null,
-
+    name_ar: string | null;
+    name_en: string | null;
   }
   const [formData, setFormData] = useState<FormDataType>({
     name_ar: "",
@@ -65,12 +66,12 @@ export default function rubbush_collectors() {
     image: null,
     has_recycle: 0,
     has_detailed_address: 0,
-    discount_value_percentage: switch1 ? 0 : '',
+    discount_value_percentage: switch1 ? 0 : "",
   });
   const formSchema = Yup.object().shape({
-    name_ar: Yup.string().required('الاسم باللغه العربيه مطلوب'),
-    name_en: Yup.string().required('الاسم باللغه الانجليزيه مطلوب'),
-  })
+    name_ar: Yup.string().required("الاسم باللغه العربيه مطلوب"),
+    name_en: Yup.string().required("الاسم باللغه الانجليزيه مطلوب"),
+  });
   const [updateFormData, setUpdateFormData] = useState<FormDataType>({
     name_ar: "",
     name_en: "",
@@ -86,59 +87,58 @@ export default function rubbush_collectors() {
     name_en: "",
   });
   const [errorMsg, setErrorMsg] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false)
-
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
 
   const handleCheckSubscription = (value: boolean, name: string) => {
     setSwitch1(!switch1);
-    if (name == 'add') {
+    if (name == "add") {
       setFormData((prev) => ({
         ...prev,
         ["has_recycle"]: value ? 1 : 0,
       }));
     }
 
-
-    if (name == 'edit') {
+    if (name == "edit") {
       setUpdateFormData((prev) => ({
         ...prev,
         ["has_recycle"]: value ? 1 : null,
       }));
     }
-
   };
   const handleCheckDetails = (value: boolean, name: string) => {
-    setAddressSwicth(!addressSwicth)
-    if (name == 'add') {
+    setAddressSwicth(!addressSwicth);
+    if (name == "add") {
       setFormData((prev) => ({
         ...prev,
         ["has_detailed_address"]: value ? 1 : 0,
       }));
     }
 
-
-    if (name == 'edit') {
+    if (name == "edit") {
       setUpdateFormData((prev) => ({
         ...prev,
         ["has_detailed_address"]: value ? 1 : 0,
       }));
     }
-
   };
 
   const fetchDataList = ({
     search = searchTerm,
     is_active = activeFilter,
-    pageNum = page
-  }: { search?: string; is_active?: boolean | undefined; pageNum?: number } = {}) => {
+    pageNum = page,
+  }: {
+    search?: string;
+    is_active?: boolean | undefined;
+    pageNum?: number;
+  } = {}) => {
     console.log(is_active);
     const isActive =
       is_active != undefined
         ? is_active
           ? "&is_active=" + 1
           : "&is_active=" + 0
-        : '';
+        : "";
     const hasSearch = search ? "&search=" + search : "";
 
     const query = `?page=${pageNum}${hasSearch}${isActive}`;
@@ -148,9 +148,7 @@ export default function rubbush_collectors() {
         setDataList(response.data);
         setTotalPages(response.meta.last_page);
       })
-      .catch((error) => {
-
-      });
+      .catch((error) => {});
   };
   const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -160,13 +158,11 @@ export default function rubbush_collectors() {
   };
 
   const handleActiveFilter = (value: boolean | undefined) => {
-    setPage(1)
+    setPage(1);
     // setActiveFilter(value)
     // setPage(1);
     fetchDataList({ is_active: value, pageNum: 1 });
-
-
-  }
+  };
 
   const updateDataItemActive = (value: any, index: number) => {
     const service = dataList.find((item, i) => {
@@ -188,7 +184,7 @@ export default function rubbush_collectors() {
 
         console.log(response);
       })
-      .catch((error) => { });
+      .catch((error) => {});
   };
 
   const deleteSubmit = (item: Category, selectedIndex: number) => {
@@ -199,7 +195,7 @@ export default function rubbush_collectors() {
         setDataList(updatedArr);
         successDialog(true);
       })
-      .catch((error) => { });
+      .catch((error) => {});
   };
 
   const updateDataItem = (item: Category) => {
@@ -212,16 +208,18 @@ export default function rubbush_collectors() {
       image: item.image,
       has_recycle: item.has_recycle,
       has_detailed_address: item.has_detailed_address,
-      discount_value_percentage: item.has_recycle ? Number(item.discount_value_percentage) : 0,
+      discount_value_percentage: item.has_recycle
+        ? Number(item.discount_value_percentage)
+        : 0,
     });
   };
 
   const updateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setErrorMsg('')
+    setErrorMsg("");
     const validateResult = await validateAllInputs<FormDataType>(
       formSchema,
-      updateFormData
+      updateFormData,
     );
     if (!validateResult) return;
 
@@ -229,23 +227,30 @@ export default function rubbush_collectors() {
 
     if (validateResult.isInvalid) return;
     if (!selectedDataItem) return;
-    const body = JSON.stringify({
-      ...updateFormData,
-    });
-    updateCategoryService(selectedDataItem.id, body)
+    const body: any = { ...updateFormData };
+
+    if (typeof body.image === "string" && !body.image.startsWith("data:")) {
+      delete body.image;
+    }
+
+    // if it's File or base64 keep it
+    if (body.image instanceof File) {
+      // keep it
+    }
+    updateCategoryService(selectedDataItem.id, JSON.stringify(body))
       .then((response) => {
-        setIsUpdateDialogOpen(false)
+        setIsUpdateDialogOpen(false);
         fetchDataList();
         successDialog(true);
       })
       .catch((error) => {
-        setIsUpdateDialogOpen(false)
+        setIsUpdateDialogOpen(false);
       });
   };
 
   const addFormChangeHander = (
     e: React.ChangeEvent<HTMLInputElement>,
-    index?: number
+    index?: number,
   ) => {
     setFormData((prev) => ({
       ...prev,
@@ -256,7 +261,7 @@ export default function rubbush_collectors() {
   };
   const updateFormChangeHander = (
     e: React.ChangeEvent<HTMLInputElement>,
-    index?: number
+    index?: number,
   ) => {
     setUpdateFormData((prev) => ({
       ...prev,
@@ -267,35 +272,37 @@ export default function rubbush_collectors() {
   };
   const createSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setErrorMsg('')
+    setErrorMsg("");
     const validateResult = await validateAllInputs<FormDataType>(
       formSchema,
-      formData
+      formData,
     );
     if (!validateResult) return;
 
     setFormErrors({ ...validateResult.outputResult });
     if (validateResult.isInvalid) return;
 
-    setIsDialogOpen(false)
+    setIsDialogOpen(false);
 
     const fd = new FormData();
     fd.append("name_ar", formData.name_ar);
     fd.append("name_en", formData.name_en);
     fd.append("order", formData.order.toString());
     fd.append("is_active", formData.is_active.toString());
-    fd.append("has_recycle", formData.has_recycle!.toString())
-    fd.append("has_detailed_address", formData.has_detailed_address.toString())
+    fd.append("has_recycle", formData.has_recycle!.toString());
+    fd.append("has_detailed_address", formData.has_detailed_address.toString());
     if (formData.image) {
       fd.append("image", formData.image);
     }
     if (formData.discount_value_percentage) {
-      fd.append("discount_value_percentage", formData.discount_value_percentage.toString());
+      fd.append(
+        "discount_value_percentage",
+        formData.discount_value_percentage.toString(),
+      );
     }
 
     addCategoryService(fd)
       .then((response) => {
-
         fetchDataList();
 
         //@ts-ignore
@@ -313,7 +320,7 @@ export default function rubbush_collectors() {
       })
       .catch((error) => {
         setErrorMsg(error?.message);
-        setIsDialogOpen(false)
+        setIsDialogOpen(false);
       });
   };
   const tableHeadActionsSlot = () => {
@@ -331,17 +338,19 @@ export default function rubbush_collectors() {
           الحالة
         </UIPrimaryDropdown>
 
-
         <UIBaseDialog
           open={isDialogOpen}
           onClose={() => setIsDialogOpen(false)}
           title="اضافة خدمة"
-          confirmHandler={() => { }}
+          confirmHandler={() => {}}
           confirmText="اضافة"
           form="update-form"
           btn={
             <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
-              <button onClick={() => setIsDialogOpen(true)} className="bg-[#0094140D] p-1 rounded-lg">
+              <button
+                onClick={() => setIsDialogOpen(true)}
+                className="bg-[#0094140D] p-1 rounded-lg"
+              >
                 اضافة خدمة
               </button>
             </div>
@@ -350,10 +359,7 @@ export default function rubbush_collectors() {
           <form onSubmit={createSubmit} id="update-form">
             {errorMsg && (
               <div className="mb-6 text-start border border-red-800 bg-red-100 px-3 py-3 rounded-lg">
-                <span className="text-red-800 error-alert">
-                  {" "}
-                  {errorMsg}
-                </span>
+                <span className="text-red-800 error-alert"> {errorMsg}</span>
               </div>
             )}
             <div className="space-y-7">
@@ -405,24 +411,30 @@ export default function rubbush_collectors() {
                 }}
               ></SelectInput>
 
-
               <div className="grid grid-cols-2 py-6 ">
-
                 <ToggleSwitch
                   checked={switch1}
                   label="اعادة تدوير"
-                  onChange={(value) => handleCheckSubscription(value, 'add')}
+                  onChange={(value) => handleCheckSubscription(value, "add")}
                 />
                 <ToggleSwitch
                   checked={addressSwicth}
                   label="عرض تفاصيل العنوان"
-                  onChange={(value) => handleCheckDetails(value, 'add')}
+                  onChange={(value) => handleCheckDetails(value, "add")}
                 />
-
               </div>
 
               {switch1 && (
-                <TextFieldNada isPercentage={true} prependIcon="mdi mdi-ticket-percent-outline text-gray-400 " handleChange={addFormChangeHander} name="discount_value_percentage" label="نسبة الخصم" placeholder="ادخل نسبة الخصم" type="number" value={formData.discount_value_percentage} />
+                <TextFieldNada
+                  isPercentage={true}
+                  prependIcon="mdi mdi-ticket-percent-outline text-gray-400 "
+                  handleChange={addFormChangeHander}
+                  name="discount_value_percentage"
+                  label="نسبة الخصم"
+                  placeholder="ادخل نسبة الخصم"
+                  type="number"
+                  value={formData.discount_value_percentage}
+                />
               )}
             </div>
           </form>
@@ -454,17 +466,16 @@ export default function rubbush_collectors() {
               </div>
             ),
 
-            has_recycle: (item, index: number) => (
-              item.has_recycle ?
+            has_recycle: (item, index: number) =>
+              item.has_recycle ? (
                 <div className="bg-[#009414] text-white rounded-full w-7 h-7 overflow-hidden flex justify-center items-center">
                   <span className="mdi mdi-check"></span>
                 </div>
-                :
+              ) : (
                 <div className="bg-[#F9285A] text-white rounded-full w-7 h-7 overflow-hidden flex justify-center items-center">
                   <span className="mdi mdi-close"></span>
                 </div>
-            ),
-
+              ),
 
             is_active: (item, index: number) => (
               <UIPrimaryDropdown
@@ -508,16 +519,13 @@ export default function rubbush_collectors() {
               </div>
             ),
           }}
-
-        >
-        </BaseDataTable>
-
+        ></BaseDataTable>
 
         <UIBaseDialog
           open={isUpdateDialogOpen}
           onClose={() => setIsUpdateDialogOpen(false)}
           title="تعديل خدمة"
-          confirmHandler={() => { }}
+          confirmHandler={() => {}}
           confirmText="تعديل"
           form="update-form"
         >
@@ -543,7 +551,7 @@ export default function rubbush_collectors() {
                 value={updateFormData.name_ar}
                 label=" اسم الخدمة ( عربي ) "
                 placeholder=" اسم الخدمة  "
-                errorMessage={formErrors.name_ar || ''}
+                errorMessage={formErrors.name_ar || ""}
               ></TextFieldNada>
 
               <TextFieldNada
@@ -553,7 +561,7 @@ export default function rubbush_collectors() {
                 value={updateFormData.name_en}
                 label=" اسم الخدمة ( انجليزي ) "
                 placeholder=" اسم الخدمة "
-                errorMessage={formErrors.name_en || ''}
+                errorMessage={formErrors.name_en || ""}
               ></TextFieldNada>
 
               <SelectInput
@@ -573,23 +581,20 @@ export default function rubbush_collectors() {
                 }}
               ></SelectInput>
 
-
               <div className="grid grid-cols-2 py-6 ">
-
-
-                <ToggleSwitch className="col-span-1"
+                <ToggleSwitch
+                  className="col-span-1"
                   checked={updateFormData.has_recycle ? true : false}
                   label="اعادة تدوير"
-                  onChange={(value) => handleCheckSubscription(value, 'edit')}
+                  onChange={(value) => handleCheckSubscription(value, "edit")}
                 />
 
-
-                <ToggleSwitch className="col-span-1"
+                <ToggleSwitch
+                  className="col-span-1"
                   checked={updateFormData.has_detailed_address ? true : false}
                   label="عرض تفاصيل العنوان"
-                  onChange={(value) => handleCheckDetails(value, 'edit')}
+                  onChange={(value) => handleCheckDetails(value, "edit")}
                 />
-
               </div>
 
               {updateFormData.has_recycle && (
@@ -610,13 +615,21 @@ export default function rubbush_collectors() {
                 //   prependIcon="mdi mdi-ticket-percent-outline"
                 // ></SelectInput>
 
-
-                <TextFieldNada isPercentage={true} prependIcon="mdi mdi-ticket-percent-outline text-gray-400 " handleChange={updateFormChangeHander} name="discount_value_percentage" label="نسبة الخصم" placeholder="ادخل نسبة الخصم" type="number" value={updateFormData.discount_value_percentage} />
+                <TextFieldNada
+                  isPercentage={true}
+                  prependIcon="mdi mdi-ticket-percent-outline text-gray-400 "
+                  handleChange={updateFormChangeHander}
+                  name="discount_value_percentage"
+                  label="نسبة الخصم"
+                  placeholder="ادخل نسبة الخصم"
+                  type="number"
+                  value={updateFormData.discount_value_percentage}
+                />
               )}
             </div>
           </form>
         </UIBaseDialog>
-      </div >
+      </div>
     </>
   );
 }
