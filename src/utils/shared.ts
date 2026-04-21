@@ -28,44 +28,91 @@ import * as Yup from "yup";
  * // outputResult = { name: "Name is required", age: "Must be at least 18" }
  * // isInvalid = true
  */
+// export const validateAllInputs = async <T>(
+//     formSchema: Yup.Schema,
+//     formData: T,
+// ) => {
+//     const outputResult: { [key in keyof T]: string } = {} as {
+//         [key in keyof T]: string;
+//     };
+
+//     let invalid = true;
+
+//     try {
+//         // Validate the entire form data; don't stop at the first error.
+//         await formSchema.validate(formData, { abortEarly: false });
+
+//         invalid = false;
+
+//         // If validation passes, set all fields to empty string (no errors).
+//         for (const paramName in formData) {
+//             const key = paramName as keyof T;
+//             outputResult[key] = "";
+//         }
+//     } catch (err) {
+//         // If the error is not a Yup validation error, exit early.
+//         if (!(err instanceof Yup.ValidationError)) return;
+
+//         // err.inner contains all validation errors.
+//         err.inner.forEach((error) => {
+//             if (error.path) {
+//                 const keyPath = error.path as keyof T;
+//                 outputResult[keyPath] = error.message;
+//             }
+//         });
+//     }
+
+//     return {
+//         outputResult: {
+//             ...outputResult,
+//         },
+//         isInvalid: invalid,
+//     };
+// };
+
 export const validateAllInputs = async <T>(
     formSchema: Yup.Schema,
-    formData: T
+    formData: T,
 ) => {
-    const outputResult: { [key in keyof T]: string } = {} as {
-        [key in keyof T]: string;
-    };
-
+    const outputResult: any = {};
     let invalid = true;
 
     try {
-        // Validate the entire form data; don't stop at the first error.
         await formSchema.validate(formData, { abortEarly: false });
-
         invalid = false;
 
-        // If validation passes, set all fields to empty string (no errors).
-        for (const paramName in formData) {
-            const key = paramName as keyof T;
-            outputResult[key] = "";
-        }
+        return {
+            outputResult: {},
+            isInvalid: false,
+        };
     } catch (err) {
-        // If the error is not a Yup validation error, exit early.
         if (!(err instanceof Yup.ValidationError)) return;
 
-        // err.inner contains all validation errors.
         err.inner.forEach((error) => {
-            if (error.path) {
-                const keyPath = error.path as keyof T;
-                outputResult[keyPath] = error.message;
+            if (!error.path) return;
+
+            const path = error.path;
+
+            // ✅ handle discounts[0].discount_rate
+            const match = path.match(/(\w+)\[(\d+)\]\.(\w+)/);
+
+            if (match) {
+                const [, arrayName, index, field] = match;
+
+                if (!outputResult[arrayName]) outputResult[arrayName] = [];
+                if (!outputResult[arrayName][index])
+                    outputResult[arrayName][index] = {};
+
+                outputResult[arrayName][index][field] = error.message;
+            } else {
+                // ✅ normal fields
+                outputResult[path] = error.message;
             }
         });
     }
 
     return {
-        outputResult: {
-            ...outputResult,
-        },
+        outputResult,
         isInvalid: invalid,
     };
 };
@@ -81,7 +128,7 @@ export const validateAllInputs = async <T>(
 export const validateInput = async (
     formSchema: Yup.Schema,
     inputName: string,
-    newValue: string
+    newValue: string,
 ) => {
     try {
         // Construct a minimal form data object with just the field to validate.
@@ -152,13 +199,12 @@ export const errorHandler = (error: any): string => {
  */
 export const responseErrorServiceHandler = async (
     response: Response,
-    serviceMessage: string
+    serviceMessage: string,
 ) => {
     console.log(response.status);
     if (response.status === 401) {
         window.location.href = "/auth/login";
         throw new Error("unauthorized");
-
     }
 
     const contentType = response.headers.get("content-type");
@@ -197,7 +243,7 @@ export const getQueryParam = (paramName: string) => {
 export async function convertUrlToBase64(url: string): Promise<string> {
     if (typeof window === "undefined") {
         throw new Error(
-            "convertUrlToBase64 can only be run on the client side"
+            "convertUrlToBase64 can only be run on the client side",
         );
     }
 

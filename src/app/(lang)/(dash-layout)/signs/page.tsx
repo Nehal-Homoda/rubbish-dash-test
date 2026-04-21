@@ -113,18 +113,18 @@ export default function rubbush_collectors() {
   );
 
   const formSchema = Yup.object().shape({
-image: Yup.mixed().test(
-  "image-required",
-  "الصورة مطلوبة",
-  (value) =>
-    value instanceof File ||
-    (typeof value === "string" && value.trim() !== "")
-),
+    image: Yup.mixed().test(
+      "image-required",
+      "الصورة مطلوبة",
+      (value) =>
+        value instanceof File ||
+        (typeof value === "string" && value.trim() !== "")
+    ),
 
-  title_ar: Yup.string().required("العنوان باللغه العربيه مطلوب"),
-  title_en: Yup.string().required("العنوان باللغه الانجليزيه مطلوب"),
-  order: Yup.number().required("الترتيب مطلوب"),
-});
+    title_ar: Yup.string().required("العنوان باللغه العربيه مطلوب"),
+    title_en: Yup.string().required("العنوان باللغه الانجليزيه مطلوب"),
+    order: Yup.number().required("الترتيب مطلوب"),
+  });
 
   const fetchDataList = ({
     search = "",
@@ -151,7 +151,7 @@ image: Yup.mixed().test(
         setDataList(response.data);
         setTotalPages(response.meta.last_page);
       })
-      .catch(() => {});
+      .catch(() => { });
   };
 
   const handleActiveFilter = (value: boolean | undefined) => {
@@ -182,7 +182,7 @@ image: Yup.mixed().test(
 
         console.log(response);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const deleteSubmit = (item: Banner, selectedIndex: number) => {
@@ -193,12 +193,12 @@ image: Yup.mixed().test(
         setDataList(updatedArr);
         successDialog(true);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const updateDataItem = (item: Banner) => {
     setSelectedDataItem(item);
-        console.log("IMAGE BEFORE VALIDATION:", updateFormData.image);
+    console.log("IMAGE BEFORE VALIDATION:", updateFormData.image);
 
     setUpdateFormData({
       title_ar: item.title_ar,
@@ -206,12 +206,12 @@ image: Yup.mixed().test(
       order: item.order,
       link: item.link,
       is_active: item.is_active ? 1 : 0,
-      image: item.image ||"",
+      image: item.image || "",
       category_id: item.category_id,
       is_ad: item.is_ad ? 1 : 0,
       ad_image: item.ad_image || "",
     });
-        console.log("IMAGE BEFORE VALIDATION:", updateFormData.image);
+    console.log("IMAGE BEFORE VALIDATION:", updateFormData.image);
 
   };
 
@@ -231,7 +231,7 @@ image: Yup.mixed().test(
     //   ...updateFormData,
     // });
 
-     const body: any = { ...updateFormData };
+    const body: any = { ...updateFormData };
 
     if (typeof body.image === "string" && !body.image.startsWith("data:")) {
       delete body.image;
@@ -342,7 +342,7 @@ image: Yup.mixed().test(
     if (name == "edit") {
       setUpdateFormData((prev) => ({
         ...prev,
-        ["is_ad"]: value ? 1 : null,
+        ["is_ad"]: value ? 1 : 0,
       }));
     }
   };
@@ -384,7 +384,7 @@ image: Yup.mixed().test(
           title="اضافة لافتة"
           confirmText="اضافة"
           form="add-form"
-          confirmHandler={() => {}}
+          confirmHandler={() => { }}
           btn={
             <div className="bg-[#009414] py-2 rounded-xl text-center  text-white px-3">
               <button
@@ -405,7 +405,7 @@ image: Yup.mixed().test(
             <div className="space-y-7">
               <div className="w-full flex justify-center mb-20">
                 <FileInputImg
-                errorMessage={formErrors.image || ''}
+                  errorMessage={formErrors.image || ''}
                   state="edit"
                   onFileChange={(arg) => {
                     setFormData((prev) => ({
@@ -611,7 +611,7 @@ image: Yup.mixed().test(
           open={isDialogOpen}
           onClose={() => setIsDialogOpen(false)}
           title="تعديل اللافتة"
-          confirmHandler={() => {}}
+          confirmHandler={() => { }}
           confirmText="تعديل"
           form="update-form"
         >
@@ -619,7 +619,7 @@ image: Yup.mixed().test(
             <div className="space-y-7">
               <div className="w-full flex justify-center mb-20">
                 <FileInputImg
-                 showCloseButton={false}
+                  showCloseButton={false}
                   errorMessage={updateFormErrors.image || ""}
                   state="edit"
                   fileUrl={updateFormData.image as string}
@@ -715,11 +715,12 @@ image: Yup.mixed().test(
 
               <ToggleSwitch
                 className="col-span-1"
-                checked={updateFormData.is_ad ? true : false}
+                // checked={updateFormData.is_ad ? true : false}
+                checked={updateFormData.is_ad === 1}
                 label="اعلان"
                 onChange={(value) => handleCheckSubscription(value, "edit")}
               />
-              {updateFormData.is_ad && (
+              {updateFormData.is_ad === 1 && (
                 <div className="w-full flex justify-center mb-20">
                   <FileInputImg
                     errorMessage={updateFormErrors.ad_image || ""}
