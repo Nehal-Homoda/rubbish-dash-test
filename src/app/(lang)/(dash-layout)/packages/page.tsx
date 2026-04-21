@@ -1154,3 +1154,4 @@ export default function rubbush_collectors() {
       </UIBaseDialog>
     </>
   );
+}
