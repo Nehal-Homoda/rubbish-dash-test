@@ -278,7 +278,7 @@ export default function rubbush_collectors() {
         setDataList(response.data);
         setTotalPages(response.meta.last_page);
       })
-      .catch(() => {});
+      .catch(() => { });
   };
   const tableSearchHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -320,7 +320,7 @@ export default function rubbush_collectors() {
 
         console.log(response);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const deleteSubmit = (item: PackageOffer, selectedIndex: number) => {
@@ -331,7 +331,7 @@ export default function rubbush_collectors() {
         setDataList(updatedArr);
         successDialog(true);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const updateDataItem = (item: PackageOffer) => {
@@ -343,25 +343,25 @@ export default function rubbush_collectors() {
       order: item.order ? item.order : 0,
       is_active: item.is_active ? 1 : 0,
       category_id: item.category,
-      area_id: item.area,
+      area_id: item.district.area.id,
       district_id: item.district.id,
       days: item.days,
       days_count: item.days_count ? parseInt(item.days_count) : "",
       price_per_unit: String(item.price_per_unit ?? ""),
       discounts: item.discounts?.length
         ? item.discounts.map((d) => ({
-            min_units: d.min_units,
-            max_units: d.max_units,
-            discount_rate: d.discount_rate ?? "",
-          }))
+          min_units: d.min_units,
+          max_units: d.max_units,
+          discount_rate: d.discount_rate ?? "",
+        }))
         : [
-            { min_units: 1, max_units: "", discount_rate: "" },
-            { min_units: 2, max_units: 5, discount_rate: "" },
-            { min_units: 6, max_units: 9, discount_rate: "" },
-            { min_units: 10, max_units: 15, discount_rate: "" },
-            { min_units: 16, max_units: 19, discount_rate: "" },
-            { min_units: 20, max_units: "", discount_rate: "" },
-          ],
+          { min_units: 1, max_units: "", discount_rate: "" },
+          { min_units: 2, max_units: 5, discount_rate: "" },
+          { min_units: 6, max_units: 9, discount_rate: "" },
+          { min_units: 10, max_units: 15, discount_rate: "" },
+          { min_units: 16, max_units: 19, discount_rate: "" },
+          { min_units: 20, max_units: "", discount_rate: "" },
+        ],
     });
   };
 
@@ -564,7 +564,7 @@ export default function rubbush_collectors() {
       .then((response) => {
         setCategories(response.data);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   const fetchAreaList = ({
@@ -586,7 +586,7 @@ export default function rubbush_collectors() {
         setAreaList(response.data);
         setTotalPages(response.meta.last_page);
       })
-      .catch(() => {});
+      .catch(() => { });
   };
 
   const fetchDistrictList = ({
@@ -614,7 +614,7 @@ export default function rubbush_collectors() {
         setDistrictList(response.data);
         setTotalPages(response.meta.last_page);
       })
-      .catch(() => {});
+      .catch(() => { });
   };
 
   const tableHeadActionsSlot = () => {
@@ -640,7 +640,7 @@ export default function rubbush_collectors() {
           open={isDialogOpen}
           onClose={() => setIsDialogOpen(false)}
           title="اضافة باقة"
-          confirmHandler={() => {}}
+          confirmHandler={() => { }}
           confirmText="اضافة"
           form="update-form"
           btn={
@@ -882,6 +882,23 @@ export default function rubbush_collectors() {
       setDistrictList([]);
     }
   }, [formData.area_id]);
+  useEffect(() => {
+    if (updateFormData.area_id) {
+      fetchDistrictList({ area_id: updateFormData.area_id.toString() });
+    } else {
+      setDistrictList([]);
+    }
+  }, [updateFormData.area_id]);
+
+  useEffect(() => {
+    if (updateFormData.district_id) {
+      showDistrictService(Number(updateFormData.district_id)).then((res) => {
+        setDistrictDays(res.data.available_days || []);
+      });
+    } else {
+      setDistrictDays([]);
+    }
+  }, [updateFormData.district_id]);
 
   useEffect(() => {
     fetchDataList();
@@ -948,7 +965,7 @@ export default function rubbush_collectors() {
         open={isUpdateDialogOpen}
         onClose={() => setIsUpdateDialogOpen(false)}
         title="تعديل باقة"
-        confirmHandler={() => {}}
+        confirmHandler={() => { }}
         confirmText="تعديل"
         form="update-form"
       >
@@ -1033,31 +1050,31 @@ export default function rubbush_collectors() {
               ></SelectInput>
             </div>
 
-            {/* <SelectInput
-                value={updateFormData.district_id}
-                items={districtList}
-                itemName="name_ar"
-                itemValue="id"
-                label="المنطقة"
-                placeholder="اختر المنطقة"
-                name="district_id"
-                required={true}
-                onChange={(value) => {
-                  setUpdateFormData((prev) => ({
-                    ...prev,
-                    ["district_id"]: value,
-                    ["days"]: [],
-                  }));
+            <SelectInput
+              value={updateFormData.district_id}
+              items={districtList}
+              itemName="name_ar"
+              itemValue="id"
+              label="المنطقة"
+              placeholder="اختر المنطقة"
+              name="district_id"
+              required={true}
+              onChange={(value) => {
+                setUpdateFormData((prev) => ({
+                  ...prev,
+                  ["district_id"]: value,
+                  ["days"]: [],
+                }));
 
-                  if (value) {
-                    showDistrictService(value).then((res) => {
-                      setDistrictDays(res.data.available_days || []);
-                    });
-                  } else {
-                    setDistrictDays([]);
-                  }
-                }}
-              ></SelectInput> */}
+                // if (value) {
+                //   showDistrictService(value).then((res) => {
+                //     setDistrictDays(res.data.available_days || []);
+                //   });
+                // } else {
+                //   setDistrictDays([]);
+                // }
+              }}
+            ></SelectInput>
 
             <div className="col-span-1">
               <MultiCheckbox
@@ -1137,4 +1154,3 @@ export default function rubbush_collectors() {
       </UIBaseDialog>
     </>
   );
-}
