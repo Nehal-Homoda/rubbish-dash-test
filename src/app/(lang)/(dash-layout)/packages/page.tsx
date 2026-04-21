@@ -56,6 +56,7 @@ interface FormDataInputErrors {
   district_id: string | null;
   days: string;
   price_per_unit: string | null;
+  discounts?: { discount_rate?: string }[];
 }
 export default function rubbush_collectors() {
   const [dataList, setDataList] = useState<PackageOffer[]>([]);
@@ -174,11 +175,25 @@ export default function rubbush_collectors() {
     name_ar: Yup.string().required("الاسم باللغه العربيه مطلوب"),
     name_en: Yup.string().required("الاسم باللغه الانجليزيه مطلوب"),
     category_id: Yup.string().required("نوع الخدمة مطلوب"),
+    area_id: Yup.string().required("الحي مطلوب"),
+    district_id: Yup.string().required("المنطقة مطلوبه"),
     price_per_unit: Yup.string().required("سعر الوحده الواحده"),
-    // is_active: Yup.array()
-    //   .of(Yup.string())
-    //   .min(1, "Select at least one district")
-    //   .required("Available districts are required"),
+    days: Yup.array()
+      .of(Yup.string())
+      .min(1, "Select at least one day")
+      .required("Available days are required"),
+    discounts: Yup.array().of(
+      Yup.object().shape({
+        discount_rate: Yup.number()
+          .typeError("يجب ادخال رقم")
+          .min(0, "اقل قيمة 0")
+          .max(100, "اقصى قيمة 100")
+          .required("نسبة الخصم مطلوبة"),
+      })
+    ),
+
+
+
   });
   const [formErrors, setFormErrors] = useState<FormDataInputErrors>({
     name_ar: "",
@@ -188,6 +203,9 @@ export default function rubbush_collectors() {
     district_id: "",
     price_per_unit: "",
     days: "",
+    discounts: [],
+
+
   });
   const [updateFormErrors, setUpdateFormErrors] = useState<FormDataInputErrors>(
     {
@@ -342,7 +360,7 @@ export default function rubbush_collectors() {
       name_en: item.name_en,
       order: item.order ? item.order : 0,
       is_active: item.is_active ? 1 : 0,
-      category_id: item.category,
+      category_id: item.category?.id,
       area_id: item.district.area.id,
       district_id: item.district.id,
       days: item.days,
@@ -528,7 +546,7 @@ export default function rubbush_collectors() {
       .catch((error) => {
         setErrorMsg(error?.message);
         window.scrollTo({ top: 0, behavior: "smooth" });
-        setIsDialogOpen(false);
+
       });
   };
 
@@ -537,11 +555,7 @@ export default function rubbush_collectors() {
       ...prev,
       ["category_id"]: value ? value : null,
     }));
-    // const selected = categories.find((item, index) => {
-    //   return item.id == value
-    // })
-    // if (!selected) return
-    // setSelectedCategory(selected)
+
 
     getCategoryByIdService(value).then((response) => {
       setCategoryItem(response.data);
@@ -734,9 +748,11 @@ export default function rubbush_collectors() {
                     ["area_id"]: value,
                   }));
                 }}
+                errorMessage={formErrors.area_id || ""}
               ></SelectInput>
 
               <SelectInput
+                errorMessage={formErrors.district_id || ""}
                 value={formData.district_id}
                 items={districtList}
                 itemName="name_ar"
@@ -840,6 +856,9 @@ export default function rubbush_collectors() {
                           placeholder="ادخل نسبة الخصم"
                           type="number"
                           value={formData.discounts[index]?.discount_rate}
+                          errorMessage={
+                            formErrors.discounts?.[index]?.discount_rate || ""
+                          }
                         />
                       </div>
                     </div>
@@ -868,6 +887,9 @@ export default function rubbush_collectors() {
       const recycle =
         price - (price * categoryItem.discount_value_percentage) / 100;
 
+
+      console.log('recycling price', recycle)
+
       setFormData((prev) => ({
         ...prev,
         recycle_price: recycle,
@@ -882,6 +904,8 @@ export default function rubbush_collectors() {
       setDistrictList([]);
     }
   }, [formData.area_id]);
+
+
   useEffect(() => {
     if (updateFormData.area_id) {
       fetchDistrictList({ area_id: updateFormData.area_id.toString() });
@@ -933,6 +957,8 @@ export default function rubbush_collectors() {
                 {item.is_active ? "مفعل" : "غير مفعل"}
               </UIPrimaryDropdown>
             ),
+
+            category: (item) => item.category?.name || "-",
 
             procedures: (item, index: number) => (
               <div className="flex justify-center gap-3">
@@ -1143,6 +1169,7 @@ export default function rubbush_collectors() {
                         placeholder="ادخل نسبة الخصم"
                         type="number"
                         value={updateFormData.discounts[index]?.discount_rate}
+                        errorMessage={updateFormErrors.discounts?.[index]?.discount_rate || ""}
                       />
                     </div>
                   </div>
