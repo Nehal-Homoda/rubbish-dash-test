@@ -7,7 +7,7 @@ export interface PackageOffer {
     is_active: any;
     order: number | null;
     no_of_subscriptions: number;
-    category: string | null;
+    category: Category;
     area: string | null;
     district: District;
     days: string[];
@@ -22,7 +22,10 @@ export interface District {
     name_en: string;
     available_days: string[];
 }
-
+export interface Category {
+    id: number;
+    name: string;
+}
 export interface Area {
     id: number;
     name_ar: string;
