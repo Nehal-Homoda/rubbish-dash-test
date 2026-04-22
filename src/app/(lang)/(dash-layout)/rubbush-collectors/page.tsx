@@ -55,7 +55,7 @@ export default function rubbush_collectors() {
     const [distrects, setDistrects] = useState<District[]>([]);
     const headerArr = [
         { text: "ID", name: "id" },
-        { text: " الصورة", name: "image" },
+        // { text: " الصورة", name: "image" },
         { text: " الاسم", name: "name" },
         { text: "رقم التليفون", name: "phone" },
         { text: " المناطق", name: "districts" },

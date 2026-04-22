@@ -32,12 +32,9 @@ export default function page() {
     const [collector, setCollector] = useState<Collector | null>(null);
     const [distrects, setDistrects] = useState<District[]>([]);
     const [errorMsg, setErrorMsg] = useState("");
-
     const [formErrors, setFormErrors] = useState({
         name: "",
     });
-
-
     const [updateFormData, setUpdateFormData] = useState<UpdateFormDataType>({
         name: "",
         phone: "",
@@ -69,6 +66,7 @@ export default function page() {
         name: Yup.string().required('الاسم مطلوب'),
 
     })
+
     const updateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         if (!collector) return;
@@ -154,7 +152,7 @@ export default function page() {
                     </div>
                 )}
                 <div className="space-y-7">
-                    {collector && <div className="mb-16">
+                    {/* {collector && <div className="mb-16">
                         <FileInputImg
                             state="edit"
                             //@ts-ignore
@@ -166,7 +164,7 @@ export default function page() {
                                 }));
                             }}
                         ></FileInputImg>
-                    </div>}
+                    </div>} */}
                     <TextFieldNada
                         name="name"
                         type="text"

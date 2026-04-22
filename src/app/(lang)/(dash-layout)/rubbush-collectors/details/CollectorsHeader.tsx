@@ -3,7 +3,7 @@ import {
     showCollectorService,
 } from "@/services/collectorsService";
 import { Collector } from "@/types/collectors.interface";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import header_bg_img from "@/assets/images/bg/profile-header-bg.jpg";
 import Link from "next/link";
@@ -14,14 +14,21 @@ import { getQueryParam } from "@/utils/shared";
 
 export default function CollectorHeader() {
     const id = () => {
-            return getQueryParam('id') || '';
-        };
+        return getQueryParam('id') || '';
+    };
     const [collector, setCollector] = useState<Collector | null>(null);
-    const localePath = useLocalePath();
+    const router = useRouter();
+    const btnTabs = [
+        { name: "الملف الشخصي", type: "personal-data" },
+        { name: " الزيارات", type: "visits" },
+    ];
     const pathname = usePathname();
-
+    const currentTab = pathname.includes("visits")
+        ? "visits"
+        : "personal-data";
+    const [type, setType] = useState("personal-data");
     const fetchCollector = async () => {
-        
+
         showCollectorService(id())
             .then((response) => {
                 setCollector(response.data);
@@ -30,6 +37,15 @@ export default function CollectorHeader() {
                 console.log(error.message);
             });
     };
+    const handleChangeBtnType = (item: string) => {
+        if (item === "visits") {
+            router.push(`/rubbush-collectors/details/visits?id=${collector?.id}`);
+            setType(item)
+        } else {
+            setType(item);
+        }
+    };
+
     useEffect(() => {
         fetchCollector();
     }, []);
@@ -47,43 +63,29 @@ export default function CollectorHeader() {
                             {collector?.name ?? "****"}
                         </h5>
                         <p className="">
-                            {collector && collector.districts&& collector.districts.length ? collector.districts
+                            {collector && collector.districts && collector.districts.length ? collector.districts
                                 .map((item) => item.name)
                                 .join(" | ") : "***"}
                         </p>
                     </div>
                     <div className="flex flex-col-reverse lg:flex-row gap-5 items-center lg:items-end justify-between mt-20">
-                        <div className="flex gap-3 font-semibold">
-                            <Link
-                                className={` text-nowrap flex-grow-0 flex-shrink-0 underline-offset-[0.75rem] ${
-                                    pathname ==
-                                    localePath(
-                                        `/rubbush-collectors/details/profile`
-                                    )
-                                        ? "underline"
-                                        : ""
-                                }`}
-                                href={localePath(
-                                    `/rubbush-collectors/details/profile?id=${collector?.id}`
-                                )}
-                            >
-                                الملف الشخصي
-                            </Link>
-                            <Link
-                                className={` text-nowrap flex-grow-0 flex-shrink-0  underline-offset-[0.75rem] ${
-                                    pathname ==
-                                    localePath(
-                                        `/rubbush-collectors/details/visits`
-                                    )
-                                        ? "underline"
-                                        : ""
-                                }`}
-                                href={localePath(
-                                    `/rubbush-collectors/details/visits?id=${collector?.id}`
-                                )}
-                            >
-                                الزيارات
-                            </Link>
+                        <div className="flex items-center gap-4">
+
+                            {btnTabs.map((item, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() =>
+                                        handleChangeBtnType(item.type)
+                                    }
+                                    className={`relative ${currentTab == item.type
+                                            ? "before:absolute before:w-full before:h-[0.5] before:-bottom-3 before:bg-white"
+                                            : ""
+                                        }`}
+                                >
+                                    {item.name}
+                                </button>
+                            ))}
+
                         </div>
 
                         <div className="flex gap-5">

@@ -29,25 +29,22 @@ export default function page() {
     const [dataList, setDataList] = useState<Visit[]>([]);
     const headerArr = [
         { text: "ID", name: "id" },
-        { text: " المنطقة ", name: "name" },
-        { text: " نوع الخدمة", name: "category" },
-        { text: "المستخدم", name: "price_per_unit" },
-        { text: "جامع القمامة", name: "days_count" },
-        { text: "تاريخ الزيارة", name: "price_per_unit" },
+        { text: " المنطقة ", name: "districts" },
+        { text: " نوع الخدمة", name: "category_name" },
+        { text: "المستخدم", name: "user_name" },
+        { text: "جامع القمامة", name: "collector_name" },
+        { text: "تاريخ الزيارة", name: "created_at" },
         { text: "الحالة", name: "is_active" },
-        { text: "ملاحظة", name: "" },
+        { text: "ملاحظة", name: "user_note" },
+        // { text: "الاجراءات", name: "procedures" },
     ];
-    const statusList = [
-        { is_active: "pending", name: "قيد الانتظار" },
-        { is_active: "in_progress", name: "قيد التنفيذ" },
-        { is_active: "collected", name: "مجمع" },
-        { is_active: "not_collected", name: "غير مجمع" },
-    ];
+
     const [totalPages, setTotalPages] = useState(1);
     const [page, setPage] = useState(1);
     const [selectedDataItem, setSelectedDataItem] = useState<Visit | null>(
         null
     );
+    const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
     const [updateFormData, setUpdateFormData] = useState<FormDataType>({
         name_ar: "",
         name_en: "",
@@ -57,6 +54,12 @@ export default function page() {
         order: 0,
         days_count: "",
     });
+    const statusList = [
+        { is_active: "pending", name: "قيد الانتظار" },
+        { is_active: "in_progress", name: "قيد التنفيذ" },
+        { is_active: "collected", name: "مجمع" },
+        { is_active: "not_collected", name: "غير مجمع" },
+    ];
 
     const fetchDataList = ({
         search = "",
@@ -95,7 +98,7 @@ export default function page() {
         if (!service) return;
 
         const body = JSON.stringify({
-            status: value,
+            is_active: value,
         });
 
         updateVisitsService(service.id, body)
@@ -175,7 +178,7 @@ export default function page() {
     };
     useEffect(() => {
         fetchDataList();
-    }, [page]); // runs every time `page` changes
+    }, [page]);
 
     return (
         <>
@@ -189,7 +192,36 @@ export default function page() {
                     onSearchChange={tableSearchHandler}
                     headerActionsSlot={tableHeadActionsSlot()}
                     renderers={{
+                        is_active: (item, index: number) => (
+                            <UIPrimaryDropdown
+                                tiny
+                                itemName="name"
+                                itemValue="is_active"
+                                btnColorTailwindClass={statusDropdownColor(item.status)}
+                                items={statusList}
+                                onSelected={(value) => updateDataItemActive(value, index)}
+                            >
+                                {statusDropdownName(item.status)}
+                            </UIPrimaryDropdown>
+                        ),
 
+                        // procedures: (item, index: number) => (
+                        //     <div className="flex justify-center gap-3">
+                        //         <UIDialogConfirm
+                        //             danger
+                        //             title="هل انت متأكد من حذف العنصر"
+                        //             confirmHandler={() => deleteSubmit(item, index)}
+                        //         >
+                        //             <button className="bg-[#F9285A0A] p-1 rounded-lg">
+                        //                 <span className="mdi mdi-trash-can-outline text-[#F9285A]"></span>
+                        //             </button>
+                        //         </UIDialogConfirm>
+
+
+
+
+                        //     </div>
+                        // ),
                     }}
                 >
                     {/* {dataList.map((item, index) => (
@@ -300,6 +332,10 @@ export default function page() {
                         </tr>
                     ))} */}
                 </BaseDataTable>
+
+
+
+
             </div>
         </>
     );
