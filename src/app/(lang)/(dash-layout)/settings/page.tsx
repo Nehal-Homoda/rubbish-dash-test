@@ -17,9 +17,12 @@ type FormDataType = {
     recycle_price_by_kilo: number | string;
     grace_period_visits: number | string;
     ticket_auto_reply_message_ar: string;
+    ticket_auto_reply_message_en: string;
     ticket_auto_reply_enabled: number | string;
     force_update_android_version: number | string;
     force_update_ios_version: number | string;
+    collector_visit_notification_body_ar: string;
+    collector_visit_notification_body_en: string;
 };
 
 export default function settings() {
@@ -34,8 +37,11 @@ export default function settings() {
         grace_period_visits: 0,
         ticket_auto_reply_enabled: 0,
         ticket_auto_reply_message_ar: "",
+        ticket_auto_reply_message_en: "",
         force_update_android_version: 0,
         force_update_ios_version: 0,
+        collector_visit_notification_body_ar: "",
+        collector_visit_notification_body_en: ""
     });
 
     const [ticketAutoReplyEnabled, setTicketAutoReplyEnabled] =
@@ -59,6 +65,8 @@ export default function settings() {
                         data.recycle_price_by_kilo?.toString() || "0",
                     ticket_auto_reply_message_ar:
                         data.ticket_auto_reply_message_ar || "",
+                    ticket_auto_reply_message_en:
+                        data.ticket_auto_reply_message_en || "",
                     ticket_auto_reply_enabled:
                         data.ticket_auto_reply_enabled || 0,
                     grace_period_visits:
@@ -67,6 +75,10 @@ export default function settings() {
                         data.force_update_android_version || 0,
                     force_update_ios_version:
                         data.force_update_ios_version || 0,
+                    collector_visit_notification_body_ar:
+                        data.collector_visit_notification_body_ar || "",
+                    collector_visit_notification_body_en:
+                        data.collector_visit_notification_body_en || "",
                 });
 
                 setTicketAutoReplyEnabled(!!data.ticket_auto_reply_enabled);
@@ -235,23 +247,6 @@ export default function settings() {
                 />
 
                 <ToggleSwitch
-                    checked={ticketAutoReplyEnabled}
-                    label="اظهار رسالة الدعم"
-                    onChange={handleCheckAutoReply}
-                />
-
-                {ticketAutoReplyEnabled && (
-                    <TextFieldNada
-                        placeholder=""
-                        name="ticket_auto_reply_message_ar"
-                        type="text"
-                        handleChange={addFormChangeHander}
-                        value={formData.ticket_auto_reply_message_ar}
-                        label="رسالة الدعم"
-                    />
-                )}
-
-                <ToggleSwitch
                     checked={androidForceUpdate}
                     label="تحديث Android"
                     onChange={handleCheckForceAndroidUpdate}
@@ -262,6 +257,52 @@ export default function settings() {
                     label="تحديث IOS"
                     onChange={handleCheckForceIosUpdate}
                 />
+
+                <ToggleSwitch
+                    checked={ticketAutoReplyEnabled}
+                    label="اظهار رسالة الدعم"
+                    onChange={handleCheckAutoReply}
+                />
+                {ticketAutoReplyEnabled && (
+                    <>
+                        <TextFieldNada
+                            placeholder=""
+                            name="ticket_auto_reply_message_ar"
+                            type="text"
+                            handleChange={addFormChangeHander}
+                            value={formData.ticket_auto_reply_message_ar}
+                            label="رسالة الدعم باللغه العربيه"
+                        />
+                        <TextFieldNada
+                            placeholder=""
+                            name="ticket_auto_reply_message_ar"
+                            type="text"
+                            handleChange={addFormChangeHander}
+                            value={formData.ticket_auto_reply_message_en}
+                            label="رسالة الدعم باللغه الانجليزيه "
+                        />
+
+                    </>
+                )}
+
+                <TextFieldNada
+                    placeholder=""
+                    name="collector_visit_notification_body_ar"
+                    type="text"
+                    handleChange={addFormChangeHander}
+                    value={formData.collector_visit_notification_body_ar}
+                    label="رسالة المندوب باللغه العربيه"
+                />
+                <TextFieldNada
+                    placeholder=""
+                    name="collector_visit_notification_body_en"
+                    type="text"
+                    handleChange={addFormChangeHander}
+                    value={formData.collector_visit_notification_body_en}
+                    label="رسالة المندوب باللغه الانجليزيه"
+                />
+
+
 
                 <div className="mt-4 flex items-center justify-center gap-4">
                     <button type="submit" className="base-btn min-w-[200px]">

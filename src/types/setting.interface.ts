@@ -22,4 +22,7 @@ export interface Setting {
     grace_period_visits: number;
     ticket_auto_reply_enabled: number;
     ticket_auto_reply_message_ar: string;
+    ticket_auto_reply_message_en: string;
+    collector_visit_notification_body_ar:string;
+    collector_visit_notification_body_en:string;
 }
