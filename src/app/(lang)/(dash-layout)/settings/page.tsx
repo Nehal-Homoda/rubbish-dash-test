@@ -27,7 +27,6 @@ type FormDataType = {
 
 export default function settings() {
     const [settingData, setSettingData] = useState<Setting | null>(null);
-
     const [formData, setFormData] = useState<FormDataType>({
         ios_version: "",
         android_version: "",
@@ -43,7 +42,6 @@ export default function settings() {
         collector_visit_notification_body_ar: "",
         collector_visit_notification_body_en: ""
     });
-
     const [ticketAutoReplyEnabled, setTicketAutoReplyEnabled] =
         useState(false);
     const [iosForceUpdate, setIosForceUpdate] = useState(false);
@@ -58,6 +56,8 @@ export default function settings() {
 
                 setFormData({
                     android_version: data.android_version || "",
+
+
                     ios_version: data.ios_version || "",
                     vodafone_cash_number: data.wallet_number?.toString() || "0",
                     instapay_number: data.instapay_number || "",
@@ -134,6 +134,8 @@ export default function settings() {
         setFormData({
             android_version: settingData.android_version || "",
             ios_version: settingData.ios_version || "",
+
+
             vodafone_cash_number:
                 settingData.wallet_number?.toString() || "0",
             instapay_number: settingData.instapay_number || "",
@@ -143,12 +145,21 @@ export default function settings() {
                 settingData.ticket_auto_reply_enabled || 0,
             ticket_auto_reply_message_ar:
                 settingData.ticket_auto_reply_message_ar || "",
+            ticket_auto_reply_message_en:
+                settingData.ticket_auto_reply_message_en || "",
             grace_period_visits:
                 settingData.grace_period_visits?.toString() || "0",
+
             force_update_android_version:
                 settingData.force_update_android_version || 0,
+
+
             force_update_ios_version:
                 settingData.force_update_ios_version || 0,
+
+
+            collector_visit_notification_body_ar: settingData.collector_visit_notification_body_ar || '',
+            collector_visit_notification_body_en: settingData.collector_visit_notification_body_en || ''
         });
 
         setTicketAutoReplyEnabled(
