@@ -263,7 +263,7 @@ export default function rubbush_collectors({ user }: Props) {
         setAreaList(response.data);
         setTotalPages(response.meta.last_page);
       })
-      .catch(() => {});
+      .catch(() => { });
   };
   const fetchDataList = ({
     search = searchTerm,
@@ -346,39 +346,39 @@ export default function rubbush_collectors({ user }: Props) {
       });
   };
 
- const handleSelectedUserSubscription = async (item: any) => {
-  const res = await showSubscriptionService(item.id);
-  const data = res.data;
+  const handleSelectedUserSubscription = async (item: any) => {
+    const res = await showSubscriptionService(item.id);
+    const data = res.data;
 
-  setSelectedUserSubscription(data);
+    setSelectedUserSubscription(data);
 
-  const formattedData = {
-    area_id: data?.user?.area_id?.toString() ?? "",
-    district_id: data?.district?.id?.toString() ?? "",
-    package_id: data?.package?.id?.toString() ?? "",
-    days: Array.isArray(data?.days) ? data.days : [],
-    address_title: data?.address?.title ?? "",
-    start_date: data?.starts_at?.split(" ")[0] || "",
-    ends_at: data?.ends_at?.split(" ")[0] || "",
-    time_from: data?.time_from ?? "",
-    price_per_unit: data?.package?.price_per_unit?.toString() ?? "",
-    category_id: data?.category?.id?.toString() ?? "",
-    units: data?.units ?? 1,
-    payment_method_id:
-    data?.payment?.payment_method?.id?.toString() ?? "",
-  payment_verification:
-    data?.payment?.payment_verification ?? null,
+    const formattedData = {
+      area_id: data?.user?.area_id?.toString() ?? "",
+      district_id: data?.district?.id?.toString() ?? "",
+      package_id: data?.package?.id?.toString() ?? "",
+      days: Array.isArray(data?.days) ? data.days : [],
+      address_title: data?.address?.title ?? "",
+      start_date: data?.starts_at?.split(" ")[0] || "",
+      ends_at: data?.ends_at?.split(" ")[0] || "",
+      time_from: data?.time_from ?? "",
+      price_per_unit: data?.package?.price_per_unit?.toString() ?? "",
+      category_id: data?.category?.id?.toString() ?? "",
+      units: data?.units ?? 1,
+      payment_method_id:
+        data?.payment?.payment_method?.id?.toString() ?? "",
+      payment_verification:
+        data?.payment?.payment_verification ?? null,
+    };
+
+    setUpdateFormData(formattedData);
+
+    setUpdatePackageItem(data.package);
+
+    if (formattedData.category_id) {
+      const cat = await getCategoryByIdService(formattedData.category_id);
+      setCategoryItem(cat.data);
+    }
   };
-
-  setUpdateFormData(formattedData);
-
-  setUpdatePackageItem(data.package);
-
-  if (formattedData.category_id) {
-    const cat = await getCategoryByIdService(formattedData.category_id);
-    setCategoryItem(cat.data);
-  }
-};
 
   const fetchDistrict = ({
     search = "",
@@ -405,7 +405,7 @@ export default function rubbush_collectors({ user }: Props) {
         setDistrict(response.data);
         setTotalPages(response.meta.last_page);
       })
-      .catch(() => {});
+      .catch(() => { });
   };
   const fetchCategories = () => {
     getCategoriesService().then((response) => {
@@ -544,7 +544,7 @@ export default function rubbush_collectors({ user }: Props) {
         setDataList(updatedArr);
         successDialog(true);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   //@ts-ignore
@@ -691,7 +691,7 @@ export default function rubbush_collectors({ user }: Props) {
           open={isDialogOpen}
           onClose={() => setIsDialogOpen(false)}
           title="اضافة اشتراك"
-          confirmHandler={() => {}}
+          confirmHandler={() => { }}
           confirmText="اضافة"
           form="add-form"
           btn={
@@ -735,6 +735,7 @@ export default function rubbush_collectors({ user }: Props) {
 
               <div className="col-span-6">
                 <SelectInput
+                  disabled={!addSubscriptionFormData.area_id}
                   errorMessage={formErrors.district_id || ""}
                   placeholder="ادخل اسم المنطقة"
                   name="name_ar"
@@ -929,10 +930,9 @@ export default function rubbush_collectors({ user }: Props) {
                         key={index}
                         value={item}
                         className={({ active, checked }) =>
-                          `${
-                            active
-                              ? "ring-2 ring-white/60 ring-offset-2 ring-offset-sky-300"
-                              : ""
+                          `${active
+                            ? "ring-2 ring-white/60 ring-offset-2 ring-offset-sky-300"
+                            : ""
                           }
                                                      ${checked ? "border border-[#009414] " : ""}
                                                        relative flex cursor-pointer  rounded-lg px-5 py-4 ring-1 ring-gray-100 focus:outline-none  col-span-1`
@@ -945,11 +945,10 @@ export default function rubbush_collectors({ user }: Props) {
                                 <div className="text-sm">
                                   <RadioGroup.Label
                                     as="div"
-                                    className={`font-medium  ${
-                                      checked
+                                    className={`font-medium  ${checked
                                         ? "text-gray-900"
                                         : "text-gray-900"
-                                    }`}
+                                      }`}
                                   >
                                     <div className="flex items-center gap-4">
                                       <div className="w-10 h-10 rounded-full">
@@ -1122,15 +1121,15 @@ export default function rubbush_collectors({ user }: Props) {
           onClose={() => setIsShowDialogOpen(false)}
           hideConfirmBtn
           title="تفاصيل الاشتراك "
-          confirmHandler={() => {}}
+          confirmHandler={() => { }}
           confirmText="الغاء"
           form="show-form"
         >
           <form className="" id="show-form">
             <div className="grid grid-cols-12 gap-7 mt-5">
-                  <div className="col-span-6">
+              <div className="col-span-6">
                 <SelectInput
-                disabled
+                  disabled
                   value={updateFormData.area_id}
                   items={areaList}
                   itemName="name_ar"
@@ -1140,7 +1139,7 @@ export default function rubbush_collectors({ user }: Props) {
                   name="area_id"
                   required={true}
                   onChange={(value) => {
-                   
+
                   }}
                   errorMessage={formErrors.area_id || ""}
                 ></SelectInput>
@@ -1159,7 +1158,7 @@ export default function rubbush_collectors({ user }: Props) {
                   disabled
                   onChange={
                     (value) => undefined
-                
+
                   }
                 ></SelectInput>
               </div>
@@ -1185,7 +1184,7 @@ export default function rubbush_collectors({ user }: Props) {
                   value={updateFormData?.package_id}
                   label=" نوع الباقة"
                   disabled
-                  onChange={(value) => {}}
+                  onChange={(value) => { }}
                 ></SelectInput>
               </div>
 
@@ -1213,7 +1212,7 @@ export default function rubbush_collectors({ user }: Props) {
                 <TextFieldNada
                   type="text"
                   name="start_date"
-                  handleChange={(e) => {}}
+                  handleChange={(e) => { }}
                   value={updateFormData.start_date}
                   label="تاريخ البدأ "
                   placeholder=" تاريخ البدأ "
@@ -1224,7 +1223,7 @@ export default function rubbush_collectors({ user }: Props) {
                 <TextFieldNada
                   type="text"
                   name="ends_at"
-                  handleChange={(e) => {}}
+                  handleChange={(e) => { }}
                   value={updateFormData.ends_at}
                   label="تاريخ الانتهاء "
                   placeholder=" "
@@ -1251,7 +1250,7 @@ export default function rubbush_collectors({ user }: Props) {
                 ></SelectInput>
               </div>
 
-              
+
               <div className="col-span-6">
                 <TextFieldNada
                   name="units"
@@ -1264,7 +1263,7 @@ export default function rubbush_collectors({ user }: Props) {
                 ></TextFieldNada>
               </div>
 
-               <div className="col-span-6">
+              <div className="col-span-6">
                 <TextFieldNada
                   name="price"
                   type="number"
@@ -1287,14 +1286,14 @@ export default function rubbush_collectors({ user }: Props) {
                     label=" سعر الوحدة ( اعادة التدوير ) "
                     placeholder=" ادخل سعر الوحدة ( اعادة التدوير )"
                     isPrice={true}
-                    
+
                   ></TextFieldNada>
                 </div>
               )}
 
-                 <div className="col-span-12">
+              <div className="col-span-12">
                 <TextFieldNada
-                disabled
+                  disabled
                   name="price"
                   type="number"
                   handleChange={(e) => takeValue(e, "price")}
@@ -1335,7 +1334,7 @@ export default function rubbush_collectors({ user }: Props) {
           open={isUpdateDialogOpen}
           onClose={() => setIsUpdateDialogOpen(false)}
           title="تعديل الاشتراك "
-          confirmHandler={() => {}}
+          confirmHandler={() => { }}
           confirmText="حفظ"
           form="update-form"
         >
@@ -1362,6 +1361,7 @@ export default function rubbush_collectors({ user }: Props) {
               </div>
               <div className="col-span-6">
                 <SelectInput
+               
                   errorMessage={updateFormErrors.district_id || ""}
                   placeholder="ادخل اسم المنطقة"
                   name="district_id"

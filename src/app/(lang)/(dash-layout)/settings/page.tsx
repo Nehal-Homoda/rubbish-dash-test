@@ -56,8 +56,6 @@ export default function settings() {
 
                 setFormData({
                     android_version: data.android_version || "",
-
-
                     ios_version: data.ios_version || "",
                     vodafone_cash_number: data.wallet_number?.toString() || "0",
                     instapay_number: data.instapay_number || "",
