@@ -82,7 +82,7 @@ interface FormDataInputs {
   start_date: string | null;
   ends_at: string | null;
   time_from: string | null;
-  has_subscription: number;
+  has_subscription?: number;
   package_id: string | null;
   payment_method_id: string | null;
   price_per_unit: string | null;
