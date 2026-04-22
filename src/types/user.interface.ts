@@ -52,8 +52,16 @@ export interface Subscription {
     district: District;
     package: Package;
     category: Category;
+    area:Area;
     payment: Payment;
     address: Address;
+}
+
+export interface Area {
+  id: number
+  name_en: string
+  name_ar: string
+ 
 }
 
 export interface District {
