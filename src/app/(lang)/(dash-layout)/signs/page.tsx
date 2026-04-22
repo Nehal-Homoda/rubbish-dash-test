@@ -16,6 +16,7 @@ import {
   addBannerService,
   deleteBannerService,
   getBannersService,
+  showBannerService,
   updateBannerService,
 } from "@/services/bannersServices";
 import { Category } from "@/types/categories.interface";
@@ -196,24 +197,32 @@ export default function rubbush_collectors() {
       .catch((error) => { });
   };
 
-  const updateDataItem = (item: Banner) => {
+  const updateDataItem = async (item: Banner) => {
+    setType("");
+
     setSelectedDataItem(item);
-    console.log("IMAGE BEFORE VALIDATION:", updateFormData.image);
+    const res = await showBannerService(item.id);
+    const data = res.data;
 
     setUpdateFormData({
-      title_ar: item.title_ar,
-      title_en: item.title_en,
-      order: item.order,
-      link: item.link,
-      is_active: item.is_active ? 1 : 0,
-      image: item.image || "",
-      category_id: item.category_id,
-      is_ad: item.is_ad ? 1 : 0,
-      ad_image: item.ad_image || "",
+      title_ar: data.title_ar,
+      title_en: data.title_en,
+      order: data.order,
+      link: data.link,
+      is_active: data.is_active ? 1 : 0,
+      image: data.image || "",
+      category_id: data.category_id,
+      is_ad: data.is_ad ? 1 : 0,
+      ad_image: data.ad_image || "",
     });
-    console.log("IMAGE BEFORE VALIDATION:", updateFormData.image);
-
+    if (data.category_id) {
+      setType("internal");
+    } else if (data.link) {
+      setType("external");
+    }
   };
+
+
 
   const updateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -232,6 +241,11 @@ export default function rubbush_collectors() {
     // });
 
     const body: any = { ...updateFormData };
+    if (type === "external") {
+      body.category_id = null;
+    } else if (type === "internal") {
+      body.link = "";
+    }
 
     if (typeof body.image === "string" && !body.image.startsWith("data:")) {
       delete body.image;
@@ -244,7 +258,7 @@ export default function rubbush_collectors() {
         successDialog(true);
       })
       .catch((error) => {
-        setIsDialogOpen(false);
+
       });
   };
 
@@ -357,6 +371,8 @@ export default function rubbush_collectors() {
     });
   };
 
+
+
   const handleSelectedCategory = (value: any) => {
     setFormData((prev) => ({
       ...prev,
@@ -380,7 +396,21 @@ export default function rubbush_collectors() {
         </UIPrimaryDropdown>
         <UIBaseDialog
           open={isAddDialogOpen}
-          onClose={() => setIsAddDialogOpen(false)}
+          onClose={() => {
+            setIsDialogOpen(false);
+            setFormData({
+              title_ar: "",
+              title_en: "",
+              order: 0,
+              link: "",
+              is_active: 0,
+              image: null,
+              category_id: "",
+              is_ad: 0,
+              ad_image: "",
+            });
+            setType("");
+          }}
           title="اضافة لافتة"
           confirmText="اضافة"
           form="add-form"
@@ -450,6 +480,18 @@ export default function rubbush_collectors() {
                 required={true}
                 onChange={(value) => {
                   setType(value);
+
+                  if (value === "external") {
+                    setFormData((prev) => ({
+                      ...prev,
+                      category_id: "",
+                    }));
+                  } else if (value === "internal") {
+                    setFormData((prev) => ({
+                      ...prev,
+                      link: "",
+                    }));
+                  }
                 }}
               ></SelectInput>
 
@@ -619,6 +661,7 @@ export default function rubbush_collectors() {
             <div className="space-y-7">
               <div className="w-full flex justify-center mb-20">
                 <FileInputImg
+                  key={String(updateFormData.image)}
                   showCloseButton={false}
                   errorMessage={updateFormErrors.image || ""}
                   state="edit"
@@ -653,20 +696,46 @@ export default function rubbush_collectors() {
                 placeholder=" ادخل نص اللافتة بالغة الانجليزية  "
               ></TextFieldNada>
 
-              {updateFormData.link && (
+              <SelectInput
+                value={type}
+                items={typeList}
+                itemName="name"
+                itemValue="type"
+                label="نوع الرابط"
+                placeholder="اختر نوع الرابط"
+                name="type"
+                required={true}
+                onChange={(value) => {
+                  setType(value);
+
+                  if (value === "external") {
+                    setUpdateFormData((prev) => ({
+                      ...prev,
+                      category_id: "",
+                    }));
+                  } else if (value === "internal") {
+                    setUpdateFormData((prev) => ({
+                      ...prev,
+                      link: "",
+                    }));
+                  }
+                }}
+              ></SelectInput>
+
+              {type === "external" && (
                 <TextFieldNada
                   name="link"
                   type="text"
                   prependIcon="mdi mdi-notebook-edit-outline"
                   iconType="mdi"
-                  handleChange={addFormChangeHander}
+                  handleChange={updateFormChangeHander}
                   value={updateFormData.link}
                   label=" الرابط"
                   placeholder=" ادخل الرابط الخاص باللافتة  "
                   required={false}
                 ></TextFieldNada>
               )}
-              {updateFormData.category_id && (
+              {type === "internal" && (
                 <SelectInput
                   value={updateFormData.category_id}
                   items={categoryList}

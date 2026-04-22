@@ -10,8 +10,7 @@ export const getBannersService = async (query?: string) => {
         const response = await apiCall.get(
             `/admins/banners${decodeURIComponent(query || "")}`,
             {
-                headers: {
-                },
+                headers: {},
             },
         );
         if (!response.ok) {
@@ -24,6 +23,25 @@ export const getBannersService = async (query?: string) => {
         throw new Error(error.message);
     }
 };
+
+export const showBannerService = async (id: number) => {
+    try {
+        const response = await apiCall.get(`/admins/banners/${id}`, {
+            headers: {
+                // Authorization: `Bearer ${token}`,
+                // "Content-Type": "application/json",
+            },
+        });
+        if (!response.ok) {
+            await responseErrorServiceHandler(response, "show banner");
+        }
+        const data = await response.json();
+        return data;
+    } catch (error: any) {
+        throw new Error(error.message);
+    }
+};
+
 export const addBannerService = async (form: FormData) => {
     try {
         const response = await apiCall.post(`/admins/banners`, {
