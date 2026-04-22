@@ -872,6 +872,50 @@ export default function rubbush_collectors() {
     );
   };
 
+  const calculateRecyclePrice = (
+    price: number,
+    discount?: number
+  ) => {
+    if (!discount) return null;
+    return price - (price * discount) / 100;
+  };
+
+  useEffect(() => {
+    const price = Number(formData.price_per_unit);
+    const discount = categoryItem?.discount_value_percentage;
+
+    if (!price || isNaN(price)) {
+      setFormData((prev) => ({
+        ...prev,
+        recycle_price: null,
+      }));
+      return;
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      recycle_price: calculateRecyclePrice(price, discount),
+    }));
+  }, [formData.price_per_unit, categoryItem?.discount_value_percentage]);
+
+
+  useEffect(() => {
+    const price = Number(updateFormData.price_per_unit);
+    const discount = categoryItem?.discount_value_percentage;
+
+    if (!price || isNaN(price)) {
+      setUpdateFormData((prev) => ({
+        ...prev,
+        recycle_price: null,
+      }));
+      return;
+    }
+    setUpdateFormData((prev) => ({
+      ...prev,
+      recycle_price: calculateRecyclePrice(price, discount),
+    }));
+  }, [updateFormData.price_per_unit, categoryItem?.discount_value_percentage]);
+
   useEffect(() => {
     const price = Number(formData.price_per_unit);
 
@@ -900,19 +944,17 @@ export default function rubbush_collectors() {
   useEffect(() => {
     if (formData.area_id) {
       fetchDistrictList({ area_id: formData.area_id.toString() });
-    } else {
-      setDistrictList([]);
+      return;
     }
-  }, [formData.area_id]);
 
-
-  useEffect(() => {
     if (updateFormData.area_id) {
       fetchDistrictList({ area_id: updateFormData.area_id.toString() });
-    } else {
-      setDistrictList([]);
+      return;
     }
-  }, [updateFormData.area_id]);
+    setDistrictList([]);
+  }, [formData.area_id, updateFormData.area_id]);
+
+
 
   useEffect(() => {
     if (updateFormData.district_id) {
@@ -923,6 +965,7 @@ export default function rubbush_collectors() {
       setDistrictDays([]);
     }
   }, [updateFormData.district_id]);
+
 
   useEffect(() => {
     fetchDataList();
@@ -1132,6 +1175,19 @@ export default function rubbush_collectors() {
               placeholder=" ادخل سعر الوحدة "
               isPrice={true}
             ></TextFieldNada>
+
+
+
+            <TextFieldNada
+              name="recycle_price"
+              type="number"
+              handleChange={updateFormChangeHander}
+              value={updateFormData.recycle_price ?? ""}
+              label=" سعر الوحدة ( اعادة التدوير ) "
+              placeholder=" ادخل سعر الوحدة ( اعادة التدوير )"
+              isPrice={true}
+            ></TextFieldNada>
+
             <TextFieldNada
               name="days_count"
               type="number"
